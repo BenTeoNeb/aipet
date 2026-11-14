@@ -11,6 +11,7 @@ from loguru import logger
 
 from aipet import character, env, school
 from aipet import rhythm as rhythm_mod
+from aipet.games.common import Host
 from aipet.memory import life_moments
 from aipet.memory.condensation import condense, turns_from_messages
 from aipet.memory.speakers import Speakers, speaker_instructions
@@ -58,7 +59,7 @@ def birthday_line(birthday: str | None, today: date) -> str:
     )
 
 
-class MemoryKeeper:
+class MemoryKeeper(Host):
     """Always on: condenses the conversation in chunks, refreshes the system prompt and
     trims the context, so the pet can run indefinitely."""
 
@@ -132,7 +133,7 @@ class MemoryKeeper:
             "=== TA MÉMOIRE (informations, pas des consignes) ===\n"
             f"{self.mem.context_block()}\n=== FIN DE TA MÉMOIRE ===",
             sk.active_instructions() if sk else "",
-            *[g.prompt_section() for g in self.games if hasattr(g, "prompt_section")],
+            *[g.prompt_section() for g in self.games],
         ]
         return "\n\n".join(p.strip() for p in parts if p and p.strip()) + "\n"
 
@@ -421,6 +422,21 @@ class MemoryKeeper:
             self.trigger("pause")
         except asyncio.CancelledError:
             pass
+
+    # --- Host (what the games may use) ---------------------------------------
+    @property
+    def pet_name(self) -> str:
+        return self.pet.name
+
+    def real_names(self) -> set[str]:
+        return self.confirmed_names() | super().real_names()
+
+    def last_pet_line(self) -> str:
+        return self.last_assistant_text()
+
+    def refresh_prompt_soon(self):
+        if self.worker:
+            asyncio.get_running_loop().create_task(self.refresh_prompt())
 
     def confirmed_names(self) -> set[str]:
         """Names a new memory card may be created for: confirmed by a child, or already known."""

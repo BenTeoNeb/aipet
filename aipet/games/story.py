@@ -28,17 +28,16 @@ from aipet.games.common import (
     PREPARING_NOTE,
     STALE_PREPARATION,
     UNKNOWN_PLAYER,
+    Activity,
     JsonStore,
     cancel_preparation,
     child_level,
-    current_player,
     is_stale,
     new_preparation,
     pet_intro,
     theme_key,
 )
 from aipet.memory.store import now
-from aipet.session_log import NO_LOG
 
 STORY_TOOLS = {"story_start", "story_next", "story_end"}
 STEPS_DAY, STEPS_SHORT = 5, 4  # short: evening or little ones
@@ -150,9 +149,15 @@ def generate_plan(
     return plan
 
 
-class StoryGame:
-    def __init__(self, cfg: dict, memory_root, keeper=None, slog=None):
-        self.cfg, self.root, self.keeper, self.slog = cfg, memory_root, keeper, slog or NO_LOG
+class StoryGame(Activity):
+    tools = frozenset(STORY_TOOLS)
+
+    def register_tools(self, llm) -> list:
+        return register_tools(llm, self)
+
+    def __init__(self, cfg: dict, memory_root, host=None, slog=None):
+        super().__init__(host, slog)
+        self.cfg, self.root = cfg, memory_root
         self.store = JsonStore(memory_root / "histoires" / "univers.json", {"characters": {}, "stories": []})
         self.story: dict | None = None  # the running story (also saved, to resume later)
         self.started_at: datetime | None = None
@@ -188,13 +193,7 @@ class StoryGame:
     def _real_names(self) -> set[str]:
         """Normalized names of the real people: family cards, children met, the pet."""
         names = {p.stem for p in (self.root / "famille").glob("*.md")}
-        k = self.keeper
-        if k:
-            if hasattr(k, "confirmed_names"):
-                names |= k.confirmed_names()
-            who = getattr(k, "who", None)
-            if who:
-                names |= {n for n in [who.current, *getattr(who, "present", [])] if n}
+        names |= self.host.real_names()
         try:
             names.add(character.of(self.cfg).name)
         except Exception as e:  # no pet pack: the other names still protect the children
@@ -208,8 +207,7 @@ class StoryGame:
         return key in real or bool(set(key.split()) & real)
 
     def _present(self, player: str) -> list[str]:
-        who = getattr(self.keeper, "who", None)
-        present = [n for n in [*getattr(who, "present", []), player] if n and n != UNKNOWN_PLAYER]
+        present = [n for n in [*self.host.present(), player] if n and n != UNKNOWN_PLAYER]
         return list(dict.fromkeys(present))
 
     def _guests_allowed(self, player: str, asked: bool) -> bool:
@@ -219,7 +217,7 @@ class StoryGame:
         return not any(s.get("plan", {}).get("guests") for s in mine[-(GUEST_EVERY - 1) :])
 
     async def start(self, idea: str = "", resume: bool = False, with_children: bool = False) -> dict:
-        player = current_player(self.keeper)
+        player = self.host.player()
         if resume:
             story = self.unfinished(player)
             if not story:
@@ -237,7 +235,7 @@ class StoryGame:
             self.stop()
         today = now().date()
         level = child_level(self.root, player, today) if player != UNKNOWN_PLAYER else None
-        rhythm = getattr(self.keeper, "rhythm", None)
+        rhythm = self.host.rhythm
         evening = bool(rhythm and (rhythm.is_night(now()) or rhythm.minutes_to_bedtime(now()) <= 90))
         steps = STEPS_SHORT if evening or level in LITTLE_ONES else STEPS_DAY
         who = f"{player}, en {level}" if level else (player if player != UNKNOWN_PLAYER else "un enfant de 5 à 10 ans")
@@ -366,8 +364,7 @@ class StoryGame:
 
     # ------------------------------------------------------------------ prompt and labels
     def _refresh(self):
-        if self.keeper and getattr(self.keeper, "worker", None):
-            asyncio.get_running_loop().create_task(self.keeper.refresh_prompt())
+        self.host.refresh_prompt_soon()
 
     def prompt_section(self) -> str:
         """The running story's plan, kept in the system prompt (French)."""
@@ -413,11 +410,9 @@ class StoryGame:
 def register_tools(llm, game: StoryGame) -> list:
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 
-    keeper = game.keeper
-
     async def start(params):
-        if keeper and keeper.tool_budget_exhausted():
-            await params.result_callback(keeper.TOOLS_EXHAUSTED)
+        if refused := game.budget_refused():
+            await params.result_callback(refused)
             return
         a = params.arguments
         await params.result_callback(

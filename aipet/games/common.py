@@ -10,16 +10,76 @@ from pathlib import Path
 
 from aipet import character, school
 from aipet.memory.store import _slug, _without_article, normalize_text, parse_card
+from aipet.memory.tools import TOOLS_EXHAUSTED
+from aipet.session_log import NO_LOG
 
 UNKNOWN_PLAYER = "famille"  # games played while the pet doesn't know (for sure) who is talking
 GAMES_DIR = "jeux"  # in the family memory (data)
 
 
-def current_player(keeper) -> str:
-    who = getattr(keeper, "who", None)
-    if who and who.current and who.certainty == "sure":
-        return who.current
-    return UNKNOWN_PLAYER
+class Host:
+    """What a game may use of the conversation it runs in (MemoryKeeper implements it). These
+    defaults are a game played on its own (tests, tools): nobody known for sure, no tool budget,
+    no system prompt to refresh."""
+
+    who = None  # memory.speakers.Speakers
+    rhythm = None  # rhythm.Rhythm
+    pet_name = "Toi"
+
+    def player(self) -> str:
+        """The child talking, if known for sure; else the family."""
+        who = self.who
+        if who and who.current and who.certainty == "sure":
+            return who.current
+        return UNKNOWN_PLAYER
+
+    def present(self) -> list[str]:
+        return list(self.who.present) if self.who else []
+
+    def real_names(self) -> set[str]:
+        """Children met in this conversation (beyond the family cards)."""
+        return {n for n in [self.who.current, *self.who.present] if n} if self.who else set()
+
+    def last_pet_line(self) -> str:
+        """What the pet said just before the child's last message."""
+        return ""
+
+    def tool_budget_exhausted(self) -> bool:
+        return False
+
+    def refresh_prompt_soon(self):
+        """The game's prompt section changed: send the model the new system prompt."""
+
+
+class Activity:
+    """A game whose state is kept by code, run during an activity (see its SKILL.md). The pipeline
+    builds them all (`aipet.games.make_games`) and the conversation drives them through this
+    interface only."""
+
+    tools: frozenset[str] = frozenset()  # the tool names it registers
+
+    def __init__(self, host: Host | None = None, slog=None):
+        self.host = host or Host()
+        self.slog = slog or NO_LOG
+
+    def register_tools(self, llm) -> list:
+        """Register its tools with the LLM; return their FunctionSchema."""
+        raise NotImplementedError
+
+    def on_user_message(self, text: str) -> str | None:
+        """Each new child message: a short verdict for the pet (refereed by code), or None."""
+        return None
+
+    def prompt_section(self) -> str:
+        """Its part of the system prompt while it runs (French), or ""."""
+        return ""
+
+    def stop(self):
+        """The activity ends (finished, replaced, good night…): forget the running round."""
+
+    def budget_refused(self) -> dict | None:
+        """For its tools: the answer to give when this turn already used too many tools."""
+        return TOOLS_EXHAUSTED if self.host.tool_budget_exhausted() else None
 
 
 def theme_key(theme: str) -> str:

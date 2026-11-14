@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 import pytest
 
 from aipet.games import story as story_mod
+from aipet.games.common import Host
 from aipet.games.story import STEPS_DAY, STEPS_SHORT, StoryGame
 from aipet.memory import Memory
 from aipet.rhythm import TZ, Rhythm
@@ -14,17 +15,12 @@ from aipet.rhythm import TZ, Rhythm
 
 class Who:
     def __init__(self, name):
-        self.current, self.certainty = name, "sure"
+        self.current, self.certainty, self.present = name, "sure", []
 
 
-class Keeper:
-    TOOLS_EXHAUSTED = {"error": "trop"}
-
+class Keeper(Host):
     def __init__(self, name, rhythm=None):
         self.who, self.rhythm = Who(name), rhythm
-
-    def tool_budget_exhausted(self):
-        return False
 
 
 def plan(title, steps, characters=("Plumette",)):
@@ -163,7 +159,7 @@ def test_real_people_are_guests_never_characters(env, monkeypatch):
 
     monkeypatch.setattr(story_mod, "generate_plan", mixed_plan)
     g = game(mem, "Noam")
-    g.keeper.who.present = ["Noam", "Mila"]
+    g.host.who.present = ["Noam", "Mila"]
     asyncio.run(g.start("un gâteau"))
     assert calls[-1]["guests"] == ["Noam", "Mila", "Flocon"]  # first story: guests allowed
     assert [c["name"] for c in g.story["plan"]["characters"]] == ["Piko"]

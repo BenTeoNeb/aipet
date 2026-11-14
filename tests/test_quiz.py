@@ -6,7 +6,7 @@ from datetime import date, datetime
 import pytest
 
 from aipet.games import quiz as quiz_mod
-from aipet.games.common import days_in_a_row
+from aipet.games.common import Host, days_in_a_row
 from aipet.games.quiz import Quiz
 from aipet.memory import Memory
 from aipet.rhythm import TZ
@@ -24,14 +24,9 @@ class Who:
         self.current, self.certainty = name, certainty
 
 
-class Keeper:
-    TOOLS_EXHAUSTED = {"error": "trop"}
-
+class Keeper(Host):
     def __init__(self, name):
         self.who = Who(name)
-
-    def tool_budget_exhausted(self):
-        return False
 
 
 @pytest.fixture

@@ -28,9 +28,9 @@ from aipet.games.common import (
     PREPARING_NOTE,
     STALE_PREPARATION,
     UNKNOWN_PLAYER,
+    Activity,
     cancel_preparation,
     child_level,
-    current_player,
     days_in_a_row,
     is_stale,
     new_preparation,
@@ -38,7 +38,6 @@ from aipet.games.common import (
     theme_key,
 )
 from aipet.memory.store import normalize_text, now
-from aipet.session_log import NO_LOG
 
 QUIZ_TOOLS = {"quiz_history", "quiz_start", "quiz_answer"}
 DEFAULT_QUESTIONS = 5
@@ -232,16 +231,22 @@ def generate_questions(
     return questions[:n]
 
 
-class Quiz:
+class Quiz(Activity):
+    tools = frozenset(QUIZ_TOOLS)
+
+    def register_tools(self, llm) -> list:
+        return register_tools(llm, self)
+
     """The quiz in progress (one at a time) and its tools."""
 
-    def __init__(self, cfg: dict, memory_root: Path, keeper=None, slog=None):
-        self.cfg, self.root, self.keeper, self.slog = cfg, Path(memory_root), keeper, slog or NO_LOG
+    def __init__(self, cfg: dict, memory_root: Path, host=None, slog=None):
+        super().__init__(host, slog)
+        self.cfg, self.root = cfg, Path(memory_root)
         self.store = QuizStore(self.root)
         self.game: Game | None = None
 
     def player(self) -> str:
-        return current_player(self.keeper)
+        return self.host.player()
 
     def _ev(self, type_, **kw):
         self.slog.event(type_, **kw)
@@ -338,11 +343,9 @@ def register_tools(llm, quiz: Quiz) -> list:
     """Register the quiz tools with the LLM; return their FunctionSchema."""
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 
-    keeper = quiz.keeper
-
     async def budget_ok(params) -> bool:
-        if keeper and keeper.tool_budget_exhausted():
-            await params.result_callback(keeper.TOOLS_EXHAUSTED)
+        if refused := quiz.budget_refused():
+            await params.result_callback(refused)
             return False
         return True
 

@@ -25,17 +25,16 @@ from aipet.games.common import (
     PREPARING_NOTE,
     STALE_PREPARATION,
     UNKNOWN_PLAYER,
+    Activity,
     JsonStore,
     cancel_preparation,
     child_level,
-    current_player,
     days_in_a_row,
     is_stale,
     new_preparation,
     pet_intro,
 )
 from aipet.memory.store import normalize_text, now
-from aipet.session_log import NO_LOG
 
 YES_NO_TOOLS = {"yesno_start"}
 TARGET = 15  # answers to hold to win the game
@@ -105,9 +104,15 @@ class Round:
     held: int = 0
 
 
-class YesNoGame:
-    def __init__(self, cfg: dict, memory_root, keeper=None, slog=None):
-        self.cfg, self.keeper, self.slog = cfg, keeper, slog or NO_LOG
+class YesNoGame(Activity):
+    tools = frozenset(YES_NO_TOOLS)
+
+    def register_tools(self, llm) -> list:
+        return register_tools(llm, self)
+
+    def __init__(self, cfg: dict, memory_root, host=None, slog=None):
+        super().__init__(host, slog)
+        self.cfg = cfg
         self.store = JsonStore(memory_root / GAMES_DIR / "ni_oui_ni_non.json", {"players": {}, "asked": []})
         self.root = memory_root
         self.round: Round | None = None
@@ -134,7 +139,7 @@ class YesNoGame:
     async def start(self) -> dict:
         if self.round:
             self.stop()  # a new game replaces an unfinished one
-        player = current_player(self.keeper)
+        player = self.host.player()
         hist = self.history(player)
         level = child_level(self.root, player, now().date()) if player != UNKNOWN_PLAYER else None
         asked = self.store.load().get("asked", [])[-MAX_EXCLUDED:]
@@ -242,11 +247,9 @@ class YesNoGame:
 def register_tools(llm, game: YesNoGame) -> list:
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 
-    keeper = game.keeper
-
     async def start(params):
-        if keeper and keeper.tool_budget_exhausted():
-            await params.result_callback(keeper.TOOLS_EXHAUSTED)
+        if refused := game.budget_refused():
+            await params.result_callback(refused)
             return
         await params.result_callback(await game.start())
 

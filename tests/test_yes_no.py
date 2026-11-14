@@ -6,6 +6,7 @@ from datetime import datetime
 import pytest
 
 from aipet.games import yes_no
+from aipet.games.common import Host
 from aipet.games.yes_no import TARGET, YesNoGame, forbidden_word
 from aipet.memory import Memory
 from aipet.rhythm import TZ
@@ -13,17 +14,12 @@ from aipet.rhythm import TZ
 
 class Who:
     def __init__(self, name):
-        self.current, self.certainty = name, "sure"
+        self.current, self.certainty, self.present = name, "sure", []
 
 
-class Keeper:
-    TOOLS_EXHAUSTED = {"error": "trop"}
-
+class Keeper(Host):
     def __init__(self, name):
         self.who = Who(name)
-
-    def tool_budget_exhausted(self):
-        return False
 
 
 @pytest.fixture
@@ -140,7 +136,7 @@ def test_guess_counts_questions_warns_and_stops(tmp_path, monkeypatch):
     g.start()
     for _ in range(3):
         g.on_user_message("non")
-    g.keeper.last_assistant_text = lambda: "Je crois que c'est une girafe !"
+    g.host.last_pet_line = lambda: "Je crois que c'est une girafe !"
     g.on_user_message("oui")
     g.end(found=True, answer="une girafe")
     h = g.history("Noam")
@@ -210,7 +206,7 @@ def test_guess_win_needs_a_proposal_and_a_yes(tmp_path, monkeypatch):
     class Talking(Keeper):
         said = ""
 
-        def last_assistant_text(self):
+        def last_pet_line(self):
             return self.said
 
     monkeypatch.setattr(guess, "now", lambda: datetime(2026, 11, 12, 17, 0, tzinfo=TZ))

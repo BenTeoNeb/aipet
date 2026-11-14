@@ -60,8 +60,7 @@ def build_worker(
 
     from aipet import skills
     from aipet.cleanup import SpokenTextCleaner, TranscriptFilter
-    from aipet.games import guess, learn, story, yes_no
-    from aipet.games import quiz as quiz_mod
+    from aipet.games import make_games
     from aipet.memory import MEMORY_TOOLS, Memory, MemoryKeeper, make_memory_processor, register_tools
     from aipet.turns import (
         QuietVADUserTurnStartStrategy,
@@ -113,42 +112,22 @@ def build_worker(
         wait=wait,
         slog=session_log,
     )
-    quiz = quiz_mod.Quiz(cfg, mem.root, keeper, slog=session_log)  # quiz state kept by code, saved in memory
-    yes_no_game = yes_no.YesNoGame(cfg, mem.root, keeper, slog=session_log)  # refereed by code, no model call
-    guess_game = guess.GuessGame(
-        mem.root, keeper, slog=session_log, max_questions=cfg.get("games", {}).get("guess_max_questions", 20)
-    )
-    story_game = story.StoryGame(cfg, mem.root, keeper, slog=session_log)
-    learn_game = learn.LearnGame(cfg, mem.root, keeper, slog=session_log)
-    keeper.games = [quiz, yes_no_game, guess_game, story_game, learn_game]
+    keeper.games = make_games(cfg, mem.root, keeper, slog=session_log)
     stt, llm, tts = make_stt(cfg, mem.known_names()), make_llm(cfg, keeper.system_prompt()), make_tts(cfg)
+    base_tools = MEMORY_TOOLS | skills.SKILL_TOOLS
     tools = ToolsSchema(
         standard_tools=[
             *register_tools(llm, mem, keeper).standard_tools,
             *skills.register_tools(llm, keeper.skills, keeper),
-            *quiz_mod.register_tools(llm, quiz),
-            *yes_no.register_tools(llm, yes_no_game),
-            *guess.register_tools(llm, guess_game),
-            *story.register_tools(llm, story_game),
-            *learn.register_tools(llm, learn_game),
+            *(schema for game in keeper.games for schema in game.register_tools(llm)),
         ]
     )
     # Every tool is registered and checked; the model only receives the base tools plus those of the
     # running activity (declared in its SKILL.md), to keep each request light and choices clear.
     keeper.tool_schemas = {t.name: t for t in tools.standard_tools}
-    keeper.base_tools = set(MEMORY_TOOLS | skills.SKILL_TOOLS)
+    keeper.base_tools = set(base_tools)
     keeper.apply_tools(())
-    check_safety(
-        tools,
-        keeper.system_prompt(),
-        MEMORY_TOOLS
-        | skills.SKILL_TOOLS
-        | quiz_mod.QUIZ_TOOLS
-        | yes_no.YES_NO_TOOLS
-        | guess.GUESS_TOOLS
-        | story.STORY_TOOLS
-        | learn.LEARN_TOOLS,
-    )
+    check_safety(tools, keeper.system_prompt(), base_tools.union(*(game.tools for game in keeper.games)))
     rc = cfg.get("responsiveness", {})
 
     @llm.event_handler("on_completion_timeout")

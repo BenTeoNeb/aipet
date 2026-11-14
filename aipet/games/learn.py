@@ -23,17 +23,16 @@ from aipet.games.common import (
     PREPARING_NOTE,
     STALE_PREPARATION,
     UNKNOWN_PLAYER,
+    Activity,
     JsonStore,
     cancel_preparation,
     child_level,
-    current_player,
     is_stale,
     new_preparation,
     pet_intro,
     theme_key,
 )
 from aipet.memory.store import _slug, now, parse_card
-from aipet.session_log import NO_LOG
 
 LEARN_TOOLS = {"learn_suggest", "learn_start", "learn_next", "learn_end"}
 START_LEVEL = 3  # relative to the class: 3 = « de son niveau »
@@ -103,9 +102,15 @@ def generate_lesson(cfg: dict, topic: str, domain: str, who: str, level: int, se
     return plan
 
 
-class LearnGame:
-    def __init__(self, cfg: dict, memory_root, keeper=None, slog=None):
-        self.cfg, self.root, self.keeper, self.slog = cfg, memory_root, keeper, slog or NO_LOG
+class LearnGame(Activity):
+    tools = frozenset(LEARN_TOOLS)
+
+    def register_tools(self, llm) -> list:
+        return register_tools(llm, self)
+
+    def __init__(self, cfg: dict, memory_root, host=None, slog=None):
+        super().__init__(host, slog)
+        self.cfg, self.root = cfg, memory_root
         self.store = JsonStore(memory_root / GAMES_DIR / "apprendre.json", {"players": {}})
         self.lesson: dict | None = None
 
@@ -117,7 +122,7 @@ class LearnGame:
 
     # ------------------------------------------------------------------ suggest
     def suggest(self) -> dict:
-        player = current_player(self.keeper)
+        player = self.host.player()
         p = self.store.load()["players"].get(player, {})
         card_likes, school_now = [], []
         card = self.root / "famille" / f"{_slug(player)}.md"
@@ -145,7 +150,7 @@ class LearnGame:
         topic, domain = (topic or "").strip(), (domain or "").strip()
         if not topic:
             return {"error": "Demande d'abord ce qu'il veut découvrir."}
-        player = current_player(self.keeper)
+        player = self.host.player()
         data = self.store.load()
         p = data["players"].get(player, {})
         level = p.get("domains", {}).get(theme_key(domain), {}).get("level", START_LEVEL) if domain else START_LEVEL
@@ -238,8 +243,7 @@ class LearnGame:
 
     # ------------------------------------------------------------------ prompt and labels
     def _refresh(self):
-        if self.keeper and getattr(self.keeper, "worker", None):
-            asyncio.get_running_loop().create_task(self.keeper.refresh_prompt())
+        self.host.refresh_prompt_soon()
 
     def prompt_section(self) -> str:
         les = self.lesson
@@ -273,11 +277,9 @@ class LearnGame:
 def register_tools(llm, game: LearnGame) -> list:
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 
-    keeper = game.keeper
-
     async def budget_ok(params) -> bool:
-        if keeper and keeper.tool_budget_exhausted():
-            await params.result_callback(keeper.TOOLS_EXHAUSTED)
+        if refused := game.budget_refused():
+            await params.result_callback(refused)
             return False
         return True
 

@@ -6,6 +6,7 @@ from datetime import datetime
 import pytest
 
 from aipet.games import learn as learn_mod
+from aipet.games.common import Host
 from aipet.games.learn import START_LEVEL, LearnGame
 from aipet.memory import Memory
 from aipet.rhythm import TZ
@@ -13,17 +14,12 @@ from aipet.rhythm import TZ
 
 class Who:
     def __init__(self, name):
-        self.current, self.certainty = name, "sure"
+        self.current, self.certainty, self.present = name, "sure", []
 
 
-class Keeper:
-    TOOLS_EXHAUSTED = {"error": "trop"}
-
+class Keeper(Host):
     def __init__(self, name):
         self.who = Who(name)
-
-    def tool_budget_exhausted(self):
-        return False
 
 
 def lesson(title, n=3):

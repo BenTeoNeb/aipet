@@ -17,9 +17,8 @@ from dataclasses import dataclass
 
 from loguru import logger
 
-from aipet.games.common import GAMES_DIR, JsonStore, current_player
+from aipet.games.common import GAMES_DIR, Activity, JsonStore
 from aipet.memory.store import normalize_text, now
-from aipet.session_log import NO_LOG
 
 GUESS_TOOLS = {"guess_start", "guess_end"}
 MAX_QUESTIONS = 20
@@ -56,9 +55,15 @@ class GuessRound:
     last_reply: str = ""  # the child's latest message
 
 
-class GuessGame:
-    def __init__(self, memory_root, keeper=None, slog=None, max_questions: int = MAX_QUESTIONS):
-        self.keeper, self.slog, self.max_questions = keeper, slog or NO_LOG, max_questions
+class GuessGame(Activity):
+    tools = frozenset(GUESS_TOOLS)
+
+    def register_tools(self, llm) -> list:
+        return register_tools(llm, self)
+
+    def __init__(self, memory_root, host=None, slog=None, max_questions: int = MAX_QUESTIONS):
+        super().__init__(host, slog)
+        self.max_questions = max_questions
         self.store = JsonStore(memory_root / GAMES_DIR / "devine.json", {"players": {}})
         self.round: GuessRound | None = None
 
@@ -79,7 +84,7 @@ class GuessGame:
         return out
 
     def start(self) -> dict:
-        player = current_player(self.keeper)
+        player = self.host.player()
         self.round = GuessRound(player, self.max_questions)
         logger.info(f"🔮 Guess game for {player} (max {self.max_questions} questions)")
         self.slog.event("guess_start", player=player)
@@ -154,7 +159,7 @@ class GuessGame:
         return bool(words) and bool(words & answer_words(self.round.last_reply))
 
     def _win_confirmed(self, answer: str) -> bool:
-        pet_said = self.keeper.last_assistant_text() if hasattr(self.keeper, "last_assistant_text") else ""
+        pet_said = self.host.last_pet_line()
         return confirms_guess(answer, pet_said, self.round.last_reply)
 
     def _record(self, found: bool, answer: str) -> dict:
@@ -171,7 +176,7 @@ class GuessGame:
         return {
             "found": bool(found),
             "questions": r.count,
-            "score": f"{getattr(getattr(self.keeper, 'pet', None), 'name', 'Toi')} {h['pet_found']} – {r.player} {h['child_won']}",
+            "score": f"{self.host.pet_name} {h['pet_found']} – {r.player} {h['child_won']}",
             "note": "Félicite l'enfant (surtout s'il t'a battu), dis le score de vos parties, propose une revanche.",
         }
 
@@ -183,11 +188,9 @@ class GuessGame:
 def register_tools(llm, game: GuessGame) -> list:
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 
-    keeper = game.keeper
-
     async def start(params):
-        if keeper and keeper.tool_budget_exhausted():
-            await params.result_callback(keeper.TOOLS_EXHAUSTED)
+        if refused := game.budget_refused():
+            await params.result_callback(refused)
             return
         await params.result_callback(game.start())
 
