@@ -105,6 +105,20 @@ def test_no_filler_when_reply_arrives(make):
     asyncio.run(run())
 
 
+def test_no_filler_after_the_sleeping_pets_zzz(make):
+    """Seen in a real session: asleep, the pet answered « zzz » then « Attends, je réfléchis… »."""
+
+    async def run():
+        t = make(turns.ThinkingFiller, after=0.05, deadline=0.1)
+        await t.process_frame(UserStoppedSpeakingFrame(), D.DOWNSTREAM)
+        await t.process_frame(TTSSpeakFrame("Zzz… Flocon fait dodo…", append_to_context=False), D.DOWNSTREAM)
+        await asyncio.sleep(0.2)
+        spoken = [f.text for f, _ in t.out if isinstance(f, TTSSpeakFrame)]
+        assert spoken == ["Zzz… Flocon fait dodo…"]  # passed on, nothing added (no filler, no apology)
+
+    asyncio.run(run())
+
+
 def test_turn_abandoned_when_nothing_arrives(make):
     async def run():
         t = make(turns.ThinkingFiller, after=10, deadline=0.05)

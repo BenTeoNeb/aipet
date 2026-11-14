@@ -243,6 +243,11 @@ class ThinkingFiller(FrameProcessor):
             self._start()
         elif isinstance(frame, FunctionCallInProgressFrame) and direction == FrameDirection.DOWNSTREAM:
             self._start(tool=True)  # the waiting phrase was said; the tool may take a while
+        elif isinstance(frame, TTSSpeakFrame) and direction == FrameDirection.DOWNSTREAM:
+            # Someone upstream already answers this turn without the model (the sleeping pet's
+            # « zzz », an apology): no « Hmm, je réfléchis… » after it. Our own lines never come
+            # through here (pushed from this processor).
+            self._cancel()
         elif isinstance(frame, (LLMTextFrame, UserStartedSpeakingFrame, InterruptionFrame)):
             # The reply is arriving (even "[silence]"), or the child speaks again. Not on
             # BotStartedSpeaking: our own "Hmm" must not cancel the deadline.

@@ -183,7 +183,7 @@ class SleepGate(FrameProcessor):
                 self._last_line = line
                 logger.info(f"😴 Asleep ({reason}): sleepy reply")
                 if self._slog:
-                    self._slog.event("sleepy_reply", reason=reason)
+                    self._slog.event("sleepy_reply", reason=reason, text=line)
                 await self.push_frame(TTSSpeakFrame(line, append_to_context=False))
                 return
         await self.push_frame(frame, direction)

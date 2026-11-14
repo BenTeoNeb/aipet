@@ -119,6 +119,8 @@ def thread(events: list[dict], pet: Character) -> list[dict]:
                     items.append({"kind": "pet", "t": e["t"], "text": "", "silent": True, "emotions": []})
                 continue
             items.append({"kind": "pet", "t": e["t"], "text": text, "emotions": emotions})
+        elif t == "sleepy_reply" and e.get("text"):
+            items.append({"kind": "pet", "t": e["t"], "text": e["text"], "emotions": [], "asleep": True})
         elif t == "filler_spoken":
             items.append({"kind": "pet", "t": e["t"], "text": e.get("text", ""), "filler": True, "emotions": []})
         elif m := _marker(e, pet):
