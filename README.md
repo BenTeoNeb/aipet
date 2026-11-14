@@ -123,7 +123,7 @@ flowchart LR
     mic([🎙️ Microphone]) --> wake[Wake word<br/>local]
     wake --> stt[Speech<br/>recognition]
     stt --> filter[Transcript filter<br/>short-reply keeper]
-    filter --> mem[Memory<br/>& labels]
+    filter --> mem[Conversation<br/>labels & memory]
     mem --> llm[Conversation model<br/>+ tools & games]
     llm --> tags[Emotion & control<br/>tags removed]
     tags --> tts[Voice]
@@ -137,6 +137,13 @@ Built on [Pipecat](https://github.com/pipecat-ai/pipecat). The main pieces:
 - **Engines** ([`aipet/engines.py`](aipet/engines.py)): one provider and model per role (speech
   recognition, conversation, preparation of stories and quizzes, memory condensation, voice). No
   other module knows about providers.
+- **Conversation** ([`aipet/conversation.py`](aipet/conversation.py)): between the child's words and
+  the model, it labels each message (who speaks, short hints such as « bientôt l'heure de dormir »),
+  keeps the system prompt current and reacts to the pet's control tags. It coordinates small parts
+  that each own one concern: speakers, sleep and goodbyes ([`sleep.py`](aipet/sleep.py)), presence,
+  the tools sent to the model ([`tool_gate.py`](aipet/tool_gate.py)), memory condensation and the
+  activities. [`session.py`](aipet/session.py) runs one conversation from start to end (web page or
+  Pi), and [`hangup.py`](aipet/hangup.py) lets the pet end it by itself.
 - **Memory** ([`aipet/memory/`](aipet/memory/)): conversations are condensed into per-child cards,
   daily memories, the pet's own life and a summary that stays in the prompt; the pet can search and
   read its memory with tools. Each pet's data lives in `~/.aipet/pets/<id>/`.
@@ -165,9 +172,13 @@ aipet/
   character.py                  character packs (load and check)
   prompts.py                    system prompt (French) and startup safety check
   pipeline.py                   pipeline shared by the web and headless modes
+  session.py, hangup.py         one conversation's lifecycle; the pet hanging up by itself
+  conversation.py               labels, system prompt, control tags (coordinates the parts below)
+  sleep.py, presence.py         sleep, good night and goodbye; when each child last talked
+  tool_gate.py                  tools sent to the model, per-turn budget
   engines.py                    speech recognition, models and voice providers
-  memory/                       store, condensation, tools, speakers, keeper, « Ma vie » moments
-  games/                        quiz, yes/no, guess, story, learn
+  memory/                       store, condensation (keeper), tools, speakers, « Ma vie » moments
+  games/                        quiz, yes/no, guess, story, learn (common.py: Activity, Host)
   skills.py, builtin_skills/    SKILL.md activities
   rhythm.py, energy.py          time, school calendar, tiredness
   turns.py, cleanup.py          turn-taking, transcript and spoken-text filters

@@ -76,7 +76,7 @@ def _jsonable(obj):
 async def debug_state():
     cfg = load_config()
     ctx = SESSION.get("context")
-    keeper = SESSION.get("keeper")
+    conversation = SESSION.get("conversation")
     return {
         "engines": engines.describe(cfg),
         "listening": cfg.get("listening", {}),
@@ -84,12 +84,12 @@ async def debug_state():
             "active": ctx is not None,
             "since": SESSION.get("started"),
         },
-        "system_prompt": keeper.system_prompt() if keeper else build_system_prompt(cfg),
-        "speakers": keeper.who.state() if keeper else None,
-        "skills": (keeper.skills if keeper and keeper.skills else skills.Skills.from_config(cfg)).state(),
-        "energy": _energy(keeper).snapshot() if cfg.get("energy", {}).get("enabled", True) else None,
-        "asleep": keeper.sleep_reason() if keeper else _asleep_outside_session(cfg),
-        "condensation": keeper.last if keeper else None,
+        "system_prompt": conversation.system_prompt() if conversation else build_system_prompt(cfg),
+        "speakers": conversation.who.state() if conversation else None,
+        "skills": (conversation.skills if conversation else skills.Skills.from_config(cfg)).state(),
+        "energy": _energy(conversation).snapshot() if cfg.get("energy", {}).get("enabled", True) else None,
+        "asleep": conversation.sleep.reason() if conversation else _asleep_outside_session(cfg),
+        "condensation": conversation.memory.last if conversation else None,
         "context": [_jsonable(x) for x in ctx.get_messages(truncate_large_values=True)] if ctx else [],
     }
 
@@ -179,11 +179,15 @@ async def debug_memory_delete(path: str, x_pet: str | None = Header(None), origi
 @app.post("/debug/memory/condense", include_in_schema=False)
 async def debug_memory_condense(x_pet: str | None = Header(None), origin: str | None = Header(None)):
     _guard(x_pet, origin)
-    keeper = SESSION.get("keeper")
-    if keeper is None:
+    conversation = SESSION.get("conversation")
+    if conversation is None:
         return {"ok": False, "reason": "no session"}
-    changed = await keeper.checkpoint("manual")
-    return {"ok": keeper.last.get("error") is None, "changes": changed, "error": keeper.last.get("error")}
+    changed = await conversation.memory.checkpoint("manual")
+    return {
+        "ok": conversation.memory.last.get("error") is None,
+        "changes": changed,
+        "error": conversation.memory.last.get("error"),
+    }
 
 
 def _asleep_outside_session(cfg: dict) -> str | None:
@@ -194,10 +198,10 @@ def _asleep_outside_session(cfg: dict) -> str | None:
     return "night" if Rhythm.from_config(cfg).is_night(datetime.now(TZ)) else None
 
 
-def _energy(keeper) -> Energy:
+def _energy(conversation) -> Energy:
     """The live energy counter during a session, else the saved one (read from disk)."""
-    if keeper and keeper.energy:
-        return keeper.energy
+    if conversation and conversation.sleep.energy:
+        return conversation.sleep.energy
     ec = load_config().get("energy", {})
     return Energy(ec.get("talk_minutes", 20), ec.get("recharge_minutes", 30), ec.get("wake_up_at", 0.5),
                   state_file=STATE_DIR / "energy.json")  # fmt: skip
@@ -206,7 +210,7 @@ def _energy(keeper) -> Energy:
 @app.post("/debug/energy/recharge", include_in_schema=False)
 async def debug_energy_recharge(x_pet: str | None = Header(None), origin: str | None = Header(None)):
     _guard(x_pet, origin)
-    energy = _energy(SESSION.get("keeper"))
+    energy = _energy(SESSION.get("conversation"))
     energy.recharge()
     return {"ok": True, **energy.snapshot()}
 
@@ -217,9 +221,9 @@ async def debug_reset(x_pet: str | None = Header(None), origin: str | None = Hea
     ctx = SESSION.get("context")
     if ctx is None:
         return {"ok": False, "reason": "no session"}
-    keeper = SESSION.get("keeper")
-    if keeper:
-        keeper.reset_context()
+    conversation = SESSION.get("conversation")
+    if conversation:
+        conversation.reset_context()
     else:
         ctx.set_messages([])
     return {"ok": True}
@@ -251,7 +255,7 @@ async def parents_day(d: str | None = None):
     cfg = load_config()
     pet = character.of(cfg)
     digest = parents.day_digest(_day(d), pet)
-    energy = _energy(SESSION.get("keeper")).snapshot() if cfg.get("energy", {}).get("enabled", True) else None
+    energy = _energy(SESSION.get("conversation")).snapshot() if cfg.get("energy", {}).get("enabled", True) else None
     return {**digest, "pet": pet.name, "energy": energy, "asleep": _asleep_outside_session(cfg)}
 
 
@@ -292,9 +296,9 @@ async def memory_edit(request: Request):
         res = parents.edit(_memory(), str(body.get("path", "")), body.get("change") or {})
     except ValueError as e:
         return {"ok": False, "reason": str(e)}
-    keeper = SESSION.get("keeper")
-    if keeper:  # the running pet sees the correction right away
-        await keeper.refresh_prompt()
+    conversation = SESSION.get("conversation")
+    if conversation:  # the running pet sees the correction right away
+        await conversation.refresh_prompt()
     return res
 
 
@@ -359,7 +363,7 @@ async def bot(runner_args: RunnerArguments):
         params=TransportParams(audio_in_enabled=True, audio_out_enabled=True),
     )
     session = WebSession(transport, mute_while_speaking=False)
-    SESSION.update(context=session.context, keeper=session.keeper, started=time.time())
+    SESSION.update(context=session.context, conversation=session.conversation, started=time.time())
 
     @transport.event_handler("on_client_connected")
     async def on_client_connected(transport, client):

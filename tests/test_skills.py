@@ -10,7 +10,8 @@ import pytest
 from pipecat.processors.aggregators.llm_context import LLMContext
 
 from aipet import config, memory, prompts, skills
-from aipet.memory import Memory, MemoryKeeper
+from aipet.conversation import Conversation
+from aipet.memory import Memory
 from aipet.skills import Skills, read_skill
 
 
@@ -31,7 +32,7 @@ def sk(tmp_path):
 
 @pytest.fixture
 def keeper(tmp_path, sk):
-    k = MemoryKeeper(Memory(tmp_path / "mem"), {"memory": {}}, LLMContext(), "BASE", max_turns=99)
+    k = Conversation(Memory(tmp_path / "mem"), {"memory": {}}, LLMContext(), "BASE", max_turns=99)
     k.skills = sk
     return k
 
@@ -154,7 +155,7 @@ def test_automatic_end(keeper):
 def test_end_after_long_pause(keeper):
     async def go():
         keeper.skills.use("quiz")
-        keeper.last_activity = memory.now() - timedelta(minutes=keeper.forget_after_min + 1)
+        keeper.sleep.last_activity = memory.now() - timedelta(minutes=keeper.forget_after_min + 1)
         await keeper.on_wake()
         assert keeper.skills.active is None
         keeper.skills.use("quiz")
@@ -168,7 +169,7 @@ def test_end_after_long_pause(keeper):
 def test_tools(keeper):
     async def go():
         llm = FakeLLM()
-        schemas = skills.register_tools(llm, keeper.skills, keeper)
+        schemas = skills.register_tools(llm, keeper)
         assert {s.name for s in schemas} == skills.SKILL_TOOLS
         refreshed = []
 
@@ -187,13 +188,13 @@ def test_tools(keeper):
 def test_budget_shared_with_memory_tools(keeper):
     async def go():
         llm = FakeLLM()
-        skills.register_tools(llm, keeper.skills, keeper)
+        skills.register_tools(llm, keeper)
 
         async def refresh():
             pass
 
         keeper.refresh_prompt = refresh
-        keeper.tool_calls = memory.MAX_TOOLS_PER_TURN
+        keeper.tools.calls = memory.MAX_TOOLS_PER_TURN
         res = await call(llm, "use_skill", name="quiz")
         assert res == memory.TOOLS_EXHAUSTED and keeper.skills.active is None
 
@@ -235,32 +236,32 @@ def test_tools_follow_the_running_activity(keeper, tmp_path):
         "---\nname: jeu\ndescription: Un jeu.\ntools: outil_jeu, outil_fantome\n---\nJoue.\n"
     )
     names = ["search_memory", "use_skill", "end_skill", "outil_jeu", "outil_quiz"]
-    keeper.tool_schemas = {n: schema(n) for n in names}
-    keeper.base_tools = {"search_memory", "use_skill", "end_skill"}
+    keeper.tools.schemas = {n: schema(n) for n in names}
+    keeper.tools.base = {"search_memory", "use_skill", "end_skill"}
 
     def sent():
         return {t.name for t in keeper.context.tools.standard_tools}
 
-    keeper.apply_tools(())
-    assert sent() == keeper.base_tools
+    keeper.tools.apply(())
+    assert sent() == keeper.tools.base
 
     async def go():
         llm = FakeLLM()
-        skills.register_tools(llm, keeper.skills, keeper)
+        skills.register_tools(llm, keeper)
 
         async def refresh():
             pass
 
         keeper.refresh_prompt = refresh
         await call(llm, "use_skill", name="jeu")
-        assert sent() == keeper.base_tools | {"outil_jeu"}  # unknown « outil_fantome » ignored
+        assert sent() == keeper.tools.base | {"outil_jeu"}  # unknown « outil_fantome » ignored
         await call(llm, "end_skill")
-        assert sent() == keeper.base_tools
+        assert sent() == keeper.tools.base
         await call(llm, "use_skill", name="jeu")
         keeper.on_sleep()  # a short sleep keeps the activity and its tools
-        assert sent() == keeper.base_tools | {"outil_jeu"}
+        assert sent() == keeper.tools.base | {"outil_jeu"}
         keeper.reset_context()  # a reset ends them
-        assert sent() == keeper.base_tools
+        assert sent() == keeper.tools.base
 
     asyncio.run(go())
 
@@ -276,7 +277,7 @@ def test_switching_activity_stops_the_previous_game(keeper):
 
     async def go():
         llm = FakeLLM()
-        skills.register_tools(llm, keeper.skills, keeper)
+        skills.register_tools(llm, keeper)
 
         async def refresh():
             pass

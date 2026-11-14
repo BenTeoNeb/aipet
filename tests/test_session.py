@@ -56,6 +56,6 @@ def test_open_pause_and_close(tmp_path, monkeypatch):
         await s.close("shutdown")
         await s.close("shutdown")  # once only
         assert events(second).count("session_end") == (2 if second == first else 1)
-        assert s.keeper.worker is None  # no prompt refresh after the end
+        assert s.conversation._worker is None  # no prompt refresh after the end
 
     asyncio.run(go())

@@ -15,7 +15,7 @@ def build_system_prompt(cfg: dict) -> str:
 
     Sections (in order): identity and persona (from the character pack), speaking aloud,
     understanding the child, tags, rules that never change. Speakers, memory and skills sections
-    are appended by MemoryKeeper.
+    are appended by conversation.Conversation.
     """
     pet = character.of(cfg)
     g = pet.g

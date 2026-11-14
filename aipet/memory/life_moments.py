@@ -6,8 +6,12 @@ Once per conversation, at a calm moment, the code suggests one such question in 
 from __future__ import annotations
 
 import re
+from pathlib import Path
 
-from aipet.memory.store import LIFE_CHOSEN, LIFE_WORDS, normalize_text
+from loguru import logger
+
+from aipet.memory.store import LIFE_CHOSEN, LIFE_FILE, LIFE_WORDS, normalize_text, parse_life
+from aipet.session_log import NO_LOG
 
 MIN_CHILD_MESSAGES = 3  # not right away: first the child says what it came for
 # Words that don't tell two undecided things apart (« ta couleur préférée » / « ton jeu préféré »).
@@ -43,3 +47,31 @@ def life_question(child: str, undecided: list[str], collection_ask: str, life: d
     if collection_ask:
         return f"{intro} : demande à {child} {collection_ask}"
     return ""
+
+
+class LifeMoments:
+    """Counts the child's messages in a conversation and suggests at most one « ma vie » moment."""
+
+    def __init__(self, memory_root: Path, pet, slog=None):
+        self.root, self.pet, self.slog = Path(memory_root), pet, slog or NO_LOG
+        self.child_messages = 0
+        self.asked = False
+
+    def new_conversation(self):
+        self.child_messages, self.asked = 0, False
+
+    def child_spoke(self):
+        self.child_messages += 1
+
+    def hint(self, child: str | None, calm: bool) -> str:
+        """The French hint for the label of this message, or "" (not now)."""
+        if self.asked or self.child_messages < MIN_CHILD_MESSAGES or not child or not calm:
+            return ""
+        p = self.root / LIFE_FILE
+        life = parse_life(p.read_text()) if p.exists() else {}
+        hint = life_question(child, list(self.pet.undecided), self.pet.collection_ask, life)
+        if hint:
+            self.asked = True
+            logger.info(f"🐾 « Ma vie » moment suggested to the pet for {child}")
+            self.slog.event("life_moment", child=child)
+        return hint

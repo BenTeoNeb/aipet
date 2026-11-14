@@ -5,8 +5,9 @@ import types
 
 import pytest
 
-from aipet import cleanup, config, memory, prompts, session_log
+from aipet import cleanup, config, memory, prompts
 from aipet.cleanup import clean_spoken, valid_transcript
+from aipet.tool_gate import ToolGate
 
 
 @pytest.mark.parametrize(
@@ -69,15 +70,14 @@ def test_filter_drops_without_calling_the_model(monkeypatch):
 
 def test_tool_budget_per_turn(tmp_path):
     mem = memory.Memory(tmp_path)
-    keeper = types.SimpleNamespace(tool_calls=0, slog=session_log.NO_LOG)
-    keeper.tool_budget_exhausted = lambda: memory.MemoryKeeper.tool_budget_exhausted(keeper)
+    gate = ToolGate(context=None)
     handlers = {}
 
     class FakeLLM:
         def register_function(self, name, handler):
             handlers[name] = handler
 
-    memory.register_tools(FakeLLM(), mem, keeper)
+    memory.register_tools(FakeLLM(), mem, gate.exhausted)
     results = []
 
     class P:

@@ -6,7 +6,8 @@ import pytest
 from pipecat.processors.aggregators.llm_context import LLMContext
 
 from aipet import character, memory
-from aipet.memory import Memory, MemoryKeeper, condensation, parse_card, store, tools
+from aipet.conversation import Conversation
+from aipet.memory import Memory, condensation, parse_card, store, tools
 
 CFG = {"memory": {}, "engines": {}}
 
@@ -185,7 +186,7 @@ def test_history_edited_by_hand(mem):
 
 def keeper_with(mem, n_user=3, keep=4):
     ctx = LLMContext()
-    k = MemoryKeeper(mem, CFG, ctx, "base", keep=keep, max_turns=99)
+    k = Conversation(mem, CFG, ctx, "base", keep=keep, max_turns=99)
     for i in range(n_user):
         ctx.add_message({"role": "user", "content": f"message {i}"})
         k.tag_last_user_message()
@@ -203,7 +204,7 @@ def test_notes_taken_during_condensation_are_not_lost(mem, monkeypatch):
 
     monkeypatch.setattr(condensation, "_call_llm", slow)
     k, _ = keeper_with(mem)
-    asyncio.run(k.checkpoint("test"))
+    asyncio.run(k.memory.checkpoint("test"))
     left = (mem.root / "a_trier.md").read_text()
     assert "chien" in left and "lapin" not in left
 
@@ -219,7 +220,7 @@ def test_no_double_condensation(mem, monkeypatch):
     k, _ = keeper_with(mem)
 
     async def both():
-        await asyncio.gather(k.checkpoint("a"), k.checkpoint("b"))
+        await asyncio.gather(k.memory.checkpoint("a"), k.memory.checkpoint("b"))
 
     asyncio.run(both())
     assert len(calls) == 1
@@ -231,17 +232,17 @@ def test_failure_keeps_the_chunk_and_does_not_duplicate(mem, monkeypatch):
 
     monkeypatch.setattr(condensation, "_call_llm", boom)
     k, _ = keeper_with(mem)
-    asyncio.run(k.checkpoint("x"))
-    assert k.done == 0 and not list((mem.root / "conversations").glob("*"))
-    assert k.last["error"] and k.last["reason"] == "x"
+    asyncio.run(k.memory.checkpoint("x"))
+    assert k.memory.done == 0 and not list((mem.root / "conversations").glob("*"))
+    assert k.memory.last["error"] and k.memory.last["reason"] == "x"
 
 
 def test_trim_starts_on_a_user_message(mem, monkeypatch):
     monkeypatch.setattr(condensation, "_call_llm", lambda c, p: update())
     k, ctx = keeper_with(mem, n_user=10, keep=5)
-    asyncio.run(k.checkpoint("x"))
+    asyncio.run(k.memory.checkpoint("x"))
     msgs = ctx.get_messages()
-    assert msgs[0]["role"] == "user" and len(msgs) <= 6 and k.done == len(msgs)
+    assert msgs[0]["role"] == "user" and len(msgs) <= 6 and k.memory.done == len(msgs)
 
 
 def test_reset_during_condensation(mem, monkeypatch):
@@ -252,10 +253,10 @@ def test_reset_during_condensation(mem, monkeypatch):
         return update()
 
     monkeypatch.setattr(condensation, "_call_llm", during)
-    asyncio.run(k.checkpoint("x"))
-    assert k.done == 0 and ctx.get_messages() == []
+    asyncio.run(k.memory.checkpoint("x"))
+    assert k.memory.done == 0 and ctx.get_messages() == []
     ctx.add_message({"role": "user", "content": "nouveau"})
-    assert memory.turns_from_messages(ctx.get_messages()[k.done :])
+    assert memory.turns_from_messages(ctx.get_messages()[k.memory.done :])
 
 
 def test_label_with_date_and_speaker(mem):
@@ -400,7 +401,7 @@ def test_empty_life_update_writes_nothing(mem):
 def test_birthday_line():
     from datetime import date
 
-    from aipet.memory.keeper import birthday_line
+    from aipet.conversation import birthday_line
 
     assert birthday_line(None, date(2026, 11, 11)) == ""
     assert "tout premier jour" in birthday_line("2026-11-11", date(2026, 11, 11))
@@ -460,13 +461,15 @@ def make_keeper(mem, monkeypatch, when):
 
     from pipecat.processors.aggregators.llm_context import LLMContext
 
+    from aipet import conversation, presence, sleep
     from aipet.memory import keeper as keeper_mod
     from aipet.rhythm import TZ, Rhythm
 
     clock = {"t": dt(*when, tzinfo=TZ)}
-    monkeypatch.setattr(keeper_mod, "now", lambda: clock["t"])
-    k = MemoryKeeper(mem, CFG, LLMContext(), "BASE")
-    k.rhythm = Rhythm(holidays=[])
+    for mod in (keeper_mod, conversation, presence, sleep):  # the conversation's clock
+        monkeypatch.setattr(mod, "now", lambda: clock["t"])
+    k = Conversation(mem, CFG, LLMContext(), "BASE")
+    k.sleep.rhythm = Rhythm(holidays=[])
     return k, clock
 
 
@@ -477,17 +480,17 @@ def test_presence_snapshot_and_lines(mem, monkeypatch):
     from aipet.rhythm import TZ
 
     k, clock = make_keeper(mem, monkeypatch, (2026, 11, 12, 18, 0))
-    assert k.presence_lines() == "C'est la toute première fois qu'on te parle."
+    assert k.presence.lines() == "C'est la toute première fois qu'on te parle."
     k.who.set("Mila", "sure", [])
     k.context.add_message({"role": "user", "content": "Coucou Flocon"})
     k.tag_last_user_message()
     clock["t"] = dt(2026, 11, 13, 17, 0, tzinfo=TZ)
     asyncio.run(k.on_wake())  # new session: snapshot of « last time »
-    lines = k.presence_lines()
+    lines = k.presence.lines()
     assert "hier soir" in lines and "Mila : hier soir" in lines
     assert "presence.json" in (mem.root / ".gitignore").read_text()
     clock["t"] += timedelta(minutes=5)
-    assert "Mila : hier soir" in k.presence_lines()  # stays the session snapshot
+    assert "Mila : hier soir" in k.presence.lines()  # stays the session snapshot
 
 
 def test_sleep_reason_night_with_bedtime_grace(mem, monkeypatch):
@@ -496,17 +499,17 @@ def test_sleep_reason_night_with_bedtime_grace(mem, monkeypatch):
     from aipet.rhythm import TZ
 
     k, clock = make_keeper(mem, monkeypatch, (2026, 11, 12, 20, 25))  # Thursday, bedtime 20:30
-    k.last_activity = clock["t"]
-    assert k.sleep_reason() is None
-    assert "bientôt l'heure de dormir (20h30)" in k.turn_hint()
+    k.sleep.last_activity = clock["t"]
+    assert k.sleep.reason() is None
+    assert "bientôt l'heure de dormir (20h30)" in " · ".join(k.sleep.hints())
     clock["t"] = dt(2026, 11, 12, 20, 33, tzinfo=TZ)  # just after bedtime, still talking: grace
-    k.last_activity = clock["t"]
-    assert k.sleep_reason() is None and "dis bonne nuit" in k.turn_hint()
+    k.sleep.last_activity = clock["t"]
+    assert k.sleep.reason() is None and "dis bonne nuit" in " · ".join(k.sleep.hints())
     clock["t"] = dt(2026, 11, 12, 20, 45, tzinfo=TZ)  # grace over
-    assert k.sleep_reason() == "night"
+    assert k.sleep.reason() == "night"
     clock["t"] = dt(2026, 11, 13, 3, 0, tzinfo=TZ)
-    k.last_activity = clock["t"]
-    assert k.sleep_reason() == "night"
+    k.sleep.last_activity = clock["t"]
+    assert k.sleep.reason() == "night"
 
 
 def test_energy_hints_and_nap(mem, monkeypatch):
@@ -526,14 +529,16 @@ def test_energy_hints_and_nap(mem, monkeypatch):
         def asleep(self):
             return self._s == "asleep"
 
-    k.energy = FakeEnergy("tired")
-    assert "tu commences à être fatigué" in k.turn_hint()
-    k.energy = FakeEnergy("very_tired")
-    assert "dis au revoir joyeusement" in k.turn_hint() and "reste avec lui" in k.turn_hint()
-    k.energy = FakeEnergy("asleep")
-    assert k.sleep_reason() == "nap"
+    k.sleep.energy = FakeEnergy("tired")
+    assert "tu commences à être fatigué" in " · ".join(k.sleep.hints())
+    k.sleep.energy = FakeEnergy("very_tired")
+    assert "dis au revoir joyeusement" in " · ".join(k.sleep.hints()) and "reste avec lui" in " · ".join(
+        k.sleep.hints()
+    )
+    k.sleep.energy = FakeEnergy("asleep")
+    assert k.sleep.reason() == "nap"
     k.context.add_message({"role": "user", "content": "Coucou"})
-    k.energy = FakeEnergy("very_tired")
+    k.sleep.energy = FakeEnergy("very_tired")
     k.tag_last_user_message()
     assert "très fatigué" in k.context.get_messages()[-1]["content"].split("⟧")[0]
 
@@ -603,19 +608,19 @@ def test_condensation_backs_off_then_gives_up_and_moves_on(mem, monkeypatch):
 
     monkeypatch.setattr(condensation, "_call_llm", boom)
     k, ctx = keeper_with(mem)
-    asyncio.run(k.checkpoint("turns"))
-    assert k._failures == 1 and k._retry_after is not None
+    asyncio.run(k.memory.checkpoint("turns"))
+    assert k.memory._failures == 1 and k.memory._retry_after is not None
     calls = []
-    monkeypatch.setattr(k, "checkpoint", lambda reason: calls.append(reason))
-    k.trigger("turns")
+    monkeypatch.setattr(k.memory, "checkpoint", lambda reason: calls.append(reason))
+    k.memory.trigger("turns")
     assert calls == []  # backing off: not retried at every message
     monkeypatch.undo()
     monkeypatch.setattr(condensation, "_call_llm", boom)
     for _ in range(keeper_mod.MAX_CONDENSE_FAILURES - 1):
-        asyncio.run(k.checkpoint("manual"))
-    assert k.done == len(ctx.get_messages()) or k.done > 0  # gave up: context can shrink
+        asyncio.run(k.memory.checkpoint("manual"))
+    assert k.memory.done == len(ctx.get_messages()) or k.memory.done > 0  # gave up: context can shrink
     assert list((mem.root / "conversations").glob("*.jsonl"))  # raw transcript kept
-    assert k._failures == 0
+    assert k.memory._failures == 0
 
 
 @pytest.mark.parametrize(
@@ -624,7 +629,7 @@ def test_condensation_backs_off_then_gives_up_and_moves_on(mem, monkeypatch):
      ("je veux pas faire dodo", False), ("pas encore dormir", False), ("un doudou là", False), ("Oui.", False)],
 )  # fmt: skip
 def test_says_goodnight(text, yes):
-    from aipet.memory.keeper import says_goodnight
+    from aipet.sleep import says_goodnight
 
     assert says_goodnight(text) is yes
 
@@ -636,18 +641,18 @@ def test_goodnight_ends_the_activity_then_the_pet_sleeps(mem, monkeypatch):
 
     k, clock = make_keeper(mem, monkeypatch, (2026, 11, 12, 20, 19))  # Thursday, bedtime 20:30
     ended = []
-    k.end_skill = lambda reason: ended.append(reason)
+    k.end_activity = lambda reason: ended.append(reason)
     k.context.add_message({"role": "user", "content": "Non non, dodo là."})
     k.tag_last_user_message()
     label = k.context.get_messages()[-1]["content"]
     assert ended == ["goodnight"] and "dis-lui bonne nuit" in label and "sans rien proposer" in label
-    assert k.sleep_reason() is None  # this turn: Flocon says good night
+    assert k.sleep.reason() is None  # this turn: Flocon says good night
     k.context.add_message({"role": "assistant", "content": "Bonne nuit Mila !"})
     k.context.add_message({"role": "user", "content": "Flocon ?"})
     k.tag_last_user_message()
-    assert k.sleep_reason() == "night"  # from the next message, asleep until morning
+    assert k.sleep.reason() == "night"  # from the next message, asleep until morning
     clock["t"] = dt(2026, 11, 13, 7, 31, tzinfo=TZ)
-    assert k.sleep_reason() is None
+    assert k.sleep.reason() is None
 
 
 def test_goodnight_in_the_daytime_does_not_put_the_pet_to_sleep(mem, monkeypatch):
@@ -656,4 +661,4 @@ def test_goodnight_in_the_daytime_does_not_put_the_pet_to_sleep(mem, monkeypatch
     k.tag_last_user_message()
     k.context.add_message({"role": "user", "content": "coucou"})
     k.tag_last_user_message()
-    assert k.sleep_reason() is None and k.asleep_until is None
+    assert k.sleep.reason() is None and k.sleep.asleep_until is None

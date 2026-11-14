@@ -4,15 +4,11 @@ from __future__ import annotations
 
 import asyncio
 import re
-from typing import TYPE_CHECKING
+from collections.abc import Callable
 
 from loguru import logger
 
 from aipet.memory.store import SEARCH_KINDS, STOPWORDS, Memory, normalize_text
-
-if TYPE_CHECKING:  # type hint only (keeper imports this module)
-    from aipet.memory.keeper import MemoryKeeper
-
 
 # --------------------------------------------------------------------------
 # Tools for the model
@@ -43,11 +39,9 @@ MEMORY_TOOLS = {"search_memory", "read_memory", "forget"}
 TOOLS_EXHAUSTED = {"error": "Tu as déjà beaucoup cherché pour ce tour : réponds maintenant avec ce que tu sais."}
 
 
-def register_tools(llm, mem: Memory, keeper: MemoryKeeper | None = None):
-    """Register the memory tools with the LLM; returns the ToolsSchema for the context."""
-
-    def budget_exhausted() -> bool:
-        return keeper.tool_budget_exhausted() if keeper else False
+def register_tools(llm, mem: Memory, budget_exhausted: Callable[[], bool] = lambda: False):
+    """Register the memory tools with the LLM; returns the ToolsSchema for the context.
+    `budget_exhausted` counts each call against the per-turn tool budget (tool_gate.ToolGate)."""
 
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
     from pipecat.adapters.llm.schemas.tools_schema import ToolsSchema

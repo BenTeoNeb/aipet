@@ -6,6 +6,7 @@ from pipecat.frames.frames import LLMContextFrame, TTSSpeakFrame, UserStartedSpe
 from pipecat.processors.aggregators.llm_context import LLMContext
 from pipecat.processors.frame_processor import FrameDirection
 
+from aipet.conversation import Conversation
 from aipet.energy import NAP_LINES, NIGHT_LINES, Energy, SleepGate
 
 
@@ -163,12 +164,12 @@ def test_the_sleepy_reply_is_marked_for_the_hang_up():
 def test_goodbye_hangs_up_unless_the_child_goes_on(tmp_path):
     from pipecat.processors.aggregators.llm_context import LLMContext as Ctx
 
-    from aipet.memory import Memory, MemoryKeeper
+    from aipet.memory import Memory
 
-    k = MemoryKeeper(Memory(tmp_path, "Flocon"), {"memory": {}}, Ctx(), "BASE")
-    assert k.hang_up_reason() is None
+    k = Conversation(Memory(tmp_path, "Flocon"), {"memory": {}}, Ctx(), "BASE")
+    assert k.sleep.hang_up_reason() is None
     asyncio.run(k.on_tag("fin"))  # « [joie] [fin] À bientôt ! »
-    assert k.hang_up_reason() == "goodbye"
+    assert k.sleep.hang_up_reason() == "goodbye"
     k.context.add_message({"role": "user", "content": "Attends, encore une question !"})
     k.tag_last_user_message()
-    assert k.hang_up_reason() is None
+    assert k.sleep.hang_up_reason() is None

@@ -60,8 +60,9 @@ def build_worker(
 
     from aipet import skills
     from aipet.cleanup import SpokenTextCleaner, TranscriptFilter
+    from aipet.conversation import Conversation
     from aipet.games import make_games
-    from aipet.memory import MEMORY_TOOLS, Memory, MemoryKeeper, make_memory_processor, register_tools
+    from aipet.memory import MEMORY_TOOLS, Memory, register_tools
     from aipet.turns import (
         QuietVADUserTurnStartStrategy,
         ShortReplyKeeper,
@@ -98,36 +99,32 @@ def build_worker(
         slog=session_log,
         queue=lambda frames: worker.queue_frames(frames),  # the worker is built below
     )
-    keeper = MemoryKeeper(
+    conversation = Conversation(
         mem,
         cfg,
         context,
         build_system_prompt(cfg),
-        pause_secs=mc.get("condense_after_pause_secs", 25),
-        max_turns=mc.get("condense_every_turns", 8),
-        keep=mc.get("kept_messages", 12),
         skills=skill_set,
         rhythm=Rhythm.from_config(cfg),  # sense of time: part of the system prompt
         energy=energy,
         wait=wait,
+        games=lambda host: make_games(cfg, mem.root, host, slog=session_log),
         slog=session_log,
+        pause_secs=mc.get("condense_after_pause_secs", 25),
+        max_turns=mc.get("condense_every_turns", 8),
+        keep=mc.get("kept_messages", 12),
     )
-    keeper.games = make_games(cfg, mem.root, keeper, slog=session_log)
-    stt, llm, tts = make_stt(cfg, mem.known_names()), make_llm(cfg, keeper.system_prompt()), make_tts(cfg)
+    stt, llm, tts = make_stt(cfg, mem.known_names()), make_llm(cfg, conversation.system_prompt()), make_tts(cfg)
     base_tools = MEMORY_TOOLS | skills.SKILL_TOOLS
     tools = ToolsSchema(
         standard_tools=[
-            *register_tools(llm, mem, keeper).standard_tools,
-            *skills.register_tools(llm, keeper.skills, keeper),
-            *(schema for game in keeper.games for schema in game.register_tools(llm)),
+            *register_tools(llm, mem, conversation.tool_budget_exhausted).standard_tools,
+            *skills.register_tools(llm, conversation),
+            *(schema for game in conversation.games for schema in game.register_tools(llm)),
         ]
     )
-    # Every tool is registered and checked; the model only receives the base tools plus those of the
-    # running activity (declared in its SKILL.md), to keep each request light and choices clear.
-    keeper.tool_schemas = {t.name: t for t in tools.standard_tools}
-    keeper.base_tools = set(base_tools)
-    keeper.apply_tools(())
-    check_safety(tools, keeper.system_prompt(), base_tools.union(*(game.tools for game in keeper.games)))
+    conversation.tools.register(tools.standard_tools, base_tools)
+    check_safety(tools, conversation.system_prompt(), base_tools.union(*(game.tools for game in conversation.games)))
     rc = cfg.get("responsiveness", {})
 
     @llm.event_handler("on_completion_timeout")
@@ -165,8 +162,8 @@ def build_worker(
     )
 
     async def protect_sad_moments(emotion: str):
-        if keeper.energy and emotion in ("triste", "calin"):
-            keeper.energy.protect()  # never fall asleep in the middle of a sad moment
+        if energy and emotion in ("triste", "calin"):
+            energy.protect()  # never fall asleep in the middle of a sad moment
 
     steps = [
         transport.input(),
@@ -176,10 +173,10 @@ def build_worker(
         *keep_short,
         SilenceNudge(  # in an activity, a missed answer gets one « tu m'as répondu ? »
             lambda: (
-                bool(keeper.skills and keeper.skills.active)
-                and not keeper.sleep_reason()
+                bool(conversation.skills.active)
+                and not conversation.sleep.reason()
                 # only when the pet is waiting for an answer (not after « bonne nuit ! »)
-                and "?" in keeper.last_assistant_text(before_child=False).rstrip()[-100:]
+                and "?" in conversation.last_assistant_text(before_child=False).rstrip()[-100:]
                 and getattr(gate, "awake", True)
             ),
             lc.get("nudge_after_silence_secs", 12),
@@ -187,16 +184,23 @@ def build_worker(
             lines=pet.lines["nudges"],
         ),
         user_agg,
-        make_memory_processor(keeper),
+        conversation.processor(),  # labels each turn, condenses during pauses
         SleepGate(  # asleep: sleepy line, no model call
-            keeper.sleep_reason,
-            keeper.energy,
+            conversation.sleep.reason,
+            energy,
             slog=session_log,
             nap_lines=pet.lines["nap"],
             night_lines=pet.lines["night"],
         ),
         *(
-            [HangUp(keeper.hang_up_reason, on_hang_up, after=ec.get("hang_up_after_secs", 8), slog=session_log)]
+            [
+                HangUp(
+                    conversation.sleep.hang_up_reason,
+                    on_hang_up,
+                    after=ec.get("hang_up_after_secs", 8),
+                    slog=session_log,
+                )
+            ]
             if on_hang_up and ec.get("hang_up", True)
             else []
         ),
@@ -211,7 +215,7 @@ def build_worker(
             apology=pet.lines["apology"],
         ),
         SpokenTextCleaner(),  # no markdown/emojis spoken aloud
-        EmotionTagFilter(on_tag=keeper.on_tag),
+        EmotionTagFilter(on_tag=conversation.on_tag),
         tts,
         transport.output(),
         EmotionEmitter(on_emotion=protect_sad_moments),
@@ -225,5 +229,5 @@ def build_worker(
         idle_timeout_secs=None,
         observers=[SessionObserver(session_log)] if session_log else [],
     )
-    keeper.llm, keeper.worker = llm, worker  # to refresh the system prompt
-    return worker, context, keeper
+    conversation.bind(llm, worker)  # to refresh the system prompt
+    return worker, context, conversation

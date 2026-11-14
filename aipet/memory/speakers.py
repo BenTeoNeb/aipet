@@ -45,7 +45,7 @@ CERTAINTY_FR = {"sure": "sûr", "probable": "probable", "unknown": "inconnu"}
 class Speakers:
     """Who is speaking: current speaker, people present, names waiting for confirmation."""
 
-    def __init__(self, pet_name: str = "", slog=None):
+    def __init__(self, pet_name: str = "", known=None, slog=None):
         self.pet_name = pet_name  # never a child's name (« c'est Flocon »)
         self.current: str | None = None
         self.certainty = "unknown"  # "sure" | "probable" | "unknown"
@@ -53,7 +53,7 @@ class Speakers:
         self.previous: str | None = None
         self.history: list[dict] = []
         self.slog = slog or NO_LOG
-        self.known = lambda: []  # names from the cards (set by MemoryKeeper)
+        self.known = known or list  # () -> names from the family cards
         self.confirmed: set[str] = set()  # names confirmed while the pet is running
         self.to_confirm: dict[str, str | None] = {}  # name -> known name it resembles
 

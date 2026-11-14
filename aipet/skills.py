@@ -172,32 +172,21 @@ class Skills:
 SKILL_TOOLS = {"use_skill", "end_skill"}
 
 
-def register_tools(llm, skills: Skills, keeper=None) -> list:
-    """Register both tools with the LLM; return their FunctionSchema."""
+def register_tools(llm, conversation) -> list:
+    """Register both tools with the LLM (they act on conversation.Conversation); return their
+    FunctionSchema."""
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 
+    from aipet.memory.tools import TOOLS_EXHAUSTED
+
     async def use(params):
-        if keeper and keeper.tool_budget_exhausted():
-            await params.result_callback(keeper.TOOLS_EXHAUSTED)
+        if conversation.tool_budget_exhausted():
+            await params.result_callback(TOOLS_EXHAUSTED)
             return
-        previous = skills.active
-        res = skills.use(params.arguments.get("name", ""))
-        if keeper and "skill" in res and previous and previous != res["skill"]:
-            keeper.stop_games()  # the previous activity's game must not keep refereeing
-        if keeper and "skill" in res:  # before the result: the next inference already has the tools
-            keeper.apply_tools(skills.all()[res["skill"]].tools)
-        if keeper and "skill" in res:
-            await keeper.refresh_prompt()  # the instructions stay even if the history is trimmed
-        await params.result_callback(res)
+        await params.result_callback(await conversation.use_skill(params.arguments.get("name", "")))
 
     async def end(params):
-        res = skills.end()
-        if keeper:
-            keeper.stop_games()  # an unfinished game keeps its result
-            keeper.apply_tools(())
-        if keeper and "skill_ended" in res:
-            await keeper.refresh_prompt()
-        await params.result_callback(res)
+        await params.result_callback(await conversation.end_skill())
 
     llm.register_function("use_skill", use)
     llm.register_function("end_skill", end)

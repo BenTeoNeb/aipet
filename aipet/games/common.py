@@ -18,7 +18,7 @@ GAMES_DIR = "jeux"  # in the family memory (data)
 
 
 class Host:
-    """What a game may use of the conversation it runs in (MemoryKeeper implements it). These
+    """What a game may use of the conversation it runs in (conversation.Conversation implements it). These
     defaults are a game played on its own (tests, tools): nobody known for sure, no tool budget,
     no system prompt to refresh."""
 

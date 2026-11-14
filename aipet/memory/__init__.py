@@ -4,11 +4,12 @@
 - `condensation`: the model turns conversation chunks into structured updates.
 - `tools`: search_memory / read_memory / forget, exposed to the model.
 - `speakers`: who is talking (first names confirmed before being used).
-- `keeper`: labels messages, trims the context and condenses continuously.
+- `keeper`: condenses the conversation continuously and trims the context.
+- `life_moments`: the « ma vie » moments (the pet's own life, chosen by the children).
 """
 
 from aipet.memory.condensation import SCHEMA, condense, turns_from_messages
-from aipet.memory.keeper import MemoryKeeper, make_memory_processor
+from aipet.memory.keeper import MemoryKeeper
 from aipet.memory.speakers import Speakers
 from aipet.memory.store import Memory, now, parse_card, render_card, spoken_date
 from aipet.memory.tools import MAX_TOOLS_PER_TURN, MEMORY_TOOLS, TOOLS_EXHAUSTED, register_tools
@@ -22,7 +23,6 @@ __all__ = [
     "MemoryKeeper",
     "Speakers",
     "condense",
-    "make_memory_processor",
     "now",
     "parse_card",
     "register_tools",

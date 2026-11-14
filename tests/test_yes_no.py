@@ -5,6 +5,7 @@ from datetime import datetime
 
 import pytest
 
+from aipet.conversation import Conversation
 from aipet.games import yes_no
 from aipet.games.common import Host
 from aipet.games.yes_no import TARGET, YesNoGame, forbidden_word
@@ -95,8 +96,6 @@ def test_stop_keeps_the_result_and_days(game):
 def test_keeper_adds_the_verdict_to_the_label(tmp_path):
     from pipecat.processors.aggregators.llm_context import LLMContext
 
-    from aipet.memory import MemoryKeeper
-
     class FakeGame:
         def on_user_message(self, text):
             return f"verdict pour « {text} »"
@@ -104,7 +103,7 @@ def test_keeper_adds_the_verdict_to_the_label(tmp_path):
         def stop(self):
             self.stopped = True
 
-    k = MemoryKeeper(Memory(tmp_path), {"memory": {}}, LLMContext(), "BASE")
+    k = Conversation(Memory(tmp_path), {"memory": {}}, LLMContext(), "BASE")
     fake = FakeGame()
     k.games = [fake]
     k.context.add_message({"role": "user", "content": "Peut-être"})
@@ -112,7 +111,7 @@ def test_keeper_adds_the_verdict_to_the_label(tmp_path):
     assert "verdict pour « Peut-être »⟧ Peut-être" in k.context.get_messages()[-1]["content"]
     k.tag_last_user_message()  # already labelled: not refereed twice
     assert k.context.get_messages()[-1]["content"].count("verdict") == 1
-    k.end_skill("test")
+    k.end_activity("test")
     assert fake.stopped
 
 

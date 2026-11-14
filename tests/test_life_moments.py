@@ -4,7 +4,8 @@ asks a child to choose something for it or to feed its collection (no network)."
 from pipecat.processors.aggregators.llm_context import LLMContext
 
 from aipet import character
-from aipet.memory import Memory, MemoryKeeper
+from aipet.conversation import Conversation
+from aipet.memory import Memory
 from aipet.memory.life_moments import life_question, still_undecided
 from aipet.memory.store import LIFE_CHOSEN, LIFE_WORDS
 
@@ -29,7 +30,7 @@ def test_choices_and_collection_take_turns():
 
 
 def keeper(tmp_path):
-    k = MemoryKeeper(Memory(tmp_path, "Flocon"), {"memory": {}}, LLMContext(), "BASE")
+    k = Conversation(Memory(tmp_path, "Flocon"), {"memory": {}}, LLMContext(), "BASE")
     k.who.current, k.who.certainty = "Mila", "sure"
     return k
 
@@ -57,7 +58,7 @@ def test_not_during_an_activity_nor_for_an_unsure_child(tmp_path):
 
     k.skills = Busy()
     assert not any("ma vie" in say(k, f"m{i}") for i in range(4))
-    k.skills = None
+    Busy.active = None
     k.who.certainty = "probable"
     assert "ma vie" not in say(k, "m5")
     k.who.certainty = "sure"
