@@ -24,7 +24,19 @@ from datetime import datetime
 from loguru import logger
 
 from aipet import character, engines
-from aipet.games.common import UNKNOWN_PLAYER, JsonStore, child_level, current_player, pet_intro, theme_key
+from aipet.games.common import (
+    PREPARING_NOTE,
+    STALE_PREPARATION,
+    UNKNOWN_PLAYER,
+    JsonStore,
+    cancel_preparation,
+    child_level,
+    current_player,
+    is_stale,
+    new_preparation,
+    pet_intro,
+    theme_key,
+)
 from aipet.memory.store import now
 
 STORY_TOOLS = {"story_start", "story_next", "story_end"}
@@ -230,6 +242,7 @@ class StoryGame:
         steps = STEPS_SHORT if evening or level in LITTLE_ONES else STEPS_DAY
         who = f"{player}, en {level}" if level else (player if player != UNKNOWN_PLAYER else "un enfant de 5 à 10 ans")
         past = [s["title"] for s in self.store.load()["stories"]][-15:]
+        prep = new_preparation(self)
         present = self._present(player)
         guests = None
         if present and self._guests_allowed(player, with_children):
@@ -246,6 +259,8 @@ class StoryGame:
             return {
                 "error": "L'histoire n'a pas pu être préparée : raconte-en une simple toi-même, ou propose autre chose."
             }
+        if is_stale(self, prep):
+            return STALE_PREPARATION
         if len(plan.get("steps", [])) < 3:
             return {"error": "Plan incomplet : raconte une histoire simple toi-même."}
         real = self._real_names()
@@ -307,6 +322,7 @@ class StoryGame:
 
     def stop(self):
         """The activity ends mid-story: it stays unfinished, to be resumed another time."""
+        cancel_preparation(self)
         if self.story:
             self._save_story(self.story)
             self._ev("story_paused", title=self.story["title"], step=self.story["step"])
@@ -420,14 +436,15 @@ def register_tools(llm, game: StoryGame) -> list:
             game.end(a.get("reaction", ""), a.get("favourite_characters"), a.get("character_updates"))
         )
 
-    llm.register_function("story_start", start)
+    llm.register_function("story_start", start, cancel_on_interruption=False)  # see PREPARING_NOTE
     llm.register_function("story_next", nxt)
     llm.register_function("story_end", end)
     return [
         FunctionSchema(
             name="story_start",
             description="Prépare une histoire : écrit son plan (monde, personnages, étapes, fin) d'après l'idée de "
-            "l'enfant, avec des personnages récurrents qu'il aime. resume=true pour reprendre l'histoire pas finie.",
+            "l'enfant, avec des personnages récurrents qu'il aime. resume=true pour reprendre l'histoire pas finie."
+            + PREPARING_NOTE,
             properties={
                 "idea": {
                     "type": "string",

@@ -344,11 +344,12 @@
     setTimeout(glance, 2600 + Math.random() * 3600);
   })();
 
+  let sleepNote = "";  // set when the pet hung up because it fell asleep
   function setState(s) {
     document.body.dataset.state = s === "connecting" ? "thinking" : s;
     face();
     status.textContent = {
-      idle: "Appuie sur le bouton pour commencer",
+      idle: sleepNote || "Appuie sur le bouton pour commencer",
       connecting: `${name} se réveille…`,
       listening: `${name} t'écoute !`,
       thinking: `${name} réfléchit…`,
@@ -398,6 +399,7 @@
   }
 
   async function start() {
+    sleepNote = "";
     toggle.disabled = true; setState("connecting");
     client = new PipecatClient({
       transport: new SmallWebRTCTransport(),
@@ -412,7 +414,10 @@
           // The emotion lingers after the last sentence, then the cat becomes attentive again.
           clearTimeout(mood.fade); mood.fade = setTimeout(() => setEmotion(null), 2600);
         },
-        onServerMessage: (m) => { if (m?.type === "emotion") setEmotion(m.emotion); },
+        onServerMessage: (m) => {
+          if (m?.type === "emotion") setEmotion(m.emotion);
+          if (m?.type === "hang_up") hangUp(m.reason);
+        },
         onUserTranscript: (d) => {
           onUserTranscript(d);
           ev("user", d.final ? "transcription" : "partielle", d.text, d.final ? "" : "interim");
@@ -456,6 +461,15 @@
   }
 
   async function stop() { const c = client; stopUI(); if (c) await c.disconnect(); }
+
+  // The pet fell asleep: it hangs up, and the page says when to come back.
+  async function hangUp(reason) {
+    ev("bot", "raccroche", reason === "nap" ? "sieste" : "nuit");
+    sleepNote = reason === "nap"
+      ? `${name} fait une petite sieste… reviens un peu plus tard 💤`
+      : `${name} dort. À demain matin ! 💤`;
+    await stop();
+  }
 
 
   // ======================= Debug =======================

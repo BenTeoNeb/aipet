@@ -181,3 +181,58 @@ def test_real_people_are_guests_never_characters(env, monkeypatch):
     # … unless the child asks.
     asyncio.run(g.start("moi en pirate", with_children=True))
     assert calls[-1]["guests"] == ["Noam", "Mila", "Flocon"]
+
+
+def test_a_preparation_stopped_meanwhile_starts_nothing(env, monkeypatch):
+    """Preparations are asynchronous (a child talking no longer cancels them): one whose activity
+    was stopped, or replaced by a newer start, must not start it when its plan arrives."""
+    import threading
+
+    mem, calls, clock = env
+    release = threading.Event()
+
+    def slow_plan(*a, **kw):
+        release.wait(2)
+        return plan("Lente", STEPS_DAY)
+
+    monkeypatch.setattr(story_mod, "generate_plan", slow_plan)
+    g = game(mem)
+
+    async def run():
+        task = asyncio.create_task(g.start("un loup gentil"))
+        await asyncio.sleep(0.05)
+        g.stop()  # the activity ends while the plan is being written
+        release.set()
+        return await task
+
+    res = asyncio.run(run())
+    assert res.get("cancelled") and g.story is None
+    release.clear()
+    res = asyncio.run(_two_starts(g, release))
+    assert g.story["title"] == "Lente" and res[0].get("cancelled") and "title" in res[1]
+
+
+async def _two_starts(g, release):
+    first = asyncio.create_task(g.start("un loup"))
+    await asyncio.sleep(0.05)
+    second = asyncio.create_task(g.start("un loup et une petite fille"))  # the newer one wins
+    await asyncio.sleep(0.05)
+    release.set()
+    return await asyncio.gather(first, second)
+
+
+def test_preparation_tools_are_asynchronous():
+    from aipet.games import learn, quiz, yes_no
+
+    seen = {}
+
+    class LLM:
+        def register_function(self, name, handler, **kw):
+            seen[name] = kw.get("cancel_on_interruption", True)
+
+    for mod in (story_mod, quiz, learn, yes_no):
+        mod.register_tools(LLM(), type("G", (), {"keeper": None})())
+    assert {n: seen[n] for n in ("story_start", "quiz_start", "learn_start", "yesno_start")} == dict.fromkeys(
+        ("story_start", "quiz_start", "learn_start", "yesno_start"), False
+    )
+    assert seen["story_next"] is True and seen["quiz_answer"] is True

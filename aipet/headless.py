@@ -49,6 +49,12 @@ async def main(use_wake: bool, input_device: int | None, output_device: int | No
         if use_wake
         else None
     )
+
+    async def hang_up(reason: str):
+        """The pet sleeps: back to waiting for the wake word (it answers « zzz » if woken at night)."""
+        if gate and gate.awake:
+            gate._sleep()
+
     # Microphone without automatic gain: low volume threshold so speech is detected.
     worker, context, keeper = build_worker(
         transport,
@@ -58,6 +64,7 @@ async def main(use_wake: bool, input_device: int | None, output_device: int | No
         min_volume=a.get("mic_min_volume", 0.2),
         gate=gate,
         session_log=slog,
+        on_hang_up=hang_up,
     )
     if gate:
         # One session log = one wake-up, until sleep (and the condensation that follows).

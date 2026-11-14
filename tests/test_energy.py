@@ -108,3 +108,48 @@ def test_sleep_gate():
     assert [f.text for f in nap if isinstance(f, TTSSpeakFrame)][0] in NAP_LINES
     night = run_gate("night")
     assert [f.text for f in night if isinstance(f, TTSSpeakFrame)][0] in NIGHT_LINES
+
+
+def test_the_sleeping_pet_hangs_up():
+    """Seen in a real session: after « bonne nuit » the pet slept but the call stayed open, and the
+    child kept talking to a « zzz »."""
+    from pipecat.frames.frames import BotStartedSpeakingFrame, BotStoppedSpeakingFrame
+
+    state = {"asleep": None, "going": None}
+    hung = []
+
+    async def hang_up(reason):
+        hung.append(reason)
+
+    gate = SleepGate(lambda: state["asleep"], energy=None, on_hang_up=hang_up,
+                     hang_up_reason=lambda: state["going"] or state["asleep"], hang_up_after=0.05)  # fmt: skip
+
+    async def push(frame, direction=FrameDirection.DOWNSTREAM):
+        pass
+
+    gate.push_frame = push
+    send = lambda f: SleepGate.process_frame(gate, f, FrameDirection.DOWNSTREAM)  # noqa: E731
+
+    async def go():
+        await send(BotStoppedSpeakingFrame())  # awake: the conversation goes on
+        await asyncio.sleep(0.1)
+        assert hung == []
+        state["going"] = "night"  # « bonne nuit » said
+        await send(BotStoppedSpeakingFrame())
+        await send(UserStartedSpeakingFrame())  # the child answers « bonne nuit » in time…
+        await asyncio.sleep(0.1)
+        assert hung == []
+        state["asleep"] = "night"  # …and gets a « zzz », then the pet hangs up at once
+        await send(LLMContextFrame(LLMContext()))
+        await send(BotStartedSpeakingFrame())
+        await send(BotStoppedSpeakingFrame())
+        await asyncio.sleep(1.1)
+        assert hung == ["night"]
+        state.update(asleep=None, going=None)  # a parent recharged it meanwhile: no hang-up
+        state["going"] = "nap"
+        await send(BotStoppedSpeakingFrame())
+        state["going"] = None
+        await asyncio.sleep(0.1)
+        assert hung == ["night"]
+
+    asyncio.run(go())

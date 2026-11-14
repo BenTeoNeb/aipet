@@ -25,10 +25,15 @@ from loguru import logger
 from aipet import engines
 from aipet.games.common import (
     GAMES_DIR,
+    PREPARING_NOTE,
+    STALE_PREPARATION,
     UNKNOWN_PLAYER,
+    cancel_preparation,
     child_level,
     current_player,
     days_in_a_row,
+    is_stale,
+    new_preparation,
     pet_intro,
     theme_key,
 )
@@ -252,6 +257,7 @@ class Quiz:
         player = self.player()
         level = child_level(self.root, player, now().date()) if player != UNKNOWN_PLAYER else None
         difficulty = self.store.difficulty(player, theme)
+        prep = new_preparation(self)
         try:
             questions = await asyncio.to_thread(
                 generate_questions, self.cfg, theme, level, self.store.asked(theme), count, difficulty
@@ -259,6 +265,8 @@ class Quiz:
         except Exception as e:
             logger.warning(f"Quiz preparation failed: {e}")
             return {"error": "Le quiz n'a pas pu être préparé. Propose un autre jeu ou réessaie plus tard."}
+        if is_stale(self, prep):
+            return STALE_PREPARATION
         if len(questions) < 3:
             return {"error": "Pas assez de nouvelles questions sur ce thème : propose un autre thème."}
         self.game = Game(player, theme, level, questions, difficulty=difficulty)
@@ -279,6 +287,7 @@ class Quiz:
 
     def stop(self):
         """Activity ended, sleep, reset: an unfinished quiz is dropped."""
+        cancel_preparation(self)
         self.game = None
 
     def answer(self, correct: bool, question_number: int | None = None) -> dict:
@@ -351,7 +360,7 @@ def register_tools(llm, quiz: Quiz) -> list:
         await params.result_callback(quiz.answer(bool(a.get("correct")), a.get("question_number")))
 
     llm.register_function("quiz_history", history)
-    llm.register_function("quiz_start", start)
+    llm.register_function("quiz_start", start, cancel_on_interruption=False)  # see PREPARING_NOTE
     llm.register_function("quiz_answer", answer)
     # Model-facing descriptions (French).
     return [
@@ -365,7 +374,7 @@ def register_tools(llm, quiz: Quiz) -> list:
         FunctionSchema(
             name="quiz_start",
             description="Prépare un vrai quiz sur le thème choisi (questions nouvelles, adaptées à l'enfant) et "
-            "renvoie la première question.",
+            "renvoie la première question." + PREPARING_NOTE,
             properties={
                 "theme": {"type": "string", "description": "le thème choisi, ex. « les animaux de la mer »"},
                 "count": {"type": "integer", "description": "nombre de questions (5 par défaut)"},

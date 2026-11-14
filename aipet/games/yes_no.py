@@ -22,11 +22,16 @@ from loguru import logger
 from aipet import engines
 from aipet.games.common import (
     GAMES_DIR,
+    PREPARING_NOTE,
+    STALE_PREPARATION,
     UNKNOWN_PLAYER,
     JsonStore,
+    cancel_preparation,
     child_level,
     current_player,
     days_in_a_row,
+    is_stale,
+    new_preparation,
     pet_intro,
 )
 from aipet.memory.store import normalize_text, now
@@ -133,6 +138,7 @@ class YesNoGame:
         hist = self.history(player)
         level = child_level(self.root, player, now().date()) if player != UNKNOWN_PLAYER else None
         asked = self.store.load().get("asked", [])[-MAX_EXCLUDED:]
+        prep = new_preparation(self)
         try:
             questions = await asyncio.to_thread(
                 generate_questions, self.cfg, player, level, hist["difficulty"], asked, QUESTIONS_PREPARED
@@ -140,6 +146,8 @@ class YesNoGame:
         except Exception as e:
             logger.warning(f"Ni oui ni non preparation failed: {e}")
             return {"error": "Le jeu n'a pas pu être préparé. Propose un autre jeu ou réessaie plus tard."}
+        if is_stale(self, prep):
+            return STALE_PREPARATION
         if len(questions) < 5:
             return {"error": "Pas assez de nouvelles questions : propose un autre jeu."}
         self.round = Round(player, hist["difficulty"], questions)
@@ -196,6 +204,7 @@ class YesNoGame:
 
     def stop(self):
         """The game ends without a winner or loser (activity ended, sleep…): keep its result."""
+        cancel_preparation(self)
         if self.round and self.round.held:
             self._finish(lost_on=None, stopped=True)
         self.round = None
@@ -241,12 +250,12 @@ def register_tools(llm, game: YesNoGame) -> list:
             return
         await params.result_callback(await game.start())
 
-    llm.register_function("yesno_start", start)
+    llm.register_function("yesno_start", start, cancel_on_interruption=False)  # see PREPARING_NOTE
     return [
         FunctionSchema(
             name="yesno_start",
             description="Prépare une partie de « ni oui ni non » (questions pièges adaptées à l'enfant) et renvoie "
-            "son record et la première question. Ensuite, l'arbitrage se fait tout seul.",
+            "son record et la première question. Ensuite, l'arbitrage se fait tout seul." + PREPARING_NOTE,
             properties={},
             required=[],
         )

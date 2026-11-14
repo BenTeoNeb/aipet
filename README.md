@@ -44,7 +44,7 @@ bedtime, and who never pretends to be alive. aipet is that friend, designed with
   interactive stories with recurring characters, and short discovery lessons adapted to the child's
   school level, with scores and records per child.
 - **A sense of time.** The pet knows the time of day, school days and school holidays, gets tired
-  after a while, naps, and sleeps at night.
+  after a while, naps, and sleeps at night — and then hangs up, so the conversation really ends.
 - **Natural turn-taking.** Short answers are kept while the pet talks, a « hmm… » covers slow replies,
   noise and speech not meant for the pet are ignored.
 - **A parents' space** to see who talked to the pet and about what, review the moments worth a look,
@@ -143,7 +143,11 @@ Built on [Pipecat](https://github.com/pipecat-ai/pipecat). The main pieces:
   only their one-line descriptions are always in the prompt, the full instructions and tools load
   when the activity starts. Families can add their own in `~/.aipet/skills/`.
 - **Games** ([`aipet/games/`](aipet/games/)): scores, question counts, story plans and records are
-  kept by code, so the model cannot claim a win it did not earn.
+  kept by code, so the model cannot claim a win it did not earn. Preparing a story, quiz or lesson
+  runs in the background: a child talking meanwhile gets an answer instead of cancelling it.
+- **Turn-taking** ([`aipet/turns.py`](aipet/turns.py)): while the pet is silent, the child's turn
+  starts on voice and Pipecat's Smart Turn model decides when the sentence is finished; while it
+  speaks, interrupting it takes a few words, so noise never cuts it off.
 - **Control tags** ([`aipet/emotions.py`](aipet/emotions.py)): each reply starts with an emotion
   (which drives the face and the voice style), and may say who is speaking or that the speech was not
   for the pet. Tags are never spoken.
@@ -249,7 +253,8 @@ Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).
 - **Expressive voice:** real laughs and sighs, softer and slower bedtime stories, word emphasis
   (Pipecat's expressive conversation with a TTS that supports it). Today each sentence gets a voice
   style from its emotion.
-- **Faster turns:** shorten the end-of-turn wait, make story and quiz preparation asynchronous.
+- **Faster interruptions:** when a child talks over the pet, the turn still waits a fixed delay
+  for the transcription (~1.8 s); a streaming transcription would remove it.
 - **Backup model** when the conversation model is slow or down.
 - **A distinct voice per pet** (Voxtral has a single French voice today).
 - **Other languages:** locale bundles for every model-facing text, the pet's language set in its

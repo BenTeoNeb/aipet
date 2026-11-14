@@ -191,6 +191,10 @@ class MemoryKeeper:
                     return "night"
         return None
 
+    def falling_asleep(self) -> str | None:
+        """Like sleep_reason, but also right after the evening « bonne nuit »: the pet is going to bed."""
+        return self.sleep_reason() or ("night" if self._goodnight_pending else None)
+
     def turn_hint(self) -> str:
         """Short French hints added to the user's label: energy and bedtime."""
         hints = []

@@ -45,7 +45,15 @@ def make_tts(cfg: dict):
     return engines.make_tts(cfg)
 
 
-def build_worker(transport, *, mute_while_speaking: bool, min_volume: float | None = None, gate=None, session_log=None):
+def build_worker(
+    transport,
+    *,
+    mute_while_speaking: bool,
+    min_volume: float | None = None,
+    gate=None,
+    session_log=None,
+    on_hang_up=None,
+):
     """Build the [gate] -> STT -> memory -> LLM -> TTS pipeline around an audio transport."""
     from pipecat.adapters.llm.schemas.tools_schema import ToolsSchema
 
@@ -191,6 +199,9 @@ def build_worker(transport, *, mute_while_speaking: bool, min_volume: float | No
             slog=session_log,
             nap_lines=pet.lines["nap"],
             night_lines=pet.lines["night"],
+            on_hang_up=on_hang_up if ec.get("hang_up_when_asleep", True) else None,
+            hang_up_reason=keeper.falling_asleep,
+            hang_up_after=ec.get("hang_up_after_secs", 8),
         ),
         llm,
         ThinkingFiller(

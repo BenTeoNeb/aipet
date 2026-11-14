@@ -18,7 +18,20 @@ import asyncio
 from loguru import logger
 
 from aipet import engines
-from aipet.games.common import GAMES_DIR, UNKNOWN_PLAYER, JsonStore, child_level, current_player, pet_intro, theme_key
+from aipet.games.common import (
+    GAMES_DIR,
+    PREPARING_NOTE,
+    STALE_PREPARATION,
+    UNKNOWN_PLAYER,
+    JsonStore,
+    cancel_preparation,
+    child_level,
+    current_player,
+    is_stale,
+    new_preparation,
+    pet_intro,
+    theme_key,
+)
 from aipet.memory.store import _slug, now, parse_card
 
 LEARN_TOOLS = {"learn_suggest", "learn_start", "learn_next", "learn_end"}
@@ -141,6 +154,7 @@ class LearnGame:
             f"{player}, en {school}" if school else (player if player != UNKNOWN_PLAYER else "un enfant de 5 à 10 ans")
         )
         seen = [t["topic"] for t in p.get("topics", [])][-RECENT_TOPICS:]
+        prep = new_preparation(self)
         try:
             plan = await asyncio.to_thread(generate_lesson, self.cfg, topic, domain, who, level, seen)
         except Exception as e:
@@ -148,6 +162,8 @@ class LearnGame:
             return {
                 "error": "La leçon n'a pas pu être préparée : explique simplement toi-même, ou propose autre chose."
             }
+        if is_stale(self, prep):
+            return STALE_PREPARATION
         if len(plan.get("discoveries", [])) < 2:
             return {"error": "Plan incomplet : explique simplement toi-même."}
         self.lesson = {"player": player, "topic": topic, "domain": domain or "découverte", "level": level,
@@ -217,6 +233,7 @@ class LearnGame:
 
     def stop(self):
         """The activity ends mid-lesson: nothing is recorded (the child did not finish)."""
+        cancel_preparation(self)
         self.lesson = None
 
     # ------------------------------------------------------------------ prompt and labels
@@ -286,7 +303,7 @@ def register_tools(llm, game: LearnGame) -> list:
         )
 
     llm.register_function("learn_suggest", suggest)
-    llm.register_function("learn_start", start)
+    llm.register_function("learn_start", start, cancel_on_interruption=False)  # see PREPARING_NOTE
     llm.register_function("learn_next", nxt)
     llm.register_function("learn_end", end)
     return [
@@ -299,7 +316,8 @@ def register_tools(llm, game: LearnGame) -> list:
         ),
         FunctionSchema(
             name="learn_start",
-            description="Prépare une mini-leçon de découverte sur le sujet choisi, adaptée à l'enfant.",
+            description="Prépare une mini-leçon de découverte sur le sujet choisi, adaptée à l'enfant."
+            + PREPARING_NOTE,
             properties={
                 "topic": {"type": "string", "description": "le sujet, ex. « pourquoi les volcans crachent du feu »"},
                 "domain": {

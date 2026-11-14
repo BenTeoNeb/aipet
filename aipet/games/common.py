@@ -83,3 +83,31 @@ def pet_intro(cfg: dict) -> str:
     """How preparation prompts name the pet (French): « Flocon, un petit chat »."""
     pet = character.of(cfg)
     return f"{pet.name}, {pet.intro}"
+
+
+# ---- background preparations ------------------------------------------------------------------
+# Preparing a story, a quiz, a lesson or a yes/no game takes a model call (seconds). Those tools are
+# asynchronous (registered with cancel_on_interruption=False): a child speaking meanwhile no longer
+# cancels the preparation, the pet answers them, and the result arrives afterwards. A preparation
+# whose activity was stopped or restarted in the meantime must not start anything.
+PREPARING_NOTE = (
+    " La préparation prend quelques secondes : si l'enfant parle pendant ce temps, réponds-lui en une "
+    "phrase (tu peux retenir son idée) sans commencer l'activité ; le résultat arrivera ensuite."
+)
+STALE_PREPARATION = {"cancelled": True, "note": "Cette activité a été arrêtée ou remplacée pendant sa "
+                     "préparation : ne la commence pas, continue la conversation."}  # fmt: skip
+
+
+def new_preparation(game) -> int:
+    """Start a preparation: any earlier one of this game becomes stale. Returns its number."""
+    game._preparation = getattr(game, "_preparation", 0) + 1
+    return game._preparation
+
+
+def cancel_preparation(game):
+    """The activity stops: a preparation still running must not start it."""
+    game._preparation = getattr(game, "_preparation", 0) + 1
+
+
+def is_stale(game, number: int) -> bool:
+    return getattr(game, "_preparation", 0) != number

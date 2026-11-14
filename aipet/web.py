@@ -5,6 +5,7 @@ The browser handles the microphone (echo cancellation, automatic gain), so the c
 interrupt the assistant.
 """
 
+import asyncio
 import html
 import json
 import re
@@ -18,6 +19,7 @@ from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 from pipecat.frames.frames import LLMRunFrame
+from pipecat.processors.frameworks.rtvi.frames import RTVIServerMessageFrame
 from pipecat.runner.run import app, main
 from pipecat.runner.types import RunnerArguments, SmallWebRTCRunnerArguments
 from pipecat.transports.base_transport import TransportParams
@@ -313,8 +315,6 @@ async def tech_latency_session(name: str):
 
 @app.get("/debug/tech/costs", include_in_schema=False)
 async def tech_costs(days: int = 30):
-    import asyncio
-
     cfg = load_config()
     return await asyncio.to_thread(monitoring.costs, min(days, 90), cfg.get("costs", {}))
 
@@ -337,7 +337,33 @@ async def bot(runner_args: RunnerArguments):
     )
     cfg0 = load_config()
     slog = session_log.SessionLog("web")
-    worker, context, keeper = build_worker(transport, mute_while_speaking=False, session_log=slog)
+    ended = False
+
+    async def end_session(reason: str):
+        """Once per session: condense the conversation, close the log, stop the worker."""
+        nonlocal ended
+        if ended:
+            return
+        ended = True
+        SESSION.clear()
+        keeper.cancel_pause()
+        keeper.worker = None  # no more system-prompt refreshes: the session is ending
+        await keeper.checkpoint("end of conversation", trim=False)
+        slog.end(reason)
+        await worker.cancel()
+
+    async def hang_up(reason: str):
+        """The pet sleeps: the page closes the conversation (and shows it asleep); if it does not
+        within a few seconds, the server ends it."""
+        await worker.queue_frames([RTVIServerMessageFrame(data={"type": "hang_up", "reason": reason})])
+
+        async def fallback():
+            await asyncio.sleep(5)
+            await end_session(f"hung up ({reason})")
+
+        asyncio.get_running_loop().create_task(fallback())
+
+    worker, context, keeper = build_worker(transport, mute_while_speaking=False, session_log=slog, on_hang_up=hang_up)
     SESSION.update(context=context, keeper=keeper, started=time.time())
 
     @transport.event_handler("on_client_connected")
@@ -351,12 +377,7 @@ async def bot(runner_args: RunnerArguments):
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
         logger.info("Browser disconnected")
-        SESSION.clear()
-        keeper.cancel_pause()
-        keeper.worker = None  # no more system-prompt refreshes: the session is ending
-        await keeper.checkpoint("end of conversation", trim=False)
-        slog.end("browser disconnected")
-        await worker.cancel()
+        await end_session("browser disconnected")
 
     runner = WorkerRunner(handle_sigint=runner_args.handle_sigint)
     await runner.add_workers(worker)
