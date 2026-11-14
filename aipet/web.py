@@ -1,0 +1,378 @@
+"""Web mode: open http://localhost:7860 in the browser.
+
+Run: uv run bot.py
+The browser handles the microphone (echo cancellation, automatic gain), so the child can
+interrupt the assistant.
+"""
+
+import html
+import json
+import re
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+from fastapi import Header, HTTPException, Request
+from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.staticfiles import StaticFiles
+from loguru import logger
+from pipecat.frames.frames import LLMRunFrame
+from pipecat.runner.run import app, main
+from pipecat.runner.types import RunnerArguments, SmallWebRTCRunnerArguments
+from pipecat.transports.base_transport import TransportParams
+from pipecat.transports.smallwebrtc.transport import SmallWebRTCTransport
+from pipecat.workers.runner import WorkerRunner
+
+from aipet import character, engines, env, migrate, monitoring, parents, paths, session_log, skills
+from aipet.config import config_snapshot, load_config
+from aipet.energy import Energy
+from aipet.pipeline import STATE_DIR, build_worker
+from aipet.prompts import GREETING, build_system_prompt
+from aipet.rhythm import TZ, Rhythm
+
+STATIC = Path(__file__).parent / "static"
+
+
+# Our page replaces the runner's default UI (routes declared before main()).
+@app.get("/", include_in_schema=False)
+async def index():
+    return HTMLResponse(render_index(character.of(load_config())))
+
+
+def render_index(pet) -> str:
+    """The page with this pet's name and face (face.svg / face.css from its pack)."""
+    page = (STATIC / "index.html").read_text()
+    face = pet.face_dir
+    css = (face / "face.css").read_text() if (face / "face.css").exists() else ""
+    svg = (face / "face.svg").read_text() if (face / "face.svg").exists() else ""
+    return (
+        page.replace("/*PET_FACE_CSS*/", css)
+        .replace("<!--PET_FACE_SVG-->", svg)
+        .replace("PET_NAME", html.escape(pet.name))
+    )
+
+
+@app.get("/config.json", include_in_schema=False)
+async def public_config():
+    cfg = load_config()
+    return {"name": character.of(cfg).name}
+
+
+# --- Debug: state of the current session (only one at a time) -------------
+SESSION: dict = {}
+
+
+def _jsonable(obj):
+    try:
+        return json.loads(json.dumps(obj, default=lambda o: getattr(o, "__dict__", repr(o))))
+    except Exception:
+        return repr(obj)
+
+
+@app.get("/debug/state", include_in_schema=False)
+async def debug_state():
+    cfg = load_config()
+    ctx = SESSION.get("context")
+    keeper = SESSION.get("keeper")
+    return {
+        "engines": engines.describe(cfg),
+        "listening": cfg.get("listening", {}),
+        "session": {
+            "active": ctx is not None,
+            "since": SESSION.get("started"),
+        },
+        "system_prompt": keeper.system_prompt() if keeper else build_system_prompt(cfg),
+        "speakers": keeper.who.state() if keeper else None,
+        "skills": (keeper.skills if keeper and keeper.skills else skills.Skills.from_config(cfg)).state(),
+        "energy": _energy(keeper).snapshot() if cfg.get("energy", {}).get("enabled", True) else None,
+        "asleep": keeper.sleep_reason() if keeper else _asleep_outside_session(cfg),
+        "condensation": keeper.last if keeper else None,
+        "context": [_jsonable(x) for x in ctx.get_messages(truncate_large_values=True)] if ctx else [],
+    }
+
+
+@app.middleware("http")
+async def guard_debug_routes(request: Request, call_next):
+    """Every /debug/ route (reads included: they expose the family's memory and transcripts) answers
+    only the locally served page: the X-Pet header and, when present, a localhost Origin."""
+    if request.url.path.startswith("/debug/"):
+        try:
+            _guard(request.headers.get("x-pet"), request.headers.get("origin"))
+        except HTTPException as e:
+            return JSONResponse({"detail": e.detail}, status_code=e.status_code)
+    return await call_next(request)
+
+
+def _guard(x_pet: str | None, origin: str | None):
+    """Debug actions: only from the locally served page. The Pipecat runner allows all origins
+    (CORS *), so we also check the Origin header sent by the browser."""
+    if x_pet != "1":
+        raise HTTPException(403, "missing X-Pet header")
+    if origin and not re.match(r"^https?://(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$", origin):
+        raise HTTPException(403, f"origin refused: {origin}")
+
+
+def _memory():
+    from aipet.memory import Memory
+
+    cfg = load_config()
+    pet = character.of(cfg)
+    return Memory(paths.memory_dir(cfg, pet.id), pet.name)
+
+
+@app.get("/debug/memory", include_in_schema=False)
+async def debug_memory():
+    mem = _memory()
+    return {
+        "dir": str(mem.root),
+        "files": [
+            {
+                "path": str(p.relative_to(mem.root)),
+                "size": p.stat().st_size,
+                "modified": p.stat().st_mtime,
+                "content": p.read_text()[:20000],
+            }
+            for p in mem.files() + sorted(mem.root.glob("jeux/*.json")) + sorted(mem.root.glob("histoires/*.json"))
+        ],
+    }
+
+
+@app.get("/debug/memory/search", include_in_schema=False)
+async def debug_memory_search(q: str, kind: str = "all"):
+    return _memory().search(q, kind, limit=10)
+
+
+@app.get("/debug/sessions", include_in_schema=False)
+async def debug_sessions():
+    return session_log.list_sessions()
+
+
+@app.get("/debug/sessions/{name}", include_in_schema=False)
+async def debug_session(name: str):
+    if not re.fullmatch(r"[\w-]+\.jsonl", name):
+        raise HTTPException(400, "invalid name")
+    p = session_log.SESSIONS / name
+    if not p.is_file():
+        raise HTTPException(404, "session not found")
+    ev = session_log.read_session(p)
+    return {"name": name, "summary": session_log.summarize(ev), "events": ev}
+
+
+@app.post("/debug/memory/delete", include_in_schema=False)
+async def debug_memory_delete(path: str, x_pet: str | None = Header(None), origin: str | None = Header(None)):
+    """Parental control: delete a memory file."""
+    from aipet.memory.store import SUMMARY_FILE
+
+    _guard(x_pet, origin)
+    mem = _memory()
+    p = (mem.root / path).resolve()
+    if mem.root.resolve() not in p.parents or not p.is_file() or p.name == SUMMARY_FILE:
+        return {"ok": False, "reason": "file cannot be deleted"}
+    p.unlink()
+    mem.wipe_history()  # deleted for real: not kept in older versions of the memory
+    return {"ok": True}
+
+
+@app.post("/debug/memory/condense", include_in_schema=False)
+async def debug_memory_condense(x_pet: str | None = Header(None), origin: str | None = Header(None)):
+    _guard(x_pet, origin)
+    keeper = SESSION.get("keeper")
+    if keeper is None:
+        return {"ok": False, "reason": "no session"}
+    changed = await keeper.checkpoint("manual")
+    return {"ok": keeper.last.get("error") is None, "changes": changed, "error": keeper.last.get("error")}
+
+
+def _asleep_outside_session(cfg: dict) -> str | None:
+    if env.get("NO_SLEEP") == "1":
+        return None
+    if cfg.get("energy", {}).get("enabled", True) and _energy(None).asleep:
+        return "nap"
+    return "night" if Rhythm.from_config(cfg).is_night(datetime.now(TZ)) else None
+
+
+def _energy(keeper) -> Energy:
+    """The live energy counter during a session, else the saved one (read from disk)."""
+    if keeper and keeper.energy:
+        return keeper.energy
+    ec = load_config().get("energy", {})
+    return Energy(ec.get("talk_minutes", 20), ec.get("recharge_minutes", 30), ec.get("wake_up_at", 0.5),
+                  state_file=STATE_DIR / "energy.json")  # fmt: skip
+
+
+@app.post("/debug/energy/recharge", include_in_schema=False)
+async def debug_energy_recharge(x_pet: str | None = Header(None), origin: str | None = Header(None)):
+    _guard(x_pet, origin)
+    energy = _energy(SESSION.get("keeper"))
+    energy.recharge()
+    return {"ok": True, **energy.snapshot()}
+
+
+@app.post("/debug/reset", include_in_schema=False)
+async def debug_reset(x_pet: str | None = Header(None), origin: str | None = Header(None)):
+    _guard(x_pet, origin)
+    ctx = SESSION.get("context")
+    if ctx is None:
+        return {"ok": False, "reason": "no session"}
+    keeper = SESSION.get("keeper")
+    if keeper:
+        keeper.reset_context()
+    else:
+        ctx.set_messages([])
+    return {"ok": True}
+
+
+# --- Parents' space (/parents) and technical monitoring ---------------------
+@app.get("/parents", include_in_schema=False)
+async def parents_page():
+    pet = character.of(load_config())
+    return HTMLResponse((STATIC / "parents.html").read_text().replace("PET_NAME", html.escape(pet.name)))
+
+
+def _day(d: str | None):
+    if not d:
+        return datetime.now(TZ).date()
+    try:
+        return datetime.strptime(d, "%Y-%m-%d").date()
+    except ValueError as e:
+        raise HTTPException(400, "invalid day") from e
+
+
+@app.get("/debug/parents/days", include_in_schema=False)
+async def parents_days():
+    return parents.days_with_sessions()
+
+
+@app.get("/debug/parents/day", include_in_schema=False)
+async def parents_day(d: str | None = None):
+    cfg = load_config()
+    pet = character.of(cfg)
+    digest = parents.day_digest(_day(d), pet)
+    energy = _energy(SESSION.get("keeper")).snapshot() if cfg.get("energy", {}).get("enabled", True) else None
+    return {**digest, "pet": pet.name, "energy": energy, "asleep": _asleep_outside_session(cfg)}
+
+
+@app.get("/debug/parents/thread/{name}", include_in_schema=False)
+async def parents_thread(name: str):
+    if not re.fullmatch(r"[\w-]+\.jsonl", name):
+        raise HTTPException(400, "invalid name")
+    p = paths.logs_dir() / "sessions" / name
+    if not p.is_file():
+        raise HTTPException(404, "session not found")
+    return {"name": name, "items": parents.thread(session_log.read_session(p), character.of(load_config()))}
+
+
+@app.get("/debug/parents/review", include_in_schema=False)
+async def parents_review():
+    return parents.review(_memory().root, character.of(load_config()))
+
+
+@app.post("/debug/parents/seen", include_in_schema=False)
+async def parents_seen(request: Request):
+    body = await request.json()
+    parents.mark_seen([str(i) for i in body.get("ids", [])][:500])
+    return {"ok": True}
+
+
+@app.get("/debug/memory/structured", include_in_schema=False)
+async def memory_structured(path: str):
+    try:
+        return parents.structured(_memory().root, path)
+    except ValueError as e:
+        raise HTTPException(404, str(e)) from e
+
+
+@app.post("/debug/memory/edit", include_in_schema=False)
+async def memory_edit(request: Request):
+    body = await request.json()
+    try:
+        res = parents.edit(_memory(), str(body.get("path", "")), body.get("change") or {})
+    except ValueError as e:
+        return {"ok": False, "reason": str(e)}
+    keeper = SESSION.get("keeper")
+    if keeper:  # the running pet sees the correction right away
+        await keeper.refresh_prompt()
+    return res
+
+
+@app.get("/debug/tech/latency", include_in_schema=False)
+async def tech_latency(days: int = 7):
+    return monitoring.latency_days(min(days, 60))
+
+
+@app.get("/debug/tech/latency/{name}", include_in_schema=False)
+async def tech_latency_session(name: str):
+    if not re.fullmatch(r"[\w-]+\.jsonl", name):
+        raise HTTPException(400, "invalid name")
+    p = paths.logs_dir() / "sessions" / name
+    if not p.is_file():
+        raise HTTPException(404, "session not found")
+    return monitoring.latency(session_log.read_session(p))
+
+
+@app.get("/debug/tech/costs", include_in_schema=False)
+async def tech_costs(days: int = 30):
+    import asyncio
+
+    cfg = load_config()
+    return await asyncio.to_thread(monitoring.costs, min(days, 90), cfg.get("costs", {}))
+
+
+@app.get("/debug/tech/errors", include_in_schema=False)
+async def tech_errors(days: int = 14):
+    return monitoring.errors(min(days, 60))
+
+
+app.mount("/static", StaticFiles(directory=STATIC), name="static")
+
+
+async def bot(runner_args: RunnerArguments):
+    if not isinstance(runner_args, SmallWebRTCRunnerArguments):
+        raise RuntimeError("This bot only supports the browser WebRTC transport.")
+
+    transport = SmallWebRTCTransport(
+        webrtc_connection=runner_args.webrtc_connection,
+        params=TransportParams(audio_in_enabled=True, audio_out_enabled=True),
+    )
+    cfg0 = load_config()
+    slog = session_log.SessionLog("web")
+    worker, context, keeper = build_worker(transport, mute_while_speaking=False, session_log=slog)
+    SESSION.update(context=context, keeper=keeper, started=time.time())
+
+    @transport.event_handler("on_client_connected")
+    async def on_client_connected(transport, client):
+        logger.info("Browser connected")
+        slog.start(config=config_snapshot(cfg0))
+        await keeper.on_wake()  # « last time we talked », current time, fresh context after a long pause
+        context.add_message({"role": "developer", "content": GREETING})
+        await worker.queue_frames([LLMRunFrame()])
+
+    @transport.event_handler("on_client_disconnected")
+    async def on_client_disconnected(transport, client):
+        logger.info("Browser disconnected")
+        SESSION.clear()
+        keeper.cancel_pause()
+        keeper.worker = None  # no more system-prompt refreshes: the session is ending
+        await keeper.checkpoint("end of conversation", trim=False)
+        slog.end("browser disconnected")
+        await worker.cancel()
+
+    runner = WorkerRunner(handle_sigint=runner_args.handle_sigint)
+    await runner.add_workers(worker)
+    await runner.run()
+
+
+def run():
+    """Entry point of the `pet-web` command (Pipecat's development runner, port 7860)."""
+    # Pipecat's runner looks for a `bot()` function in the __main__ module.
+    sys.modules["__main__"].bot = bot
+    migrate.migrate_legacy()  # data from before character packs (~/.flocon), once
+    logs = load_config().get("logs", {})
+    session_log.setup_file_logging(logs.get("text_keep_days", 14))
+    session_log.purge(logs.get("keep_days", 30))
+    main()
+
+
+if __name__ == "__main__":
+    run()

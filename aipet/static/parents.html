@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PET_NAME — parents</title>
+<style>
+  :root {
+    --bg: #fdf6ee; --panel: #ffffff; --text: #3a3442; --muted: #857d92; --line: #e6dfee;
+    --accent: #e0607e; --accent-soft: #fff0f4; --child: #e6f7f1; --pet: #fff0f4; --marker: #f3eefa;
+    --warn: #b7791f; --warn-soft: #fff6e0; --bad: #c0392b; --bad-soft: #fdecea; --ok: #2f855a;
+    --shadow: 0 6px 18px rgba(90,60,120,.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1b1922; --panel: #24212d; --text: #efeaf5; --muted: #a39cb3; --line: #3a3546;
+      --accent: #ff8fab; --accent-soft: #3a2631; --child: #1f3a33; --pet: #3a2631; --marker: #2d2838;
+      --warn: #f0c060; --warn-soft: #3a3020; --bad: #ff8a7a; --bad-soft: #3d2422; --ok: #6fcf97;
+      --shadow: 0 6px 18px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1b1922; --panel: #24212d; --text: #efeaf5; --muted: #a39cb3; --line: #3a3546;
+    --accent: #ff8fab; --accent-soft: #3a2631; --child: #1f3a33; --pet: #3a2631; --marker: #2d2838;
+    --warn: #f0c060; --warn-soft: #3a3020; --bad: #ff8a7a; --bad-soft: #3d2422; --ok: #6fcf97;
+    --shadow: 0 6px 18px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.45 ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; }
+  header { position: sticky; top: 0; z-index: 2; background: var(--bg); border-bottom: 1px solid var(--line); }
+  .top { max-width: 980px; margin: 0 auto; padding: 12px 16px 0; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  h1 { font-size: 1.25rem; margin: 0; flex: 1; }
+  h1 a { color: var(--muted); font-size: .85rem; font-weight: normal; margin-left: 8px; }
+  nav { max-width: 980px; margin: 0 auto; padding: 8px 16px 0; display: flex; gap: 4px; overflow-x: auto; }
+  nav button { border: 0; background: none; color: var(--muted); font: inherit; padding: 8px 12px;
+    border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; }
+  nav button[aria-selected="true"] { color: var(--text); border-color: var(--accent); font-weight: 600; }
+  .badge { display: inline-block; min-width: 1.4em; padding: 0 .4em; border-radius: 1em; background: var(--accent);
+    color: #fff; font-size: .75rem; text-align: center; margin-left: 4px; }
+  .badge:empty { display: none; }
+  main { max-width: 980px; margin: 0 auto; padding: 16px; }
+  section[hidden] { display: none; }
+  select, input, textarea, button.btn { font: inherit; color: var(--text); background: var(--panel);
+    border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; }
+  button.btn { cursor: pointer; }
+  button.btn:hover { border-color: var(--accent); }
+  button.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.btn.danger { color: var(--bad); }
+  .muted { color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; box-shadow: var(--shadow); }
+  .card h3 { margin: 0 0 6px; font-size: 1.05rem; }
+  .stat { font-size: 1.8rem; font-weight: 700; line-height: 1.1; }
+  .card ul { margin: 6px 0 0; padding-left: 18px; }
+  h2 { font-size: 1rem; margin: 22px 0 10px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .grow { flex: 1; }
+  .list { display: flex; flex-direction: column; gap: 6px; }
+  .item { display: flex; gap: 10px; align-items: baseline; padding: 8px 12px; background: var(--panel);
+    border: 1px solid var(--line); border-radius: 12px; }
+  .item .time { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 3.2em; }
+  a.link, button.link { color: var(--accent); background: none; border: 0; padding: 0; font: inherit; cursor: pointer; text-decoration: underline; }
+  .energy { height: 10px; border-radius: 6px; background: var(--line); overflow: hidden; margin-top: 8px; }
+  .energy i { display: block; height: 100%; background: var(--ok); }
+
+  /* Conversations */
+  .sessions { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+  .sessions button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+  .thread { display: flex; flex-direction: column; gap: 8px; }
+  .msg { max-width: 78%; padding: 8px 12px; border-radius: 16px; white-space: pre-wrap; }
+  .msg .who { display: block; font-size: .78rem; color: var(--muted); margin-bottom: 2px; }
+  .msg.child { align-self: flex-end; background: var(--child); border-bottom-right-radius: 6px; }
+  .msg.pet { align-self: flex-start; background: var(--pet); border-bottom-left-radius: 6px; }
+  .msg.pet.minor { opacity: .7; font-style: italic; }
+  .marker { align-self: center; background: var(--marker); border-radius: 999px; padding: 4px 12px; font-size: .88rem; text-align: center; }
+
+  /* Review */
+  .flag { border-left: 4px solid var(--warn); }
+  .flag.k-sad, .flag.k-confidence { border-left-color: var(--accent); }
+  .flag.k-swear, .flag.k-failure { border-left-color: var(--bad); }
+  .flag.seen { opacity: .55; }
+  .flag pre { white-space: pre-wrap; font: inherit; margin: 6px 0 0; color: var(--muted); }
+
+  /* Memory */
+  .mem { display: grid; grid-template-columns: 220px 1fr; gap: 16px; }
+  @media (max-width: 720px) { .mem { grid-template-columns: 1fr; } .msg { max-width: 92%; } }
+  .files { display: flex; flex-direction: column; gap: 4px; }
+  .files button { text-align: left; border: 1px solid transparent; background: none; color: var(--text); font: inherit;
+    padding: 6px 10px; border-radius: 10px; cursor: pointer; }
+  .files button[aria-current="true"] { background: var(--panel); border-color: var(--line); font-weight: 600; }
+  .files .group { font-size: .78rem; color: var(--muted); margin: 10px 0 2px; text-transform: uppercase; letter-spacing: .04em; }
+  .entry { display: flex; gap: 8px; align-items: flex-start; padding: 6px 0; border-bottom: 1px dashed var(--line); }
+  .entry:last-child { border-bottom: 0; }
+  .entry .text { flex: 1; }
+  .entry input[type=text] { width: 100%; }
+  .icon-btn { border: 0; background: none; cursor: pointer; font-size: 1rem; padding: 2px 4px; border-radius: 6px; color: var(--muted); }
+  .icon-btn:hover { background: var(--accent-soft); color: var(--text); }
+  .icon-btn.confirm { color: var(--bad); font-size: .85rem; border: 1px solid var(--bad); }
+  table { width: 100%; border-collapse: collapse; }
+  td, th { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  textarea { width: 100%; min-height: 220px; }
+  .toast { position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg);
+    padding: 8px 16px; border-radius: 999px; opacity: 0; transition: opacity .2s; pointer-events: none; }
+  .toast.on { opacity: .95; }
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <h1>PET_NAME · espace parents <a href="/">← retour à PET_NAME</a></h1>
+    <label class="muted">Jour <select id="day"></select></label>
+  </div>
+  <nav role="tablist">
+    <button role="tab" data-tab="today" aria-selected="true">Aujourd'hui</button>
+    <button role="tab" data-tab="convs">Conversations</button>
+    <button role="tab" data-tab="review">À vérifier <span class="badge" id="review-count"></span></button>
+    <button role="tab" data-tab="memory">Mémoire</button>
+  </nav>
+</header>
+
+<main>
+  <section id="tab-today"></section>
+
+  <section id="tab-convs" hidden>
+    <div class="row" style="margin-bottom:10px"><span class="grow muted" id="convs-info"></span>
+      <label class="muted">Enfant <select id="who"><option value="">tous</option></select></label></div>
+    <div class="sessions" id="sessions"></div>
+    <div class="thread" id="thread"></div>
+  </section>
+
+  <section id="tab-review" hidden>
+    <div class="row" style="margin-bottom:10px">
+      <span class="grow muted">Les moments qui méritent un regard, sur les 14 derniers jours.</span>
+      <label class="muted"><input type="checkbox" id="show-seen"> afficher ceux déjà vus</label>
+      <button class="btn" id="all-seen">Tout marquer comme vu</button>
+    </div>
+    <div class="list" id="flags"></div>
+  </section>
+
+  <section id="tab-memory" hidden>
+    <p class="muted" style="margin-top:0">Ce que PET_NAME garde en mémoire. Chaque correction est enregistrée
+      (et peut être retrouvée dans l'historique de la mémoire). PET_NAME en tient compte tout de suite.</p>
+    <div class="mem"><div class="files" id="files"></div><div id="view" class="card"><p class="muted">Choisis un élément.</p></div></div>
+  </section>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const H = { "X-Pet": "1" };
+  const get = (url) => fetch(url, { headers: H }).then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); });
+  const post = (url, body) => fetch(url, { method: "POST", headers: { ...H, "Content-Type": "application/json" },
+    body: JSON.stringify(body) }).then((r) => r.json());
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const hm = (t) => (t || "").slice(11, 16);
+  const EMO = { joie: "😊", rire: "😄", surprise: "😮", curieux: "🤔", malice: "😏", triste: "😢", calin: "🤗", pensif: "💭" };
+  const toast = (msg) => { const t = $("toast"); t.textContent = msg; t.classList.add("on"); setTimeout(() => t.classList.remove("on"), 2200); };
+  const frDay = (d) => new Date(d + "T12:00").toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+
+  // ---- tabs
+  function show(tab) {
+    document.querySelectorAll("nav button").forEach((b) => b.setAttribute("aria-selected", b.dataset.tab === tab));
+    document.querySelectorAll("main > section").forEach((s) => (s.hidden = s.id !== "tab-" + tab));
+    ({ today: loadToday, convs: loadConvs, review: loadReview, memory: loadFiles })[tab]();
+  }
+  document.querySelectorAll("nav button").forEach((b) => b.addEventListener("click", () => show(b.dataset.tab)));
+
+  // ---- day selector
+  let digest = null, session = null;
+  async function loadDays() {
+    const today = new Date().toLocaleDateString("sv-SE");
+    const days = await get("/debug/parents/days");
+    if (!days.includes(today)) days.unshift(today);
+    $("day").innerHTML = days.map((d) => `<option value="${d}">${esc(frDay(d))}</option>`).join("");
+    $("day").addEventListener("change", () => { session = null; digest = null; show(document.querySelector('nav [aria-selected="true"]').dataset.tab); });
+  }
+  async function loadDigest() {
+    if (!digest || digest.day !== $("day").value) digest = await get("/debug/parents/day?d=" + $("day").value);
+    return digest;
+  }
+
+  // ---- today
+  async function loadToday() {
+    const d = await loadDigest();
+    const el = $("tab-today");
+    const e = d.energy;
+    const petCard = `<div class="card"><h3>${esc(d.pet)}</h3>
+      ${d.asleep ? `<div>💤 ${d.asleep === "night" ? "dort (c'est la nuit)" : "fait la sieste"}</div>` : "<div>Réveillé</div>"}
+      ${e ? `<div class="muted">Énergie ${Math.round((e.level ?? 0) * 100)} %</div><div class="energy"><i style="width:${Math.round((e.level ?? 0) * 100)}%"></i></div>` : ""}
+      ${d.pet_got_tired ? `<div class="muted" style="margin-top:6px">S'est fatigué ce jour-là</div>` : ""}</div>`;
+    const total = `<div class="card"><h3>Temps de conversation</h3><div class="stat">${d.minutes} min</div>
+      <div class="muted">${d.conversations.length} conversation(s)${d.unknown_messages ? ` · ${d.unknown_messages} message(s) sans prénom` : ""}</div></div>`;
+    const kids = d.children.map((c) => `<div class="card"><h3>${esc(c.name)}</h3>
+      <div class="muted">${c.messages} message(s) · de ${esc(c.first)} à ${esc(c.last)}</div>
+      ${c.activities.length ? `<ul>${c.activities.map((a) => `<li>${esc(a)}</li>`).join("")}</ul>` : `<div class="muted" style="margin-top:6px">Discussion libre</div>`}</div>`).join("");
+    const convs = d.conversations.map((c) => `<div class="item"><span class="time">${esc(c.start)}</span>
+      <span class="grow">${c.children.length ? esc(c.children.join(", ")) : "<span class='muted'>enfant non identifié</span>"} · ${c.minutes} min · ${c.messages} message(s)</span>
+      <button class="link" data-open="${esc(c.name)}">Lire</button></div>`).join("");
+    const acts = d.activities.map((a) => `<div class="item"><span class="time">${esc(a.t)}</span><span>${a.icon} ${esc(a.text)}</span></div>`).join("");
+    el.innerHTML = `<div class="grid">${total}${petCard}${kids}</div>
+      ${d.conversations.length ? `<h2>Conversations</h2><div class="list">${convs}</div>` : `<p class="muted">Personne n'a parlé à ${esc(d.pet)} ce jour-là.</p>`}
+      ${acts ? `<h2>Jeux et histoires</h2><div class="list">${acts}</div>` : ""}`;
+    el.querySelectorAll("[data-open]").forEach((b) => b.addEventListener("click", () => { session = b.dataset.open; show("convs"); }));
+  }
+
+  // ---- conversations
+  async function loadConvs() {
+    const d = await loadDigest();
+    $("convs-info").textContent = d.conversations.length ? frDay(d.day) : "Aucune conversation ce jour-là.";
+    if (!session || !d.conversations.some((c) => c.name === session)) session = d.conversations.at(-1)?.name || null;
+    $("sessions").innerHTML = d.conversations.map((c) => `<button class="btn" aria-pressed="${c.name === session}" data-s="${esc(c.name)}">
+      ${esc(c.start)} · ${c.children.length ? esc(c.children.join(", ")) : "?"}</button>`).join("");
+    $("sessions").querySelectorAll("[data-s]").forEach((b) => b.addEventListener("click", () => { session = b.dataset.s; loadConvs(); }));
+    const kids = [...new Set(d.children.map((c) => c.name))];
+    const cur = $("who").value;
+    $("who").innerHTML = `<option value="">tous</option>` + kids.map((k) => `<option ${k === cur ? "selected" : ""}>${esc(k)}</option>`).join("");
+    if (!session) { $("thread").innerHTML = ""; return; }
+    const t = await get("/debug/parents/thread/" + encodeURIComponent(session));
+    renderThread(t.items);
+  }
+  let lastItems = [];
+  function renderThread(items) {
+    lastItems = items;
+    const who = $("who").value;
+    let speaker = null;  // the pet's lines follow the child they answer
+    const html = items.map((i) => {
+      if (i.kind === "child") speaker = i.who;
+      if (who && i.kind !== "marker" && speaker !== who) return "";
+      if (i.kind === "marker") return `<div class="marker">${i.icon} ${esc(i.text)} <span class="muted">${hm(i.t)}</span></div>`;
+      if (i.kind === "child") {
+        const name = i.who ? esc(i.who) + (i.certainty && i.certainty !== "sure" ? " ?" : "") : "enfant non identifié";
+        return `<div class="msg child"><span class="who">${name} · ${hm(i.t)}</span>${esc(i.text)}</div>`;
+      }
+      if (i.silent) return `<div class="msg pet minor"><span class="who">${hm(i.t)}</span>(ne répond pas : pas pour lui ou incompréhensible)</div>`;
+      const emo = (i.emotions || []).map((e) => EMO[e] || "").join(" ");
+      return `<div class="msg pet${i.filler ? " minor" : ""}"><span class="who">PET_NAME ${emo} · ${hm(i.t)}</span>${esc(i.text)}</div>`;
+    }).join("");
+    $("thread").innerHTML = html || `<p class="muted">Rien à afficher.</p>`;
+  }
+  $("who").addEventListener("change", () => renderThread(lastItems));
+
+  // ---- review
+  const KIND = { sad: "😢", confidence: "🤫", swear: "🙊", name: "👤", noise: "📺", game: "🎲", failure: "⚠️" };
+  let flags = [];
+  async function loadReview() {
+    flags = await get("/debug/parents/review");
+    renderReview();
+  }
+  function renderReview() {
+    const all = $("show-seen").checked;
+    $("review-count").textContent = flags.filter((f) => !f.seen).length || "";
+    const shown = flags.filter((f) => all || !f.seen);
+    $("flags").innerHTML = shown.map((f) => `<div class="card flag k-${f.kind}${f.seen ? " seen" : ""}">
+      <div class="row"><strong class="grow">${KIND[f.kind] || "•"} ${esc(f.title)}</strong>
+        <span class="muted">${f.t ? esc(frDay(f.t.slice(0, 10))) + " " + hm(f.t) : ""}</span></div>
+      ${f.detail ? `<pre>${esc(f.detail)}</pre>` : ""}
+      <div class="row" style="margin-top:8px">
+        ${f.session ? `<button class="link" data-session="${esc(f.session)}">Voir la conversation</button>` : ""}
+        ${f.kind === "confidence" || f.kind === "game" ? `<button class="link" data-mem="${f.kind === "game" ? "jeux/devine.json" : ""}">Voir dans la mémoire</button>` : ""}
+        <span class="grow"></span>${f.seen ? "" : `<button class="btn" data-seen="${f.id}">Vu</button>`}</div></div>`).join("")
+      || `<p class="muted">Rien à vérifier. 🎉</p>`;
+    $("flags").querySelectorAll("[data-seen]").forEach((b) => b.addEventListener("click", async () => {
+      await post("/debug/parents/seen", { ids: [b.dataset.seen] });
+      flags.find((f) => f.id === b.dataset.seen).seen = true; renderReview();
+    }));
+    $("flags").querySelectorAll("[data-session]").forEach((b) => b.addEventListener("click", () => {
+      const s = b.dataset.session; $("day").value = s.slice(0, 10); digest = null; session = s; show("convs");
+    }));
+    $("flags").querySelectorAll("[data-mem]").forEach((b) => b.addEventListener("click", () => { memSel = b.dataset.mem || null; show("memory"); }));
+  }
+  $("show-seen").addEventListener("change", renderReview);
+  $("all-seen").addEventListener("click", async () => {
+    await post("/debug/parents/seen", { ids: flags.filter((f) => !f.seen).map((f) => f.id) });
+    flags.forEach((f) => (f.seen = true)); renderReview();
+  });
+
+  // ---- memory
+  let memSel = null;
+  const LABEL = (p) => p === "MA_VIE.md" ? "Ma vie de PET_NAME" : p === "RESUME.md" ? "Ce que PET_NAME sait (résumé)"
+    : p === "jeux/devine.json" ? "Devinettes" : p === "histoires/univers.json" ? "Histoires et personnages"
+    : p === "jeux/quiz.json" ? "Quiz" : p === "jeux/ni_oui_ni_non.json" ? "Ni oui ni non" : p === "jeux/apprendre.json" ? "Découvertes"
+    : p.startsWith("famille/") ? p.slice(8, -3).replace(/^./, (c) => c.toUpperCase()) : p;
+  async function loadFiles() {
+    const m = await get("/debug/memory");
+    const paths = m.files.map((f) => f.path);
+    const groups = [
+      ["Enfants et famille", paths.filter((p) => p.startsWith("famille/"))],
+      ["PET_NAME", paths.filter((p) => p === "MA_VIE.md" || p === "RESUME.md")],
+      ["Jeux et histoires", ["histoires/univers.json", "jeux/devine.json", "jeux/quiz.json", "jeux/ni_oui_ni_non.json",
+        "jeux/apprendre.json"].filter((p) => paths.includes(p))],
+    ];
+    $("files").innerHTML = groups.filter(([, ps]) => ps.length).map(([g, ps]) => `<div class="group">${g}</div>` +
+      ps.map((p) => `<button data-p="${esc(p)}" aria-current="${p === memSel}">${esc(LABEL(p))}</button>`).join("")).join("");
+    $("files").querySelectorAll("[data-p]").forEach((b) => b.addEventListener("click", () => { memSel = b.dataset.p; loadFiles(); }));
+    if (!memSel || !paths.includes(memSel)) memSel = groups.find(([, ps]) => ps.length)?.[1][0] || null;
+    if (memSel) showFile(memSel);
+  }
+  async function edit(change) {
+    const r = await post("/debug/memory/edit", { path: memSel, change });
+    toast(r.ok ? "Corrigé ✓" : "Pas corrigé : " + (r.reason || "erreur"));
+    showFile(memSel);
+  }
+  // Two-step delete: a first click asks, a second one confirms (no browser dialog).
+  function armDelete(btn, go) {
+    btn.addEventListener("click", () => {
+      if (btn.classList.contains("confirm")) return go();
+      btn.classList.add("confirm"); btn.textContent = "Retirer ?";
+      setTimeout(() => { btn.classList.remove("confirm"); btn.textContent = "🗑"; }, 3000);
+    });
+  }
+  async function showFile(path) {
+    const s = await get("/debug/memory/structured?path=" + encodeURIComponent(path));
+    const v = $("view");
+    if (s.kind === "card" || s.kind === "life") {
+      const title = s.kind === "life" ? "Ma vie de PET_NAME" : esc(s.meta.prenom || path);
+      const meta = s.kind === "card" ? Object.entries(s.meta).filter(([k]) => k !== "prenom").map(([k, val]) => `${esc(k)} : ${esc(val)}`).join(" · ") : "";
+      v.innerHTML = `<h3>${title}</h3>${meta ? `<div class="muted">${meta}</div>` : ""}` +
+        (Object.keys(s.sections).length ? "" : `<p class="muted">Rien pour l'instant.</p>`) +
+        Object.entries(s.sections).map(([sec, items]) => `<h2>${esc(sec)}</h2>` + items.map((it, i) =>
+          `<div class="entry" data-sec="${esc(sec)}" data-i="${i}"><span class="text">${esc(it)}</span>
+            <button class="icon-btn" title="Corriger" data-act="edit">✏️</button><button class="icon-btn" title="Retirer" data-act="del">🗑</button></div>`).join("")).join("");
+      v.querySelectorAll(".entry").forEach((row) => {
+        const sec = row.dataset.sec, i = +row.dataset.i, expected = s.sections[sec][i];
+        armDelete(row.querySelector('[data-act="del"]'), () => edit({ section: sec, index: i, expected, text: "" }));
+        row.querySelector('[data-act="edit"]').addEventListener("click", () => {
+          row.innerHTML = `<span class="text"><input type="text" value="${esc(expected)}"></span>
+            <button class="btn primary">Enregistrer</button><button class="btn">Annuler</button>`;
+          const [save, cancel] = row.querySelectorAll("button");
+          save.addEventListener("click", () => edit({ section: sec, index: i, expected, text: row.querySelector("input").value }));
+          cancel.addEventListener("click", () => showFile(path));
+          row.querySelector("input").focus();
+        });
+      });
+    } else if (s.kind === "games") {
+      const players = Object.entries(s.data.players || {});
+      v.innerHTML = `<h3>Devinettes</h3><p class="muted">« Trouvé » : PET_NAME a deviné. Sinon c'est l'enfant qui a gagné.</p>` +
+        (players.length ? "" : `<p class="muted">Aucune partie.</p>`) +
+        players.map(([p, d]) => `<h2>${esc(p)}</h2><table><tr><th>Jour</th><th>Réponse</th><th>Trouvé</th><th></th></tr>` +
+          d.games.map((g, i) => `<tr data-p="${esc(p)}" data-i="${i}"><td>${esc((g.date || "").slice(0, 10))}</td>
+            <td><input type="text" value="${esc(g.answer)}"></td><td><input type="checkbox" ${g.found ? "checked" : ""}></td>
+            <td class="row"><button class="btn" data-act="save">Enregistrer</button><button class="icon-btn" data-act="del">🗑</button></td></tr>`).join("") + "</table>").join("");
+      v.querySelectorAll("tr[data-p]").forEach((tr) => {
+        const player = tr.dataset.p, index = +tr.dataset.i;
+        tr.querySelector('[data-act="save"]').addEventListener("click", () =>
+          edit({ player, index, answer: tr.querySelector('input[type="text"]').value, found: tr.querySelector('input[type="checkbox"]').checked }));
+        armDelete(tr.querySelector('[data-act="del"]'), () => edit({ player, index, delete: true }));
+      });
+    } else if (s.kind === "quiz" || s.kind === "yesno" || s.kind === "learn") {
+      const players = Object.entries(s.data.players || {});
+      const del = (p, i) => `<button class="icon-btn" title="Retirer" data-del="${esc(p)}|${i}">🗑</button>`;
+      const day = (d) => esc((d || "").slice(0, 10));
+      const body = ([p, d]) => {
+        if (s.kind === "quiz") {
+          const best = Object.values(d.best || {}).map((b) => `${esc(b.theme)} ${b.score}/${b.total}`).join(" · ");
+          return `<h2>${esc(p)}</h2><div class="muted">Records : ${best || "—"} · meilleure série ${d.best_streak || 0}
+            · ${(d.play_days || []).length} jour(s) de jeu</div><table><tr><th>Jour</th><th>Thème</th><th>Score</th><th></th></tr>` +
+            (d.games || []).map((g, i) => `<tr><td>${day(g.date)}</td><td>${esc(g.theme)} <span class="muted">(${esc(g.level || "")})</span>
+              <details><summary class="muted">questions</summary>${(g.questions || []).map((q) =>
+                `<div>${q.correct ? "✅" : "❌"} ${esc(q.question)} <span class="muted">— ${esc(q.answer)}</span></div>`).join("")}</details></td>
+              <td>${g.score}/${g.total}</td><td>${del(p, i)}</td></tr>`).reverse().join("") + "</table>";
+        }
+        if (s.kind === "yesno") {
+          return `<h2>${esc(p)}</h2><div class="muted">Record : ${d.best || 0} réponses tenues · niveau ${d.difficulty ?? "?"} sur 5
+            · ${(d.play_days || []).length} jour(s) de jeu</div><table><tr><th>Jour</th><th>Tenu</th><th>Perdu sur</th><th></th></tr>` +
+            (d.games || []).map((g, i) => `<tr><td>${day(g.date)}</td><td>${g.held}</td>
+              <td>${g.stopped ? "<span class='muted'>arrêté</span>" : esc(g.lost_on || "—")}</td><td>${del(p, i)}</td></tr>`).reverse().join("") + "</table>";
+        }
+        const doms = Object.values(d.domains || {}).map((x) => `${esc(x.name)} niveau ${x.level}/5 (${x.lessons} leçon(s))`).join(" · ");
+        const qs = (d.open_questions || []).map((q, i) => `<div class="entry"><span class="text">${esc(q)}</span>
+          <button class="icon-btn" title="Retirer" data-q="${esc(p)}|${i}">🗑</button></div>`).join("");
+        return `<h2>${esc(p)}</h2><div class="muted">${doms || "—"}</div>` +
+          (d.topics || []).map((t, i) => `<div class="entry"><span class="text">${day(t.date)} · <strong>${esc(t.title || t.topic)}</strong>
+            <span class="muted">(${esc(t.domain)}${t.liked ? ", a aimé" : ""})</span>${t.retained ? `<br><span class="muted">A retenu : ${esc(t.retained)}</span>` : ""}</span>
+            ${del(p, i)}</div>`).reverse().join("") +
+          (qs ? `<h2>Ses questions en suspens</h2>${qs}` : "");
+      };
+      v.innerHTML = `<h3>${esc(LABEL(path))}</h3>` + (players.map(body).join("") || `<p class="muted">Rien pour l'instant.</p>`);
+      v.querySelectorAll("[data-del]").forEach((b) => { const [player, i] = b.dataset.del.split("|");
+        armDelete(b, () => edit({ player, index: +i, delete: true })); });
+      v.querySelectorAll("[data-q]").forEach((b) => { const [player, i] = b.dataset.q.split("|");
+        armDelete(b, () => edit({ player, question: +i, delete: true })); });
+    } else if (s.kind === "universe") {
+      const chars = Object.entries(s.data.characters || {});
+      const stories = s.data.stories || [];
+      v.innerHTML = `<h3>Histoires</h3><h2>Personnages inventés (qui reviennent)</h2>` +
+        (chars.map(([k, c]) => `<div class="entry" data-k="${esc(k)}"><span class="text"><strong>${esc(c.name)}</strong> — ${esc(c.description)}
+          <span class="muted">· ${c.appearances} histoire(s)${Object.keys(c.liked_by || {}).length ? " · aimé par " + esc(Object.keys(c.liked_by).join(", ")) : ""}</span></span>
+          <button class="icon-btn" title="Retirer" data-act="del">🗑</button></div>`).join("") || `<p class="muted">Aucun.</p>`) +
+        `<h2>Histoires racontées</h2>` + (stories.map((st, i) => `<div class="entry" data-s="${i}"><span class="text">${esc((st.date || "").slice(0, 10))} ·
+          « ${esc(st.title)} » pour ${esc(st.player)}${st.finished ? "" : " <span class='muted'>(pas finie)</span>"}
+          ${(st.plan?.guests || []).length ? `<span class="muted">· invités : ${esc(st.plan.guests.map((g) => g.name + " (" + g.role + ")").join(", "))}</span>` : ""}</span>
+          <button class="icon-btn" title="Retirer" data-act="del">🗑</button></div>`).reverse().join("") || `<p class="muted">Aucune.</p>`);
+      v.querySelectorAll("[data-k]").forEach((r) => armDelete(r.querySelector("button"), () => edit({ character: r.dataset.k, delete: true })));
+      v.querySelectorAll("[data-s]").forEach((r) => armDelete(r.querySelector("button"), () => edit({ story: +r.dataset.s, delete: true })));
+    } else {
+      const editable = path === "RESUME.md";
+      v.innerHTML = `<h3>${esc(LABEL(path))}</h3>` + (editable
+        ? `<textarea id="txt">${esc(s.text)}</textarea><div class="row" style="margin-top:8px"><button class="btn primary" id="save-txt">Enregistrer</button></div>`
+        : `<pre style="white-space:pre-wrap">${esc(s.text)}</pre>`);
+      if (editable) $("save-txt").addEventListener("click", () => edit({ text: $("txt").value }));
+    }
+  }
+
+  // ---- start
+  (async () => {
+    await loadDays();
+    loadToday();
+    get("/debug/parents/review").then((f) => { flags = f; $("review-count").textContent = f.filter((x) => !x.seen).length || ""; });
+  })();
+</script>
+</body>
+</html>

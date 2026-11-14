@@ -1,0 +1,153 @@
+/* Plume's face: a little tawny owl (SVG parts and one pose per emotion, see data-emo).
+   Same part names as the kitten (ears = tufts, paws = wings), so the poses are shared. */
+#cat { --fur: #c79a6e; --fur-shade: #b3875d; --line: #8c6544; --disc: #f6e8d3;
+       --pink: #f7b2a2; --pink-deep: #e9826a; --beak: #f2b33d; }
+:root { --eye: #f0a43a; --spark: #ffc94d; --heart: #ff8fab; }
+.fur { fill: var(--fur); stroke: var(--line); stroke-width: 3; stroke-linejoin: round; }
+.inner-ear, .cheek, .pad { fill: var(--pink); }
+.cheek { opacity: var(--blush); transition: opacity .5s; }
+.beak { fill: var(--beak); stroke: var(--line); stroke-width: 2.5; stroke-linejoin: round; }
+.disc { fill: var(--disc); stroke: var(--line); stroke-width: 2; }
+.ink { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+.soft { stroke: var(--line); stroke-width: 2.5; stroke-linecap: round; fill: none; }
+.whisker { stroke: var(--line); stroke-width: 2.5; stroke-linecap: round; }
+.eyeball { fill: var(--ink); } .iris { fill: var(--eye); } .pupil { fill: var(--ink); } .shine { fill: #fff; }
+.tail-out { stroke: var(--line); stroke-width: 19; stroke-linecap: round; fill: none; }
+.tail-in { stroke: var(--fur); stroke-width: 13; stroke-linecap: round; fill: none; }
+.mouth-fill { fill: var(--pink-deep); stroke: var(--ink); stroke-width: 3; stroke-linejoin: round; }
+.tongue { fill: var(--pink); }
+
+/* -- pose: each layer has its own role, so poses and animations don't fight each other -- */
+#cat svg * { transform-box: fill-box; }
+#bob  { transform-origin: 50% 100%; animation: breath var(--breath) ease-in-out infinite; }
+#pose { transform-box: view-box; transform-origin: 100px 150px;
+        transform: translateY(var(--head-y)) rotate(var(--tilt)); transition: transform .45s cubic-bezier(.3,1.4,.5,1); }
+#head { transform-box: view-box; transform-origin: 100px 150px; }
+.ear { transition: transform .35s cubic-bezier(.3,1.5,.5,1); }
+.ear.left  { transform-origin: 80% 100%; transform: rotate(var(--ear-l)); }
+.ear.right { transform-origin: 20% 100%; transform: rotate(var(--ear-r)); }
+.ear.left .tw  { transform-origin: 80% 100%; animation: twitch 17s 3s infinite; }
+.ear.right .tw { transform-origin: 20% 100%; animation: twitch 11s infinite; }
+.brow { opacity: var(--brow-o); transform-origin: center; transition: transform .35s, opacity .35s; }
+.brow.left  { transform: translateY(var(--brow-y)) rotate(var(--brow-l)); }
+.brow.right { transform: translateY(var(--brow-y)) rotate(var(--brow-r)); }
+.eye { transform-origin: center; transform: scale(var(--eye-s)); transition: transform .3s cubic-bezier(.3,1.6,.5,1); }
+.eye .open { transform-origin: center; animation: blink 5.3s infinite; transition: opacity .15s; }
+.eye .look { transform: translate(calc(var(--lx) + var(--sx)), calc(var(--ly) + var(--sy))); transition: transform .3s; }
+.eye .pupil { transform-origin: center; transform: scale(var(--pupil)); transition: transform .3s; }
+.eye .arc { opacity: 0; transition: opacity .15s; }
+#tail { transform-box: view-box; transform-origin: 148px 176px; animation: wag var(--wag) ease-in-out infinite alternate; }
+.wh { animation: whisk 7s ease-in-out infinite; }
+.wh.l { transform-origin: 100% 50%; } .wh.r { transform-origin: 0% 50%; animation-delay: .15s; }
+.paw { transition: transform .4s cubic-bezier(.3,1.5,.5,1); }
+
+@keyframes breath { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.012, 1.022); } }
+@keyframes blink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.08); } }
+@keyframes twitch { 0%, 90%, 96%, 100% { transform: rotate(0); } 92% { transform: rotate(9deg); } 94% { transform: rotate(-5deg); } }
+@keyframes wag { from { transform: rotate(-7deg); } to { transform: rotate(9deg); } }
+@keyframes whisk { 0%, 46%, 56%, 100% { transform: rotate(0); } 49% { transform: rotate(5deg); } 53% { transform: rotate(-4deg); } }
+@keyframes purr { from { transform: rotate(-2.5deg); } to { transform: rotate(2.5deg); } }
+@keyframes hop { from { transform: translateY(0); } to { transform: translateY(-4px); } }
+@keyframes giggle { from { transform: translateY(0) rotate(-2.5deg); } to { transform: translateY(-3px) rotate(2.5deg); } }
+@keyframes pop { 0% { transform: scale(1); } 35% { transform: scale(1.07) translateY(-4px); } 100% { transform: scale(1); } }
+@keyframes ponder { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-5deg); } }
+@keyframes rise { 0% { transform: translateY(10px) scale(.5); opacity: 0; } 25% { opacity: 1; }
+                  100% { transform: translateY(-20px) scale(1); opacity: 0; } }
+@keyframes twinkle { 0%, 100% { transform: scale(.35) rotate(0); opacity: .2; } 50% { transform: scale(1) rotate(20deg); opacity: 1; } }
+@keyframes dot { 0%, 100% { transform: scale(.6); opacity: .35; } 40% { transform: scale(1); opacity: 1; } }
+@keyframes sway { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+@keyframes burst { 0% { transform: scale(.3); opacity: 0; } 30% { transform: scale(1); opacity: 1; } 100% { transform: scale(1.15); opacity: .55; } }
+
+/* -- mouth -- */
+#mouth > * { opacity: 0; transition: opacity .15s; }
+#mouth .m-w { opacity: 1; }
+#mouth-open { fill: var(--pink-deep); transform-origin: 50% 0%; transform: scaleY(var(--mouth)); }
+.m-o, .m-laugh { transform-origin: 50% 20%; transform: scale(calc(.8 + var(--mouth) * .35)); }
+
+/* -- little signs around the head -- */
+.fx { opacity: 0; transition: opacity .3s; pointer-events: none; }
+.fx > * { transform-origin: center; }
+.fx .heart { fill: var(--heart); } .fx .star { fill: var(--spark); }
+.fx text { font: 800 22px ui-rounded, "SF Pro Rounded", system-ui, sans-serif; fill: var(--muted); }
+.fx .dot { fill: var(--muted); }
+.fx .ray { stroke: var(--spark); stroke-width: 4; stroke-linecap: round; }
+.fx .ha { stroke: var(--pink-deep); stroke-width: 3; stroke-linecap: round; fill: none; }
+
+/* ================= the faces ================= */
+/* listening: ears up, big eyes */
+#cat[data-emo="ecoute"] { --ear-l: 7deg; --ear-r: -7deg; --eye-s: 1.07; --brow-o: .45; --brow-y: -2px; }
+
+/* asleep (no conversation, or sleep mode) */
+#cat[data-emo="endormi"] { --head-y: 5px; --tilt: -4deg; --ear-l: -9deg; --ear-r: 9deg; --breath: 6s; --wag: 7s; --blush: .65; }
+#cat[data-emo="endormi"] .eye .open { opacity: 0; } #cat[data-emo="endormi"] .eye .arc.down { opacity: 1; }
+#cat[data-emo="endormi"] .fx-zzz { opacity: 1; }
+#cat[data-emo="endormi"] .fx-zzz > * { animation: rise 3.6s ease-out infinite; }
+#cat[data-emo="endormi"] .fx-zzz > :nth-child(2) { animation-delay: 1.2s; }
+#cat[data-emo="endormi"] .fx-zzz > :nth-child(3) { animation-delay: 2.4s; }
+
+/* thoughtful (also while thinking) */
+#cat[data-emo="pensif"] { --lx: -2.6px; --ly: -3px; --brow-o: .85; --brow-l: 5deg; --brow-r: -11deg; --brow-y: -2px; --ear-r: -6deg; --wag: 1.6s; }
+#cat[data-emo="pensif"] #head { animation: ponder 2.4s ease-in-out infinite; }
+#cat[data-emo="pensif"] .fx-dots { opacity: 1; }
+#cat[data-emo="pensif"] .fx-dots > * { animation: dot 1.5s ease-in-out infinite; }
+#cat[data-emo="pensif"] .fx-dots > :nth-child(2) { animation-delay: .25s; }
+#cat[data-emo="pensif"] .fx-dots > :nth-child(3) { animation-delay: .5s; }
+#cat[data-emo="pensif"] #mouth .m-w { opacity: 0; } #cat[data-emo="pensif"] #mouth .m-flat { opacity: 1; }
+
+/* joy */
+#cat[data-emo="joie"] { --brow-o: .8; --brow-y: -4px; --blush: .85; --eye-s: 1.08; --ear-l: 5deg; --ear-r: -5deg; --wag: .9s; }
+#cat[data-emo="joie"] #head { animation: hop .45s ease-in-out infinite alternate; }
+#cat[data-emo="joie"] .fx-stars { opacity: 1; }
+#cat[data-emo="joie"] .fx-stars > * { animation: twinkle 1.4s ease-in-out infinite; }
+#cat[data-emo="joie"] .fx-stars > :nth-child(2) { animation-delay: .45s; }
+#cat[data-emo="joie"] .fx-stars > :nth-child(3) { animation-delay: .9s; }
+#cat[data-emo="joie"] #mouth .m-w { opacity: 0; } #cat[data-emo="joie"] #mouth .m-smile { opacity: 1; }
+
+/* laughing: squinting eyes, big mouth, bouncing head */
+#cat[data-emo="rire"] { --blush: .9; --brow-o: .7; --brow-y: -3px; --wag: .7s; }
+#cat[data-emo="rire"] .eye .open { opacity: 0; } #cat[data-emo="rire"] .eye .arc.up { opacity: 1; }
+#cat[data-emo="rire"] #head { animation: giggle .2s ease-in-out infinite alternate; }
+#cat[data-emo="rire"] #mouth .m-w, #cat[data-emo="rire"] #mouth-open { opacity: 0; } #cat[data-emo="rire"] #mouth .m-laugh { opacity: 1; }
+#cat[data-emo="rire"] .fx-ha { opacity: 1; } #cat[data-emo="rire"] .fx-ha > * { animation: dot .5s ease-in-out infinite; }
+#cat[data-emo="rire"] .fx-ha > :nth-child(even) { animation-delay: .25s; }
+
+/* surprise: round eyes, small o-shaped mouth, startle */
+#cat[data-emo="surprise"] { --eye-s: 1.2; --pupil: .72; --brow-o: 1; --brow-y: -7px; --ear-l: 10deg; --ear-r: -10deg; --blush: .6; }
+#cat[data-emo="surprise"] #head { animation: pop .45s ease-out 1; }
+#cat[data-emo="surprise"] .eye .open { animation: none; }
+#cat[data-emo="surprise"] #mouth .m-w, #cat[data-emo="surprise"] #mouth-open { opacity: 0; } #cat[data-emo="surprise"] #mouth .m-o { opacity: 1; }
+#cat[data-emo="surprise"] .fx-rays { opacity: 1; } #cat[data-emo="surprise"] .fx-rays > * { animation: burst .5s ease-out 1 both; }
+#cat[data-emo="surprise"] .paw { transform: translateY(-5px); }
+
+/* curious: tilted head, one ear up */
+#cat[data-emo="curieux"] { --tilt: 9deg; --ear-l: 12deg; --ear-r: 4deg; --brow-o: .9; --brow-l: -12deg; --brow-y: -3px; --eye-s: 1.08; --lx: 1.5px; --ly: -1.5px; --wag: 1.3s; }
+#cat[data-emo="curieux"] .fx-ask { opacity: 1; } #cat[data-emo="curieux"] .fx-ask > * { animation: sway 1.3s ease-in-out infinite alternate; }
+
+/* cuddly: eyes closed with happiness, pink cheeks, purring, little hearts */
+#cat[data-emo="calin"] { --tilt: -6deg; --blush: 1; --breath: 2.6s; --wag: 4.5s; --ear-l: -4deg; --ear-r: 4deg; }
+#cat[data-emo="calin"] .eye .open { opacity: 0; } #cat[data-emo="calin"] .eye .arc.down { opacity: 1; }
+#cat[data-emo="calin"] .wh { animation: purr .11s linear infinite alternate; }
+#cat[data-emo="calin"] .fx-hearts { opacity: 1; }
+#cat[data-emo="calin"] .fx-hearts > * { animation: rise 2.6s ease-out infinite; }
+#cat[data-emo="calin"] .fx-hearts > :nth-child(2) { animation-delay: .9s; }
+#cat[data-emo="calin"] .fx-hearts > :nth-child(3) { animation-delay: 1.7s; }
+#cat[data-emo="calin"] .paw.l { transform: translate(6px, -4px); } #cat[data-emo="calin"] .paw.r { transform: translate(-6px, -4px); }
+
+/* mischief: wink and side smile */
+#cat[data-emo="malice"] { --tilt: -5deg; --brow-o: 1; --brow-l: -13deg; --brow-r: 9deg; --brow-y: -2px; --ear-r: -9deg; --blush: .7; --lx: 1.8px; --wag: 1.1s; }
+#cat[data-emo="malice"] .eye.right .open { opacity: 0; } #cat[data-emo="malice"] .eye.right .arc.up { opacity: 1; }
+#cat[data-emo="malice"] #mouth .m-w { opacity: 0; } #cat[data-emo="malice"] #mouth .m-smirk { opacity: 1; }
+#cat[data-emo="malice"] .fx-wink { opacity: 1; } #cat[data-emo="malice"] .fx-wink > * { animation: twinkle 1.1s ease-in-out infinite; }
+
+/* sad (empathizing): worried brows, low ears, everything slows down */
+#cat[data-emo="triste"] { --head-y: 3px; --tilt: 4deg; --brow-o: 1; --brow-l: -17deg; --brow-r: 17deg; --brow-y: -1px;
+  --ear-l: -16deg; --ear-r: 16deg; --blush: .3; --ly: 2.2px; --eye-s: 1.06; --breath: 5.5s; --wag: 6s; }
+#cat[data-emo="triste"] #mouth .m-w { opacity: 0; } #cat[data-emo="triste"] #mouth .m-sad { opacity: 1; }
+#cat[data-emo="triste"] .wh.l { animation: none; transform: rotate(-7deg); } #cat[data-emo="triste"] .wh.r { animation: none; transform: rotate(7deg); }
+#cat[data-emo="triste"] .shine.big { transform-origin: center; transform: scale(1.35); }
+
+
+/* owl tweaks: feather tufts (not pink ears), a short tail that barely moves, no whiskers */
+.inner-ear { fill: var(--fur-shade); }
+#tail { transform-origin: 100px 176px; }
+@keyframes wag { from { transform: rotate(-3deg); } to { transform: rotate(3deg); } }

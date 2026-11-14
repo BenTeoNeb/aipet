@@ -1,0 +1,24 @@
+# Secrets
+.env
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+
+# Front-end build tooling (the bundle flocon/static/pipecat.js is committed)
+frontend/node_modules/
+
+# Editors / OS
+.DS_Store
+.idea/
+.vscode/
+
+# Misc
+*.tmp
+*.bak

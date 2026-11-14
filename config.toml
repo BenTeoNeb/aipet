@@ -1,0 +1,164 @@
+# Assistant customization — edit this file freely.
+
+# Which pet lives here: a character pack in characters/<name>/ (persona, voice, face, lines).
+# Each pet has its own memory: a new pet meets the children as strangers.
+character = "flocon"
+
+[audio]
+# true = the assistant does not listen while it speaks (so it doesn't hear itself
+# through the Mac's speaker). Set false with a headset so you can interrupt it.
+deaf_while_speaking = true
+# Local mode only: microphone volume threshold (0 to 1). Lower it if your voice isn't detected.
+mic_min_volume = 0.2
+
+[listening]
+# Anti-noise settings. Re-read at each new conversation.
+# While Flocon speaks, at least N words are needed to interrupt it:
+# noises (dishes, doors, laughter) produce no words, so they no longer cut it off.
+# 1 = very interruptible, 3 = reasonable, 99 = never interrupted.
+words_to_interrupt = 3
+# Voice activity detector (Silero):
+vad_confidence = 0.8   # 0 to 1 (default 0.7): higher = less sensitive to noise
+vad_start_secs = 0.3   # seconds of voice before speech is detected (default 0.2)
+web_min_volume = 0.5   # web mode: minimum volume (the browser already applies gain)
+# During an activity, nothing heard this long after Flocon spoke: he asks once « tu m'as répondu ? »
+nudge_after_silence_secs = 12
+# Unfinished sentence ("Et après le dragon il…"): Flocon doesn't answer right away and lets
+# the child finish ([attends] tag). No delay on normal exchanges; check with analyze.py that
+# waits stay rare (otherwise: false, or a shorter delay).
+wait_for_unfinished_sentence = true
+unfinished_sentence_wait_secs = 2.5   # maximum wait, cut short as soon as the child speaks again
+
+[responsiveness]
+retry_llm_after_secs = 6    # seconds without the model's first word → the request is retried once
+filler_after_secs = 3.5     # seconds of waiting → Flocon says "Hmm, voyons…" (once per turn)
+give_up_after_secs = 25     # seconds without any answer → turn abandoned, Flocon apologizes
+tool_give_up_after_secs = 60  # same while a tool runs (story or lesson plan): longer
+
+# Engines: each role picks its provider and model, independently of the others.
+# The code depends on no provider (everything goes through engines.py). Common keys:
+#   provider, model, region (optional), url (OpenAI-compatible API: Mistral, Ollama,
+#   OpenRouter…), key_env = NAME of the environment variable holding the API key (never the key).
+# One-off override: FLOCON_CONVERSATION_MODEL=…, FLOCON_TTS_PROVIDER=…, etc.
+# Speech recognition and synthesis stay in the cloud: too slow locally on the Pi.
+
+[engines.stt]
+provider = "openrouter"      # google | openai | openrouter
+model = "openai/gpt-transcribe"
+# Back to Google: provider = "google"  model = "chirp_3"  region = "eu"
+# (Chirp 3 streams while the child speaks; OpenRouter transcribes each sentence once it ends.)
+
+[engines.conversation]
+provider = "openrouter"      # google-vertex | google | anthropic-vertex | anthropic | openai | openrouter
+# Gemini 3.6 Flash, minimal reasoning: ≈ 1.2 s to the first word, steady, follows the tag rules.
+# (Claude Haiku 5.5 without reasoning was tried on 13/11/2026: fast, but it "thinks aloud" — spoken
+# meta-comments about its tags, [silence] to an unknown speaker — so not for the conversation.)
+model = "google/gemini-3.6-flash"
+reasoning = "minimal"        # openrouter: reasoning effort (none | minimal | low | medium | high)
+# openrouter: key in OPEN_ROUTER_API; routing = { ... } adds OpenRouter provider preferences
+# (data_collection = "deny" is always set: children's speech is never kept for training).
+# Other choices:
+#   provider = "openrouter"  model = "google/gemini-3.6-flash"   (reasoning "minimal": ≈ 1.2 s, steady)
+#   provider = "openrouter"  model = "openai/gpt-6-luna"         (reasoning "low": ≈ 1.6 s, 10x cheaper)
+#   provider = "openrouter"  model = "openai/gpt-6.1-terra"      (reasoning "low": ≈ 2.5 s)
+#   provider = "google-vertex"  model = "gemini-3.6-flash"       (Google directly)
+#   provider = "anthropic-vertex"  model = "claude-haiku-5-5"  (Claude quota on Vertex required)
+#   provider = "openai"  model = "mistral-medium-latest"  url = "https://api.mistral.ai/v1"  key_env = "MISTRAL_API_KEY"
+
+[engines.preparation]
+# What activities prepare before starting: story plans, lessons, quiz and « ni oui ni non » questions.
+# A few seconds is fine here (Flocon says « Hmm, voyons… »): more reasoning for better plans.
+# Without this section: the conversation's model with reasoning = "medium".
+provider = "openrouter"
+model = "google/gemini-3.6-flash"
+reasoning = "low"            # ≈ 3.5-5 s per plan or quiz ("medium": 8-15 s, the child waits too long)
+# Per activity (story, learn, quiz, yes_no): another model or reasoning effort for that one only.
+# Gemini 3.8 Flash writes better lessons (explains the "why") and sharper « ni oui ni non » traps,
+# for ≈ 1.5 s more (Flocon benchmark, 13/11/2026); stories and quizzes were as good with 3.6.
+[engines.preparation.activities]
+learn = { model = "google/gemini-3.8-flash" }
+yes_no = { model = "google/gemini-3.8-flash" }
+
+[engines.condensation]
+# Memory: not urgent, quality matters more (and it doesn't queue behind the conversation).
+provider = "openrouter"
+model = "google/gemini-3.8-flash"  # background job: a careful summary matters more than speed
+
+[engines.tts]
+provider = "openrouter"      # google | openai | elevenlabs | openrouter
+model = "mistralai/voxtral-mini-tts-3-0"
+# The voice, its speed and one voice per emotion tag come from the pet's pack:
+# characters/<name>/character.toml, [voice]. A value set here wins over the pack's.
+# Back to Google: provider = "google"  voice = "fr-FR-Chirp3-HD-Leda" (Chirp 3 HD: -Aoede, -Puck, -Charon…)
+
+[skills]
+# Flocon's activities: one folder per activity, with a SKILL.md file written in French
+# (see skills/quiz/SKILL.md). Those in skills/ are shipped; add your own in this folder
+# (same name = replaces the shipped one). Picked up without restarting.
+# family_dir = "~/.aipet/skills"   # default; shared by every pet of the household
+
+[memory]
+# Long-term memory: markdown files (versioned with git), one folder per pet:
+# ~/.aipet/pets/<pet>/memory. A pet never reads another pet's memory.
+# dir = "~/elsewhere/{pet}/memory"   # optional; {pet} is replaced by the pet's name
+# Continuous condensation (Flocon is always on):
+condense_after_pause_secs = 25   # seconds of silence after an answer
+condense_every_turns = 20        # safety net; otherwise condensation happens during pauses (fewer slowdowns)
+kept_messages = 12               # recent messages kept verbatim in the context
+keep_transcripts_days = 30       # raw transcripts deleted after this (outside git)
+
+[logs]
+# Detailed logs for analysis (in ~/.aipet/pets/<pet>/logs; never in git; contains the children's speech).
+keep_days = 30        # session logs (JSONL)
+text_keep_days = 14   # aipet.log text log (rotated at 10 MB)
+
+[costs]
+# Cost view (debug panel → Coûts). Model prices come from OpenRouter's public list; the voice (TTS)
+# and transcription (STT) prices are not in it: set them here (USD) to include them.
+# tts_usd_per_million_chars = 0.0
+# stt_usd_per_minute = 0.0
+
+[wake]
+# Local/headless mode: the assistant sleeps until the wake word.
+# Web mode (bot.py) doesn't use the wake word.
+enabled = true
+# The wake word model comes from the pet's pack ([wake].model); setting model here overrides it.
+threshold = 0.35
+# Back to sleep after N seconds without speech once the answer is finished.
+sleep_after_secs = 18
+# On wake: "sound" (short blip, doesn't cover the child's sentence), a sentence to say, or "" (nothing).
+response = "sound"
+# Safety net: if nobody speaks for N seconds, back to sleep no matter what.
+max_awake_secs = 120
+
+[rhythm]
+# Flocon's daily rhythm. School holidays come from the official French calendar (cached locally).
+zone = "C"                   # school-holiday zone: A, B or C
+wednesday_school = "none"    # "none" (4-day week) or "morning"
+weekday_bedtime = "20:30"    # Flocon sleeps from bedtime to wake-up (only a sleepy "zzz" at night)
+weekday_wakeup = "07:30"
+weekend_bedtime = "21:30"    # Saturday and Sunday evenings
+weekend_wakeup = "08:30"     # Saturday and Sunday mornings
+
+[energy]
+# Like a pet, Flocon gets tired: energy drains while talking and recharges at rest. Below 40% he
+# yawns and suggests calm things, below 15% he says goodbye, at 0% he naps for real (never in the
+# middle of a sad moment). Parents can recharge him from the debug panel.
+enabled = true
+talk_minutes = 20            # active conversation per full charge
+recharge_minutes = 30        # rest needed for a full recharge
+wake_up_at = 0.5             # he wakes up from a nap at this level
+
+[games]
+guess_max_questions = 20     # « devine à quoi je pense »: Flocon gives up and asks after this many questions
+
+[family]
+# The children are not listed here: each pet learns their first names, ages and classes from them
+# (and keeps them in its own memory; classes advance every school year).
+# Household facts only, never the children's names (French: goes into every pet's prompt).
+info = ""   # e.g. "On habite à Lyon. Le chat de la maison s'appelle Moustache."
+
+[rules]
+# Rules added to the base guardrails (one sentence per line, in French: goes into the prompt).
+extra = """
+"""

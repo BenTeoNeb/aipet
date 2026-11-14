@@ -1,0 +1,787 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PET_NAME</title>
+<style>
+  :root {
+    --bg: #fdf6ee; --text: #3a3442; --muted: #8a8296;
+    --fur: #ffffff; --fur-shade: #ece6f2; --line: #d9d1e4; --ink: #3a3442;
+    --pink: #ffb3c7; --pink-deep: #ff8fab;
+    --listen: #7fd8be; --think: #ffd97a; --speak: #c3b5ff; --idle: #e9e2f0;
+    --accent: #ff8fab; --danger: #e17055;
+    --bubble-user: #e6f7f1; --bubble-bot: #fff0f4; --shadow: 0 12px 30px rgba(90,60,120,.12);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1b1922; --text: #efeaf5; --muted: #a39cb3;
+      --fur: #fbfaff; --fur-shade: #e2dcec; --line: #c9c0d8;
+      --listen: #3fae8f; --think: #c9a443; --speak: #7f6fd6; --idle: #34303f;
+      --bubble-user: #1f3a33; --bubble-bot: #3a2631; --shadow: 0 12px 30px rgba(0,0,0,.45);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100dvh; background: var(--bg); color: var(--text);
+    font-family: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  header { padding: 20px 16px 0; text-align: center; }
+  h1 { margin: 0; font-size: 2rem; letter-spacing: .5px; }
+  #status { margin-top: 6px; color: var(--muted); font-size: 1.05rem; min-height: 1.4em; }
+
+  /* The pet: the container is shared, the face comes from the character pack (face.css). */
+  .stage { padding: 14px 16px 8px; display: grid; place-items: center; }
+  #cat {
+    --scale: 1; --halo: var(--idle); --mouth: 0;
+    /* pose: set by the emotion (data-emo), smoothly animated */
+    --tilt: 0deg; --head-y: 0px; --ear-l: 0deg; --ear-r: 0deg;
+    --brow-o: 0; --brow-y: 0px; --brow-l: 0deg; --brow-r: 0deg;
+    --blush: .5; --eye-s: 1; --pupil: 1; --lx: 0px; --ly: 0px; --sx: 0px; --sy: 0px;
+    --breath: 4.2s; --wag: 3.4s;
+    position: relative; width: min(68vw, 270px, 34dvh); aspect-ratio: 1; padding: 0; border: none; cursor: pointer;
+    border-radius: 50%; background-color: var(--halo); -webkit-tap-highlight-color: transparent;
+    background-image: radial-gradient(circle at 50% 28%, rgba(255,255,255,.55), rgba(255,255,255,0) 62%);
+    box-shadow: var(--shadow), 0 0 0 calc((var(--scale) - 1) * 110px) color-mix(in srgb, var(--halo) 45%, transparent);
+    transition: background-color .5s, box-shadow .08s linear;
+  }
+  #cat:focus-visible { outline: 3px solid var(--accent); outline-offset: 6px; }
+  #cat svg { width: 100%; height: 100%; overflow: visible; transform: scale(var(--scale)); transition: transform .08s linear; }
+  body[data-state="listening"] #cat { --halo: var(--listen); }
+  body[data-state="thinking"]  #cat { --halo: var(--think); }
+  body[data-state="speaking"]  #cat { --halo: var(--speak); }
+
+  /*PET_FACE_CSS*/
+  /* Reduced motion: poses still change, but nothing moves on its own. */
+  @media (prefers-reduced-motion: reduce) {
+    #cat, #cat svg, #cat svg * { animation: none !important; transition-duration: .01s !important; }
+  }
+
+  #toggle {
+    margin-top: 22px; font: inherit; font-size: 1.25rem; font-weight: 700; color: #fff;
+    background: var(--accent); border: none; border-radius: 999px; padding: 14px 32px;
+    box-shadow: var(--shadow); cursor: pointer;
+  }
+  #toggle.stop { background: var(--danger); }
+  #toggle:disabled { opacity: .6; cursor: wait; }
+
+  /* Conversation */
+  /* The cat always stays visible; only the conversation scrolls. */
+  .kid { height: 100dvh; overflow: hidden; }
+  header, .stage { flex: none; }
+  #log { width: 100%; max-width: 640px; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain;
+    padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 10px;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px);
+            mask-image: linear-gradient(to bottom, transparent 0, #000 18px); }
+  #log > :first-child { margin-top: auto; }
+  .msg { flex: none; }
+  .msg { max-width: 85%; padding: 10px 14px; border-radius: 18px; line-height: 1.4; font-size: 1.05rem; }
+  .msg.user { align-self: flex-end; background: var(--bubble-user); border-bottom-right-radius: 6px; }
+  .msg.bot { align-self: flex-start; background: var(--bubble-bot); border-bottom-left-radius: 6px; }
+  .msg.bot::before { content: "🐾 "; }
+  .msg.interim { opacity: .55; font-style: italic; }
+  .msg.error { align-self: center; background: none; color: var(--danger); font-size: .95rem; }
+
+  /* ---------- Debug ---------- */
+  :root { --panel: #ffffff; --panel-2: #f6f1fa; --mono: ui-monospace, "SF Mono", Menlo, monospace;
+          --ok: #2e9e7c; --warn: #c98a00; --bad: #d0573f;
+          --seg-stt: #7fd8be; --seg-llm: #ffd97a; --seg-tts: #c3b5ff; --seg-net: #ffb3c7; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --panel: #24212d; --panel-2: #2c2837; --ok: #5fd0ac; --warn: #e3b64c; --bad: #ef8a73; }
+  }
+  .layout { width: 100%; display: flex; flex-direction: column; align-items: center; }
+  .kid { width: 100%; display: flex; flex-direction: column; align-items: center; }
+  #dbg { display: none; }
+  body.debug .layout { display: grid; grid-template-columns: minmax(320px, 1fr) minmax(360px, 560px); align-items: start; gap: 0; }
+  body.debug #dbg { display: flex; }
+  @media (max-width: 900px) { body.debug .layout { display: flex; } }
+  #dbg-btn { position: fixed; top: 12px; right: 12px; z-index: 5; font: 600 .85rem var(--mono); color: var(--muted);
+    background: var(--panel); border: 1px solid var(--idle); border-radius: 999px; padding: 6px 12px; cursor: pointer; }
+  body.debug #dbg-btn { color: var(--text); border-color: var(--accent); }
+  #dbg { flex-direction: column; width: 100%; max-width: 560px; height: 100dvh; position: sticky; top: 0;
+    background: var(--panel); border-left: 1px solid var(--idle); font-size: .86rem; }
+  @media (max-width: 900px) { #dbg { height: auto; position: static; border-left: none; border-top: 1px solid var(--idle); } }
+  .dbg-head { padding: 52px 14px 10px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+  .chip { font: 600 .74rem var(--mono); padding: 3px 8px; border-radius: 999px; background: var(--panel-2); color: var(--muted); }
+  .chip b { color: var(--text); font-weight: 700; }
+  .chip.live { color: var(--ok); } .chip.off { color: var(--bad); }
+  .tabs { display: flex; gap: 2px; padding: 0 10px; border-bottom: 1px solid var(--idle); }
+  .tabs button { font: 600 .82rem inherit; font-family: inherit; color: var(--muted); background: none; border: none;
+    padding: 9px 10px; border-bottom: 2px solid transparent; cursor: pointer; }
+  .tabs button[aria-selected="true"] { color: var(--text); border-bottom-color: var(--accent); }
+  .tabs .count { font-family: var(--mono); font-size: .72rem; opacity: .7; }
+  .pane { display: none; flex: 1; overflow: auto; padding: 12px 14px 16px; min-height: 260px; }
+  .pane.on { display: block; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+  .row .grow { flex: 1; }
+  .btn { font: 600 .8rem inherit; font-family: inherit; color: var(--text); background: var(--panel-2); border: 1px solid var(--idle);
+    border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+  .btn:hover { border-color: var(--accent); }
+  .btn.danger { color: var(--bad); }
+  .muted { color: var(--muted); }
+  .mono { font-family: var(--mono); }
+
+  /* Conversation context */
+  .mem { display: flex; flex-direction: column; gap: 6px; }
+  .m { border-radius: 10px; background: var(--panel-2); padding: 8px 10px; border-left: 3px solid var(--idle); }
+  .m.user { border-left-color: var(--listen); } .m.assistant, .m.model { border-left-color: var(--pink-deep); }
+  .m.developer, .m.system { border-left-color: var(--think); }
+  .m .who { font: 700 .7rem var(--mono); text-transform: uppercase; letter-spacing: .5px; color: var(--muted);
+    display: flex; justify-content: space-between; }
+  details.m.internal { opacity: .6; } details.m.internal summary { cursor: pointer; }
+  .m .txt { margin-top: 3px; white-space: pre-wrap; word-break: break-word; line-height: 1.4; }
+  .m pre { margin: 4px 0 0; font: .74rem var(--mono); white-space: pre-wrap; word-break: break-all; color: var(--muted); }
+  details.sys { margin-bottom: 12px; background: var(--panel-2); border-radius: 10px; padding: 8px 10px; }
+  details.sys summary { cursor: pointer; font-weight: 700; }
+  details.sys pre { font: .76rem/1.45 var(--mono); white-space: pre-wrap; margin: 8px 0 0; }
+  .say { display: flex; gap: 6px; margin-top: 12px; }
+  .say input { flex: 1; font: inherit; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--idle);
+    background: var(--bg); color: var(--text); }
+
+  /* Long-term memory */
+  .ltm { display: grid; grid-template-columns: 170px 1fr; gap: 10px; align-items: start; }
+  @media (max-width: 520px) { .ltm { grid-template-columns: 1fr; } }
+  #ltm-files { display: flex; flex-direction: column; gap: 2px; font: .76rem var(--mono); }
+  #ltm-files .grp { margin: 8px 0 2px; color: var(--muted); font-weight: 700; text-transform: uppercase; font-size: .68rem; }
+  #ltm-files button { text-align: left; font: inherit; color: var(--text); background: none; border: none; padding: 3px 6px;
+    border-radius: 6px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #ltm-files button:hover, #ltm-files button.on { background: var(--panel-2); }
+  #ltm-view { background: var(--panel-2); border-radius: 10px; padding: 10px 12px; min-height: 120px; }
+  #ltm-view pre { margin: 0; font: .76rem/1.5 var(--mono); white-space: pre-wrap; word-break: break-word; }
+  #ltm-view .path { font: 700 .74rem var(--mono); color: var(--muted); margin-bottom: 6px; }
+  .hit { background: var(--panel-2); border-radius: 8px; padding: 6px 8px; margin-bottom: 6px; }
+  .hit .f { font: 700 .72rem var(--mono); color: var(--muted); }
+  .hit pre { margin: 2px 0 0; font: .74rem var(--mono); white-space: pre-wrap; }
+  .m .tag { font: .68rem var(--mono); color: var(--muted); text-transform: none; letter-spacing: 0; }
+
+  /* Sessions */
+  #ses-list tr.s { cursor: pointer; } #ses-list tr.s:hover td, #ses-list tr.on td { background: var(--panel-2); }
+  #ses-detail h4 { margin: 14px 0 6px; }
+  .ses-sum { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+  .ev .err-row .e, .ev .err-row .d { color: var(--bad); }
+
+  /* Latency */
+  .turn { margin-bottom: 12px; }
+  .turn .lbl { display: flex; justify-content: space-between; font-family: var(--mono); font-size: .76rem; margin-bottom: 4px; }
+  .bar { display: flex; height: 18px; border-radius: 6px; overflow: hidden; background: var(--panel-2); }
+  .bar span { height: 100%; min-width: 2px; }
+  .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: .76rem; color: var(--muted); margin-bottom: 12px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 4px; vertical-align: -1px; }
+  table.t { width: 100%; border-collapse: collapse; font: .76rem var(--mono); }
+  table.t th, table.t td { text-align: right; padding: 4px 6px; border-bottom: 1px solid var(--panel-2); }
+  table.t th:first-child, table.t td:first-child { text-align: left; }
+  .big { font: 700 1.6rem var(--mono); }
+  .good { color: var(--ok); } .meh { color: var(--warn); } .slow { color: var(--bad); }
+
+  /* Events */
+  .ev { font: .75rem/1.5 var(--mono); }
+  .ev div { display: grid; grid-template-columns: 62px 120px 1fr; gap: 6px; border-bottom: 1px dashed var(--panel-2); padding: 1px 0; }
+  .ev .k { color: var(--muted); } .ev .e { font-weight: 700; } .ev .d { word-break: break-word; }
+  .ev .user .e { color: var(--ok); } .ev .bot .e { color: var(--pink-deep); } .ev .llm .e { color: var(--warn); }
+  .ev .err .e, .ev .err .d { color: var(--bad); } .ev .met .e { color: var(--muted); }
+  .ev .interim { opacity: .5; }
+</style>
+</head>
+<body data-state="idle">
+  <button id="dbg-btn" title="Panneau de débogage (touche D)">🛠 debug</button>
+  <div class="layout"><div class="kid">
+  <header>
+    <h1 id="name">…</h1>
+    <div id="status">Appuie sur le bouton pour commencer</div>
+  </header>
+  <div class="stage">
+    <button id="cat" data-emo="endormi" aria-label="Parler à PET_NAME">
+      <!--PET_FACE_SVG-->
+    </button>
+    <div style="text-align:center"><button id="toggle">On discute ?</button></div>
+  </div>
+  <main id="log" aria-live="polite"></main>
+  </div>
+
+  <aside id="dbg" aria-label="Débogage">
+    <div class="dbg-head"><a href="/parents" target="_blank" rel="noopener" style="color:var(--accent);font-size:.85rem">Espace parents ↗</a></div>
+    <div class="dbg-head" id="chips"><span class="chip off" id="chip-conn">● déconnecté</span></div>
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="mem" aria-selected="true">Conversation <span class="count" id="mem-count"></span></button>
+      <button role="tab" data-tab="ltm">Mémoire <span class="count" id="ltm-count"></span></button>
+      <button role="tab" data-tab="lat">Latence</button>
+      <button role="tab" data-tab="ses">Sessions</button>
+      <button role="tab" data-tab="ev">Événements <span class="count" id="ev-count"></span></button>
+      <button role="tab" data-tab="cost">Coûts</button>
+      <button role="tab" data-tab="err">Erreurs <span class="count" id="err-count"></span></button>
+      <button role="tab" data-tab="cfg">Moteurs</button>
+    </div>
+
+    <section class="pane on" id="pane-mem">
+      <div class="row"><span class="grow muted" id="mem-info">Pas de session — lance la conversation.</span>
+        <button class="btn" id="mem-copy">Copier JSON</button>
+        <button class="btn" id="energy-recharge" title="Recharge l'énergie de PET_NAME (le réveille d'une sieste)">Recharger</button>
+        <button class="btn danger" id="mem-reset" title="Vide l'historique de conversation (pas la mémoire à long terme)">Effacer</button></div>
+      <details class="sys"><summary>Consignes système <span class="muted mono" id="sys-len"></span></summary><pre id="sys"></pre></details>
+      <div class="mem" id="mem"></div>
+      <form class="say" id="say"><input id="say-in" placeholder="Écrire à PET_NAME (sans parler)…" autocomplete="off">
+        <button class="btn">Envoyer</button></form>
+    </section>
+
+    <section class="pane" id="pane-ltm">
+      <div class="row"><span class="grow muted" id="ltm-info">Mémoire à long terme</span>
+        <button class="btn" id="ltm-condense" title="Condense maintenant la conversation en cours dans la mémoire">Condenser maintenant</button></div>
+      <div class="row muted mono" id="ltm-last"></div>
+      <form class="say" id="ltm-search" style="margin:0 0 10px"><input id="ltm-q" placeholder="Chercher comme PET_NAME (ex. Léa dinosaures)…" autocomplete="off">
+        <button class="btn">Chercher</button></form>
+      <div id="ltm-results"></div>
+      <div class="ltm">
+        <nav id="ltm-files"></nav>
+        <article id="ltm-view"><p class="muted">Choisis un fichier.</p></article>
+      </div>
+    </section>
+
+    <section class="pane" id="pane-ses">
+      <div class="row"><span class="grow muted">Journaux détaillés (~/.aipet/pets/…/logs/sessions)</span>
+        <button class="btn" id="ses-refresh">Rafraîchir</button></div>
+      <table class="t" id="ses-list"></table>
+      <div id="ses-detail"></div>
+    </section>
+
+    <section class="pane" id="pane-lat">
+      <div class="row"><div class="grow"><div class="muted">Dernier tour — fin de parole → voix de PET_NAME</div>
+        <div class="big" id="lat-last">—</div></div>
+        <div class="muted mono" id="lat-avg"></div></div>
+      <div class="legend"><span><i style="background:var(--seg-stt)"></i>transcription</span>
+        <span><i style="background:var(--seg-llm)"></i>LLM (1er texte)</span>
+        <span><i style="background:var(--seg-tts)"></i>TTS + audio</span></div>
+      <div id="turns"></div>
+      <h4>Par session <span class="muted">(médianes, ms, 7 derniers jours)</span></h4>
+      <p class="muted" style="margin:0 0 6px">attente = de la transcription reçue à la fin de tour détectée ;
+        LLM = premier texte du modèle ; voix = le reste jusqu'au premier son. STT : délai de la transcription (avant).</p>
+      <table class="t"><thead><tr><th>session</th><th>tours</th><th>STT</th><th>attente</th><th>LLM</th><th>voix</th><th>total</th></tr></thead>
+        <tbody id="lat-sessions"></tbody></table>
+      <h4>TTFB par service <span class="muted">(serveur)</span></h4>
+      <table class="t"><thead><tr><th>service</th><th>dernier</th><th>moyenne</th><th>n</th></tr></thead><tbody id="ttfb"></tbody></table>
+    </section>
+
+    <section class="pane" id="pane-ev">
+      <div class="row"><label class="grow"><input type="checkbox" id="ev-interim"> afficher les transcriptions partielles</label>
+        <button class="btn" id="ev-clear">Vider</button></div>
+      <div class="ev" id="ev"></div>
+    </section>
+
+    <section class="pane" id="pane-cost">
+      <div class="row"><span class="grow muted" id="cost-note"></span><button class="btn" id="cost-refresh">Rafraîchir</button></div>
+      <table class="t"><thead><tr><th>jour</th><th>total $</th><th>conversation $</th><th>fond $</th><th>jetons entrée</th>
+        <th>jetons sortie</th><th>voix (car.)</th><th>parole enfant (min)</th></tr></thead><tbody id="cost-rows"></tbody></table>
+    </section>
+
+    <section class="pane" id="pane-err">
+      <div class="row"><span class="grow muted">Erreurs et incidents, 14 derniers jours</span><button class="btn" id="err-refresh">Rafraîchir</button></div>
+      <table class="t"><thead><tr><th>quand</th><th>quoi</th><th>détail</th></tr></thead><tbody id="err-rows"></tbody></table>
+    </section>
+
+    <section class="pane" id="pane-cfg">
+      <table class="t" id="cfg"></table>
+      <p class="muted">Modifier <span class="mono">config.toml</span> puis relancer la conversation (la config est relue à chaque session).</p>
+    </section>
+  </aside>
+  </div>
+  <audio id="bot-audio" autoplay></audio>
+
+<script type="module">
+  import { PipecatClient, SmallWebRTCTransport } from "/static/pipecat.js";
+
+  const $ = (id) => document.getElementById(id);
+  const DEBUG_GET = { headers: { "X-Pet": "1" } };  // every /debug/ route requires it
+  const cat = $("cat"), toggle = $("toggle"), status = $("status"), log = $("log");
+  let client = null, botBubble = null, interimBubble = null, name = "";
+
+  fetch("/config.json").then(r => r.json()).then(c => {
+    name = c.name; $("name").textContent = c.name; document.title = c.name;
+    cat.setAttribute("aria-label", `Parler à ${c.name}`);
+  }).catch(() => { $("name").textContent = "…"; });
+
+  // ---------- Face ----------
+  // The expression (data-emo on #cat) comes from the conversation state, then from the emotion
+  // The pet picks itself (tag stripped server-side, received as an "emotion" message),
+  // and otherwise from a small guess based on the sentence's punctuation and words.
+  const EMOS = ["joie", "rire", "surprise", "curieux", "calin", "pensif", "malice", "triste"];
+  const calm = matchMedia("(prefers-reduced-motion: reduce)");
+  const mood = { emo: null, fade: null, tagAt: -1e9, forced: null };
+
+  function face() {
+    const s = document.body.dataset.state;
+    cat.dataset.emo = mood.forced
+      || (s === "idle" ? "endormi" : s === "thinking" ? "pensif" : mood.emo || (s === "listening" ? "ecoute" : "neutre"));
+  }
+  function setEmotion(e, source = "pet") {
+    if (e && !EMOS.includes(e)) return;
+    clearTimeout(mood.fade);
+    if (e && source === "pet") mood.tagAt = performance.now();
+    if (e && e !== mood.emo) ev("bot", "émotion", `${e}${source === "pet" ? "" : " (devinée)"}`);
+    mood.emo = e || null;
+    face();
+  }
+  // No tag from the model: guess from the displayed sentence.
+  function guessEmotion(text) {
+    const t = text.toLowerCase();
+    if (/\b(ha ha|hi hi|hé hé|hihi|haha)\b|rigol|blague/.test(t)) return "rire";
+    if (/désolé|dommage|ça fait de la peine|grosse peine|pas facile|mon pauvre|ma pauvre/.test(t)) return "triste";
+    if (/ronron|câlin|bonne nuit|fais de beaux rêves|tout doux|bisou/.test(t)) return "calin";
+    if (/^(oh|ah|waouh|ouah|ça alors)\b|par mes moustaches|incroyable/.test(t)) return "surprise";
+    if (/devine|secret|chut|petit filou|langue au chat/.test(t)) return "malice";
+    if (/hmm|voyons|je me demande|il était une fois|laisse-moi réfléchir/.test(t)) return "pensif";
+    if (/\?\s*$/.test(t)) return "curieux";
+    if (t.includes("!")) return "joie";
+    return null;
+  }
+  // Small side glances, so it looks alive while awake.
+  (function glance() {
+    const awake = !["endormi", "calin", "rire", "pensif"].includes(cat.dataset.emo);
+    if (awake && !calm.matches && !document.hidden) {
+      cat.style.setProperty("--sx", ((Math.random() - .5) * 4.5).toFixed(1) + "px");
+      cat.style.setProperty("--sy", ((Math.random() - .5) * 2.5).toFixed(1) + "px");
+      setTimeout(() => { cat.style.setProperty("--sx", "0px"); cat.style.setProperty("--sy", "0px"); }, 500 + Math.random() * 900);
+    }
+    setTimeout(glance, 2600 + Math.random() * 3600);
+  })();
+
+  function setState(s) {
+    document.body.dataset.state = s === "connecting" ? "thinking" : s;
+    face();
+    status.textContent = {
+      idle: "Appuie sur le bouton pour commencer",
+      connecting: `${name} se réveille…`,
+      listening: `${name} t'écoute !`,
+      thinking: `${name} réfléchit…`,
+      speaking: `${name} parle`,
+    }[s];
+  }
+
+  // Scrolling: follow the bottom, unless the user scrolled up to read.
+  const nearBottom = () => log.scrollHeight - log.scrollTop - log.clientHeight < 60;
+  const scrollLog = () => log.scrollTo({ top: log.scrollHeight, behavior: "smooth" });
+
+  function addMsg(cls, text) {
+    const el = document.createElement("div");
+    el.className = "msg " + cls; el.textContent = text;
+    const stick = nearBottom(); log.appendChild(el); if (stick) scrollLog();
+    return el;
+  }
+
+  function onUserTranscript({ text, final }) {
+    if (!text) return;
+    if (!interimBubble) interimBubble = addMsg("user interim", text);
+    const stick = nearBottom(); interimBubble.textContent = text; if (stick) scrollLog();
+    if (final) {
+      interimBubble.classList.remove("interim"); interimBubble = null;
+      // The child talking over the pet doesn't cut its reply in two bubbles.
+      if (document.body.dataset.state !== "speaking") botBubble = null;
+    }
+  }
+
+  // Pipecat sends each spoken sentence twice: once before synthesis (spoken: false) and once
+  // after (spoken: true, or spoken_status "completed" for 2.x clients). Show it once, when spoken.
+  const isBotPreview = (d) => d.will_be_spoken && !(d.spoken || d.spoken_status === "completed");
+
+  function onBotOutput(data) {
+    const type = data.text_type || data.aggregated_by;
+    if (type === "word" || type === "token" || !data.text || isBotPreview(data)) return;
+    if (!botBubble) botBubble = addMsg("bot", data.text);
+    else { const stick = nearBottom(); botBubble.textContent += " " + data.text; if (stick) scrollLog(); }
+    // The pet hasn't picked an emotion recently: guess one.
+    if (performance.now() - mood.tagAt > 8000) { const g = guessEmotion(data.text); if (g) setEmotion(g, "auto"); }
+  }
+
+  // The cat grows a little with the volume, and opens its mouth while speaking.
+  function pulse(level, speaking = false) {
+    cat.style.setProperty("--scale", (1 + Math.min(level * 1.5, 0.18)).toFixed(3));
+    cat.style.setProperty("--mouth", speaking ? Math.min(level * 4.5, 1).toFixed(2) : 0);
+  }
+
+  async function start() {
+    toggle.disabled = true; setState("connecting");
+    client = new PipecatClient({
+      transport: new SmallWebRTCTransport(),
+      enableMic: true, enableCam: false,
+      callbacks: {
+        onBotReady: () => { setState("listening"); ev("bot", "prêt"); },
+        onUserStartedSpeaking: () => { setEmotion(null); setState("listening"); ev("user", "parle…"); },
+        onUserStoppedSpeaking: () => { setState("thinking"); ev("user", "s'arrête"); dbg.turn = { stop: now() }; },
+        onBotStartedSpeaking: () => { clearTimeout(mood.fade); setState("speaking"); ev("bot", "parle…"); finishTurn(); },
+        onBotStoppedSpeaking: () => {
+          setState("listening"); botBubble = null; pulse(0); ev("bot", "s'arrête");
+          // The emotion lingers after the last sentence, then the cat becomes attentive again.
+          clearTimeout(mood.fade); mood.fade = setTimeout(() => setEmotion(null), 2600);
+        },
+        onServerMessage: (m) => { if (m?.type === "emotion") setEmotion(m.emotion); },
+        onUserTranscript: (d) => {
+          onUserTranscript(d);
+          ev("user", d.final ? "transcription" : "partielle", d.text, d.final ? "" : "interim");
+          if (d.final && dbg.turn) { mark("transcript"); dbg.turn.text = (dbg.turn.text ? dbg.turn.text + " " : "") + d.text; }
+        },
+        onBotOutput: (d) => { onBotOutput(d); if (d.text && d.text_type !== "word" && d.text_type !== "token" && !isBotPreview(d)) ev("bot", "dit", d.text); },
+        onBotLlmStarted: () => { ev("llm", "LLM démarre"); mark("llmStart"); },
+        onBotLlmText: () => mark("llmText"),
+        onBotLlmStopped: () => ev("llm", "LLM fini"),
+        onBotTtsStarted: () => { ev("bot", "TTS démarre"); mark("tts"); },
+        onMetrics,
+        onLLMFunctionCall: (d) => ev("llm", "outil " + (d.function_name || "?"), JSON.stringify(d.args ?? d.arguments ?? {})),
+        onLocalAudioLevel: (l) => { if (document.body.dataset.state === "listening") pulse(l); },
+        onRemoteAudioLevel: (l) => { if (document.body.dataset.state === "speaking") pulse(l, true); },
+        onTrackStarted: (track, p) => {
+          // The bot track arrives without a participant: any non-local audio is the bot.
+          if (track.kind === "audio" && !p?.local) {
+            const el = $("bot-audio");
+            el.srcObject = new MediaStream([track]);
+            el.play().catch((e) => addMsg("error", "Le son est bloqué par le navigateur : " + e.message));
+          }
+        },
+        onConnected: () => ev("bot", "connecté"),
+        onDisconnected: () => { ev("err", "déconnecté"); stopUI(); },
+        onError: (m) => { addMsg("error", "Oups : " + (m?.data?.message || "erreur")); ev("err", "erreur", m?.data?.message || JSON.stringify(m)); },
+      },
+    });
+    try {
+      await client.connect({ webrtcRequestParams: { endpoint: "/api/offer" } });
+      toggle.textContent = "Au revoir !"; toggle.classList.add("stop");
+    } catch (e) {
+      addMsg("error", "Impossible de démarrer : " + (e?.message || e));
+      stopUI();
+    } finally { toggle.disabled = false; }
+  }
+
+  function stopUI() {
+    setEmotion(null); setState("idle"); pulse(0);
+    toggle.textContent = "On discute ?"; toggle.classList.remove("stop");
+    client = null; botBubble = null; interimBubble = null;
+  }
+
+  async function stop() { const c = client; stopUI(); if (c) await c.disconnect(); }
+
+
+  // ======================= Debug =======================
+  const dbg = {
+    t0: performance.now(), events: [], turn: null, turns: [], ttfb: {}, memHash: "", poll: null,
+  };
+  const esc = (t) => String(t).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  const now = () => performance.now();
+  const fmt = (ms) => ms == null ? "—" : ms >= 1000 ? (ms / 1000).toFixed(2) + " s" : Math.round(ms) + " ms";
+  const grade = (ms) => ms < 1500 ? "good" : ms < 3000 ? "meh" : "slow";
+
+  function setDebug(on) {
+    document.body.classList.toggle("debug", on);
+    try { localStorage.setItem("pet-debug", on ? "1" : "0"); } catch {}
+    clearInterval(dbg.poll);
+    if (on) { refreshState(); dbg.poll = setInterval(refreshState, 1200); }
+  }
+  let startDebug = new URLSearchParams(location.search).has("debug");
+  try { startDebug ||= localStorage.getItem("pet-debug") === "1"; } catch {}
+  $("dbg-btn").onclick = () => setDebug(!document.body.classList.contains("debug"));
+  addEventListener("keydown", (e) => {
+    if (e.key.toLowerCase() === "d" && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) $("dbg-btn").click();
+  });
+  document.querySelectorAll(".tabs button").forEach((b) => b.onclick = () => {
+    document.querySelectorAll(".tabs button").forEach((x) => x.setAttribute("aria-selected", x === b));
+    document.querySelectorAll(".pane").forEach((p) => p.classList.toggle("on", p.id === "pane-" + b.dataset.tab));
+  });
+
+  // --- event log ---
+  function ev(cls, name, detail = "", extra = "") {
+    const t = ((now() - dbg.t0) / 1000).toFixed(2);
+    const row = document.createElement("div");
+    row.className = cls + (extra ? " " + extra : "");
+    row.innerHTML = `<span class="k">${t}</span><span class="e">${esc(name)}</span><span class="d">${esc(detail)}</span>`;
+    if (extra === "interim" && !$("ev-interim").checked) row.style.display = "none";
+    const box = $("ev"), stick = box.parentElement.scrollTop + box.parentElement.clientHeight >= box.parentElement.scrollHeight - 30;
+    box.appendChild(row); dbg.events.push(row);
+    if (dbg.events.length > 800) dbg.events.shift().remove();
+    $("ev-count").textContent = dbg.events.length;
+    if (stick) box.parentElement.scrollTop = box.parentElement.scrollHeight;
+  }
+  $("ev-interim").onchange = (e) => document.querySelectorAll(".ev .interim").forEach((r) => r.style.display = e.target.checked ? "" : "none");
+  $("ev-clear").onclick = () => { $("ev").innerHTML = ""; dbg.events = []; $("ev-count").textContent = ""; };
+
+  // --- latency per turn ---
+  function mark(key) {
+    const t = dbg.turn;
+    if (t && t[key] == null) t[key] = now();
+  }
+  function finishTurn() {
+    const t = dbg.turn; dbg.turn = null;
+    if (!t || t.stop == null) return;
+    t.bot = now();
+    dbg.turns.unshift(t); dbg.turns.length = Math.min(dbg.turns.length, 12);
+    renderTurns();
+  }
+  function renderTurns() {
+    const html = dbg.turns.map((t) => {
+      const total = t.bot - t.stop;
+      const stt = Math.max(0, (t.transcript ?? t.stop) - t.stop);
+      const llm = Math.max(0, (t.llmText ?? t.transcript ?? t.stop) - (t.transcript ?? t.stop));
+      const tts = Math.max(0, total - stt - llm);
+      const pct = (v) => (100 * v / Math.max(total, 1)).toFixed(1) + "%";
+      return `<div class="turn"><div class="lbl"><span class="muted">« ${esc((t.text || "").slice(0, 40))} »</span>
+        <span class="${grade(total)}">${fmt(total)}</span></div>
+        <div class="bar" title="transcription ${fmt(stt)} · LLM ${fmt(llm)} · TTS ${fmt(tts)}">
+          <span style="width:${pct(stt)};background:var(--seg-stt)"></span>
+          <span style="width:${pct(llm)};background:var(--seg-llm)"></span>
+          <span style="width:${pct(tts)};background:var(--seg-tts)"></span></div>
+        <div class="lbl muted"><span>STT ${fmt(stt)} · LLM ${fmt(llm)} · TTS ${fmt(tts)}</span></div></div>`;
+    }).join("");
+    $("turns").innerHTML = html || '<p class="muted">Aucun tour mesuré pour l\'instant.</p>';
+    if (dbg.turns.length) {
+      const last = dbg.turns[0].bot - dbg.turns[0].stop;
+      $("lat-last").textContent = fmt(last); $("lat-last").className = "big " + grade(last);
+      const avg = dbg.turns.reduce((a, t) => a + (t.bot - t.stop), 0) / dbg.turns.length;
+      $("lat-avg").textContent = `moyenne ${fmt(avg)} sur ${dbg.turns.length}`;
+    }
+  }
+  function onMetrics(data) {
+    for (const m of data.ttfb || []) {
+      const k = m.processor.replace(/#\d+$/, "");
+      const s = (dbg.ttfb[k] ||= { last: 0, sum: 0, n: 0 });
+      s.last = m.value * 1000; s.sum += s.last; s.n++;
+      ev("met", "ttfb", `${k} ${fmt(s.last)}`);
+    }
+    $("ttfb").innerHTML = Object.entries(dbg.ttfb).map(([k, s]) =>
+      `<tr><td>${esc(k)}</td><td class="${grade(s.last * 2)}">${fmt(s.last)}</td><td>${fmt(s.sum / s.n)}</td><td>${s.n}</td></tr>`).join("");
+  }
+  renderTurns();
+
+  // --- conversation context (server-side LLM context) ---
+  function contentText(c) {
+    if (typeof c === "string") return c;
+    if (Array.isArray(c)) return c.map((p) => p?.text ?? (p?.type ? `[${p.type}]` : JSON.stringify(p))).join("\n");
+    return null;
+  }
+  let lastState = null;
+  async function refreshState() {
+    try {
+      const st = await (await fetch("/debug/state", DEBUG_GET)).json();
+      lastState = st;
+      renderCfg(st);
+      const hash = JSON.stringify(st.context) + st.system_prompt;
+      if (hash === dbg.memHash) return;
+      dbg.memHash = hash;
+      $("sys").textContent = st.system_prompt; $("sys-len").textContent = `${st.system_prompt.length} car.`;
+      const msgs = st.context;
+      $("mem-count").textContent = msgs.length || "";
+      const chars = msgs.reduce((a, m) => a + JSON.stringify(m).length, 0);
+      $("mem-info").textContent = st.session.active
+        ? `${msgs.length} message(s) · ~${Math.round((chars + st.system_prompt.length) / 4)} tokens (estimation)`
+        : "Pas de session — lance la conversation.";
+      const box = $("mem"), stick = box.parentElement.scrollTop + box.parentElement.clientHeight >= box.parentElement.scrollHeight - 30;
+      box.innerHTML = msgs.map((m, i) => {
+        if (m.llm && m.message) {  // LLM-specific message (e.g. Gemini thought signature)
+          const kind = m.message.type || "interne";
+          return `<details class="m internal"><summary class="who"><span>${esc(m.llm)} · ${esc(kind)}</span><span>#${i + 1}</span></summary>
+            <pre>${esc(JSON.stringify(m.message, null, 1))}</pre></details>`;
+        }
+        const role = m.role || m.type || "?";
+        let txt = contentText(m.content), tag = "";
+        if (txt) { const mt = txt.match(/^⟦([^⟧]*)⟧\s*/); if (mt) { tag = mt[1]; txt = txt.slice(mt[0].length); } }
+        const rest = { ...m }; delete rest.role; if (txt != null) delete rest.content;
+        const more = Object.keys(rest).length ? `<pre>${esc(JSON.stringify(rest, null, 1))}</pre>` : "";
+        return `<div class="m ${esc(role)}"><div class="who"><span>${esc(role)} <span class="tag">${esc(tag)}</span></span><span>#${i + 1}</span></div>
+          ${txt != null ? `<div class="txt">${esc(txt)}</div>` : ""}${more}</div>`;
+      }).join("") || '<p class="muted">Mémoire vide.</p>';
+      if (stick) box.parentElement.scrollTop = box.parentElement.scrollHeight;
+    } catch (e) { $("mem-info").textContent = "Serveur injoignable : " + e.message; }
+  }
+  function renderCfg(st) {
+    const m = st.engines;
+    $("chips").innerHTML = `<span class="chip ${client ? "live" : "off"}">● ${client ? "connecté" : "déconnecté"}</span>
+      <span class="chip">état <b>${esc(document.body.dataset.state)}</b></span>
+      <span class="chip">frimousse <b>${esc(cat.dataset.emo)}</b></span>
+      <span class="chip">LLM <b>${esc(m.conversation)}</b></span>
+      ${st.skills?.active ? `<span class="chip">activité <b>${esc(st.skills.active)}</b></span>` : ""}
+      ${st.energy ? `<span class="chip">énergie <b>${Math.round(st.energy.level * 100)} %</b>${st.asleep ? " · dort (" + esc(st.asleep === "night" ? "nuit" : "sieste") + ")" : st.energy.state !== "normal" ? " · fatigué" : ""}</span>` : ""}
+      ${st.speakers ? `<span class="chip">parle <b>${esc(st.speakers.current || "inconnu")}</b>${st.speakers.current ? " · " + esc(st.speakers.certainty) : ""}</span>` : ""}`;
+    const c = st.condensation;
+    $("ltm-last").textContent = c?.when ? `dernière condensation ${c.when} (${c.reason}) → ${c.error ? "ERREUR " + c.error : (c.changes.join(", ") || "rien de nouveau")}` : "";
+    $("cfg").innerHTML = Object.entries({
+      "Reconnaissance (STT)": m.stt, "Conversation (LLM)": m.conversation, "Condensation mémoire": m.condensation, "Voix (TTS)": m.tts, "Projet GCP": m.project,
+      "Compétences": st.skills ? (st.skills.available.map(c => c.name).join(", ") || "aucune")
+        + (Object.keys(st.skills.errors || {}).length ? ` · ${Object.keys(st.skills.errors).length} ignorée(s) : `
+        + Object.entries(st.skills.errors).map(([f, e]) => f.split("/").slice(-2, -1)[0] + " (" + e + ")").join(", ") : "") : null,
+      "Mots pour interrompre": st.listening?.words_to_interrupt,
+      "VAD confiance / début": st.listening ? `${st.listening.vad_confidence} / ${st.listening.vad_start_secs} s` : null,
+      "Session": st.session.active ? "active depuis " + new Date(st.session.since * 1000).toLocaleTimeString() : "aucune",
+    }).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v ?? "—")}</td></tr>`).join("");
+  }
+  $("mem-reset").onclick = async () => {
+    const r = await (await fetch("/debug/reset", { method: "POST", headers: { "X-Pet": "1" } })).json();
+    ev(r.ok ? "llm" : "err", "mémoire effacée", r.ok ? "" : r.reason); refreshState();
+  };
+  $("energy-recharge").onclick = async () => {
+    const r = await (await fetch("/debug/energy/recharge", { method: "POST", headers: { "X-Pet": "1" } })).json();
+    ev(r.ok ? "llm" : "err", "énergie rechargée", r.ok ? Math.round(r.level * 100) + " %" : r.reason); refreshState();
+  };
+  $("mem-copy").onclick = () => navigator.clipboard?.writeText(JSON.stringify(lastState, null, 2));
+  $("say").onsubmit = async (e) => {
+    e.preventDefault();
+    const text = $("say-in").value.trim();
+    if (!text) return;
+    if (!client) { ev("err", "envoi", "pas de session"); return; }
+    $("say-in").value = "";
+    addMsg("user", text); botBubble = null;
+    ev("user", "texte envoyé", text);
+    dbg.turn = { stop: now(), transcript: now(), text };
+    try { await client.sendText(text); } catch (err) { ev("err", "sendText", err.message); }
+  };
+  // --- long-term memory (files) ---
+  let ltmSel = "RESUME.md", ltmData = null;
+  async function refreshLtm() {
+    try {
+      ltmData = await (await fetch("/debug/memory", DEBUG_GET)).json();
+      const fs = ltmData.files;
+      $("ltm-count").textContent = fs.length || "";
+      $("ltm-info").textContent = ltmData.dir;
+      const groups = {};
+      for (const f of fs) { const g = f.path.includes("/") ? f.path.split("/")[0] : "racine"; (groups[g] ||= []).push(f); }
+      const order = ["racine", "famille", "histoires", "souvenirs", "conversations"];
+      $("ltm-files").innerHTML = Object.keys(groups).sort((a, b) => order.indexOf(a) - order.indexOf(b)).map((g) =>
+        `<div class="grp">${esc(g)}</div>` + groups[g].sort((a, b) => g === "souvenirs" || g === "conversations" ? b.path.localeCompare(a.path) : 0)
+          .map((f) => `<button data-p="${esc(f.path)}" class="${f.path === ltmSel ? "on" : ""}">${esc(f.path.split("/").pop())}</button>`).join("")).join("");
+      $("ltm-files").querySelectorAll("button").forEach((b) => b.onclick = () => { ltmSel = b.dataset.p; showLtm(); refreshLtm(); });
+      showLtm();
+    } catch (e) { $("ltm-info").textContent = "Serveur injoignable : " + e.message; }
+  }
+  function showLtm() {
+    const f = ltmData?.files.find((x) => x.path === ltmSel);
+    $("ltm-view").innerHTML = f ? `<div class="row"><span class="path grow">${esc(f.path)} · modifié ${new Date(f.modified * 1000).toLocaleString()}</span>
+        ${f.path === "RESUME.md" ? "" : '<button class="btn danger" id="ltm-del">Supprimer</button>'}</div><pre>${esc(f.content)}</pre>`
+                                : '<p class="muted">Choisis un fichier.</p>';
+    const del = $("ltm-del");
+    if (del) del.onclick = async () => {
+      if (del.dataset.armed !== "1") { del.dataset.armed = "1"; del.textContent = "Confirmer la suppression"; return; }
+      const r = await (await fetch("/debug/memory/delete?path=" + encodeURIComponent(f.path), { method: "POST", headers: { "X-Pet": "1" } })).json();
+      ev(r.ok ? "llm" : "err", "suppression", f.path + (r.ok ? "" : " : " + r.reason));
+      ltmSel = "RESUME.md"; refreshLtm();
+    };
+  }
+  $("ltm-search").onsubmit = async (e) => {
+    e.preventDefault();
+    const q = $("ltm-q").value.trim(); if (!q) { $("ltm-results").innerHTML = ""; return; }
+    const hits = await (await fetch("/debug/memory/search?q=" + encodeURIComponent(q), DEBUG_GET)).json();
+    $("ltm-results").innerHTML = hits.length ? hits.map((h) => `<div class="hit"><div class="f">${esc(h.file)}</div><pre>${esc(h.excerpt)}</pre></div>`).join("")
+                                             : '<p class="muted">Rien trouvé.</p>';
+  };
+  $("ltm-condense").onclick = async () => {
+    const b = $("ltm-condense"); b.disabled = true; b.textContent = "Condensation…";
+    try {
+      const r = await (await fetch("/debug/memory/condense", { method: "POST", headers: { "X-Pet": "1" } })).json();
+      ev(r.ok ? "llm" : "err", "condensation", r.ok ? (r.changes.join(", ") || "rien de nouveau") : (r.error || r.reason));
+    } finally { b.disabled = false; b.textContent = "Condenser maintenant"; refreshLtm(); refreshState(); }
+  };
+  setInterval(() => { if (document.body.classList.contains("debug") && $("pane-ltm").classList.contains("on")) refreshLtm(); }, 3000);
+  document.querySelector('[data-tab="ltm"]').addEventListener("click", refreshLtm);
+
+  // --- session logs (server) ---
+  const fmtS = (s) => s == null ? "—" : s >= 60 ? `${Math.floor(s / 60)} min ${Math.round(s % 60)} s` : `${Math.round(s)} s`;
+  let sesSel = null;
+  async function refreshSessions() {
+    try {
+      const list = await (await fetch("/debug/sessions", DEBUG_GET)).json();
+      $("ses-list").innerHTML = `<thead><tr><th>début</th><th>mode</th><th>durée</th><th>tours</th><th>latence moy/max</th><th>outils</th><th>err.</th></tr></thead><tbody>` +
+        list.map((x) => `<tr class="s ${x.name === sesSel ? "on" : ""}" data-n="${esc(x.name)}"><td>${esc((x.start || "").slice(5, 16).replace("T", " "))}${x.ongoing ? " ●" : ""}</td>
+          <td>${esc(x.mode || "")}</td><td>${fmtS(x.duration_s)}</td><td>${x.turns}</td>
+          <td class="${x.latency_avg_ms ? grade(x.latency_avg_ms) : ""}">${fmt(x.latency_avg_ms)} / ${fmt(x.latency_max_ms)}</td>
+          <td>${x.tools}</td><td class="${x.errors ? "slow" : ""}">${x.errors}</td></tr>`).join("") + "</tbody>";
+      if (!list.length) $("ses-list").innerHTML = '<tr><td class="muted">Aucune session journalisée pour l\'instant.</td></tr>';
+      $("ses-list").querySelectorAll("tr.s").forEach((tr) => tr.onclick = () => { sesSel = tr.dataset.n; refreshSessions(); showSession(); });
+    } catch (e) { $("ses-list").innerHTML = `<tr><td class="slow">Serveur injoignable : ${esc(e.message)}</td></tr>`; }
+  }
+  const evLabel = {
+    session_start: "début", session_end: "fin", user_started_speaking: "enfant parle", user_stopped_speaking: "enfant se tait",
+    transcription: "transcription", llm_response: "réponse brute", bot_started_speaking: "PET_NAME parle", bot_stopped_speaking: "PET_NAME se tait",
+    tool_call: "outil →", tool_result: "outil ←", emotion: "émotion", speaker: "interlocuteur",
+    condensation: "condensation", condensation_error: "condensation ✗", error: "ERREUR", interruption: "interruption",
+    sleep: "veille", wake: "réveil", metric: "métrique", wait: "attend la fin", wait_useful: "attente utile",
+    wait_expired: "attente expirée", skill_start: "activité →", skill_end: "activité ←",
+  };
+  function evDetail(e) {
+    switch (e.type) {
+      case "transcription": return e.text;
+      case "llm_response": return `${e.raw_text || "(appel d'outil)"} · 1er texte ${fmt(e.first_text_ms)} · total ${fmt(e.duration_ms)}`;
+      case "bot_started_speaking": return `tour ${e.turn} · fin de parole → voix ${fmt(e.voice_latency_ms)}`;
+      case "tool_call": return `${e.name} ${JSON.stringify(e.arguments)}`;
+      case "tool_result": return `${e.name} ${JSON.stringify(e.result).slice(0, 300)}`;
+      case "emotion": return e.emotion;
+      case "speaker": return `${e.name} (${e.certainty})${e.previous ? " — avant " + e.previous : ""}`;
+      case "condensation": return `${e.reason} · ${e.messages} msg · ${e.duration_s} s → ${(e.files || []).join(", ") || "rien"}`;
+      case "metric": return e.name === "tokens" ? `${e.service} entrée ${e.input} · sortie ${e.output} · réflexion ${e.reasoning ?? 0}`
+                                                : `${e.service} ${e.name} ${e.value}`;
+      case "session_start": return `${e.mode}${e.wake_score ? " · score réveil " + e.wake_score : ""} · ${JSON.stringify(e.config || {}).slice(0, 200)}`;
+      case "session_end": return `${e.reason} · ${fmtS(e.duration_s)}`;
+      default: { const r = { ...e }; delete r.t; delete r.s; delete r.type; return Object.keys(r).length ? JSON.stringify(r) : ""; }
+    }
+  }
+  async function showSession() {
+    if (!sesSel) return;
+    const d = await (await fetch("/debug/sessions/" + encodeURIComponent(sesSel), DEBUG_GET)).json();
+    const r = d.summary, showMet = $("ses-met")?.checked;
+    $("ses-detail").innerHTML = `<h4>${esc(d.name)}</h4><div class="ses-sum">
+        <span class="chip">tours <b>${r.turns}</b></span><span class="chip">latence <b>${fmt(r.latency_avg_ms)}</b> moy · <b>${fmt(r.latency_max_ms)}</b> max</span>
+        <span class="chip">outils <b>${r.tools}</b></span><span class="chip">émotions <b>${r.emotions}</b></span>
+        <span class="chip">interruptions <b>${r.interruptions}</b></span><span class="chip ${r.errors ? "off" : ""}">erreurs <b>${r.errors}</b></span>
+        <span class="chip">attentes <b>${r.waits}</b> (utiles ${r.waits_useful})</span>
+        <span class="chip">tokens <b>${r.tokens_in}</b> → <b>${r.tokens_out}</b></span>
+        ${r.speakers.length ? `<span class="chip">avec <b>${esc(r.speakers.join(", "))}</b></span>` : ""}</div>
+      <div class="row"><label><input type="checkbox" id="ses-met" ${showMet ? "checked" : ""}> afficher les métriques</label>
+        <a class="btn" href="/debug/sessions/${encodeURIComponent(d.name)}" target="_blank">JSON brut</a></div>
+      <div class="ev">${d.events.filter((e) => showMet || e.type !== "metric").map((e) => {
+        const cls = /error/.test(e.type) ? "err-row" : /^user_|transcri|speaker/.test(e.type) ? "user"
+                  : /^bot_|emotion|^wait/.test(e.type) ? "bot" : /tool|llm_|condensation|skill/.test(e.type) ? "llm" : "met";
+        return `<div class="${cls}"><span class="k">${e.s.toFixed(1)}</span><span class="e">${esc(evLabel[e.type] || e.type)}</span><span class="d">${esc(evDetail(e))}</span></div>`;
+      }).join("")}</div>`;
+    $("ses-met").onchange = showSession;
+  }
+  $("ses-refresh").onclick = () => { refreshSessions(); showSession(); };
+  document.querySelector('[data-tab="ses"]').addEventListener("click", refreshSessions);
+
+  // ---- technical monitoring: latency per session, costs, errors
+  const ms = (v) => (v == null ? "—" : v);
+  async function refreshLatSessions() {
+    const rows = await (await fetch("/debug/tech/latency", DEBUG_GET)).json();
+    $("lat-sessions").innerHTML = rows.map((r) => `<tr><td>${esc(r.session.slice(0, 16).replace("_", " "))}</td><td>${r.turns}</td>
+      <td>${ms(r.stt)}</td><td>${ms(r.wait)}</td><td>${ms(r.llm)}</td><td>${ms(r.voice)}</td><td><b>${ms(r.total)}</b></td></tr>`).join("");
+  }
+  document.querySelector('[data-tab="lat"]').addEventListener("click", refreshLatSessions);
+  async function refreshCosts() {
+    $("cost-note").textContent = "Calcul…";
+    const c = await (await fetch("/debug/tech/costs", DEBUG_GET)).json();
+    const usd = (v) => (v == null ? "—" : v.toFixed(3));
+    $("cost-note").textContent = c.note + (c.prices_known ? "" : " (liste des prix indisponible)");
+    $("cost-rows").innerHTML = c.days.map((d) => `<tr><td>${esc(d.day)}</td><td><b>${usd(d.total_usd)}</b>${d.speech_priced ? "" : ""}</td>
+      <td>${usd(d.conversation_usd)}</td><td>${usd(d.background_usd)}</td><td>${d.tokens_in.toLocaleString("fr-FR")}</td>
+      <td>${d.tokens_out.toLocaleString("fr-FR")}</td><td>${d.tts_chars.toLocaleString("fr-FR")}${d.tts_usd != null ? " · $" + usd(d.tts_usd) : ""}</td>
+      <td>${d.stt_minutes.toFixed(1)}${d.stt_usd != null ? " · $" + usd(d.stt_usd) : ""}</td></tr>`
+      + (d.unpriced.length ? `<tr><td></td><td colspan="7" class="muted">sans prix : ${esc(d.unpriced.join(", "))}</td></tr>` : "")).join("");
+  }
+  document.querySelector('[data-tab="cost"]').addEventListener("click", refreshCosts);
+  $("cost-refresh").addEventListener("click", refreshCosts);
+  async function refreshErrors() {
+    const rows = await (await fetch("/debug/tech/errors", DEBUG_GET)).json();
+    $("err-count").textContent = rows.length || "";
+    $("err-rows").innerHTML = rows.map((e) => `<tr><td>${esc(e.t.slice(5, 16))}</td><td>${esc(e.kind)}${e.fatal ? " (fatale)" : ""}</td>
+      <td style="text-align:left">${esc(e.detail)}</td></tr>`).join("") || `<tr><td colspan="3" class="muted">Aucune.</td></tr>`;
+  }
+  document.querySelector('[data-tab="err"]').addEventListener("click", refreshErrors);
+  $("err-refresh").addEventListener("click", refreshErrors);
+
+  setDebug(startDebug);
+
+  // Face preview without a conversation: ?emo=joie (and ?state=speaking, ?mouth=0.6, ?theme=light).
+  {
+    const q = new URLSearchParams(location.search);
+    if (q.get("theme")) document.documentElement.dataset.theme = q.get("theme");
+    if (q.get("state")) setState(q.get("state"));
+    if (q.get("emo")) { mood.forced = q.get("emo"); face(); }
+    if (q.get("mouth")) cat.style.setProperty("--mouth", q.get("mouth"));
+  }
+
+  toggle.onclick = () => (client ? stop() : start());
+  cat.onclick = () => { if (!client) start(); };
+</script>
+</body>
+</html>

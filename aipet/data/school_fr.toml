@@ -1,0 +1,43 @@
+# What children typically learn at each level of the French school system (model-facing, French).
+# Broad landmarks only: every class moves at its own pace, so the pet also asks the child what they
+# are learning right now and remembers it. Edit freely.
+
+[PS]
+age = 3
+reperes = "Maternelle, petite section : parler, chanter des comptines, jouer ensemble, reconnaître les couleurs et quelques formes, compter un, deux, trois."
+
+[MS]
+age = 4
+reperes = "Maternelle, moyenne section : enrichir son vocabulaire, raconter, reconnaître des lettres, commencer à écrire son prénom, compter jusqu'à dix environ, découvrir les animaux et les saisons."
+
+[GS]
+age = 5
+reperes = "Maternelle, grande section : reconnaître les lettres et quelques sons, écrire son prénom, compter et dénombrer jusqu'à vingt ou trente, se préparer à lire. Ne sait pas encore vraiment lire."
+
+[CP]
+age = 6
+reperes = "CP : apprendre à lire et à écrire (les sons, les syllabes, les premiers petits textes), les nombres jusqu'à cent, additionner et soustraire de petits nombres, découvrir le monde (le vivant, la matière, le temps qui passe). Lire seul un long texte est encore difficile."
+
+[CE1]
+age = 7
+reperes = "CE1 : lire de façon plus fluide, écrire des phrases, les premières dictées et la conjugaison simple, les nombres jusqu'à mille, les premières tables de multiplication, lire l'heure, la monnaie, mesurer des longueurs."
+
+[CE2]
+age = 8
+reperes = "CE2 : lire des textes plus longs, conjuguer (présent, futur, imparfait), les nombres jusqu'à dix mille, les tables de multiplication, découvrir la division, les durées et les mesures, se repérer dans l'espace et dans le temps (frise, carte)."
+
+[CM1]
+age = 9
+reperes = "CM1 : les grands nombres, les fractions simples, les nombres à virgule, multiplier et diviser, la géométrie ; en histoire, des premiers humains et des Gaulois jusqu'au temps des rois ; en sciences, le vivant, la matière et l'énergie ; un peu d'anglais."
+
+[CM2]
+age = 10
+reperes = "CM2 : fractions et nombres à virgule, problèmes, aires et périmètres, proportionnalité ; en histoire, de la Révolution française aux deux guerres mondiales ; en géographie, la France et l'Europe ; en sciences, le corps humain, la Terre et l'univers ; l'anglais."
+
+["6e"]
+age = 11
+reperes = "Sixième, au collège : plusieurs professeurs, de nouvelles matières ; nombres décimaux et fractions, géométrie ; en histoire, l'Antiquité (Égypte, Grèce, Rome) ; sciences et technologie ; une langue vivante."
+
+["5e"]
+age = 12
+reperes = "Cinquième : nombres relatifs, calcul littéral qui commence, géométrie ; en histoire, le Moyen Âge et les débuts des Temps modernes ; physique-chimie et SVT ; une deuxième langue parfois."

@@ -1,0 +1,17 @@
+[Unit]
+Description=AI pet - French voice companion (headless)
+After=network-online.target sound.target
+Wants=network-online.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/aipet
+ExecStart=/home/pi/.local/bin/uv run --frozen pet-headless
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+# The Jabra cancels echo in hardware: the pet can be interrupted while it speaks.
+Environment=PET_DEAF=0
+
+[Install]
+WantedBy=multi-user.target
