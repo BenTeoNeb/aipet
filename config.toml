@@ -154,7 +154,7 @@ recharge_minutes = 30        # rest needed for a full recharge
 wake_up_at = 0.5             # he wakes up from a nap at this level
 # Once asleep (nap, night, or right after « bonne nuit »), or when a child says goodbye, he hangs up:
 # the web page closes the conversation; on the Pi he goes back to waiting for the wake word.
-hang_up_when_asleep = true
+hang_up = true
 hang_up_after_secs = 8       # silence after his last words before hanging up (at once after a « zzz »)
 
 [games]

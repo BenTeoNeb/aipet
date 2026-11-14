@@ -19,6 +19,7 @@ from aipet import character, engines, paths
 from aipet.config import load_config
 from aipet.emotions import EmotionEmitter, EmotionTagFilter
 from aipet.energy import Energy, SleepGate
+from aipet.hangup import HangUp
 from aipet.prompts import build_system_prompt, check_safety
 from aipet.rhythm import Rhythm
 from aipet.session_log import SessionObserver
@@ -214,9 +215,11 @@ def build_worker(
             slog=session_log,
             nap_lines=pet.lines["nap"],
             night_lines=pet.lines["night"],
-            on_hang_up=on_hang_up if ec.get("hang_up_when_asleep", True) else None,
-            hang_up_reason=keeper.hang_up_reason,
-            hang_up_after=ec.get("hang_up_after_secs", 8),
+        ),
+        *(
+            [HangUp(keeper.hang_up_reason, on_hang_up, after=ec.get("hang_up_after_secs", 8), slog=session_log)]
+            if on_hang_up and ec.get("hang_up", True)
+            else []
         ),
         llm,
         ThinkingFiller(

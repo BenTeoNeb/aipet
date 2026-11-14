@@ -115,44 +115,49 @@ def test_the_sleeping_pet_hangs_up():
     child kept talking to a « zzz »."""
     from pipecat.frames.frames import BotStartedSpeakingFrame, BotStoppedSpeakingFrame
 
-    state = {"asleep": None, "going": None}
+    from aipet.hangup import HangUp, SleepyReplyFrame
+
+    state = {"reason": None}
     hung = []
 
     async def hang_up(reason):
         hung.append(reason)
 
-    gate = SleepGate(lambda: state["asleep"], energy=None, on_hang_up=hang_up,
-                     hang_up_reason=lambda: state["going"] or state["asleep"], hang_up_after=0.05)  # fmt: skip
+    h = HangUp(lambda: state["reason"], hang_up, after=0.05)
 
     async def push(frame, direction=FrameDirection.DOWNSTREAM):
         pass
 
-    gate.push_frame = push
-    send = lambda f: SleepGate.process_frame(gate, f, FrameDirection.DOWNSTREAM)  # noqa: E731
+    h.push_frame = push
+    send = lambda f: HangUp.process_frame(h, f, FrameDirection.DOWNSTREAM)  # noqa: E731
 
     async def go():
         await send(BotStoppedSpeakingFrame())  # awake: the conversation goes on
         await asyncio.sleep(0.1)
         assert hung == []
-        state["going"] = "night"  # « bonne nuit » said
+        state["reason"] = "night"  # « bonne nuit » said
         await send(BotStoppedSpeakingFrame())
         await send(UserStartedSpeakingFrame())  # the child answers « bonne nuit » in time…
         await asyncio.sleep(0.1)
         assert hung == []
-        state["asleep"] = "night"  # …and gets a « zzz », then the pet hangs up at once
-        await send(LLMContextFrame(LLMContext()))
+        h._after = 5  # …and gets a « zzz »: the pet hangs up at once, not after the usual silence
+        await send(SleepyReplyFrame("zzz", append_to_context=False))
         await send(BotStartedSpeakingFrame())
         await send(BotStoppedSpeakingFrame())
         await asyncio.sleep(1.1)
         assert hung == ["night"]
-        state.update(asleep=None, going=None)  # a parent recharged it meanwhile: no hang-up
-        state["going"] = "nap"
+        h._after = 0.05
+        state["reason"] = "nap"
         await send(BotStoppedSpeakingFrame())
-        state["going"] = None
+        state["reason"] = None  # a parent recharged it meanwhile: no hang-up
         await asyncio.sleep(0.1)
         assert hung == ["night"]
 
     asyncio.run(go())
+
+
+def test_the_sleepy_reply_is_marked_for_the_hang_up():
+    assert all(type(f).__name__ == "SleepyReplyFrame" for f in run_gate("nap") if isinstance(f, TTSSpeakFrame))
 
 
 def test_goodbye_hangs_up_unless_the_child_goes_on(tmp_path):

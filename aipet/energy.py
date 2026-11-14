@@ -11,23 +11,21 @@ can recharge the pet from the debug panel.
 
 from __future__ import annotations
 
-import asyncio
 import json
 import random
 import time as _time
-from collections.abc import Awaitable, Callable
+from collections.abc import Callable
 from pathlib import Path
 
 from loguru import logger
 from pipecat.frames.frames import (
     BotStartedSpeakingFrame,
-    BotStoppedSpeakingFrame,
     LLMContextFrame,
-    TTSSpeakFrame,
     UserStartedSpeakingFrame,
 )
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
+from aipet.hangup import SleepyReplyFrame
 from aipet.session_log import NO_LOG
 
 ACTIVE_GAP = 90  # seconds: two exchanges closer than this count as continuous conversation
@@ -165,9 +163,6 @@ class SleepGate(FrameProcessor):
         slog=None,
         nap_lines: list[str] = NAP_LINES,
         night_lines: list[str] = NIGHT_LINES,
-        on_hang_up: Callable[[str], Awaitable[None]] | None = None,
-        hang_up_reason: Callable[[], str | None] | None = None,
-        hang_up_after: float = 8.0,
         **kwargs,
     ):
         super().__init__(**kwargs)
@@ -176,47 +171,11 @@ class SleepGate(FrameProcessor):
         self._energy = energy
         self._slog = slog or NO_LOG
         self._last_line = ""
-        # Hanging up: once the pet sleeps (or has just said good night, or the child said goodbye),
-        # the conversation ends a few seconds after it last spoke — at once after a sleepy « zzz ».
-        self._on_hang_up = on_hang_up
-        self._hang_up_reason = hang_up_reason or sleep_reason
-        self._hang_up_after = hang_up_after
-        self._answered_asleep = False
-        self._hang_up_task: asyncio.Task | None = None
-
-    def _cancel_hang_up(self):
-        if self._hang_up_task and not self._hang_up_task.done():
-            self._hang_up_task.cancel()
-        self._hang_up_task = None
-
-    async def _hang_up_later(self, delay: float):
-        try:
-            await asyncio.sleep(delay)
-        except asyncio.CancelledError:
-            return
-        reason = self._hang_up_reason()
-        if not reason:
-            return  # woken up meanwhile (recharged by a parent, morning)
-        logger.info(f"📞 Hanging up ({reason})")
-        self._slog.event("hang_up", reason=reason)
-        self._answered_asleep = False
-        await self._on_hang_up(reason)
-
-    async def cleanup(self):
-        self._cancel_hang_up()
-        await super().cleanup()
 
     async def process_frame(self, frame, direction: FrameDirection):
         await super().process_frame(frame, direction)
         if isinstance(frame, (UserStartedSpeakingFrame, BotStartedSpeakingFrame)) and self._energy:
             self._energy.activity()
-        if self._on_hang_up:
-            if isinstance(frame, (UserStartedSpeakingFrame, BotStartedSpeakingFrame)):
-                self._cancel_hang_up()  # someone speaks: decide again when it ends
-            elif isinstance(frame, BotStoppedSpeakingFrame) and self._hang_up_reason():
-                self._cancel_hang_up()
-                delay = 1.0 if self._answered_asleep else self._hang_up_after
-                self._hang_up_task = asyncio.create_task(self._hang_up_later(delay))
         if isinstance(frame, LLMContextFrame) and direction == FrameDirection.DOWNSTREAM:
             reason = self._sleep_reason()
             if reason:
@@ -225,7 +184,6 @@ class SleepGate(FrameProcessor):
                 self._last_line = line
                 logger.info(f"😴 Asleep ({reason}): sleepy reply")
                 self._slog.event("sleepy_reply", reason=reason, text=line)
-                self._answered_asleep = True
-                await self.push_frame(TTSSpeakFrame(line, append_to_context=False))
+                await self.push_frame(SleepyReplyFrame(line, append_to_context=False))
                 return
         await self.push_frame(frame, direction)
