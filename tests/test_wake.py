@@ -123,7 +123,7 @@ def test_audio_blocked_asleep_and_passes_awake(framed):
         await g._wake(0.9)
         await g.process_frame(audio, FrameDirection.DOWNSTREAM)
         assert audio in g.pushed
-        g._sleep()
+        g.sleep()
 
     asyncio.run(run())
 
@@ -139,7 +139,7 @@ def test_pending_reply_then_rate_limited_error_sound(framed):
             await g.process_frame(ErrorFrame(error="network"), FrameDirection.UPSTREAM)
         assert not g._pending
         assert sum(isinstance(f, OutputAudioRawFrame) for f in g.pushed) == n0 + 1  # a single sound within 5 s
-        g._sleep()
+        g.sleep()
 
     asyncio.run(run())
 

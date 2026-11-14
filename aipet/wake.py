@@ -108,7 +108,7 @@ class WakeWordGate(FrameProcessor):
         env = np.minimum(1, t / 0.01) * np.exp(-t * 14)
         return (0.25 * 32767 * env * np.sin(2 * np.pi * freq * t)).astype(np.int16).tobytes()
 
-    def _sleep(self):
+    def sleep(self):
         logger.info("Back to sleep")
         self._awake = False
         self._pending = False
@@ -138,7 +138,7 @@ class WakeWordGate(FrameProcessor):
         try:
             await asyncio.sleep(self._max_awake)
             logger.warning(f"Nobody has spoken for {self._max_awake:.0f}s: forcing sleep")
-            self._sleep()
+            self.sleep()
         except asyncio.CancelledError:
             pass
 
@@ -151,7 +151,7 @@ class WakeWordGate(FrameProcessor):
             while (self._pending and waited < 12) or (self._tools and waited < TOOL_WAIT_SECS):
                 await asyncio.sleep(1)
                 waited += 1
-            self._sleep()
+            self.sleep()
         except asyncio.CancelledError:
             pass
 

@@ -18,7 +18,6 @@ from fastapi import Header, HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
-from pipecat.frames.frames import LLMRunFrame
 from pipecat.processors.frameworks.rtvi.frames import RTVIServerMessageFrame
 from pipecat.runner.run import app, main
 from pipecat.runner.types import RunnerArguments, SmallWebRTCRunnerArguments
@@ -27,11 +26,12 @@ from pipecat.transports.smallwebrtc.transport import SmallWebRTCTransport
 from pipecat.workers.runner import WorkerRunner
 
 from aipet import character, engines, env, migrate, monitoring, parents, paths, session_log, skills
-from aipet.config import config_snapshot, load_config
+from aipet.config import load_config
 from aipet.energy import Energy
-from aipet.pipeline import STATE_DIR, build_worker
-from aipet.prompts import GREETING, build_system_prompt
+from aipet.pipeline import STATE_DIR
+from aipet.prompts import build_system_prompt
 from aipet.rhythm import TZ, Rhythm
+from aipet.session import Session
 
 STATIC = Path(__file__).parent / "static"
 
@@ -327,6 +327,29 @@ async def tech_errors(days: int = 14):
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 
+class WebSession(Session):
+    """A browser connection. Hanging up: the page closes the call (and shows the pet asleep or saying
+    goodbye); if it does not within a few seconds, the server ends the session."""
+
+    mode = "web"
+
+    async def hang_up(self, reason: str):
+        await self.worker.queue_frames([RTVIServerMessageFrame(data={"type": "hang_up", "reason": reason})])
+
+        async def fallback():
+            await asyncio.sleep(5)
+            await self.close(f"hung up ({reason})")
+
+        asyncio.get_running_loop().create_task(fallback())
+
+    async def close(self, reason: str, condensation: str = "end of conversation"):
+        if self._closed:
+            return
+        SESSION.clear()
+        await super().close(reason, condensation)
+        await self.worker.cancel()
+
+
 async def bot(runner_args: RunnerArguments):
     if not isinstance(runner_args, SmallWebRTCRunnerArguments):
         raise RuntimeError("This bot only supports the browser WebRTC transport.")
@@ -335,52 +358,21 @@ async def bot(runner_args: RunnerArguments):
         webrtc_connection=runner_args.webrtc_connection,
         params=TransportParams(audio_in_enabled=True, audio_out_enabled=True),
     )
-    cfg0 = load_config()
-    slog = session_log.SessionLog("web")
-    ended = False
-
-    async def end_session(reason: str):
-        """Once per session: condense the conversation, close the log, stop the worker."""
-        nonlocal ended
-        if ended:
-            return
-        ended = True
-        SESSION.clear()
-        keeper.cancel_pause()
-        keeper.worker = None  # no more system-prompt refreshes: the session is ending
-        await keeper.checkpoint("end of conversation", trim=False)
-        slog.end(reason)
-        await worker.cancel()
-
-    async def hang_up(reason: str):
-        """The pet sleeps: the page closes the conversation (and shows it asleep); if it does not
-        within a few seconds, the server ends it."""
-        await worker.queue_frames([RTVIServerMessageFrame(data={"type": "hang_up", "reason": reason})])
-
-        async def fallback():
-            await asyncio.sleep(5)
-            await end_session(f"hung up ({reason})")
-
-        asyncio.get_running_loop().create_task(fallback())
-
-    worker, context, keeper = build_worker(transport, mute_while_speaking=False, session_log=slog, on_hang_up=hang_up)
-    SESSION.update(context=context, keeper=keeper, started=time.time())
+    session = WebSession(transport, mute_while_speaking=False)
+    SESSION.update(context=session.context, keeper=session.keeper, started=time.time())
 
     @transport.event_handler("on_client_connected")
     async def on_client_connected(transport, client):
         logger.info("Browser connected")
-        slog.start(config=config_snapshot(cfg0))
-        await keeper.on_wake()  # « last time we talked », current time, fresh context after a long pause
-        context.add_message({"role": "developer", "content": GREETING})
-        await worker.queue_frames([LLMRunFrame()])
+        await session.open()
 
     @transport.event_handler("on_client_disconnected")
     async def on_client_disconnected(transport, client):
         logger.info("Browser disconnected")
-        await end_session("browser disconnected")
+        await session.close("browser disconnected")
 
     runner = WorkerRunner(handle_sigint=runner_args.handle_sigint)
-    await runner.add_workers(worker)
+    await runner.add_workers(session.worker)
     await runner.run()
 
 

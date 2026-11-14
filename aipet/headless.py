@@ -10,15 +10,42 @@ import argparse
 import asyncio
 
 from loguru import logger
-from pipecat.frames.frames import LLMRunFrame
 from pipecat.transports.local.audio import LocalAudioTransport, LocalAudioTransportParams
 from pipecat.workers.runner import WorkerRunner
 
 from aipet import env, migrate, session_log
-from aipet.config import config_snapshot, load_config
-from aipet.pipeline import build_worker
-from aipet.prompts import GREETING
+from aipet.config import load_config
+from aipet.session import Session
 from aipet.wake import WakeWordGate
+
+
+class HeadlessSession(Session):
+    """The pet on the machine's own microphone and speaker. With a wake word, one session log = one
+    wake-up, until it goes back to sleep. Hanging up = back to waiting for the wake word (it answers
+    « zzz » if woken at night)."""
+
+    mode = "headless"
+
+    def __init__(self, transport, wake_cfg: dict | None, **build_kwargs):
+        w = wake_cfg
+        self.gate = (
+            WakeWordGate(
+                model=w.get("model", "hey_jarvis"),
+                threshold=w.get("threshold", 0.5),
+                idle_timeout=w.get("sleep_after_secs", 8),
+                ack=w.get("response", "sound"),
+                max_awake=w.get("max_awake_secs", 120),
+                on_wake=lambda: self.open(greet=False, wake_score=round(self.gate.last_score, 3)),
+                on_sleep=self.pause,
+            )
+            if w
+            else None
+        )
+        super().__init__(transport, gate=self.gate, **build_kwargs)
+
+    async def hang_up(self, reason: str):
+        if self.gate and self.gate.awake:
+            self.gate.sleep()
 
 
 async def main(use_wake: bool, input_device: int | None, output_device: int | None):
@@ -27,7 +54,6 @@ async def main(use_wake: bool, input_device: int | None, output_device: int | No
     logs = cfg.get("logs", {})
     session_log.setup_file_logging(logs.get("text_keep_days", 14))
     session_log.purge(logs.get("keep_days", 30))
-    slog = session_log.SessionLog("headless")
     use_wake = use_wake and w.get("enabled", False)
 
     transport = LocalAudioTransport(
@@ -38,72 +64,25 @@ async def main(use_wake: bool, input_device: int | None, output_device: int | No
             output_device_index=output_device,
         )
     )
-    gate = (
-        WakeWordGate(
-            model=w.get("model", "hey_jarvis"),
-            threshold=w.get("threshold", 0.5),
-            idle_timeout=w.get("sleep_after_secs", 8),
-            ack=w.get("response", "sound"),
-            max_awake=w.get("max_awake_secs", 120),
-        )
-        if use_wake
-        else None
-    )
-
-    async def hang_up(reason: str):
-        """The pet sleeps: back to waiting for the wake word (it answers « zzz » if woken at night)."""
-        if gate and gate.awake:
-            gate._sleep()
-
     # Microphone without automatic gain: low volume threshold so speech is detected.
-    worker, context, keeper = build_worker(
+    session = HeadlessSession(
         transport,
+        w if use_wake else None,
         # On the Pi the Jabra cancels echo: PET_DEAF=0 (systemd service) lets kids interrupt it.
         mute_while_speaking=env.get("DEAF", str(a.get("deaf_while_speaking", True))).lower()
         not in ("0", "false", "no"),
         min_volume=a.get("mic_min_volume", 0.2),
-        gate=gate,
-        session_log=slog,
-        on_hang_up=hang_up,
     )
-    if gate:
-        # One session log = one wake-up, until sleep (and the condensation that follows).
-        async def on_wake():
-            slog.start(wake_score=round(getattr(gate, "last_score", 0), 3), config=config_snapshot(cfg))
-            await keeper.on_wake()  # refresh the date, trim the context after a long pause
-
-        def on_sleep():
-            slog.event("sleep")
-            keeper.who.reset()
-            # Activities and games survive a short sleep (a child thinking over a quiz question);
-            # keeper.on_wake ends them after a long pause.
-            if keeper.wait:
-                keeper.wait.cancel()
-            current = slog.path
-
-            async def condense_then_close():
-                await keeper.checkpoint("sleep")
-                if slog.path == current:  # not woken up again in the meantime
-                    slog.end("sleep")
-
-            asyncio.create_task(condense_then_close())
-
-        gate._on_wake, gate._on_sleep = on_wake, on_sleep
-    else:
-        slog.start(config=config_snapshot(cfg))
     if not use_wake:
-        context.add_message({"role": "developer", "content": GREETING})
-        await worker.queue_frames([LLMRunFrame()])
+        await session.open()  # always listening: one session, greeting at startup
 
     runner = WorkerRunner()
-    await runner.add_workers(worker)
+    await runner.add_workers(session.worker)
     logger.info(f"{a['name']} {'is waiting for its wake word' if use_wake else 'is listening'}… (Ctrl+C to quit)")
     try:
         await runner.run()
     finally:
-        keeper.worker = None
-        await keeper.checkpoint("shutdown", trim=False)
-        slog.end("shutdown")
+        await session.close("shutdown", condensation="shutdown")
 
 
 def run():

@@ -531,11 +531,11 @@ class MemoryKeeper:
         await self.refresh_prompt()
 
     def on_sleep(self):
-        """Called when the pet goes back to sleep (headless mode)."""
+        """The pet goes back to waiting for its wake word (headless mode): whoever talks next must say
+        who they are. The conversation is condensed by the session (see session.Session.pause)."""
         self.who.reset()
         if self.wait:
             self.wait.cancel()
-        self.trigger("sleep")
 
 
 def make_memory_processor(keeper: MemoryKeeper):
