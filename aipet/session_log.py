@@ -109,6 +109,26 @@ def purge(keep_days: int = 30):
             p.unlink(missing_ok=True)
 
 
+class NullLog:
+    """Stands in for a session log where there is none (tests, tools): every call does nothing, so
+    callers never check for one."""
+
+    path = None
+    active = False
+
+    def start(self, **info):
+        pass
+
+    def end(self, reason: str = ""):
+        pass
+
+    def event(self, type: str, **data):
+        pass
+
+
+NO_LOG = NullLog()
+
+
 class SessionLog:
     """One JSONL file per session. `event()` can be called from anywhere (memory, wake…)."""
 

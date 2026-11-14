@@ -78,6 +78,26 @@ def build_worker(
 
     mem = Memory(paths.memory_dir(cfg, pet.id), pet.name)
     context = LLMContext()
+    skill_set = skills.Skills.from_config(cfg, slog=session_log)
+    logger.info(f"Skills: {', '.join(skill_set.all()) or 'none'}")
+    ec = cfg.get("energy", {})
+    energy = (
+        Energy(
+            ec.get("talk_minutes", 20),
+            ec.get("recharge_minutes", 30),
+            ec.get("wake_up_at", 0.5),
+            state_file=STATE_DIR / "energy.json",
+            slog=session_log,
+        )
+        if ec.get("enabled", True)
+        else None
+    )
+    wait = UnfinishedSentenceWait(
+        lc.get("unfinished_sentence_wait_secs", 2.5),
+        enabled=lc.get("wait_for_unfinished_sentence", True),
+        slog=session_log,
+        queue=lambda frames: worker.queue_frames(frames),  # the worker is built below
+    )
     keeper = MemoryKeeper(
         mem,
         cfg,
@@ -86,24 +106,19 @@ def build_worker(
         pause_secs=mc.get("condense_after_pause_secs", 25),
         max_turns=mc.get("condense_every_turns", 8),
         keep=mc.get("kept_messages", 12),
+        skills=skill_set,
+        rhythm=Rhythm.from_config(cfg),  # sense of time: part of the system prompt
+        energy=energy,
+        wait=wait,
+        slog=session_log,
     )
-    keeper.skills = skills.Skills.from_config(cfg)
-    logger.info(f"Skills: {', '.join(keeper.skills.all()) or 'none'}")
-    # Sense of time and energy (set before the LLM is built: they are part of the system prompt).
-    keeper.rhythm = Rhythm.from_config(cfg)
-    ec = cfg.get("energy", {})
-    if ec.get("enabled", True):
-        keeper.energy = Energy(
-            ec.get("talk_minutes", 20),
-            ec.get("recharge_minutes", 30),
-            ec.get("wake_up_at", 0.5),
-            state_file=STATE_DIR / "energy.json",
-        )
-    quiz = quiz_mod.Quiz(cfg, mem.root, keeper)  # quiz state kept by code, saved in memory
-    yes_no_game = yes_no.YesNoGame(cfg, mem.root, keeper)  # refereed by code, no model call
-    guess_game = guess.GuessGame(mem.root, keeper, max_questions=cfg.get("games", {}).get("guess_max_questions", 20))
-    story_game = story.StoryGame(cfg, mem.root, keeper)
-    learn_game = learn.LearnGame(cfg, mem.root, keeper)
+    quiz = quiz_mod.Quiz(cfg, mem.root, keeper, slog=session_log)  # quiz state kept by code, saved in memory
+    yes_no_game = yes_no.YesNoGame(cfg, mem.root, keeper, slog=session_log)  # refereed by code, no model call
+    guess_game = guess.GuessGame(
+        mem.root, keeper, slog=session_log, max_questions=cfg.get("games", {}).get("guess_max_questions", 20)
+    )
+    story_game = story.StoryGame(cfg, mem.root, keeper, slog=session_log)
+    learn_game = learn.LearnGame(cfg, mem.root, keeper, slog=session_log)
     keeper.games = [quiz, yes_no_game, guess_game, story_game, learn_game]
     stt, llm, tts = make_stt(cfg, mem.known_names()), make_llm(cfg, keeper.system_prompt()), make_tts(cfg)
     tools = ToolsSchema(
@@ -228,21 +243,5 @@ def build_worker(
         idle_timeout_secs=None,
         observers=[SessionObserver(session_log)] if session_log else [],
     )
-    keeper.llm, keeper.worker = llm, worker
-    keeper.slog = session_log
-    keeper.wait = UnfinishedSentenceWait(
-        lc.get("unfinished_sentence_wait_secs", 2.5),
-        enabled=lc.get("wait_for_unfinished_sentence", True),
-        slog=session_log,
-    )
-    keeper.wait.queue = worker.queue_frames
-    keeper.skills.slog = session_log
-    quiz.slog = session_log
-    yes_no_game.slog = session_log
-    guess_game.slog = session_log
-    story_game.slog = session_log
-    learn_game.slog = session_log
-    if keeper.energy:
-        keeper.energy.slog = session_log
-    keeper.who.slog = session_log
+    keeper.llm, keeper.worker = llm, worker  # to refresh the system prompt
     return worker, context, keeper

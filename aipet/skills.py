@@ -31,6 +31,7 @@ from pathlib import Path
 from loguru import logger
 
 from aipet import paths
+from aipet.session_log import NO_LOG
 
 HERE = Path(__file__).parent
 VALID_NAME = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
@@ -72,20 +73,20 @@ def read_skill(path: Path) -> Skill:
 
 
 class Skills:
-    def __init__(self, dirs: list[str | Path]):
+    def __init__(self, dirs: list[str | Path], slog=None):
         self.dirs = [Path(os.path.expanduser(str(d))) for d in dirs]
         self.active: str | None = None
-        self.slog = None
+        self.slog = slog or NO_LOG
         self._cache: dict[str, Skill] = {}
         self._signature = None
         self.errors: dict[str, str] = {}
 
     @classmethod
-    def from_config(cls, cfg: dict) -> Skills:
+    def from_config(cls, cfg: dict, slog=None) -> Skills:
         family = paths.family_skills_dir(cfg)
         from aipet import character
 
-        return cls([HERE / "builtin_skills", character.of(cfg).skills_dir, family])
+        return cls([HERE / "builtin_skills", character.of(cfg).skills_dir, family], slog)
 
     def _files(self) -> list[Path]:
         return [p for d in self.dirs if d.is_dir() for p in sorted(d.glob("*/SKILL.md"))]
@@ -142,8 +143,7 @@ class Skills:
             return {"error": f"activité « {name} » inconnue", "available": sorted(self.all())}
         before, self.active = self.active, name
         logger.info(f"🎲 Skill: {name}" + (f" (replaces {before})" if before and before != name else ""))
-        if self.slog:
-            self.slog.event("skill_start", name=name, replaces=before)
+        self.slog.event("skill_start", name=name, replaces=before)
         return {
             "skill": name,
             "instructions": s.instructions,
@@ -156,8 +156,7 @@ class Skills:
             return {"note": "aucune activité en cours"}
         name, self.active = self.active, None
         logger.info(f"🎲 Skill ended: {name} ({reason})")
-        if self.slog:
-            self.slog.event("skill_end", name=name, reason=reason)
+        self.slog.event("skill_end", name=name, reason=reason)
         return {"skill_ended": name}
 
     def state(self) -> dict:

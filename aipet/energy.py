@@ -28,6 +28,8 @@ from pipecat.frames.frames import (
 )
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
+from aipet.session_log import NO_LOG
+
 ACTIVE_GAP = 90  # seconds: two exchanges closer than this count as continuous conversation
 PROTECT_SECS = 180  # a sad/comforting moment holds off the nap for this long
 TIRED, VERY_TIRED = 0.4, 0.15
@@ -53,7 +55,7 @@ class Energy:
         self.wake_at = wake_at
         self.state_file = state_file
         self.clock = clock
-        self.slog = slog
+        self.slog = slog or NO_LOG
         self._level = 1.0
         self._asleep = False
         self._last_activity: float | None = None
@@ -127,8 +129,7 @@ class Energy:
 
     def _log(self, type_: str, **kw):
         logger.info(f"🔋 {type_} ({self._level:.0%})")
-        if self.slog:
-            self.slog.event(type_, level=round(self._level, 3), **kw)
+        self.slog.event(type_, level=round(self._level, 3), **kw)
 
     def _save(self):
         if not self.state_file:
@@ -173,7 +174,7 @@ class SleepGate(FrameProcessor):
         self._nap_lines, self._night_lines = nap_lines, night_lines
         self._sleep_reason = sleep_reason
         self._energy = energy
-        self._slog = slog
+        self._slog = slog or NO_LOG
         self._last_line = ""
         # Hanging up: once the pet sleeps (or has just said good night, or the child said goodbye),
         # the conversation ends a few seconds after it last spoke — at once after a sleepy « zzz ».
@@ -197,8 +198,7 @@ class SleepGate(FrameProcessor):
         if not reason:
             return  # woken up meanwhile (recharged by a parent, morning)
         logger.info(f"📞 Hanging up ({reason})")
-        if self._slog:
-            self._slog.event("hang_up", reason=reason)
+        self._slog.event("hang_up", reason=reason)
         self._answered_asleep = False
         await self._on_hang_up(reason)
 
@@ -224,8 +224,7 @@ class SleepGate(FrameProcessor):
                 line = random.choice([x for x in lines if x != self._last_line] or lines)
                 self._last_line = line
                 logger.info(f"😴 Asleep ({reason}): sleepy reply")
-                if self._slog:
-                    self._slog.event("sleepy_reply", reason=reason, text=line)
+                self._slog.event("sleepy_reply", reason=reason, text=line)
                 self._answered_asleep = True
                 await self.push_frame(TTSSpeakFrame(line, append_to_context=False))
                 return

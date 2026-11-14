@@ -35,6 +35,7 @@ from aipet.games.common import (
     pet_intro,
 )
 from aipet.memory.store import normalize_text, now
+from aipet.session_log import NO_LOG
 
 YES_NO_TOOLS = {"yesno_start"}
 TARGET = 15  # answers to hold to win the game
@@ -106,14 +107,13 @@ class Round:
 
 class YesNoGame:
     def __init__(self, cfg: dict, memory_root, keeper=None, slog=None):
-        self.cfg, self.keeper, self.slog = cfg, keeper, slog
+        self.cfg, self.keeper, self.slog = cfg, keeper, slog or NO_LOG
         self.store = JsonStore(memory_root / GAMES_DIR / "ni_oui_ni_non.json", {"players": {}, "asked": []})
         self.root = memory_root
         self.round: Round | None = None
 
     def _ev(self, type_, **kw):
-        if self.slog:
-            self.slog.event(type_, **kw)
+        self.slog.event(type_, **kw)
 
     def _player_data(self, data: dict, player: str) -> dict:
         return data["players"].setdefault(

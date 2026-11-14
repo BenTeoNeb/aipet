@@ -7,6 +7,7 @@ import re
 from loguru import logger
 
 from aipet.memory.store import WEEKDAYS_FR, normalize_text, now
+from aipet.session_log import NO_LOG
 
 # --------------------------------------------------------------------------
 # Speakers: who is talking to the pet right now
@@ -44,14 +45,14 @@ CERTAINTY_FR = {"sure": "sûr", "probable": "probable", "unknown": "inconnu"}
 class Speakers:
     """Who is speaking: current speaker, people present, names waiting for confirmation."""
 
-    def __init__(self, pet_name: str = ""):
+    def __init__(self, pet_name: str = "", slog=None):
         self.pet_name = pet_name  # never a child's name (« c'est Flocon »)
         self.current: str | None = None
         self.certainty = "unknown"  # "sure" | "probable" | "unknown"
         self.present: list[str] = []
         self.previous: str | None = None
         self.history: list[dict] = []
-        self.slog = None  # session log (set by build_worker)
+        self.slog = slog or NO_LOG
         self.known = lambda: []  # names from the cards (set by MemoryKeeper)
         self.confirmed: set[str] = set()  # names confirmed while the pet is running
         self.to_confirm: dict[str, str | None] = {}  # name -> known name it resembles
@@ -59,7 +60,7 @@ class Speakers:
     def set(self, name: str, certainty: str = "probable", present: list[str] | None = None):
         name = name.strip().capitalize()
         self.to_confirm.pop(name, None)
-        if name != self.current and self.slog:
+        if name != self.current:
             self.slog.event("speaker", name=name, certainty=certainty, previous=self.current)
         if name != self.current:
             self.history.append({"time": f"{now():%H:%M:%S}", "name": name, "certainty": certainty})
@@ -90,8 +91,7 @@ class Speakers:
             self.set(name, "sure")
             return "confirmed"
         self.to_confirm[name] = resembles
-        if self.slog:
-            self.slog.event("speaker_to_confirm", name=name, resembles=resembles)
+        self.slog.event("speaker_to_confirm", name=name, resembles=resembles)
         logger.info(f"👤 {name} to confirm" + (f" (resembles {resembles})" if resembles else ""))
         return "to_confirm"
 
@@ -135,8 +135,7 @@ class Speakers:
             self.set(known[normalize_text(name)], "probable")
             return "known"
         self.to_confirm[name] = _resembles(name, list(known.values()))
-        if self.slog:
-            self.slog.event("speaker_to_confirm", name=name, resembles=self.to_confirm[name])
+        self.slog.event("speaker_to_confirm", name=name, resembles=self.to_confirm[name])
         logger.info(f"👤 {name} heard → to confirm")
         return "to_confirm"
 

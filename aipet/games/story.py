@@ -38,6 +38,7 @@ from aipet.games.common import (
     theme_key,
 )
 from aipet.memory.store import now
+from aipet.session_log import NO_LOG
 
 STORY_TOOLS = {"story_start", "story_next", "story_end"}
 STEPS_DAY, STEPS_SHORT = 5, 4  # short: evening or little ones
@@ -151,14 +152,13 @@ def generate_plan(
 
 class StoryGame:
     def __init__(self, cfg: dict, memory_root, keeper=None, slog=None):
-        self.cfg, self.root, self.keeper, self.slog = cfg, memory_root, keeper, slog
+        self.cfg, self.root, self.keeper, self.slog = cfg, memory_root, keeper, slog or NO_LOG
         self.store = JsonStore(memory_root / "histoires" / "univers.json", {"characters": {}, "stories": []})
         self.story: dict | None = None  # the running story (also saved, to resume later)
         self.started_at: datetime | None = None
 
     def _ev(self, type_, **kw):
-        if self.slog:
-            self.slog.event(type_, **kw)
+        self.slog.event(type_, **kw)
 
     # ------------------------------------------------------------------ memory
     def recurring(self, player: str) -> list[str]:

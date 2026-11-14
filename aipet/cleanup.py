@@ -22,6 +22,8 @@ from pipecat.frames.frames import (
 )
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
+from aipet.session_log import NO_LOG
+
 # --- transcripts -------------------------------------------------------------------------------
 _ONLY_PUNCT = re.compile(r"^[\W_]+$", re.UNICODE)
 _LOOP = re.compile(r"\b(\w+)(?:[\s,.!?]+\1\b){4,}", re.IGNORECASE | re.UNICODE)
@@ -44,7 +46,7 @@ def valid_transcript(text: str) -> bool:
 class TranscriptFilter(FrameProcessor):
     def __init__(self, slog=None, **kwargs):
         super().__init__(**kwargs)
-        self._slog = slog
+        self._slog = slog or NO_LOG
 
     async def process_frame(self, frame, direction: FrameDirection):
         await super().process_frame(frame, direction)
@@ -55,8 +57,7 @@ class TranscriptFilter(FrameProcessor):
         ):
             if isinstance(frame, TranscriptionFrame):
                 logger.info(f"🗑️  Transcript dropped: {frame.text!r}")
-                if self._slog:
-                    self._slog.event("transcript_dropped", text=frame.text[:200])
+                self._slog.event("transcript_dropped", text=frame.text[:200])
             return
         await self.push_frame(frame, direction)
 

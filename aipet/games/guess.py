@@ -19,6 +19,7 @@ from loguru import logger
 
 from aipet.games.common import GAMES_DIR, JsonStore, current_player
 from aipet.memory.store import normalize_text, now
+from aipet.session_log import NO_LOG
 
 GUESS_TOOLS = {"guess_start", "guess_end"}
 MAX_QUESTIONS = 20
@@ -57,7 +58,7 @@ class GuessRound:
 
 class GuessGame:
     def __init__(self, memory_root, keeper=None, slog=None, max_questions: int = MAX_QUESTIONS):
-        self.keeper, self.slog, self.max_questions = keeper, slog, max_questions
+        self.keeper, self.slog, self.max_questions = keeper, slog or NO_LOG, max_questions
         self.store = JsonStore(memory_root / GAMES_DIR / "devine.json", {"players": {}})
         self.round: GuessRound | None = None
 
@@ -81,8 +82,7 @@ class GuessGame:
         player = current_player(self.keeper)
         self.round = GuessRound(player, self.max_questions)
         logger.info(f"🔮 Guess game for {player} (max {self.max_questions} questions)")
-        if self.slog:
-            self.slog.event("guess_start", player=player)
+        self.slog.event("guess_start", player=player)
         return {
             "player": player,
             "max_questions": self.max_questions,
@@ -138,8 +138,7 @@ class GuessGame:
             answer = r.revealed
         if found and not self._win_confirmed(answer):
             logger.info(f"🔮 Win refused: « {answer} » was not proposed then confirmed (child: {r.last_reply!r})")
-            if self.slog:
-                self.slog.event("guess_win_refused", answer=answer, child=r.last_reply)
+            self.slog.event("guess_win_refused", answer=answer, child=r.last_reply)
             return {
                 "error": f"Victoire pas confirmée : tu n'as pas proposé « {answer} » juste avant, ou l'enfant n'a "
                 "pas dit oui.",
@@ -166,8 +165,7 @@ class GuessGame:
             p["games"].append({"date": now().isoformat(timespec="minutes"), "found": bool(found),
                                "answer": (answer or "").strip(), "questions": r.count})  # fmt: skip
             self.store.save(data)
-        if self.slog:
-            self.slog.event("guess_end", player=r.player, found=bool(found), questions=r.count)
+        self.slog.event("guess_end", player=r.player, found=bool(found), questions=r.count)
         self.round = None
         h = self.history(r.player)
         return {

@@ -16,6 +16,7 @@ from aipet.memory.condensation import condense, turns_from_messages
 from aipet.memory.speakers import Speakers, speaker_instructions
 from aipet.memory.store import LIFE_FILE, MONTHS_FR, Memory, normalize_text, now, parse_life, spoken_date
 from aipet.memory.tools import MAX_TOOLS_PER_TURN, TOOLS_EXHAUSTED, memory_instructions
+from aipet.session_log import NO_LOG
 
 MAX_CONDENSE_FAILURES = 3  # then the raw transcript is kept and the context moves on
 
@@ -73,15 +74,21 @@ class MemoryKeeper:
         pause_secs: float = 25,
         max_turns: int = 8,
         keep: int = 12,
+        skills=None,
+        rhythm=None,
+        energy=None,
+        wait=None,
+        slog=None,
     ):
         self.mem, self.cfg, self.context, self.base_prompt = mem, cfg, context, base_prompt
         self.pet = character.of(cfg)
-        self.who = Speakers(self.pet.name)
+        self.slog = slog or NO_LOG  # session log
+        self.who = Speakers(self.pet.name, slog=self.slog)
         self.who.known = mem.known_names
-        self.skills = None  # skills.Skills (activities), set by build_worker
-        self.wait = None  # turns.UnfinishedSentenceWait ([attends] tag), set by build_worker
-        self.rhythm = None  # rhythm.Rhythm (time of day, school days, bedtime), set by build_worker
-        self.energy = None  # energy.Energy (naps), set by build_worker
+        self.skills = skills  # skills.Skills (activities)
+        self.wait = wait  # turns.UnfinishedSentenceWait ([attends] tag)
+        self.rhythm = rhythm  # rhythm.Rhythm (time of day, school days, bedtime)
+        self.energy = energy  # energy.Energy (naps)
         self._failures, self._retry_after = 0, None  # condensation failures (backoff)
         self.games: list = []  # games refereed by code (on_user_message / stop), set by build_worker
         self.tool_schemas: dict = {}  # every tool, by name (FunctionSchema), set by build_worker
@@ -97,7 +104,6 @@ class MemoryKeeper:
         self.segment_start = None  # time of the first non-condensed message
         self.started = now()
         self.llm = None  # set by build_worker (to refresh the system prompt)
-        self.slog = None  # session log
         self.worker = None
         self.last = {"when": None, "reason": None, "changes": [], "error": None}
         self._timer: asyncio.Task | None = None
@@ -241,8 +247,7 @@ class MemoryKeeper:
         if hint:
             self.life_asked = True
             logger.info(f"🐾 « Ma vie » moment suggested to the pet for {child}")
-            if self.slog:
-                self.slog.event("life_moment", child=child)
+            self.slog.event("life_moment", child=child)
         return hint
 
     def _goodnight(self, raw: str, hint: str) -> str:
@@ -253,8 +258,7 @@ class MemoryKeeper:
             if self.rhythm:
                 self.asleep_until = self.rhythm.next_wakeup(now())
                 logger.info(f"🌙 The pet sleeps until {self.asleep_until:%H:%M} (the child went to bed)")
-                if self.slog:
-                    self.slog.event("goodnight_sleep", until=self.asleep_until.isoformat(timespec="minutes"))
+                self.slog.event("goodnight_sleep", until=self.asleep_until.isoformat(timespec="minutes"))
         if not says_goodnight(raw):
             return hint
         self.end_skill("goodnight")
@@ -271,8 +275,7 @@ class MemoryKeeper:
             )
         else:
             say = "l'enfant parle d'aller dormir : s'il va se coucher, dis-lui bonne nuit tendrement sans rien proposer"
-        if self.slog:
-            self.slog.event("goodnight", evening=bool(evening))
+        self.slog.event("goodnight", evening=bool(evening))
         return f"{say} · {hint}" if hint else say
 
     def tool_budget_exhausted(self) -> bool:
@@ -280,8 +283,7 @@ class MemoryKeeper:
         self.tool_calls += 1
         if self.tool_calls > MAX_TOOLS_PER_TURN:
             logger.warning(f"Tool budget exhausted ({self.tool_calls - 1} calls this turn)")
-            if self.slog:
-                self.slog.event("tool_budget_exhausted", calls=self.tool_calls - 1)
+            self.slog.event("tool_budget_exhausted", calls=self.tool_calls - 1)
             return True
         return False
 
@@ -352,8 +354,7 @@ class MemoryKeeper:
                 if new:
                     speaker = self.who.current if self.who.certainty == "sure" else None
                     self._note_presence(speaker)
-                    if self.slog:
-                        self.slog.event("turn", speaker=self.who.current, certainty=self.who.certainty)
+                    self.slog.event("turn", speaker=self.who.current, certainty=self.who.certainty)
                     if now() - self._prompt_refreshed > timedelta(minutes=10):  # keep « Maintenant » current
                         self._prompt_refreshed = now()
                         asyncio.get_running_loop().create_task(self.refresh_prompt())
@@ -386,8 +387,7 @@ class MemoryKeeper:
         """Control tags written by the pet (see emotions.EmotionTagFilter)."""
         if tag == "silence":
             logger.info("🤫 The pet stays silent (not for it / unintelligible)")
-            if self.slog:
-                self.slog.event("silence")
+            self.slog.event("silence")
             if self.wait:
                 self.wait.replied()
         elif tag == "attends":
@@ -396,8 +396,7 @@ class MemoryKeeper:
         elif tag == "fin":
             logger.info("👋 The child closes the conversation: the pet will hang up")
             self.closing = True
-            if self.slog:
-                self.slog.event("goodbye")
+            self.slog.event("goodbye")
         elif tag.startswith("parle:"):
             res = self.who.from_tag(tag[6:], self.last_assistant_text())
             logger.info(f"👤 [{tag}] → {res}")
@@ -451,18 +450,16 @@ class MemoryKeeper:
                 changed = await condense(self.mem, self.cfg, turns, when, allowed_new_names=self.confirmed_names())
                 self._failures, self._retry_after = 0, None
                 self.last = {"when": f"{now():%H:%M:%S}", "reason": reason, "changes": changed, "error": None}
-                if self.slog:
-                    self.slog.event(
-                        "condensation",
-                        reason=reason,
-                        messages=len(turns),
-                        files=changed,
-                        duration_s=round((now() - t_ck).total_seconds(), 1),
-                    )
+                self.slog.event(
+                    "condensation",
+                    reason=reason,
+                    messages=len(turns),
+                    files=changed,
+                    duration_s=round((now() - t_ck).total_seconds(), 1),
+                )
             except Exception as e:
                 logger.exception("Condensation failed")
-                if self.slog:
-                    self.slog.event("condensation_error", reason=reason, error=f"{type(e).__name__}: {e}")
+                self.slog.event("condensation_error", reason=reason, error=f"{type(e).__name__}: {e}")
                 self.last = {
                     "when": f"{now():%H:%M:%S}",
                     "reason": reason,
@@ -476,8 +473,7 @@ class MemoryKeeper:
                 # Repeated failures: keep the raw transcript, move on, and let the context shrink.
                 logger.warning(f"Condensation given up after {self._failures} failures: raw transcript kept")
                 await asyncio.to_thread(self.mem.save_transcript, when, turns)
-                if self.slog:
-                    self.slog.event("condensation_given_up", messages=len(turns))
+                self.slog.event("condensation_given_up", messages=len(turns))
                 self._failures, self._retry_after = 0, None
                 changed = []
             if gen == self._generation:  # the context was not cleared meanwhile

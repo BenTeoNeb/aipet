@@ -5,7 +5,7 @@ import types
 
 import pytest
 
-from aipet import cleanup, config, memory, prompts
+from aipet import cleanup, config, memory, prompts, session_log
 from aipet.cleanup import clean_spoken, valid_transcript
 
 
@@ -69,7 +69,7 @@ def test_filter_drops_without_calling_the_model(monkeypatch):
 
 def test_tool_budget_per_turn(tmp_path):
     mem = memory.Memory(tmp_path)
-    keeper = types.SimpleNamespace(tool_calls=0, slog=None)
+    keeper = types.SimpleNamespace(tool_calls=0, slog=session_log.NO_LOG)
     keeper.tool_budget_exhausted = lambda: memory.MemoryKeeper.tool_budget_exhausted(keeper)
     handlers = {}
 

@@ -33,6 +33,7 @@ from aipet.games.common import (
     theme_key,
 )
 from aipet.memory.store import _slug, now, parse_card
+from aipet.session_log import NO_LOG
 
 LEARN_TOOLS = {"learn_suggest", "learn_start", "learn_next", "learn_end"}
 START_LEVEL = 3  # relative to the class: 3 = « de son niveau »
@@ -104,13 +105,12 @@ def generate_lesson(cfg: dict, topic: str, domain: str, who: str, level: int, se
 
 class LearnGame:
     def __init__(self, cfg: dict, memory_root, keeper=None, slog=None):
-        self.cfg, self.root, self.keeper, self.slog = cfg, memory_root, keeper, slog
+        self.cfg, self.root, self.keeper, self.slog = cfg, memory_root, keeper, slog or NO_LOG
         self.store = JsonStore(memory_root / GAMES_DIR / "apprendre.json", {"players": {}})
         self.lesson: dict | None = None
 
     def _ev(self, type_, **kw):
-        if self.slog:
-            self.slog.event(type_, **kw)
+        self.slog.event(type_, **kw)
 
     def _player(self, data: dict, player: str) -> dict:
         return data["players"].setdefault(player, {"domains": {}, "topics": [], "interests": {}, "open_questions": []})

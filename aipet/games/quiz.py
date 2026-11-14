@@ -38,6 +38,7 @@ from aipet.games.common import (
     theme_key,
 )
 from aipet.memory.store import normalize_text, now
+from aipet.session_log import NO_LOG
 
 QUIZ_TOOLS = {"quiz_history", "quiz_start", "quiz_answer"}
 DEFAULT_QUESTIONS = 5
@@ -235,7 +236,7 @@ class Quiz:
     """The quiz in progress (one at a time) and its tools."""
 
     def __init__(self, cfg: dict, memory_root: Path, keeper=None, slog=None):
-        self.cfg, self.root, self.keeper, self.slog = cfg, Path(memory_root), keeper, slog
+        self.cfg, self.root, self.keeper, self.slog = cfg, Path(memory_root), keeper, slog or NO_LOG
         self.store = QuizStore(self.root)
         self.game: Game | None = None
 
@@ -243,8 +244,7 @@ class Quiz:
         return current_player(self.keeper)
 
     def _ev(self, type_, **kw):
-        if self.slog:
-            self.slog.event(type_, **kw)
+        self.slog.event(type_, **kw)
 
     def history(self) -> dict:
         return self.store.history(self.player(), now().date())
