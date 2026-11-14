@@ -51,3 +51,13 @@ def no_dev_switches(monkeypatch):
     """Development switches from a local .env must not change test behaviour."""
     for name in ("PET_NO_SLEEP", "PET_DEAF", "PET_CHARACTER", "FLOCON_NO_SLEEP", "FLOCON_DEAF", "FLOCON_CHARACTER"):
         monkeypatch.delenv(name, raising=False)
+
+
+@pytest.fixture(autouse=True)
+def fake_api_keys(monkeypatch):
+    """Real keys from a local .env are replaced by fakes: a test that builds engines behaves the
+    same on a laptop and on CI (which has no key), and can never spend money."""
+    from aipet.engines import DEFAULT_KEY_ENVS
+
+    for name in DEFAULT_KEY_ENVS.values():
+        monkeypatch.setenv(name, "fake-key-for-tests")

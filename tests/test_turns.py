@@ -348,7 +348,7 @@ def test_turn_starts_on_voice_only_while_the_pet_is_silent():
     asyncio.run(run())
 
 
-def test_pipeline_uses_the_voice_start_unless_disabled(monkeypatch):
+def test_pipeline_uses_the_voice_start_unless_disabled(monkeypatch, tmp_path):
     from aipet import pipeline
 
     seen = {}
@@ -367,6 +367,6 @@ def test_pipeline_uses_the_voice_start_unless_disabled(monkeypatch):
         def output(self):
             return FrameProcessor()
 
-    monkeypatch.setenv("PET_HOME", str(__import__("tempfile").mkdtemp()))
+    monkeypatch.setenv("PET_HOME", str(tmp_path))
     pipeline.build_worker(T(), mute_while_speaking=False)
     assert seen["start"] == ["QuietVADUserTurnStartStrategy", "MinWordsUserTurnStartStrategy"]
