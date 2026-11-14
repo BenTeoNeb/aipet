@@ -31,8 +31,11 @@ from pipecat.frames.frames import (
     TTSSpeakFrame,
     UserStartedSpeakingFrame,
     UserStoppedSpeakingFrame,
+    VADUserStartedSpeakingFrame,
+    VADUserStoppedSpeakingFrame,
 )
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
+from pipecat.turns.user_start.base_user_turn_start_strategy import BaseUserTurnStartStrategy
 
 # Spoken lines (French content): neutral defaults, each character pack has its own ([lines]).
 TOOL_SECOND_FILLER_SECS = 9
@@ -335,3 +338,34 @@ class UnfinishedSentenceWait:
 
     def cancel(self):
         self._cancel()
+
+
+class QuietVADUserTurnStartStrategy(BaseUserTurnStartStrategy):
+    """The child's turn starts when they start speaking, but only while the pet is silent.
+
+    While the pet speaks, interrupting still takes a few transcribed words (MinWords strategy, next
+    in the list), so noise never cuts it off. Starting the turn on voice matters with a segmented
+    STT (one transcript per utterance, after the child stopped): a turn started by that transcript
+    makes Pipecat forget the end of speech it already saw, and wait a fixed safety delay (the STT's
+    p99 latency minus the VAD silence, 1.8 s for OpenAI) instead of asking Smart Turn whether the
+    sentence is finished.
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._bot_speaking = False
+        self._user_speaking = False
+
+    async def process_frame(self, frame):
+        if isinstance(frame, BotStartedSpeakingFrame):
+            self._bot_speaking = True
+        elif isinstance(frame, BotStoppedSpeakingFrame):
+            self._bot_speaking = False
+            if self._user_speaking:  # the child was already talking when the pet finished
+                await self.report_user_turn_started()
+        elif isinstance(frame, VADUserStartedSpeakingFrame):
+            self._user_speaking = True
+            if not self._bot_speaking:
+                await self.report_user_turn_started()
+        elif isinstance(frame, VADUserStoppedSpeakingFrame):
+            self._user_speaking = False

@@ -296,3 +296,63 @@ def test_silence_nudge_once_during_an_activity(make):
         assert len([f for f, _ in n.out if isinstance(f, TTSSpeakFrame)]) == 1
 
     asyncio.run(run())
+
+
+# ---- the child's turn starts on voice while the pet is silent -------------------------------
+def test_turn_starts_on_voice_only_while_the_pet_is_silent():
+    """With a segmented STT, a turn started by the transcript waited a fixed 1.8 s (seen in every
+    session since the switch to GPT Transcribe): the turn must start when the child starts talking."""
+    from pipecat.frames.frames import (
+        BotStartedSpeakingFrame,
+        BotStoppedSpeakingFrame,
+        VADUserStartedSpeakingFrame,
+        VADUserStoppedSpeakingFrame,
+    )
+
+    s = turns.QuietVADUserTurnStartStrategy()
+    started = []
+
+    async def report(*a, **kw):
+        started.append(True)
+
+    s.report_user_turn_started = report
+
+    async def run():
+        await s.process_frame(VADUserStartedSpeakingFrame())  # the pet is silent: the turn starts
+        assert len(started) == 1
+        await s.process_frame(VADUserStoppedSpeakingFrame())
+        await s.process_frame(BotStartedSpeakingFrame())
+        await s.process_frame(VADUserStartedSpeakingFrame())  # noise or voice over the pet: not on its own
+        assert len(started) == 1
+        await s.process_frame(BotStoppedSpeakingFrame())  # still talking when the pet stops: now
+        assert len(started) == 2
+        await s.process_frame(VADUserStoppedSpeakingFrame())
+        await s.process_frame(BotStartedSpeakingFrame())
+        await s.process_frame(BotStoppedSpeakingFrame())  # silence after the pet: nothing
+        assert len(started) == 2
+
+    asyncio.run(run())
+
+
+def test_pipeline_uses_the_voice_start_unless_disabled(monkeypatch):
+    from aipet import pipeline
+
+    seen = {}
+    real = pipeline.UserTurnStrategies
+
+    def spy(**kw):
+        seen["start"] = [type(x).__name__ for x in kw["start"]]
+        return real(**kw)
+
+    monkeypatch.setattr(pipeline, "UserTurnStrategies", spy)
+
+    class T:
+        def input(self):
+            return FrameProcessor()
+
+        def output(self):
+            return FrameProcessor()
+
+    monkeypatch.setenv("PET_HOME", str(__import__("tempfile").mkdtemp()))
+    pipeline.build_worker(T(), mute_while_speaking=False)
+    assert seen["start"] == ["QuietVADUserTurnStartStrategy", "MinWordsUserTurnStartStrategy"]

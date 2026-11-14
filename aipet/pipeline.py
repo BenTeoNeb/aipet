@@ -54,7 +54,13 @@ def build_worker(transport, *, mute_while_speaking: bool, min_volume: float | No
     from aipet.games import guess, learn, story, yes_no
     from aipet.games import quiz as quiz_mod
     from aipet.memory import MEMORY_TOOLS, Memory, MemoryKeeper, make_memory_processor, register_tools
-    from aipet.turns import ShortReplyKeeper, SilenceNudge, ThinkingFiller, UnfinishedSentenceWait
+    from aipet.turns import (
+        QuietVADUserTurnStartStrategy,
+        ShortReplyKeeper,
+        SilenceNudge,
+        ThinkingFiller,
+        UnfinishedSentenceWait,
+    )
 
     cfg = load_config()
     pet = character.of(cfg)
@@ -139,7 +145,10 @@ def build_worker(transport, *, mute_while_speaking: bool, min_volume: float | No
             ),
             # Interrupting the pet takes N transcribed words: noise alone no longer cuts it off.
             user_turn_strategies=UserTurnStrategies(
-                start=[MinWordsUserTurnStartStrategy(min_words=lc.get("words_to_interrupt", 3))]
+                start=[
+                    *([QuietVADUserTurnStartStrategy()] if lc.get("start_turn_on_voice", True) else []),
+                    MinWordsUserTurnStartStrategy(min_words=lc.get("words_to_interrupt", 3)),
+                ]
             ),
             user_mute_strategies=[AlwaysUserMuteStrategy()] if mute_while_speaking else [],
         ),

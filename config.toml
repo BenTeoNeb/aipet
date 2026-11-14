@@ -17,6 +17,10 @@ mic_min_volume = 0.2
 # noises (dishes, doors, laughter) produce no words, so they no longer cut it off.
 # 1 = very interruptible, 3 = reasonable, 99 = never interrupted.
 words_to_interrupt = 3
+# While Flocon is silent, the child's turn starts as soon as they speak, so Pipecat's Smart Turn
+# model decides when the sentence is finished (false: the turn starts with the transcript and
+# waits a fixed ~1.8 s with the OpenAI/OpenRouter transcription).
+start_turn_on_voice = true
 # Voice activity detector (Silero):
 vad_confidence = 0.8   # 0 to 1 (default 0.7): higher = less sensitive to noise
 vad_start_secs = 0.3   # seconds of voice before speech is detected (default 0.2)
