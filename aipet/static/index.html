@@ -464,9 +464,9 @@
 
   // The pet fell asleep: it hangs up, and the page says when to come back.
   async function hangUp(reason) {
-    ev("bot", "raccroche", reason === "nap" ? "sieste" : "nuit");
-    sleepNote = reason === "nap"
-      ? `${name} fait une petite sieste… reviens un peu plus tard 💤`
+    ev("bot", "raccroche", { goodbye: "au revoir", nap: "sieste" }[reason] || "nuit");
+    sleepNote = reason === "goodbye" ? `${name} te dit à bientôt ! 👋`
+      : reason === "nap" ? `${name} fait une petite sieste… reviens un peu plus tard 💤`
       : `${name} dort. À demain matin ! 💤`;
     await stop();
   }

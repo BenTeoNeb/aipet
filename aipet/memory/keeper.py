@@ -108,6 +108,7 @@ class MemoryKeeper:
         self.forget_after_min = 30  # on wake after a longer pause: fresh context
         self.tool_calls = 0  # tool calls during the current turn
         self.child_messages = 0  # in this conversation (for the « ma vie » moment)
+        self.closing = False  # the pet said goodbye ([fin]): it hangs up after its last words
         self.life_asked = False  # the « ma vie » moment was suggested in this conversation
 
     # --- system prompt -----------------------------------------------------
@@ -191,8 +192,11 @@ class MemoryKeeper:
                     return "night"
         return None
 
-    def falling_asleep(self) -> str | None:
-        """Like sleep_reason, but also right after the evening « bonne nuit »: the pet is going to bed."""
+    def hang_up_reason(self) -> str | None:
+        """Why the conversation should end once the pet stops talking: it sleeps ('nap', 'night'), has
+        just said the evening « bonne nuit » ('night'), or the child said goodbye ('goodbye', [fin])."""
+        if self.closing:
+            return "goodbye"
         return self.sleep_reason() or ("night" if self._goodnight_pending else None)
 
     def turn_hint(self) -> str:
@@ -333,6 +337,7 @@ class MemoryKeeper:
                     hint = " · ".join([*verdicts, hint] if hint else verdicts)
                     hint = self._goodnight(raw, hint)
                     self.child_messages += 1
+                    self.closing = False  # the child speaks again: the conversation goes on
                     if not hint:  # a calm moment: nothing else to tell the pet
                         hint = self.life_hint()
                 if hint:
@@ -388,6 +393,11 @@ class MemoryKeeper:
         elif tag == "attends":
             if self.wait:
                 await self.wait.on_wait_tag()
+        elif tag == "fin":
+            logger.info("👋 The child closes the conversation: the pet will hang up")
+            self.closing = True
+            if self.slog:
+                self.slog.event("goodbye")
         elif tag.startswith("parle:"):
             res = self.who.from_tag(tag[6:], self.last_assistant_text())
             logger.info(f"👤 [{tag}] → {res}")
@@ -514,6 +524,7 @@ class MemoryKeeper:
         """On wake: after a long pause, start from a fresh conversation (everything is
         already condensed) and refresh the date in the system prompt."""
         self._seen_before = self._load_presence()  # « last time we talked » for this session
+        self.closing = False
         pause = (now() - self.last_activity).total_seconds() / 60
         if pause > self.forget_after_min:
             self.end_skill("long pause")

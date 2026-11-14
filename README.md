@@ -44,7 +44,8 @@ bedtime, and who never pretends to be alive. aipet is that friend, designed with
   interactive stories with recurring characters, and short discovery lessons adapted to the child's
   school level, with scores and records per child.
 - **A sense of time.** The pet knows the time of day, school days and school holidays, gets tired
-  after a while, naps, and sleeps at night — and then hangs up, so the conversation really ends.
+  after a while, naps, and sleeps at night. It hangs up when it falls asleep or when the child says
+  goodbye, so the conversation really ends.
 - **Natural turn-taking.** Short answers are kept while the pet talks, a « hmm… » covers slow replies,
   noise and speech not meant for the pet are ignored.
 - **A parents' space** to see who talked to the pet and about what, review the moments worth a look,

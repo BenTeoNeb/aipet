@@ -91,10 +91,10 @@ MAX_TAG = 32  # max characters between the brackets; beyond that it is not a tag
 
 
 def special_tag(name: str) -> str | None:
-    """Control tags (not emotions): "silence", "attends" or "parle:Name"."""
+    """Control tags (not emotions): "silence", "attends", "fin" or "parle:Name"."""
     n = name.strip()
     low = n.lower()
-    if low in ("silence", "attends"):
+    if low in ("silence", "attends", "fin"):
         return low
     if low.startswith("parle:") and len(n) > 6:
         return "parle:" + n[6:].strip()
@@ -145,7 +145,11 @@ Deux balises spéciales s'écrivent seules, sans rien d'autre :
   Une salutation (« Bonjour », « Coucou »), une question ou une phrase dite à toi mérite TOUJOURS une
   réponse, même si tu ne sais pas qui parle : ne pas connaître le prénom n'est jamais une raison de
   te taire (réponds, et demande qui est là).
-{wait}N'écris jamais d'autres crochets.
+{wait}Quand l'enfant clôt la conversation (« au revoir », « salut, à plus », « j'arrête », « je vais jouer »,
+« c'est fini »), dis-lui au revoir gaiement en une phrase et ajoute [fin] après l'émotion :
+[parle:Mila] [joie] [fin] À bientôt, Mila ! La conversation se termine alors. Pas de [fin] pour un au
+revoir dans une histoire ou un jeu, ni quand l'enfant hésite ou continue de te parler.
+N'écris jamais d'autres crochets.
 """
 
 

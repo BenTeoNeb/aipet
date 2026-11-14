@@ -82,6 +82,8 @@ def _marker(e: dict, pet: Character) -> tuple[str, str] | None:
         very = "très " if e["state"] == "very_tired" else ""
         return "😴", f"{n} est {very}{pet.g('fatigué', 'fatiguée')}"
     if t == "hang_up":
+        if e.get("reason") == "goodbye":
+            return "👋", f"Au revoir : {n} a raccroché"
         return "📞", f"{n} s'est endormi{pet.g('', 'e')} et a raccroché"
     if t in ("sleepy_reply", "sleep", "goodnight_sleep"):
         return "💤", f"{n} dort"

@@ -175,8 +175,8 @@ class SleepGate(FrameProcessor):
         self._energy = energy
         self._slog = slog
         self._last_line = ""
-        # Hanging up: once the pet sleeps (or has just said good night), the conversation ends a few
-        # seconds after it last spoke — at once after a sleepy « zzz ».
+        # Hanging up: once the pet sleeps (or has just said good night, or the child said goodbye),
+        # the conversation ends a few seconds after it last spoke — at once after a sleepy « zzz ».
         self._on_hang_up = on_hang_up
         self._hang_up_reason = hang_up_reason or sleep_reason
         self._hang_up_after = hang_up_after
@@ -196,7 +196,7 @@ class SleepGate(FrameProcessor):
         reason = self._hang_up_reason()
         if not reason:
             return  # woken up meanwhile (recharged by a parent, morning)
-        logger.info(f"📞 The pet sleeps ({reason}): hanging up")
+        logger.info(f"📞 Hanging up ({reason})")
         if self._slog:
             self._slog.event("hang_up", reason=reason)
         self._answered_asleep = False

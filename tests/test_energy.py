@@ -153,3 +153,17 @@ def test_the_sleeping_pet_hangs_up():
         assert hung == ["night"]
 
     asyncio.run(go())
+
+
+def test_goodbye_hangs_up_unless_the_child_goes_on(tmp_path):
+    from pipecat.processors.aggregators.llm_context import LLMContext as Ctx
+
+    from aipet.memory import Memory, MemoryKeeper
+
+    k = MemoryKeeper(Memory(tmp_path, "Flocon"), {"memory": {}}, Ctx(), "BASE")
+    assert k.hang_up_reason() is None
+    asyncio.run(k.on_tag("fin"))  # « [joie] [fin] À bientôt ! »
+    assert k.hang_up_reason() == "goodbye"
+    k.context.add_message({"role": "user", "content": "Attends, encore une question !"})
+    k.tag_last_user_message()
+    assert k.hang_up_reason() is None

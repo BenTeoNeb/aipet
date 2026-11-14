@@ -477,3 +477,12 @@ def test_filter_mutes_the_rest_of_the_reply_after_a_muting_tag(tag):
         fp.FrameProcessor.process_frame = orig
     assert received == [tag] and muted == []
     assert "".join(after) == "Coucou !"
+
+
+def test_goodbye_tag_is_never_spoken():
+    s = TagStripper()
+    out = []
+    for c in ["[parle:Mila] [joie] [f", "in] À bientôt, Mila !"]:
+        out += s.feed(c)
+    assert "".join(v for k, v in out if k == "text").strip() == "À bientôt, Mila !"
+    assert [v for k, v in out if k == "tag"] == ["parle:Mila", "fin"]

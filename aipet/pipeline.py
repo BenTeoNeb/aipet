@@ -200,7 +200,7 @@ def build_worker(
             nap_lines=pet.lines["nap"],
             night_lines=pet.lines["night"],
             on_hang_up=on_hang_up if ec.get("hang_up_when_asleep", True) else None,
-            hang_up_reason=keeper.falling_asleep,
+            hang_up_reason=keeper.hang_up_reason,
             hang_up_after=ec.get("hang_up_after_secs", 8),
         ),
         llm,
