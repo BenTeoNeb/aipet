@@ -11,7 +11,7 @@ ROUTES = ["/debug/state", "/debug/memory", "/debug/memory/search?q=chat", "/debu
 @pytest.fixture
 def client(tmp_path, monkeypatch):
     monkeypatch.setenv("PET_MEMORY_DIR", str(tmp_path / "mem"))
-    return TestClient(app)
+    return TestClient(app, client=("127.0.0.1", 50000))
 
 
 @pytest.mark.parametrize("route", ROUTES)
@@ -75,3 +75,11 @@ def test_closing_an_old_tab_keeps_the_new_tabs_session(tmp_path, monkeypatch):
         assert not web.SESSION
 
     asyncio.run(go())
+
+
+def test_other_machines_are_refused_even_with_the_header(tmp_path, monkeypatch):
+    monkeypatch.setenv("PET_MEMORY_DIR", str(tmp_path / "mem"))
+    lan = TestClient(app, client=("192.168.1.20", 50000))
+    assert lan.get("/debug/memory", headers=H).status_code == 403
+    assert lan.post("/debug/memory/delete?path=RESUME.md", headers=H).status_code == 403
+    assert lan.get("/").status_code == 200  # the pet's page itself stays reachable

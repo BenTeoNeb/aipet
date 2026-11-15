@@ -14,7 +14,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-from fastapi import Header, HTTPException, Request
+from fastapi import HTTPException, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
@@ -34,6 +34,7 @@ from aipet.rhythm import TZ, Rhythm
 from aipet.session import Session
 
 STATIC = Path(__file__).parent / "static"
+LOOPBACK = {"127.0.0.1", "::1", "localhost"}
 HANG_UP_FALLBACK_SECS = 5  # the page closes the call itself; the server does it if the page did not
 
 
@@ -100,8 +101,12 @@ async def debug_state():
 @app.middleware("http")
 async def guard_debug_routes(request: Request, call_next):
     """Every /debug/ route (reads included: they expose the family's memory and transcripts) answers
-    only the locally served page: the X-Pet header and, when present, a localhost Origin."""
+    only the locally served page: a connection from this machine, the X-Pet header and, when present,
+    a localhost Origin. (Even if the server is started with --host 0.0.0.0, the LAN gets nothing.)"""
     if request.url.path.startswith("/debug/"):
+        host = request.client.host if request.client else ""
+        if host not in LOOPBACK:
+            return JSONResponse({"detail": "local connections only"}, status_code=403)
         try:
             _guard(request.headers.get("x-pet"), request.headers.get("origin"))
         except HTTPException as e:
@@ -170,17 +175,15 @@ def debug_session(name: str):
 
 
 @app.post("/debug/memory/delete", include_in_schema=False)
-async def debug_memory_delete(path: str, x_pet: str | None = Header(None), origin: str | None = Header(None)):
+async def debug_memory_delete(path: str):
     """Parental control: delete a memory file."""
-    _guard(x_pet, origin)
     if not await asyncio.to_thread(_memory().delete, path):
         return {"ok": False, "reason": "file cannot be deleted"}
     return {"ok": True}
 
 
 @app.post("/debug/memory/condense", include_in_schema=False)
-async def debug_memory_condense(x_pet: str | None = Header(None), origin: str | None = Header(None)):
-    _guard(x_pet, origin)
+async def debug_memory_condense():
     conversation = SESSION.get("conversation")
     if conversation is None:
         return {"ok": False, "reason": "no session"}
@@ -209,16 +212,14 @@ def _energy(conversation) -> Energy:
 
 
 @app.post("/debug/energy/recharge", include_in_schema=False)
-async def debug_energy_recharge(x_pet: str | None = Header(None), origin: str | None = Header(None)):
-    _guard(x_pet, origin)
+async def debug_energy_recharge():
     energy = _energy(SESSION.get("conversation"))
     energy.recharge()
     return {"ok": True, **energy.snapshot()}
 
 
 @app.post("/debug/reset", include_in_schema=False)
-async def debug_reset(x_pet: str | None = Header(None), origin: str | None = Header(None)):
-    _guard(x_pet, origin)
+async def debug_reset():
     ctx = SESSION.get("context")
     if ctx is None:
         return {"ok": False, "reason": "no session"}
