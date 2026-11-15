@@ -33,7 +33,8 @@ versions follow [Semantic Versioning](https://semver.org/) once the first releas
 - Long stories recharged the pet's energy instead of draining it.
 - A tired pet said goodbye for its nap but never hung up (no `[fin]` when the pet itself ends the
   conversation), and answered the next « d'accord ? » as if awake: its goodbye now carries `[fin]`,
-  and a goodbye while tired starts a real nap.
+  and a goodbye while very tired starts a real nap (from its current level, never during a sad
+  moment). Merely tired, the child can still call it back.
 - Resuming a story while another was being prepared let the new one replace it; preparations had
   no overall time limit; a goodbye after a recharge hung up after 1 s.
 

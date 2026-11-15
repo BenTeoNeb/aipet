@@ -389,6 +389,7 @@ def test_system_prompt_contains_tags_and_guardrails():
 
     p = prompts.build_system_prompt(config.load_config())
     assert "[joie]" in p and "Garde-fous" in p and "ne prétends pas être vivant" in p
+    assert "TOI qui la termines" in p  # the pet's own goodbyes end the conversation too
 
 
 def test_control_tags_never_spoken():

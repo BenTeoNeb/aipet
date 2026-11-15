@@ -4,7 +4,8 @@
   conversation going on at bedtime gets a short grace period to finish.
 - `goodnight(text)`: the child says « dodo » — the pet says good night (and, in the evening, sleeps
   from the next message until morning).
-- `goodbye()`: the pet closed the conversation ([fin]); a new child message reopens it.
+- `goodbye()`: the pet closed the conversation ([fin]); a new child message reopens it, unless the
+  pet was very tired and went for its nap (see `Energy.nap_after_goodbye`).
 - `hang_up_reason()`: why the pet should hang up once it stops talking (see hangup.HangUp).
 - `hints()`: tiredness and bedtime hints for the pet's next reply (French).
 """
@@ -66,8 +67,8 @@ class SleepState:
         return None
 
     def hang_up_reason(self) -> str | None:
-        """It sleeps ('nap', 'night'), has just said the evening « bonne nuit » ('night'), or the
-        child said goodbye ('goodbye')."""
+        """It sleeps ('nap', 'night'), has just said the evening « bonne nuit » ('night'), or it said
+        goodbye ('goodbye', the [fin] tag, whoever ended the conversation)."""
         if self.closing:
             return "goodbye"
         return self.reason() or ("night" if self._goodnight_pending else None)
@@ -89,14 +90,13 @@ class SleepState:
         self.closing = False
 
     def goodbye(self):
-        """[fin]: the pet closes the conversation and hangs up after its last words. If it was tired,
-        the nap it announced is real: a « d'accord » or a quick reconnect gets a sleepy reply, not
-        the whole conversation again."""
+        """[fin]: the pet closes the conversation and hangs up after its last words. Very tired, it
+        really goes for its nap (see `Energy.nap_after_goodbye`)."""
         logger.info("👋 The pet closes the conversation: it will hang up")
         self.closing = True
         self.slog.event("goodbye")
-        if self.energy and self.energy.state() in ("tired", "very_tired"):
-            self.energy.nap()
+        if self.energy:
+            self.energy.nap_after_goodbye()
 
     def goodnight(self, text: str) -> str | None:
         """« Non non, dodo là »: the instruction for the pet (French), or None. Near bedtime the pet
@@ -130,7 +130,7 @@ class SleepState:
             if state == "tired":
                 hints.append(
                     f"tu commences à être {g('fatigué', 'fatiguée')} : dis-le avec des mots (« Ouaaah… »), jamais « *bâille* », "
-                    "et propose des choses calmes ; si tu pars faire ta sieste, dis au revoir avec [fin]"
+                    "et propose des choses calmes"
                 )
             elif state == "very_tired":
                 hints.append(

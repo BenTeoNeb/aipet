@@ -1,8 +1,8 @@
 """Hanging up: the pet ends the conversation by itself.
 
 It hangs up a few seconds after its last words when it has a reason to (`reason()`): it sleeps
-('nap', 'night'), has just said the evening « bonne nuit » ('night'), or the child said goodbye
-('goodbye', the [fin] tag). Someone speaking cancels it; the reason is checked again when they stop.
+('nap', 'night'), has just said the evening « bonne nuit » ('night'), or it said goodbye ('goodbye',
+the [fin] tag, whether the child or the pet ended the conversation). Someone speaking cancels it; the reason is checked again when they stop.
 After a sleepy « zzz » (`SleepyReplyFrame`) it hangs up at once: the pet is already asleep.
 
 What hanging up means depends on the mode (`on_hang_up`): the web page closes the call, the Pi goes

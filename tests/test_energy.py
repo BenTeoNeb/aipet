@@ -8,6 +8,7 @@ from pipecat.processors.frame_processor import FrameDirection
 
 from aipet.conversation import Conversation
 from aipet.energy import NAP_LINES, NIGHT_LINES, Energy, SleepGate
+from aipet.memory import Memory
 
 
 class Clock:
@@ -171,11 +172,7 @@ def test_the_sleepy_reply_is_marked_for_the_hang_up():
 
 
 def test_goodbye_hangs_up_unless_the_child_goes_on(tmp_path):
-    from pipecat.processors.aggregators.llm_context import LLMContext as Ctx
-
-    from aipet.memory import Memory
-
-    k = Conversation(Memory(tmp_path, "Flocon"), {"memory": {}}, Ctx(), "BASE")
+    k = Conversation(Memory(tmp_path, "Flocon"), {"memory": {}}, LLMContext(), "BASE")
     assert k.sleep.hang_up_reason() is None
     asyncio.run(k.on_tag("fin"))  # « [joie] [fin] À bientôt ! »
     assert k.sleep.hang_up_reason() == "goodbye"
@@ -214,32 +211,52 @@ def test_a_long_story_drains_instead_of_recharging():
     assert e.level() < before - 0.15  # 4 of 20 minutes spent
 
 
-def test_a_tired_pet_saying_goodbye_really_naps(tmp_path):
-    """Seen in a real session: tired, the pet said « c'est l'heure de ma sieste, file jouer » but
-    kept the conversation open, and answered the child's « d'accord ? » as if nothing happened."""
-    from pipecat.processors.aggregators.llm_context import LLMContext as Ctx
-
-    from aipet.memory import Memory
-
+def tired_pet(minutes):
     c = Clock()
     e = Energy(talk_minutes=20, recharge_minutes=30, wake_at=0.5, clock=c)
     e.activity()
-    talk(e, c, 13)  # tired, not empty
-    assert e.state() == "tired" and not e.asleep
-    k = Conversation(Memory(tmp_path, "Flocon"), {"memory": {}}, Ctx(), "BASE", energy=e)
+    talk(e, c, minutes)
+    return e, c
+
+
+def goodbye(tmp_path, e):
+    k = Conversation(Memory(tmp_path, "Flocon"), {"memory": {}}, LLMContext(), "BASE", energy=e)
     asyncio.run(k.on_tag("fin"))
-    assert k.sleep.hang_up_reason() == "goodbye" and e.asleep
+    assert k.sleep.hang_up_reason() == "goodbye"
     k.context.add_message({"role": "user", "content": "D'accord ?"})
     k.tag_last_user_message()
+    return k
+
+
+def test_a_very_tired_pet_saying_goodbye_really_naps(tmp_path):
+    """Seen in a real session: the pet announced its nap but answered the child's « d'accord ? »
+    as if nothing happened."""
+    e, c = tired_pet(17.5)
+    assert e.state() == "very_tired"
+    k = goodbye(tmp_path, e)
     assert k.sleep.hang_up_reason() == "nap"  # a sleepy reply, then it hangs up
     c.t += 5 * 60
     assert e.asleep  # a real nap, not a few seconds
-    c.t += 10 * 60
+    c.t += 15 * 60
     assert not e.asleep
 
 
-def test_the_pet_ends_its_own_goodbyes_with_fin():
-    from aipet import config, prompts
+def test_a_merely_tired_pet_saying_goodbye_can_be_called_back(tmp_path):
+    e, _ = tired_pet(13)
+    assert e.state() == "tired"
+    k = goodbye(tmp_path, e)
+    assert k.sleep.hang_up_reason() is None and not e.asleep  # the child goes on
 
-    p = prompts.build_system_prompt(config.load_config())
-    assert "TOI qui la termines" in p
+
+def test_no_nap_after_goodbye_in_a_sad_moment(tmp_path):
+    e, _ = tired_pet(17.5)
+    e.protect()
+    assert goodbye(tmp_path, e).sleep.hang_up_reason() is None and not e.asleep
+
+
+def test_no_nap_after_goodbye_that_would_end_at_once():
+    c = Clock()
+    e = Energy(talk_minutes=20, recharge_minutes=30, wake_at=0.1, clock=c)
+    e.activity()
+    talk(e, c, 17.5)
+    assert e.state() == "very_tired" and not e.nap_after_goodbye() and not e._asleep

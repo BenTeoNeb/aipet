@@ -1,8 +1,8 @@
 """The pet's energy: a pet gets tired, takes naps, and sleeps at night.
 
 Energy drains during active conversation and recharges while nobody talks. Below thresholds a hint
-is added to each user message (the pet yawns, then says goodbye); at zero the pet really naps until
-recharged. At night (see `rhythm.Rhythm`) he sleeps until morning. While asleep, `SleepGate`
+is added to each user message (the pet yawns, then says goodbye); at zero, or when it says goodbye
+while very tired (`nap_after_goodbye`), the pet really naps until recharged. At night (see `rhythm.Rhythm`) he sleeps until morning. While asleep, `SleepGate`
 answers with a short sleepy line without calling the model.
 
 Rules: energy never runs out in the middle of a sad or comforting moment (`protect`), and parents
@@ -128,15 +128,19 @@ class Energy:
         self._check_state()
         self._save()
 
-    def nap(self):
-        """The pet said goodbye to go and nap (tired, not empty yet): it really sleeps, at least
-        until it recharges from VERY_TIRED to its wake-up level."""
-        if self._asleep:
-            return
-        self._level = min(self.level(), VERY_TIRED)
-        self._asleep, self._last_activity = True, self.clock()
+    def nap_after_goodbye(self) -> bool:
+        """The pet said goodbye ([fin]) while very tired: its announced nap is real, so a « d'accord ? »
+        or a quick reconnect gets a sleepy reply. It sleeps from its current level until the wake-up
+        level, never during a sad moment, and not when merely tired (the child may still go on)."""
+        if self._asleep or self.state() != "very_tired" or self.clock() < self._protect_until:
+            return False
+        if self.level() >= self.wake_at:  # would wake up at once
+            return False
+        self._level, self._asleep, self._last_activity = self.level(), True, self.clock()
         self._log("fell_asleep", why="said goodbye")
+        self._check_state()
         self._save()
+        return True
 
     def protect(self):
         """A sad or comforting moment: postpone the nap."""
