@@ -10,7 +10,7 @@ from loguru import logger
 
 from aipet import rhythm
 from aipet.fileio import atomic_write_json, load_json, lock_for
-from aipet.memory.store import now
+from aipet.timefmt import now
 
 ANYONE = "_any"
 

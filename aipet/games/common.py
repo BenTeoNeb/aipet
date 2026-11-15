@@ -7,9 +7,9 @@ import re
 from datetime import date, timedelta
 from pathlib import Path
 
-from aipet import character, school
+from aipet import character
 from aipet.fileio import atomic_write_json, load_json, lock_for
-from aipet.memory.store import _slug, _without_article, normalize_text, parse_card
+from aipet.memory.text import normalize_text, without_article
 from aipet.memory.tools import TOOLS_EXHAUSTED
 from aipet.session_log import NO_LOG
 
@@ -86,7 +86,7 @@ def theme_key(theme: str) -> str:
     """Same theme whatever the wording: « Les animaux » = « animaux », « l'espace » = « espace »."""
     t = normalize_text(theme).strip()
     t = re.sub(r"^(les |le |la |l'|l’|un |une |des |du |de la |de l'|d'|d’)", "", t)
-    return _without_article(t).strip()
+    return without_article(t).strip()
 
 
 def days_in_a_row(play_days: list[str], today: date) -> int:
@@ -98,25 +98,6 @@ def days_in_a_row(play_days: list[str], today: date) -> int:
         n += 1
         d -= timedelta(days=1)
     return n
-
-
-def child_level(memory_root: Path, name: str, today: date) -> str | None:
-    """School level of a known child (from their card), or None."""
-    card = Path(memory_root) / "famille" / f"{_slug(name)}.md"
-    if not card.exists():
-        return None
-    meta = parse_card(card.read_text())[0]
-
-    def noted(key):
-        try:
-            return date.fromisoformat(meta.get(key, ""))
-        except ValueError:
-            return None
-
-    level = school.current_level(meta.get("classe"), noted("classe_note_le"), today)
-    if level:
-        return level
-    return school.typical_level(school.current_age(school.parse_age(meta.get("age")), noted("age_note_le"), today))
 
 
 class JsonStore:

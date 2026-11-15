@@ -31,13 +31,13 @@ from aipet.games.common import (
     Activity,
     JsonStore,
     cancel_preparation,
-    child_level,
     is_stale,
     new_preparation,
     pet_intro,
     theme_key,
 )
-from aipet.memory.store import now
+from aipet.memory.cards import DIR_FAMILY, DIR_STORIES, child_level
+from aipet.timefmt import now
 
 STORY_TOOLS = {"story_start", "story_next", "story_end"}
 STEPS_DAY, STEPS_SHORT = 5, 4  # short: evening or little ones
@@ -158,7 +158,7 @@ class StoryGame(Activity):
     def __init__(self, cfg: dict, memory_root, host=None, slog=None):
         super().__init__(host, slog)
         self.cfg, self.root = cfg, memory_root
-        self.store = JsonStore(memory_root / "histoires" / "univers.json", {"characters": {}, "stories": []})
+        self.store = JsonStore(memory_root / DIR_STORIES / "univers.json", {"characters": {}, "stories": []})
         self.story: dict | None = None  # the running story (also saved, to resume later)
         self.started_at: datetime | None = None
 
@@ -192,7 +192,7 @@ class StoryGame(Activity):
     # ------------------------------------------------------------------ real people
     def _real_names(self) -> set[str]:
         """Normalized names of the real people: family cards, children met, the pet."""
-        names = {p.stem for p in (self.root / "famille").glob("*.md")}
+        names = {p.stem for p in (self.root / DIR_FAMILY).glob("*.md")}
         names |= self.host.real_names()
         try:
             names.add(character.of(self.cfg).name)

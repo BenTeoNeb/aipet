@@ -10,7 +10,8 @@ from pathlib import Path
 
 from loguru import logger
 
-from aipet.memory.store import LIFE_CHOSEN, LIFE_FILE, LIFE_WORDS, normalize_text, parse_life
+from aipet.memory.cards import LIFE_CHOSEN, LIFE_FILE, LIFE_WORDS, parse_life
+from aipet.memory.text import normalize_text
 from aipet.session_log import NO_LOG
 
 MIN_CHILD_MESSAGES = 3  # not right away: first the child says what it came for

@@ -17,8 +17,9 @@ from datetime import datetime, timedelta
 from loguru import logger
 
 from aipet import env
-from aipet.memory.store import normalize_text, now
+from aipet.memory.text import normalize_text
 from aipet.session_log import NO_LOG
+from aipet.timefmt import now
 
 # The child is off to bed (normalized text: lower case, no accents).
 GOODNIGHT = re.compile(

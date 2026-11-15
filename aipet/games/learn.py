@@ -26,13 +26,13 @@ from aipet.games.common import (
     Activity,
     JsonStore,
     cancel_preparation,
-    child_level,
     is_stale,
     new_preparation,
     pet_intro,
     theme_key,
 )
-from aipet.memory.store import _slug, now, parse_card
+from aipet.memory.cards import LIKES, SCHOOL, card_path, child_level, parse_card
+from aipet.timefmt import now
 
 LEARN_TOOLS = {"learn_suggest", "learn_start", "learn_next", "learn_end"}
 START_LEVEL = 3  # relative to the class: 3 = « de son niveau »
@@ -125,11 +125,11 @@ class LearnGame(Activity):
         player = self.host.player()
         p = self.store.load()["players"].get(player, {})
         card_likes, school_now = [], []
-        card = self.root / "famille" / f"{_slug(player)}.md"
+        card = card_path(self.root, player)
         if player != UNKNOWN_PLAYER and card.exists():
-            _, sections = parse_card(card.read_text())
-            card_likes = sections.get("Aime", [])[-8:]
-            school_now = [t.split(" : ", 1)[-1] for t in sections.get("À l'école", [])[-4:]]
+            _, sections = parse_card(card.read_text(encoding="utf-8"))
+            card_likes = sections.get(LIKES, [])[-8:]
+            school_now = [t.split(" : ", 1)[-1] for t in sections.get(SCHOOL, [])[-4:]]
         level = child_level(self.root, player, now().date()) if player != UNKNOWN_PLAYER else None
         interests = sorted(p.get("interests", {}).items(), key=lambda kv: -kv[1])
         return {

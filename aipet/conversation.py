@@ -35,13 +35,14 @@ from aipet.games.common import Activity, Host
 from aipet.memory.keeper import MemoryKeeper
 from aipet.memory.life_moments import LifeMoments
 from aipet.memory.speakers import Speakers, speaker_instructions
-from aipet.memory.store import MONTHS_FR, Memory, now, spoken_date
+from aipet.memory.store import Memory
 from aipet.memory.tools import memory_instructions
 from aipet.presence import Presence
 from aipet.session_log import NO_LOG
 from aipet.skills import Skills
 from aipet.sleep import SleepState
 from aipet.tasks import BackgroundTasks
+from aipet.timefmt import MONTHS_FR, now, spoken_date
 from aipet.tool_gate import ToolGate
 
 PROMPT_REFRESH_MIN = 10  # keep « Maintenant » (the time in the system prompt) current

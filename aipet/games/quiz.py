@@ -29,14 +29,15 @@ from aipet.games.common import (
     Activity,
     JsonStore,
     cancel_preparation,
-    child_level,
     days_in_a_row,
     is_stale,
     new_preparation,
     pet_intro,
     theme_key,
 )
-from aipet.memory.store import normalize_text, now
+from aipet.memory.cards import child_level
+from aipet.memory.text import normalize_text
+from aipet.timefmt import now
 
 QUIZ_TOOLS = {"quiz_history", "quiz_start", "quiz_answer"}
 DEFAULT_QUESTIONS = 5

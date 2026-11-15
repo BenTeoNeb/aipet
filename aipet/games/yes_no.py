@@ -28,13 +28,14 @@ from aipet.games.common import (
     Activity,
     JsonStore,
     cancel_preparation,
-    child_level,
     days_in_a_row,
     is_stale,
     new_preparation,
     pet_intro,
 )
-from aipet.memory.store import normalize_text, now
+from aipet.memory.cards import child_level
+from aipet.memory.text import normalize_text
+from aipet.timefmt import now
 
 YES_NO_TOOLS = {"yesno_start"}
 TARGET = 15  # answers to hold to win the game

@@ -7,7 +7,9 @@ from datetime import datetime
 
 from loguru import logger
 
-from aipet.memory.store import SUMMARY_MAX, Memory, now, spoken_date
+from aipet.memory.cards import SUMMARY_MAX
+from aipet.memory.store import Memory
+from aipet.timefmt import now, spoken_date
 
 # --------------------------------------------------------------------------
 # Condensation by the model

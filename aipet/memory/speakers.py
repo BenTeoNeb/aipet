@@ -6,8 +6,9 @@ import re
 
 from loguru import logger
 
-from aipet.memory.store import WEEKDAYS_FR, normalize_text, now
+from aipet.memory.text import normalize_text
 from aipet.session_log import NO_LOG
+from aipet.timefmt import WEEKDAYS_FR, now
 
 # --------------------------------------------------------------------------
 # Speakers: who is talking to the pet right now

@@ -8,7 +8,8 @@ from collections.abc import Callable
 
 from loguru import logger
 
-from aipet.memory.store import SEARCH_KINDS, STOPWORDS, Memory, normalize_text
+from aipet.memory.store import SEARCH_KINDS, Memory
+from aipet.memory.text import STOPWORDS, normalize_text
 
 # --------------------------------------------------------------------------
 # Tools for the model
@@ -138,6 +139,6 @@ def register_tools(llm, mem: Memory, budget_exhausted: Callable[[], bool] = lamb
 
 
 def memory_instructions(pet_name: str) -> str:
-    from aipet.memory.store import life_title
+    from aipet.memory.cards import life_title
 
     return MEMORY_INSTRUCTIONS.replace("LIFE_TITLE", life_title(pet_name))

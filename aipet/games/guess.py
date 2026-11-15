@@ -18,7 +18,8 @@ from dataclasses import dataclass
 from loguru import logger
 
 from aipet.games.common import GAMES_DIR, Activity, JsonStore
-from aipet.memory.store import normalize_text, now
+from aipet.memory.text import normalize_text
+from aipet.timefmt import now
 
 GUESS_TOOLS = {"guess_start", "guess_end"}
 MAX_QUESTIONS = 20

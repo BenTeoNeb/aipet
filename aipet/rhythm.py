@@ -14,19 +14,15 @@ import urllib.request
 from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
-from zoneinfo import ZoneInfo
 
 from loguru import logger
 
 from aipet import paths
+from aipet.timefmt import MONTHS_FR, TZ, WEEKDAYS_FR
 
-TZ = ZoneInfo("Europe/Paris")
 CACHE = paths.cache_dir() / "school_holidays.json"  # shared by the household's pets
 HOLIDAYS_API = "https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-calendrier-scolaire/records"
 REFRESH_DAYS = 7
-WEEKDAYS_FR = ["lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi", "dimanche"]
-MONTHS_FR = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre",
-             "novembre", "décembre"]  # fmt: skip
 
 
 # ---------------------------------------------------------------------------

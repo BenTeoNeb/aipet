@@ -19,7 +19,6 @@ import json
 import time
 from datetime import datetime
 from pathlib import Path
-from zoneinfo import ZoneInfo
 
 from loguru import logger
 from pipecat.frames.frames import (
@@ -49,8 +48,8 @@ from pipecat.services.llm_service import LLMService
 
 from aipet import paths
 from aipet.fileio import lock_for
+from aipet.timefmt import TZ
 
-TZ = ZoneInfo("Europe/Paris")
 LOG_DIR = paths.logs_dir()  # this pet's logs
 SESSIONS = LOG_DIR / "sessions"
 

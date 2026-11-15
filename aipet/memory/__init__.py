@@ -1,6 +1,11 @@
 """The pet's long-term memory.
 
-- `store`: on-disk markdown files (French data format), cards, search, forget, apply.
+- `store`: `Memory`, one pet's memory folder: reading, search, forget, applying updates.
+- `cards`: the on-disk format (person cards, the pet's life file, folder names).
+- `updates`: the model's structured update turned into file contents.
+- `forget`: what a forget request matches, and how text is cleaned.
+- `repo`: the memory's git history.
+- `text`: French text helpers (accents, slugs, stopwords, rude words).
 - `condensation`: the model turns conversation chunks into structured updates.
 - `tools`: search_memory / read_memory / forget, exposed to the model.
 - `speakers`: who is talking (first names confirmed before being used).

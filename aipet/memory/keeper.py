@@ -15,9 +15,10 @@ from datetime import timedelta
 from loguru import logger
 
 from aipet.memory.condensation import condense, turns_from_messages
-from aipet.memory.store import Memory, now
+from aipet.memory.store import Memory
 from aipet.session_log import NO_LOG
 from aipet.tasks import start
+from aipet.timefmt import now
 
 MAX_CONDENSE_FAILURES = 3  # then the raw transcript is kept and the context moves on
 

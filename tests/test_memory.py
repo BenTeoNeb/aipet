@@ -160,7 +160,9 @@ def test_search_by_date_and_not_by_path(mem):
 
 def test_apply_writes_nothing_on_error(mem, monkeypatch):
     u = update(memory={"participants": ["Léa"], "topics": ["x"], "summary": "résumé"}, people=[person("Léa")])
-    monkeypatch.setattr(store, "render_card", lambda *a: (_ for _ in ()).throw(RuntimeError("boom")))
+    from aipet.memory import updates
+
+    monkeypatch.setattr(updates, "render_card", lambda *a: (_ for _ in ()).throw(RuntimeError("boom")))
     with pytest.raises(RuntimeError):
         mem.apply(u, memory.now())
     assert not list((mem.root / "souvenirs").glob("*.md"))
