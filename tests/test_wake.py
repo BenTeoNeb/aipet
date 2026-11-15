@@ -166,3 +166,24 @@ def test_no_sleep_while_a_tool_runs(gate, monkeypatch):
         assert not g._awake
 
     asyncio.run(run())
+
+
+def test_a_cancelled_tool_call_lets_the_pet_sleep(gate, monkeypatch):
+    from pipecat.frames.frames import FunctionCallCancelFrame, FunctionCallInProgressFrame
+
+    monkeypatch.setattr(wake, "TOOL_WAIT_SECS", 60)
+
+    async def run():
+        g = gate(idle_timeout=0.05, max_awake=5)
+        await g._wake(0.9)
+        call = FunctionCallInProgressFrame(function_name="story_start", tool_call_id="t1", arguments={})
+        await g.process_frame(call, FrameDirection.DOWNSTREAM)
+        # Interrupted: Pipecat sends a cancel instead of a result.
+        await g.process_frame(
+            FunctionCallCancelFrame(function_name="story_start", tool_call_id="t1"), FrameDirection.DOWNSTREAM
+        )
+        assert not g._tools
+        await asyncio.sleep(0.2)
+        assert not g._awake  # the mic does not stay open for the tool's 60 s
+
+    asyncio.run(run())

@@ -18,7 +18,7 @@ from dataclasses import dataclass
 from loguru import logger
 
 from aipet.games.common import GAMES_DIR, Activity, JsonStore
-from aipet.memory.text import normalize_text
+from aipet.memory.text import STOPWORDS, normalize_text
 from aipet.timefmt import now
 
 GUESS_TOOLS = {"guess_start", "guess_end"}
@@ -35,14 +35,20 @@ VAGUE_WORDS = {"petit", "petite", "grand", "grande", "gros", "grosse", "animal",
 
 def answer_words(answer: str) -> set[str]:
     words = re.findall(r"[a-z]+", normalize_text(answer))
-    return {w for w in words if len(w) >= 3 and w not in VAGUE_WORDS}
+    return {w for w in words if len(w) >= 3 and w not in VAGUE_WORDS and w not in STOPWORDS}
+
+
+def _stem(word: str) -> str:
+    return word[:-1] if len(word) > 3 and word[-1] in "sx" else word
 
 
 def confirms_guess(answer: str, pet_said: str, child_said: str) -> bool:
-    """True if the pet's last line proposed `answer` and the child's reply is a yes."""
-    said = set(re.findall(r"[a-z]+", normalize_text(pet_said)))
-    words = answer_words(answer)
-    return bool(words & said) and bool(YES.search(normalize_text(child_said)))
+    """True if the pet's last line proposed `answer` and the child's reply is a yes. The answer's
+    main word (the first one that counts: « poisson » in « un poisson rouge ») must be in the pet's
+    line: a yes to « c'est rouge ? » is not a win."""
+    said = {_stem(w) for w in re.findall(r"[a-z]+", normalize_text(pet_said))}
+    words = [w for w in re.findall(r"[a-z]+", normalize_text(answer)) if w in answer_words(answer)]
+    return bool(words) and _stem(words[0]) in said and bool(YES.search(normalize_text(child_said)))
 
 
 @dataclass

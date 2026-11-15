@@ -16,6 +16,7 @@ import re
 from loguru import logger
 from pipecat.frames.frames import (
     InterimTranscriptionFrame,
+    LLMFullResponseEndFrame,
     LLMFullResponseStartFrame,
     LLMTextFrame,
     TranscriptionFrame,
@@ -65,8 +66,12 @@ class TranscriptFilter(FrameProcessor):
 # --- text spoken aloud ------------------------------------------------------------------------
 _EMOJI = re.compile("[\U0001f300-\U0001faff\U00002600-\U000027bf\U0001f000-\U0001f2ff️‍]")
 _TIMES = re.compile(r"(\d)\s*[*×]\s*(\d)")
-_BULLET = re.compile(r"(^|\n)[ \t]*(?:[-•–]|\d+[.)])[ \t]+")
-_HEADING = re.compile(r"(^|\n)[ \t]*#{1,6}[ \t]*")
+# Only at a real line start: a streamed chunk often starts in mid-sentence (« … » + « - la capitale »,
+# « score : » + « 4. Bravo »), and `at_line_start` says whether it is the start of a line.
+_BULLET = re.compile(r"(\n)[ \t]*(?:[-•–]|\d+[.)])[ \t]+")
+_HEADING = re.compile(r"(\n)[ \t]*#{1,6}[ \t]*")
+# A chunk ending with « 7 * »: the operand may come in the next chunk; held until then.
+_TRAILING_TIMES = re.compile(r"\d\s*[*×]\s*$")
 
 
 def clean_spoken(text: str, at_line_start: bool = False) -> str:
@@ -75,25 +80,32 @@ def clean_spoken(text: str, at_line_start: bool = False) -> str:
     t = _EMOJI.sub("", t)
     t = t.replace("`", "").replace("**", "").replace("__", "")
     t = t.replace("*", "")  # italics / stage directions like "*purrs*"; "7 * 5" is already handled
-    t = _HEADING.sub(r"\1", ("\n" + t) if at_line_start else t)
-    t = _BULLET.sub(r"\1", t)
-    if at_line_start and t.startswith("\n"):
-        t = t[1:]
-    return t
+    t = ("\n" + t) if at_line_start else t
+    t = _BULLET.sub(r"\1", _HEADING.sub(r"\1", t))
+    return t[1:] if at_line_start else t
 
 
 class SpokenTextCleaner(FrameProcessor):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self._line_start = True
+        self._held = ""  # « 7 * » waiting for the next chunk
 
     async def process_frame(self, frame, direction: FrameDirection):
         await super().process_frame(frame, direction)
         if isinstance(frame, LLMFullResponseStartFrame):
-            self._line_start = True
+            self._line_start, self._held = True, ""
+        elif isinstance(frame, LLMFullResponseEndFrame) and self._held:
+            held, self._held = self._held, ""
+            await self.push_frame(LLMTextFrame(clean_spoken(held, self._line_start)), direction)
         elif isinstance(frame, LLMTextFrame) and direction == FrameDirection.DOWNSTREAM and frame.text:
-            cleaned = clean_spoken(frame.text, self._line_start)
-            self._line_start = frame.text.endswith("\n")
+            raw, self._held = self._held + frame.text, ""
+            m = _TRAILING_TIMES.search(raw)
+            if m:
+                raw, self._held = raw[: m.start()], raw[m.start() :]
+            cleaned = clean_spoken(raw, self._line_start)
+            if raw:
+                self._line_start = raw.endswith("\n")
             if cleaned != frame.text:
                 frame.text = cleaned  # same frame: its other attributes are kept
             if not cleaned:

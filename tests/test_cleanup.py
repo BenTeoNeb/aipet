@@ -42,6 +42,36 @@ def test_cleans_markdown_and_emojis():
     assert clean_spoken("## Titre\nTexte", at_line_start=True) == "Titre\nTexte"
     assert clean_spoken("un arc-en-ciel - joli") == "un arc-en-ciel - joli"  # dashes inside a sentence are kept
     assert clean_spoken("[joie] Oh !") == "[joie] Oh !"  # tags untouched
+    # A chunk in mid-sentence keeps its start (« … score : » + « 4. Bravo »).
+    assert clean_spoken(" 4. Bravo") == " 4. Bravo"
+    assert clean_spoken(" - la capitale") == " - la capitale"
+    assert clean_spoken("- une pomme", at_line_start=True) == "une pomme"
+
+
+def test_the_spoken_text_cleaner_across_chunks():
+    import asyncio
+
+    from pipecat.frames.frames import LLMFullResponseEndFrame, LLMFullResponseStartFrame, LLMTextFrame
+    from pipecat.processors.frame_processor import FrameDirection
+
+    from aipet.cleanup import SpokenTextCleaner
+
+    async def run(chunks):
+        c = SpokenTextCleaner()
+        out = []
+
+        async def push(frame, direction=FrameDirection.DOWNSTREAM):
+            out.append(frame)
+
+        c.push_frame = push
+        for f in [LLMFullResponseStartFrame(), *(LLMTextFrame(t) for t in chunks), LLMFullResponseEndFrame()]:
+            await c.process_frame(f, FrameDirection.DOWNSTREAM)
+        return "".join(f.text for f in out if isinstance(f, LLMTextFrame))
+
+    assert asyncio.run(run(["Ça fait 7 *", " 5, bravo"])) == "Ça fait 7 fois 5, bravo"
+    assert asyncio.run(run(["Ton score :", " 4. Bravo !"])) == "Ton score : 4. Bravo !"
+    assert asyncio.run(run(["- une pomme\n", "- une poire"])) == "une pomme\nune poire"
+    assert asyncio.run(run(["Encore 7 *"])) == "Encore 7 "  # a stray star at the end is still dropped
 
 
 def test_filter_drops_without_calling_the_model(monkeypatch):

@@ -25,6 +25,7 @@ from pipecat.frames.frames import (
     FunctionCallInProgressFrame,
     InterimTranscriptionFrame,
     InterruptionFrame,
+    LLMFullResponseStartFrame,
     LLMMessagesAppendFrame,
     LLMTextFrame,
     TranscriptionFrame,
@@ -194,6 +195,8 @@ class ThinkingFiller(FrameProcessor):
         self._slog = slog or NO_LOG
         self._task: asyncio.Task | None = None
         self._deadline_task: asyncio.Task | None = None
+        self._turn_t0: float | None = None  # loop time of the turn's first model call
+        self._tool_seen = False
         self._last = ""
 
     def _cancel(self):
@@ -201,19 +204,32 @@ class ThinkingFiller(FrameProcessor):
             if t and not t.done():
                 t.cancel()
         self._task = self._deadline_task = None
+        self._turn_t0 = None
 
     def _start(self, tool: bool = False):
-        self._cancel()
+        """The model starts working (again, after a tool). The filler restarts; the deadline counts
+        from the first call of the turn, so a model looping on tools cannot push it back forever."""
+        loop_time = asyncio.get_running_loop().time()
+        first = self._turn_t0 is None
+        if self._task and not self._task.done():
+            self._task.cancel()
+        if self._deadline_task and not self._deadline_task.done() and (tool or not first):
+            self._deadline_task.cancel()
+        if first:
+            self._turn_t0 = loop_time
+        self._tool_seen = tool or (not first and self._tool_seen)
         self._task = start(self._fill_later(tool), "thinking filler")
+        deadline = self._tool_deadline if self._tool_seen else self._deadline
+        assert self._turn_t0 is not None
         self._deadline_task = start(
-            self._give_up_later(self._tool_deadline if tool else self._deadline), "thinking deadline"
+            self._give_up_later(max(0.0, self._turn_t0 + deadline - loop_time), deadline), "thinking deadline"
         )
 
-    async def _give_up_later(self, deadline: float):
+    async def _give_up_later(self, wait: float, deadline: float):
         """Maximum duration of a turn: no text from the model (tool loop, network…) → give up
         on this turn (interruption) and the pet apologizes, instead of staying silent."""
         try:
-            await asyncio.sleep(deadline)
+            await asyncio.sleep(wait)
             logger.warning(f"Turn abandoned: no reply after {deadline:.0f} s")
             self._slog.event("turn_abandoned", after_s=deadline)
             await self.broadcast_interruption()
@@ -238,9 +254,9 @@ class ThinkingFiller(FrameProcessor):
 
     async def process_frame(self, frame, direction: FrameDirection):
         await super().process_frame(frame, direction)
-        if isinstance(frame, UserStoppedSpeakingFrame) and direction == FrameDirection.DOWNSTREAM:
-            self._start()
-        elif isinstance(frame, LLMMessagesAppendFrame) and frame.run_llm:
+        if isinstance(frame, LLMFullResponseStartFrame) and direction == FrameDirection.DOWNSTREAM:
+            # The model was really called (not on the child's stop: a cough or a dropped transcript
+            # ends a turn without any model call, and must not get « Hmm… » then an apology).
             self._start()
         elif isinstance(frame, FunctionCallInProgressFrame) and direction == FrameDirection.DOWNSTREAM:
             self._start(tool=True)  # the waiting phrase was said; the tool may take a while
@@ -337,8 +353,11 @@ class UnfinishedSentenceWait:
             self._ev("wait_useful")
 
     def replied(self):
-        """The pet replied normally (or [silence]): start over."""
-        self._cancel()
+        """The pet stopped speaking: it replied normally (or [silence]), start over. Not while
+        waiting: the model only said [attends], so what just ended was a filler (« Hmm… ») or a
+        canned line, and the wait must still end with an answer."""
+        if self.waiting:
+            return
         self._in_a_row, self._nudged = 0, False
 
     def cancel(self):

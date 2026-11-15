@@ -201,6 +201,10 @@ def test_guess_win_needs_a_proposal_and_a_yes(tmp_path, monkeypatch):
     assert not confirms_guess("petit chat", "Est-ce que cet animal vit dans la forêt ?", "à trouver")
     assert not confirms_guess("un chat", "Est-ce que c'est un chat ?", "Non.")
     assert not confirms_guess("un chat", "C'est un petit animal ?", "oui")  # vague words do not count
+    # A yes to a question about a property is not a win.
+    assert not confirms_guess("un poisson rouge", "Est-ce que c'est rouge ?", "Oui")
+    assert not confirms_guess("un chat noir", "C'est un chien noir ?", "oui")
+    assert confirms_guess("des chats", "C'est un chat ?", "oui !")
 
     class Talking(Keeper):
         said = ""

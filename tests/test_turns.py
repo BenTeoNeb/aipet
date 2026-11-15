@@ -6,6 +6,7 @@ import pytest
 from pipecat.frames.frames import (
     BotStartedSpeakingFrame,
     BotStoppedSpeakingFrame,
+    LLMFullResponseStartFrame,
     LLMMessagesAppendFrame,
     LLMTextFrame,
     TranscriptionFrame,
@@ -86,7 +87,7 @@ def test_short_reply_joins_the_turn_if_the_child_speaks_again(make):
 def test_filler_when_reply_is_slow(make):
     async def run():
         t = make(turns.ThinkingFiller, after=0.05)
-        await t.process_frame(UserStoppedSpeakingFrame(), D.DOWNSTREAM)
+        await t.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
         await asyncio.sleep(0.1)
         hmm = [f for f, _ in t.out if isinstance(f, TTSSpeakFrame)]
         assert len(hmm) == 1 and hmm[0].append_to_context is False
@@ -97,7 +98,7 @@ def test_filler_when_reply_is_slow(make):
 def test_no_filler_when_reply_arrives(make):
     async def run():
         t = make(turns.ThinkingFiller, after=0.1)
-        await t.process_frame(UserStoppedSpeakingFrame(), D.DOWNSTREAM)
+        await t.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
         await t.process_frame(LLMTextFrame("[silence]"), D.DOWNSTREAM)
         await asyncio.sleep(0.15)
         assert not any(isinstance(f, TTSSpeakFrame) for f, _ in t.out)
@@ -110,7 +111,7 @@ def test_no_filler_after_the_sleeping_pets_zzz(make):
 
     async def run():
         t = make(turns.ThinkingFiller, after=0.05, deadline=0.1)
-        await t.process_frame(UserStoppedSpeakingFrame(), D.DOWNSTREAM)
+        await t.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
         await t.process_frame(TTSSpeakFrame("Zzz… Flocon fait dodo…", append_to_context=False), D.DOWNSTREAM)
         await asyncio.sleep(0.2)
         spoken = [f.text for f, _ in t.out if isinstance(f, TTSSpeakFrame)]
@@ -128,7 +129,7 @@ def test_turn_abandoned_when_nothing_arrives(make):
             interrupted.append(True)
 
         t.broadcast_interruption = bi
-        await t.process_frame(UserStoppedSpeakingFrame(), D.DOWNSTREAM)
+        await t.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
         await asyncio.sleep(0.1)
         assert interrupted
         assert any(isinstance(f, TTSSpeakFrame) and f.text == turns.APOLOGY for f, _ in t.out)
@@ -140,10 +141,46 @@ def test_no_abandon_when_text_arrives(make):
     async def run():
         t = make(turns.ThinkingFiller, after=10, deadline=0.1)
         t.broadcast_interruption = None  # must not be called
-        await t.process_frame(UserStoppedSpeakingFrame(), D.DOWNSTREAM)
+        await t.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
         await t.process_frame(LLMTextFrame("Oh !"), D.DOWNSTREAM)
         await asyncio.sleep(0.15)
         assert not any(isinstance(f, TTSSpeakFrame) for f, _ in t.out)
+
+    asyncio.run(run())
+
+
+def test_no_filler_for_a_turn_without_model_call(make):
+    """A cough or a dropped transcript ends the child's turn, but the model is never called."""
+
+    async def run():
+        t = make(turns.ThinkingFiller, after=0.03, deadline=0.05)
+        t.broadcast_interruption = None  # must not be called
+        await t.process_frame(UserStoppedSpeakingFrame(), D.DOWNSTREAM)
+        await asyncio.sleep(0.1)
+        assert not any(isinstance(f, TTSSpeakFrame) for f, _ in t.out)
+
+    asyncio.run(run())
+
+
+def test_a_tool_loop_cannot_push_the_deadline_back(make):
+    from pipecat.frames.frames import FunctionCallInProgressFrame
+
+    async def run():
+        t = make(turns.ThinkingFiller, after=10, deadline=0.05, tool_deadline=0.15)
+        interrupted = []
+
+        async def bi():
+            interrupted.append(True)
+
+        t.broadcast_interruption = bi
+        await t.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
+        for i in range(4):  # the model keeps calling (refused) tools
+            call = FunctionCallInProgressFrame(function_name="x", tool_call_id=str(i), arguments={})
+            await t.process_frame(call, D.DOWNSTREAM)
+            await asyncio.sleep(0.03)
+            await t.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
+        await asyncio.sleep(0.08)
+        assert interrupted  # 0.15 s after the turn started, not after the last call
 
     asyncio.run(run())
 
@@ -248,11 +285,24 @@ def test_replied_resets_the_counters():
     async def run():
         w = make_wait(delay=10, max_in_a_row=1)
         await w.on_wait_tag()
+        w.child_speaks()
         w.replied()
-        assert not w.waiting
         await w.on_wait_tag()  # would be ignored without the reset
         assert w.waiting and not w.queued
         w.cancel()
+
+    asyncio.run(run())
+
+
+def test_a_filler_ending_does_not_cancel_the_wait():
+    """« Hmm… » was playing when [attends] came: its end is not a reply."""
+
+    async def run():
+        w = make_wait(delay=0.05)
+        await w.on_wait_tag()
+        w.replied()  # the filler stops speaking
+        await asyncio.sleep(0.1)
+        assert len(answer_requests(w)) == 1  # the pet still answers
 
     asyncio.run(run())
 
@@ -271,7 +321,7 @@ def test_filler_and_deadline_rearmed_during_a_tool_call(make, monkeypatch):
             interrupted.append(True)
 
         t.broadcast_interruption = bi
-        await t.process_frame(UserStoppedSpeakingFrame(), D.DOWNSTREAM)
+        await t.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
         await t.process_frame(LLMTextFrame("Laisse-moi imaginer…"), D.DOWNSTREAM)  # the waiting phrase
         await t.process_frame(
             FunctionCallInProgressFrame(function_name="story_start", tool_call_id="1", arguments={}), D.DOWNSTREAM

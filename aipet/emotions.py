@@ -246,7 +246,8 @@ class TagStripper:
                     logger.debug(f"Unknown tag removed: [{name}]")
                 # "word [joie] rest": exactly one space must remain; at the start of a sentence, none.
                 self._skip_ws = self._at_start or self._last in " \t\n"
-            elif _is_tag_char(c) and len(self._held) <= MAX_TAG:
+            elif (_is_tag_char(c) or (c in " '’" and ":" in self._held)) and len(self._held) <= MAX_TAG:
+                # After « parle: », a first name may hold a space or an apostrophe (« Marie Lou »).
                 self._held += c
             else:
                 # It was not a tag: give back what we were holding.

@@ -401,6 +401,15 @@ def test_control_tags_never_spoken():
     assert [v for k, v in out if k == "emotion"] == ["joie"]
 
 
+def test_a_first_name_with_a_space_is_not_spoken():
+    s = TagStripper()
+    out = []
+    for c in ["[parle:Marie ", "Lou] Coucou [parle:Zoé] ! [1, 2]"]:
+        out += s.feed(c)
+    assert "".join(v for k, v in out if k == "text") == "Coucou ! [1, 2]"
+    assert [v for k, v in out if k == "tag"] == ["parle:Marie Lou", "parle:Zoé"]
+
+
 def test_filter_forwards_control_tags():
     received = []
 

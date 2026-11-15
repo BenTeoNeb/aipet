@@ -16,6 +16,7 @@ from pipecat.frames.frames import (
     BotStartedSpeakingFrame,
     BotStoppedSpeakingFrame,
     ErrorFrame,
+    FunctionCallCancelFrame,
     FunctionCallInProgressFrame,
     FunctionCallResultFrame,
     InputAudioRawFrame,
@@ -192,6 +193,12 @@ class WakeWordGate(FrameProcessor):
             if isinstance(frame, FunctionCallInProgressFrame):
                 self._tools.add(frame.tool_call_id)  # broadcast both ways: a set, not a counter
                 self._cancel_idle()
+            elif isinstance(frame, FunctionCallCancelFrame):
+                # Interrupted: no result will come; the mic must not stay open for the tool's wait.
+                if frame.tool_call_id in self._tools:
+                    self._tools.discard(frame.tool_call_id)
+                    if not self._tools:
+                        self._arm_idle()
             elif isinstance(frame, FunctionCallResultFrame):
                 if frame.tool_call_id in self._tools:
                     self._tools.discard(frame.tool_call_id)
