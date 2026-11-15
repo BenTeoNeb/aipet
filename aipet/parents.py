@@ -358,6 +358,7 @@ def edit(mem: Memory, rel: str, change: dict) -> dict:
                 atomic_write_text(p, render_life(sections, mem.pet_name))
             else:
                 atomic_write_text(p, render_card(meta, sections))
+                mem.drop_short_card(p)  # it may still say the old text; rewritten next time
         elif rel == SUMMARY_FILE and isinstance(change.get("text"), str):
             atomic_write_text(p, change["text"].rstrip() + "\n")
             what = "résumé réécrit"

@@ -28,7 +28,6 @@ from aipet.memory.cards import (
     LIKES,
     MAX_ADVENTURES,
     MAX_JOKES,
-    MAX_SCHOOL_TOPICS,
     SCHOOL,
     SECTIONS,
     SUMMARY_FILE,
@@ -142,7 +141,7 @@ def _person(
         if topic.strip() and normalize_text(topic.strip()) not in known_topics:
             topics.append(f"{when:%Y-%m} : {topic.strip()}")
             known_topics.add(normalize_text(topic.strip()))
-    sec[SCHOOL] = topics[-MAX_SCHOOL_TOPICS:]
+    sec[SCHOOL] = topics  # the long card keeps everything; its short card picks what is current
     for key, section in [("likes", LIKES), ("dislikes", DISLIKES), ("facts", FACTS)]:
         lst = sec.setdefault(section, [])
         for item in person.get(key) or []:
@@ -172,7 +171,7 @@ def _history(w: PendingWrites, mem: dict, when: datetime):
         if txt is None:  # no card: never created here (unconfirmed or generic names)
             continue
         meta, sec = parse_card(txt)
-        sec[HISTORY] = add_history(sec.get(HISTORY, []), f"{when:%Y-%m-%d}", topics)
+        sec[HISTORY] = add_history(sec.get(HISTORY, []), f"{when:%Y-%m-%d}", topics, keep=None)
         w.put(p, render_card(meta, sec))
 
 

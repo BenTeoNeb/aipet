@@ -61,3 +61,15 @@ def fake_api_keys(monkeypatch):
 
     for name in DEFAULT_KEY_ENVS.values():
         monkeypatch.setenv(name, "fake-key-for-tests")
+
+
+@pytest.fixture(autouse=True)
+def no_short_card_model(monkeypatch):
+    """Short cards are rewritten by a model after each condensation: in tests, it is unavailable
+    (the trimmed long card stands in) unless a test fakes it."""
+    from aipet.memory import short_cards
+
+    def unavailable(cfg, system, prompt):
+        raise RuntimeError("no model in tests")
+
+    monkeypatch.setattr(short_cards, "_call_llm", unavailable)

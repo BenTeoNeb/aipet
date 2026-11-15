@@ -144,8 +144,9 @@ Built on [Pipecat](https://github.com/pipecat-ai/pipecat). The main pieces:
   the tools sent to the model ([`tool_gate.py`](aipet/tool_gate.py)), memory condensation and the
   activities. [`session.py`](aipet/session.py) runs one conversation from start to end (web page or
   Pi), and [`hangup.py`](aipet/hangup.py) lets the pet end it by itself.
-- **Memory** ([`aipet/memory/`](aipet/memory/)): conversations are condensed into per-child cards,
-  daily memories, the pet's own life and a summary that stays in the prompt; the pet can search and
+- **Memory** ([`aipet/memory/`](aipet/memory/)): conversations are condensed into per-person cards
+  (a long card that keeps everything, and a short capped card, rewritten by a model, that is the
+  only one in the prompt), daily memories, the pet's own life and a summary that stays in the prompt; the pet can search and
   read its memory with tools. Each pet's data lives in `~/.aipet/pets/<id>/`.
 - **Activities** ([`aipet/builtin_skills/`](aipet/builtin_skills/)): plain-French `SKILL.md` files;
   only their one-line descriptions are always in the prompt, the full instructions and tools load
@@ -178,8 +179,8 @@ aipet/
   sleep.py, presence.py         sleep, good night and goodbye; when each child last talked
   tool_gate.py                  tools sent to the model, per-turn budget, tool handlers
   engines.py, openrouter_tts.py speech recognition, models and voice providers
-  memory/                       store (Memory), cards (file format), updates, forget, repo (git),
-                                condensation (keeper), tools, speakers, « Ma vie » moments
+  memory/                       store (Memory), cards (file format), short_cards, updates, forget,
+                                repo (git), condensation (keeper), tools, speakers, « Ma vie » moments
   games/                        quiz, yes/no, guess, story, learn (common.py: Activity, Host)
   skills.py, builtin_skills/    SKILL.md activities
   rhythm.py, energy.py          time, school calendar, tiredness

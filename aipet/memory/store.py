@@ -5,13 +5,14 @@ on purpose: they are family data the model reads, and real data already exists.
 
     RESUME.md                  condensed summary, always injected into the system prompt
     MA_VIE.md                  the pet's own life: traits the children chose, words, adventures, jokes
-    famille/<name>.md          one card per person (age, likes, dislikes, facts…)
+    famille/<name>.md          one card per person (age, likes, dislikes, facts…): the record, keeps growing
+    fiches_courtes/<name>.md   its short card, capped and rewritten by a model: the one in the prompt
     souvenirs/YYYY-MM-DD.md    one entry per conversation (time, who, topics, summary)
     histoires/<title>.md       unfinished stories and games, so they can be resumed
     a_trier.md                 pending forget requests, folded in at the next condensation
     conversations/*.jsonl      raw transcripts (trace, searchable on request)
 
-Reading: summary + cards + latest memories are injected at the start of each session, and the
+Reading: summary + short cards + latest memories are injected at the start of each session, and the
 `search_memory` / `read_memory` / `forget` tools let the pet look things up when needed.
 Writing: after each conversation chunk, a model call turns the transcript into structured
 updates, applied here (and versioned with git when available).
@@ -30,8 +31,8 @@ from pathlib import Path
 
 from loguru import logger
 
-from aipet import school
 from aipet.fileio import atomic_write_json, atomic_write_text, load_json, lock_for
+from aipet.memory import short_cards
 from aipet.memory.cards import (  # noqa: F401 (re-exported: the memory's public format)
     DIR_CONVERSATIONS,
     DIR_FAMILY,
@@ -171,14 +172,12 @@ class Memory:
             life[LIFE_WORDS] = life[LIFE_WORDS][-WORDS_IN_PROMPT:]
         parts.append("#" + render_life(life, self.pet_name).strip())
         cards = sorted((self.root / DIR_FAMILY).glob("*.md"))
-        if cards:
+        if cards:  # the short cards only (capped); the long ones stay searchable
             today = now().date()
-            texts = []
-            for f in cards:
-                txt = f.read_text().strip()
-                line = school.child_summary(parse_card(txt)[0], today)
-                texts.append(f"{txt}\n{line}" if line else txt)
-            parts.append("## Fiches de la famille\n" + "\n\n".join(texts))
+            texts = [short_cards.prompt_text(f, today) for f in cards]
+            parts.append(
+                "## Fiches de la famille (l'essentiel ; tout le détail avec search_memory)\n" + "\n\n".join(texts)
+            )
         days = sorted((self.root / DIR_MEMORIES).glob("*.md"), reverse=True)[:3]
         recent = "\n".join(d.read_text().strip() for d in reversed(days))
         if recent:
@@ -235,6 +234,8 @@ class Memory:
                 continue
             if not folder and rel.startswith(DIR_CONVERSATIONS):
                 continue  # raw transcripts: only on explicit request
+            if rel.startswith(short_cards.DIR_SHORT + "/"):
+                continue  # a summary of a long card, which is searched itself
             m = re.search(r"(\d{4}-\d{2}-\d{2})", rel)
             if dates and not (m and m.group(1) in dates):
                 continue  # a date was asked: only that day
@@ -312,7 +313,12 @@ class Memory:
                 n = sum(len(v) for v in sec.values()) - sum(len(v) for v in new.values())
                 if n:
                     changed(p, render_card(meta, new), n)
+                    self.drop_short_card(p)  # rebuilt from the cleaned card
             everywhere = req.everywhere
+            for p in sorted((self.root / short_cards.DIR_SHORT).glob("*.md")):
+                if everywhere(p.read_text(encoding="utf-8")) or req.in_phrase(p.read_text(encoding="utf-8")):
+                    p.unlink()
+                    res["files"].append(self._rel(p))
             if req.broad or req.who:
                 life = self.root / LIFE_FILE
                 if life.exists():
@@ -401,8 +407,33 @@ class Memory:
             if p.parent == root / DIR_FAMILY:  # not re-created by the next condensation
                 name = parse_card(p.read_text(encoding="utf-8"))[0].get("prenom", p.stem)
                 self._block_card(name)
+                self.drop_short_card(p)
             p.unlink()
             self.wipe_history("Memory (history cleared after a parent deleted a file)")
+        return True
+
+    def cards_without_short_card(self) -> list[Path]:
+        return [p for p in short_cards.family_paths(self.root) if not short_cards.short_path(p).exists()]
+
+    def drop_short_card(self, long_path: Path) -> None:
+        """The long card changed under a forget or a parent's correction: its short card goes (the
+        trimmed long card stands in until the next rewrite)."""
+        with self._files_lock:
+            short_cards.short_path(long_path).unlink(missing_ok=True)
+
+    def write_short_card(self, long_path: Path, long_before: str, text: str) -> bool:
+        """Save a short card the model wrote from `long_before`; not if the long card changed
+        meanwhile (a forget, a correction: rewritten next time)."""
+        with self._files_lock:
+            if not long_path.exists() or long_path.read_text(encoding="utf-8") != long_before:
+                return False
+            meta, sections = parse_card(long_before)
+            if self._forgotten:
+                text = scrub_value(text, self._pending_match(str(meta.get("prenom", ""))))
+            sp = short_cards.short_path(long_path)
+            sp.parent.mkdir(exist_ok=True)
+            atomic_write_text(sp, short_cards.render(meta, sections, text, now().date()))
+            self._commit(f"Fiche courte : {self._rel(long_path)}")
         return True
 
     def blocked_cards(self) -> set[str]:

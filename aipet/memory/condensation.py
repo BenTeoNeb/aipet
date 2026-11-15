@@ -7,7 +7,8 @@ from datetime import datetime
 
 from loguru import logger
 
-from aipet.memory.cards import SUMMARY_MAX
+from aipet.memory import short_cards
+from aipet.memory.cards import DIR_FAMILY, SUMMARY_MAX
 from aipet.memory.store import FORGET_NOTE, Memory
 from aipet.timefmt import now, spoken_date
 
@@ -222,6 +223,9 @@ async def condense(
         changed = await asyncio.to_thread(mem.apply, update, started, allowed_new_names, summary_before)
         await asyncio.to_thread(mem.save_transcript, started, turns)
         await asyncio.to_thread(mem.notes_done)
+        # Short cards (the ones in the prompt) of the people whose long card changed, when due.
+        touched = [mem.root / label for label in changed if label.startswith(DIR_FAMILY + "/")]
+        await asyncio.to_thread(short_cards.redo_due, mem, cfg, touched + mem.cards_without_short_card())
         if FORGET_NOTE in notes:  # the summary was cleaned only now: older versions must go too
             await asyncio.to_thread(mem.wipe_history)
         try:

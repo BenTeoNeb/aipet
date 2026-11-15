@@ -62,7 +62,7 @@ def parse_card(text: str) -> tuple[dict, dict[str, list[str]]]:
 HISTORY_CHARS = 200
 
 
-def add_history(hist: list[str], day: str, topics: list[str], keep: int = 20) -> list[str]:
+def add_history(hist: list[str], day: str, topics: list[str], keep: int | None = 20) -> list[str]:
     """One « YYYY-MM-DD : topics » line per day in a card's history; same-day topics are merged."""
     hist = list(hist)
     same_day = bool(hist) and hist[-1].startswith(day) and " : " in hist[-1]
@@ -77,7 +77,7 @@ def add_history(hist: list[str], day: str, topics: list[str], keep: int = 20) ->
         hist[-1] = line
     else:
         hist.append(line)
-    return hist[-keep:]
+    return hist[-keep:] if keep else hist
 
 
 def render_card(meta: dict, sections: dict[str, list[str]]) -> str:

@@ -39,6 +39,11 @@ versions follow [Semantic Versioning](https://semver.org/) once the first releas
 - `read_memory` reads memory files only (never git internals, state files or pending notes).
 
 ### Changed
+- Each person has a long card (the record, which keeps growing: history and school topics are no
+  longer cut) and a short card (`fiches_courtes/`, at most 700 characters) that is the only one in
+  the prompt. A model rewrites the short card after a condensation when it is a week old or five
+  items behind; until then the newest items are shown under it. Forget requests and parents'
+  corrections drop it (a trimmed long card stands in until the next rewrite).
 - The memory is split into small modules (`cards`, `updates`, `forget`, `repo`, `text`); the games
   share their tool handlers and background preparations; `build_worker` is split into builders.
 - Reading the pet's energy no longer changes it: a rested pet wakes up at its next activity.
