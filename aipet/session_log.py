@@ -48,6 +48,7 @@ from pipecat.processors.frameworks.rtvi.frames import RTVIServerMessageFrame
 from pipecat.services.llm_service import LLMService
 
 from aipet import paths
+from aipet.fileio import lock_for
 
 TZ = ZoneInfo("Europe/Paris")
 LOG_DIR = paths.logs_dir()  # this pet's logs
@@ -91,14 +92,17 @@ def scrub(words: list[str]) -> int:
         return 0
     removed = 0
     for p in [*SESSIONS.glob("*.jsonl"), *LOG_DIR.glob("*.log*")]:  # *.log*: also logs from before the rename
-        try:
-            lines = p.read_text(encoding="utf-8").splitlines()
-        except OSError:
-            continue
-        kept = [line for line in lines if not all(pt.search(norm(line)) for pt in patterns)]
-        if len(kept) != len(lines):
-            p.write_text("\n".join(kept) + ("\n" if kept else ""), encoding="utf-8")
-            removed += len(lines) - len(kept)
+        # Session files: locked against `SessionLog.event` appends. The text log is rewritten in place
+        # (loguru keeps it open: replacing the file would lose the next lines).
+        with lock_for(p):
+            try:
+                lines = p.read_text(encoding="utf-8").splitlines()
+            except OSError:
+                continue
+            kept = [line for line in lines if not all(pt.search(norm(line)) for pt in patterns)]
+            if len(kept) != len(lines):
+                p.write_text("\n".join(kept) + ("\n" if kept else ""), encoding="utf-8")
+                removed += len(lines) - len(kept)
     return removed
 
 
@@ -166,7 +170,7 @@ class SessionLog:
             **data,
         }
         try:
-            with open(self.path, "a", encoding="utf-8") as f:
+            with lock_for(self.path), open(self.path, "a", encoding="utf-8") as f:
                 f.write(json.dumps(line, ensure_ascii=False, default=str) + "\n")
         except Exception as e:  # a full disk must not cut the voice
             logger.warning(f"Cannot write session log: {e}")

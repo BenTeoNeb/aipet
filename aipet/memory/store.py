@@ -23,9 +23,12 @@ import asyncio
 import json
 import os
 import re
+import shutil
 import subprocess
 import threading
+import time
 import unicodedata
+from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -33,6 +36,7 @@ from zoneinfo import ZoneInfo
 from loguru import logger
 
 from aipet import school
+from aipet.fileio import atomic_write_text, lock_for
 
 TZ = ZoneInfo("Europe/Paris")
 # French words: dates are spoken / written in French for the model and the memory files.
@@ -94,6 +98,12 @@ notre votre leur leurs elle ils elles nous vous tout tous toute cette ces comme 
 etait avait fait faire dit aux par ont sont quand comment pourquoi rappelle souviens souvenir
 toi moi lui deja encore aussi tres bien chez""".split()
 )
+
+NOTES_FILE, NOTES_IN_PROGRESS = "a_trier.md", "a_trier.en-cours.md"
+GIT_TIMEOUT_SECS = 30
+# A forget request also cleans what is not on disk yet (the conversation waiting to be condensed);
+# conversations are condensed well within this delay.
+FORGET_PENDING_SECS = 6 * 3600
 
 # On-disk directories (French data names).
 DIR_FAMILY, DIR_MEMORIES, DIR_STORIES, DIR_CONVERSATIONS = "famille", "souvenirs", "histoires", "conversations"
@@ -205,10 +215,96 @@ def _key(item: str, sep: str) -> str:
     return _without_article(normalize_text(item.split(sep, 1)[0]).strip())
 
 
+SENTENCE_END = re.compile(r"(?<=[.!?])\s+")
+
+
+@dataclass(frozen=True)
+class ForgetRequest:
+    """« Oublie … », said out loud. Deliberately cautious about what it matches:
+    - `contains_all`: every important word of the request (« le foot » matches « aime le foot »);
+    - `matches` (anywhere in the memory): every important word when there are at least two,
+      otherwise only the exact phrase."""
+
+    what: str
+    who: str | None
+    words: tuple[str, ...]
+    at: float
+
+    @classmethod
+    def parse(cls, what: str, who: str | None = None) -> ForgetRequest:
+        target = normalize_text(what).strip()
+        words = tuple(w for w in re.findall(r"\w+", target) if w not in STOPWORDS and len(w) > 2)
+        return cls(what.strip(), (who or "").strip() or None, words, time.monotonic())
+
+    @property
+    def too_vague(self) -> bool:  # « oublie Emma » alone: touch nothing
+        return not self.words or (not self.who and len(self.words) < 2)
+
+    @property
+    def broad(self) -> bool:
+        """Precise enough to remove sentences anywhere (two important words or more)."""
+        return len(self.words) >= 2
+
+    def contains_all(self, text: str) -> bool:
+        n = normalize_text(text)
+        return all(re.search(r"\b" + re.escape(w), n) for w in self.words)
+
+    def in_phrase(self, text: str) -> bool:
+        return bool(re.search(r"\b" + re.escape(normalize_text(self.what)) + r"\b", normalize_text(text)))
+
+    def matches(self, text: str) -> bool:
+        return self.contains_all(text) if self.broad else self.in_phrase(text)
+
+    def about(self, name: str) -> bool:
+        return bool(self.who) and _slug(self.who) == _slug(name)
+
+
+def _scrub_sentences(text: str, match) -> tuple[str, int]:
+    """Remove the matching sentences of a text (headings kept); returns (text, sentences removed)."""
+    lines, removed = [], 0
+    for line in text.splitlines():
+        if line.startswith("#") or not match(line):
+            lines.append(line)
+            continue
+        sentences = SENTENCE_END.split(line)
+        kept = [x for x in sentences if not match(x)]
+        removed += len(sentences) - len(kept)
+        lines.append(" ".join(kept) if kept else "(effacé à la demande)")
+    return "\n".join(lines).rstrip() + "\n", removed
+
+
+def _scrub_value(value, match):
+    """Remove matching sentences / list items from model output (strings, lists, dicts)."""
+    if isinstance(value, str):
+        if not match(value):
+            return value
+        return " ".join(x for x in SENTENCE_END.split(value) if not match(x))
+    if isinstance(value, list):
+        return [_scrub_value(v, match) for v in value if not (isinstance(v, str) and match(v))]
+    if isinstance(value, dict):
+        return {k: _scrub_value(v, match) for k, v in value.items()}
+    return value
+
+
 class Memory:
+    """One pet's memory folder. Use `Memory.shared(root)` in the app, so the voice pipeline and the
+    web page share one object; the file lock is per folder in any case."""
+
+    _shared: dict[Path, Memory] = {}
+    _shared_guard = threading.Lock()
+
+    @classmethod
+    def shared(cls, root: str | Path, pet_name: str = "") -> Memory:
+        key = Path(os.path.expanduser(str(root))).resolve()
+        with cls._shared_guard:
+            if key not in cls._shared:
+                cls._shared[key] = cls(key, pet_name)
+            return cls._shared[key]
+
     def __init__(self, root: str | Path, pet_name: str = ""):
         self.root = Path(os.path.expanduser(str(root)))
         self.pet_name = pet_name
+        self._files_lock = lock_for(self.root)
         for d in [DIR_FAMILY, DIR_MEMORIES, DIR_STORIES, DIR_CONVERSATIONS]:
             (self.root / d).mkdir(parents=True, exist_ok=True)
         legacy = self.root / LEGACY_SUMMARY_FILE
@@ -238,7 +334,9 @@ class Memory:
             except Exception as e:
                 logger.warning(f"git unavailable for memory history: {e}")
         self._lock = asyncio.Lock()  # one condensation at a time (slow: model call)
-        self._files_lock = threading.Lock()  # read-modify-write of the files (short)
+        # Read-modify-write of the files and git (short). Process-wide per folder: the web page's
+        # corrections and the pipeline's condensations never interleave.
+        self._forgotten: list[ForgetRequest] = []  # recent requests, applied to what is still pending
 
     def _summary_title(self) -> str:
         return f"Ce que {self.pet_name} sait" if self.pet_name else "Ce que je sais"
@@ -256,11 +354,19 @@ class Memory:
             p for p in self.root.rglob("*") if p.is_file() and ".git" not in p.parts and p.suffix in (".md", ".jsonl")
         )
 
+    def readable(self) -> list[Path]:
+        """What the model may read with `read_memory`: the memory files, never git internals, state
+        files or the pending notes (they quote forget requests)."""
+        return [p for p in self.files() if not p.name.startswith("a_trier")]
+
     def read(self, path: str) -> str | None:
         p = (self.root / path).resolve()
-        if self.root.resolve() not in p.parents or not p.is_file():
+        if p not in {f.resolve() for f in self.readable()}:
             return None
-        return p.read_text()
+        try:
+            return p.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            return None
 
     def context_block(self, max_memories_chars: int = 2500, full_stories: bool = False) -> str:
         """Block injected into the system prompt (French headings: the model reads them)."""
@@ -367,108 +473,145 @@ class Memory:
     # ------------------------------------------------------------- writing
     def note(self, info: str, who: str | None = None) -> None:
         line = f"- {now():%Y-%m-%d %H:%M}{f' ({who})' if who else ''} : {info.strip()}\n"
-        with open(self.root / "a_trier.md", "a") as f:
+        with self._files_lock, open(self.root / NOTES_FILE, "a", encoding="utf-8") as f:
             f.write(line)
 
-    def forget(self, what: str, who: str | None = None) -> dict:
-        """Forget request said out loud, deliberately cautious:
-        - with `who`: only in that person's card, remove items containing all the important
-          words of the request (« le foot » removes « aime le foot »);
-        - without `who`: at least two important words, and the exact phrase must appear;
-        - memories: only the sentences containing all important words (2 minimum);
-        - never a whole card, a story or a whole day.
-        The request is also passed to the condensation to clean the summary.
-        Returns {"removed_items", "files"} and "refused" (reason) when too vague."""
+    def take_notes(self) -> str | None:
+        """Notes to fold into the next condensation. They stay in a_trier.en-cours.md until
+        `notes_done()`, so a failed condensation keeps them; notes taken meanwhile go to a new file."""
+        notes, in_progress = self.root / NOTES_FILE, self.root / NOTES_IN_PROGRESS
         with self._files_lock:
-            return self._forget(what, who)
+            if notes.exists():
+                with open(in_progress, "a", encoding="utf-8") as f:
+                    f.write(notes.read_text(encoding="utf-8"))
+                notes.unlink()
+            return in_progress.read_text(encoding="utf-8") if in_progress.exists() else None
 
-    def _forget(self, what: str, who: str | None) -> dict:
-        target = normalize_text(what).strip()
-        words = [w for w in re.findall(r"\w+", target) if w not in STOPWORDS and len(w) > 2]
-        res = {"removed_items": 0, "files": []}
-        if not words or (not who and len(words) < 2):  # « oublie Emma » alone: touch nothing
+    def notes_done(self) -> None:
+        with self._files_lock:
+            (self.root / NOTES_IN_PROGRESS).unlink(missing_ok=True)
+
+    def forget(self, what: str, who: str | None = None) -> dict:
+        """Forget request said out loud, deliberately cautious (see ForgetRequest):
+        - with `who`: in that person's card, remove the items containing all the important words;
+        - without `who`: at least two important words, and the exact phrase must appear in the item;
+        - everywhere else (memories, stories, the pet's life, summary, transcripts): only sentences
+          containing all the important words (two minimum);
+        - never a whole card, story or day. What is still pending (the conversation not condensed
+          yet, a condensation running) is cleaned when it is written.
+        Returns {"removed_items", "files"} and "refused" (reason) when too vague."""
+        req = ForgetRequest.parse(what, who)
+        res: dict = {"removed_items": 0, "files": []}
+        if req.too_vague:
             # French: this reason is passed back to the model.
             res["refused"] = "trop vague : il faut quelques mots précis" + ("" if who else ", ou dire de qui il s'agit")
             return res
-        all_words = [re.compile(r"\b" + re.escape(w)) for w in words]
+        with self._files_lock:
+            cards = sorted((self.root / DIR_FAMILY).glob("*.md"))
+            if req.who:
+                cards = [p for p in cards if p.stem == _slug(req.who)]
+                if not cards:
+                    res["refused"] = f"je n'ai pas de fiche pour {req.who}"
+                    return res
+            self._forgotten = [r for r in self._forgotten if time.monotonic() - r.at < FORGET_PENDING_SECS]
+            self._forgotten.append(req)
 
-        def contains_all(t: str) -> bool:
-            n = normalize_text(t)
-            return all(pt.search(n) for pt in all_words)
-
-        phrase = re.compile(r"\b" + re.escape(target) + r"\b")
-
-        cards = sorted((self.root / DIR_FAMILY).glob("*.md"))
-        if who:
-            cards = [p for p in cards if p.stem == _slug(who)]
-            if not cards:
-                res["refused"] = f"je n'ai pas de fiche pour {who}"
-                return res
-        for p in cards:
-            meta, sec = parse_card(p.read_text())
-            match = contains_all if who else (lambda c: bool(phrase.search(normalize_text(c))))
-            new = {k: (v if k == HISTORY else [c for c in v if not match(c)]) for k, v in sec.items()}
-            n = sum(len(v) for v in sec.values()) - sum(len(v) for v in new.values())
-            if n:
-                p.write_text(render_card(meta, new))
+            def changed(p: Path, text: str, n: int):
+                atomic_write_text(p, text)
                 res["removed_items"] += n
                 res["files"].append(self._rel(p))
-        if len(words) >= 2:
-            for p in sorted((self.root / DIR_MEMORIES).glob("*.md")):
-                lines, n = [], 0
-                for line in p.read_text().splitlines():
-                    if line.startswith("#") or not contains_all(line):
-                        lines.append(line)
-                        continue
-                    sentences = re.split(r"(?<=[.!?])\s+", line)
-                    kept = [s for s in sentences if not contains_all(s)]
-                    n += len(sentences) - len(kept)
-                    lines.append(" ".join(kept) if kept else "(effacé à la demande)")
+
+            card_match = req.contains_all if req.who else req.in_phrase
+            for p in cards:
+                meta, sec = parse_card(p.read_text(encoding="utf-8"))
+                new = {k: [c for c in v if not card_match(c)] for k, v in sec.items()}
+                n = sum(len(v) for v in sec.values()) - sum(len(v) for v in new.values())
                 if n:
-                    p.write_text("\n".join(lines).rstrip() + "\n")
-                    res["removed_items"] += n
-                    res["files"].append(self._rel(p))
-        with open(self.root / "a_trier.md", "a") as f:  # the condensation also removes it from the summary
-            f.write(
-                f"- {now():%Y-%m-%d %H:%M} : DEMANDE D'OUBLI{f' (concerne {who})' if who else ''} "
-                f"→ effacer du résumé : {what.strip()}\n"
-            )
-        res["removed_items"] += self._scrub_transcripts(contains_all if len(words) >= 2 else phrase.search)
-        summary = self.root / SUMMARY_FILE
-        if summary.exists() and len(words) >= 2:  # immediately, not only at the next condensation
-            text = summary.read_text()
-            kept = [s for s in re.split(r"(?<=[.!?])\s+", text) if not contains_all(s)]
-            if len(kept) < len(re.split(r"(?<=[.!?])\s+", text)):
-                summary.write_text(" ".join(kept).rstrip() + "\n")
-                res["removed_items"] += 1
-                res["files"].append(SUMMARY_FILE)
-        if res["removed_items"]:
-            self.wipe_history()  # git would otherwise keep the forgotten text in older versions
-        return res
+                    changed(p, render_card(meta, new), n)
+            if req.broad:
+                life = self.root / LIFE_FILE
+                if life.exists():
+                    sections = parse_life(life.read_text(encoding="utf-8"))
+                    new = {k: [c for c in v if not req.contains_all(c)] for k, v in sections.items()}
+                    n = sum(map(len, sections.values())) - sum(map(len, new.values()))
+                    if n:
+                        changed(life, render_life(new, self.pet_name), n)
+                texts = [
+                    *sorted((self.root / DIR_MEMORIES).glob("*.md")),
+                    *sorted((self.root / DIR_STORIES).glob("*.md")),
+                ]
+                summary = self.root / SUMMARY_FILE
+                if summary.exists():
+                    texts.append(summary)
+                for p in texts:
+                    text, n = _scrub_sentences(p.read_text(encoding="utf-8"), req.contains_all)
+                    if n:
+                        changed(p, text, n)
+            with open(self.root / NOTES_FILE, "a", encoding="utf-8") as f:  # the condensation cleans the summary too
+                f.write(
+                    f"- {now():%Y-%m-%d %H:%M} : DEMANDE D'OUBLI{f' (concerne {req.who})' if req.who else ''} "
+                    f"→ effacer du résumé : {req.what}\n"
+                )
+            res["removed_items"] += self._scrub_transcripts(req.matches)
+            if res["removed_items"]:
+                self.wipe_history()  # git would otherwise keep the forgotten text in older versions
+            return res
+
+    def _pending_match(self, owner: str = ""):
+        """Matches text that a recent forget request removed (for what was not on disk yet)."""
+        reqs = list(self._forgotten)
+        return lambda t: any(r.matches(t) or (r.about(owner) and r.contains_all(t)) for r in reqs)
+
+    def _scrub_update(self, update: dict) -> dict:
+        if not self._forgotten:
+            return update
+        update = _scrub_value(update, self._pending_match())
+        update["people"] = [
+            _scrub_value(person, self._pending_match(str(person.get("name") or "")))
+            for person in update.get("people") or []
+            if isinstance(person, dict)
+        ]
+        return update
 
     def _scrub_transcripts(self, match) -> int:
         """Remove matching lines from the raw transcripts (conversations/*.jsonl)."""
         removed = 0
         for p in (self.root / DIR_CONVERSATIONS).glob("*.jsonl"):
-            lines = p.read_text().splitlines()
-            kept = [line for line in lines if not match(normalize_text(line))]
+            lines = p.read_text(encoding="utf-8").splitlines()
+            kept = [line for line in lines if not match(line)]
             if len(kept) != len(lines):
-                p.write_text("\n".join(kept) + ("\n" if kept else ""))
+                atomic_write_text(p, "\n".join(kept) + ("\n" if kept else ""))
                 removed += len(lines) - len(kept)
         return removed
 
-    def wipe_history(self):
+    def delete(self, rel: str) -> bool:
+        """A parent deletes a memory file, for real (older versions too). Never the summary, the
+        git folder or its settings."""
+        p = (self.root / rel).resolve()
+        root = self.root.resolve()
+        if root not in p.parents or not p.is_file():
+            return False
+        if ".git" in p.relative_to(root).parts or p.name in (SUMMARY_FILE, ".gitignore"):
+            return False
+        with self._files_lock:
+            p.unlink()
+            self.wipe_history("Memory (history cleared after a parent deleted a file)")
+        return True
+
+    def wipe_history(self, message: str = "Memory (history cleared after a forget request)"):
         """Forget for real: start the memory's git history again from the current files."""
         git = self.root / ".git"
         if not git.exists():
             return
-        try:
-            import shutil
+        with self._files_lock:
+            self._wipe_history(git, message)
 
+    def _wipe_history(self, git: Path, message: str):
+        try:
             shutil.rmtree(git)
             subprocess.run(["git", "init", "-q"], cwd=self.root, check=True)
             self._git_identity()
-            self._commit("Memory (history cleared after a forget request)")
+            self._commit(message)
         except Exception as e:
             logger.warning(f"Could not clear the memory history: {e}")
 
@@ -486,17 +629,20 @@ class Memory:
 
     def save_transcript(self, started: datetime, turns: list[dict]) -> Path:
         p = self.root / DIR_CONVERSATIONS / f"{started:%Y-%m-%d_%H%M%S}.jsonl"
-        with open(p, "a") as f:
-            for t in turns:
-                f.write(json.dumps(t, ensure_ascii=False) + "\n")
+        with self._files_lock:
+            match = self._pending_match()
+            with open(p, "a", encoding="utf-8") as f:
+                for t in turns:
+                    if not self._forgotten or not match(t.get("text", "")):
+                        f.write(json.dumps(t, ensure_ascii=False) + "\n")
         return p
 
     def apply(self, update: dict, when: datetime, allowed_new_names: set[str] | None = None) -> list[str]:
         """Apply the structured updates produced by the model (see SCHEMA).
         Everything is computed first, then written at once: an error midway writes nothing
         (no duplicated memory when the condensation is retried)."""
-        with self._files_lock:
-            return self._apply(update, when, allowed_new_names)
+        with self._files_lock:  # cleaned of anything forgotten while the model was writing it
+            return self._apply(self._scrub_update(update), when, allowed_new_names)
 
     def _apply(self, update: dict, when: datetime, allowed_new_names: set[str] | None = None) -> list[str]:
         writes: dict[Path, str | None] = {}  # None = delete
@@ -642,15 +788,20 @@ class Memory:
             if content is None:
                 p.unlink(missing_ok=True)
             else:
-                tmp = p.with_suffix(p.suffix + ".tmp")
-                tmp.write_text(content)
-                tmp.replace(p)
+                atomic_write_text(p, content)
         self._commit(f"Condensation {when:%Y-%m-%d %H:%M}")
         return labels
 
     def _commit(self, msg: str):
-        try:
-            subprocess.run(["git", "add", "-A"], cwd=self.root, check=True, capture_output=True)
-            subprocess.run(["git", "commit", "-qm", msg], cwd=self.root, capture_output=True)
-        except Exception:
-            pass
+        """Version the memory (best effort: the files are the truth, git is the history)."""
+        if not (self.root / ".git").exists():
+            return
+        with self._files_lock:
+            try:
+                for cmd in (["git", "add", "-A"], ["git", "commit", "-qm", msg]):
+                    r = subprocess.run(cmd, cwd=self.root, capture_output=True, text=True, timeout=GIT_TIMEOUT_SECS)
+                    if r.returncode and "nothing to commit" not in r.stdout + r.stderr:
+                        logger.warning(f"Memory git {cmd[1]} failed: {(r.stderr or r.stdout).strip()[:200]}")
+                        return
+            except (OSError, subprocess.SubprocessError) as e:
+                logger.warning(f"Memory git unavailable: {e}")

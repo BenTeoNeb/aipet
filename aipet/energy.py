@@ -11,7 +11,6 @@ can recharge the pet from the debug panel.
 
 from __future__ import annotations
 
-import json
 import random
 import time as _time
 from collections.abc import Callable
@@ -25,6 +24,7 @@ from pipecat.frames.frames import (
 )
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
+from aipet.fileio import atomic_write_json, load_json
 from aipet.hangup import SleepyReplyFrame
 from aipet.session_log import NO_LOG
 
@@ -133,18 +133,19 @@ class Energy:
         if not self.state_file:
             return
         try:
-            self.state_file.parent.mkdir(parents=True, exist_ok=True)
-            self.state_file.write_text(
-                json.dumps({"level": self._level, "asleep": self._asleep, "last_activity": self._last_activity})
+            atomic_write_json(
+                self.state_file,
+                {"level": self._level, "asleep": self._asleep, "last_activity": self._last_activity},
+                indent=None,
             )
         except OSError as e:
             logger.warning(f"Energy state not saved: {e}")
 
     def _load(self):
-        if not self.state_file or not self.state_file.exists():
+        if not self.state_file:
             return
         try:
-            d = json.loads(self.state_file.read_text())
+            d = load_json(self.state_file, {})
             self._level = float(d.get("level", 1.0))
             self._asleep = bool(d.get("asleep", False))
             self._last_activity = d.get("last_activity")

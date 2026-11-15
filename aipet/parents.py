@@ -22,6 +22,7 @@ from pathlib import Path
 from aipet import paths, session_log
 from aipet.character import Character
 from aipet.emotions import EMOTIONS
+from aipet.fileio import atomic_write_json, atomic_write_text, lock_for
 from aipet.memory.store import (
     DIR_FAMILY,
     LIFE_FILE,
@@ -330,11 +331,13 @@ def edit(mem: Memory, rel: str, change: dict) -> dict:
     """
     root = mem.root
     p = safe_path(root, rel)
-    with mem._files_lock:
+    removed = False  # an item deleted: the git history must not keep it either
+    with mem._files_lock, lock_for(p):  # the games lock their JSON file the same way
         if rel in EDITABLE_JSON:
-            data = json.loads(p.read_text())
+            data = json.loads(p.read_text(encoding="utf-8"))
             what = _edit_json(EDITABLE_JSON[rel], data, change)
-            p.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n")
+            atomic_write_json(p, data)
+            removed = bool(change.get("delete"))
         elif p.suffix == ".md" and (rel.startswith(DIR_FAMILY + "/") or rel == LIFE_FILE):
             meta, sections = parse_card(p.read_text())
             items = sections.get(change.get("section"), [])
@@ -347,16 +350,20 @@ def edit(mem: Memory, rel: str, change: dict) -> dict:
                 items[i] = new
             else:
                 items.pop(i)
+            removed = not new
             if rel == LIFE_FILE:
-                p.write_text(render_life(sections, mem.pet_name))
+                atomic_write_text(p, render_life(sections, mem.pet_name))
             else:
-                p.write_text(render_card(meta, sections))
+                atomic_write_text(p, render_card(meta, sections))
         elif rel == SUMMARY_FILE and isinstance(change.get("text"), str):
-            p.write_text(change["text"].rstrip() + "\n")
+            atomic_write_text(p, change["text"].rstrip() + "\n")
             what = "résumé réécrit"
         else:
             raise ValueError("ce fichier ne se corrige pas ici")
-    mem._commit(f"Correction par un parent ({rel}) : {what}"[:300])
+        if removed:  # a deleted confidence must not stay readable, not even in the commit message
+            mem.wipe_history(f"Correction par un parent ({rel}) : élément retiré, anciennes versions effacées")
+        else:
+            mem._commit(f"Correction par un parent ({rel}) : {what}"[:300])
     return {"ok": True, "change": what}
 
 

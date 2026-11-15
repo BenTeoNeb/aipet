@@ -77,7 +77,7 @@ def build_worker(
     logger.info(f"Listening: {lc}")
     logger.info(f"Engines: {engines.describe(cfg)}")
 
-    mem = Memory(paths.memory_dir(cfg, pet.id), pet.name)
+    mem = Memory.shared(paths.memory_dir(cfg, pet.id), pet.name)
     context = LLMContext()
     skill_set = skills.Skills.from_config(cfg, slog=session_log)
     logger.info(f"Skills: {', '.join(skill_set.all()) or 'none'}")

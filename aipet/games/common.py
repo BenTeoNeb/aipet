@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import json
+import copy
 import re
-import threading
 from datetime import date, timedelta
 from pathlib import Path
 
 from aipet import character, school
+from aipet.fileio import atomic_write_json, load_json, lock_for
 from aipet.memory.store import _slug, _without_article, normalize_text, parse_card
 from aipet.memory.tools import TOOLS_EXHAUSTED
 from aipet.session_log import NO_LOG
@@ -124,19 +124,14 @@ class JsonStore:
 
     def __init__(self, path: Path, empty: dict):
         self.path, self._empty = Path(path), empty
-        self.lock = threading.Lock()
+        self.lock = lock_for(self.path)  # shared with the parents' corrections
 
     def load(self) -> dict:
-        try:
-            return json.loads(self.path.read_text())
-        except (OSError, ValueError):
-            return json.loads(json.dumps(self._empty))
+        data = load_json(self.path, self._empty)
+        return data if isinstance(data, dict) else copy.deepcopy(self._empty)
 
     def save(self, data: dict):
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        tmp = self.path.with_suffix(".tmp")
-        tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1))
-        tmp.replace(self.path)
+        atomic_write_json(self.path, data)
 
 
 def pet_intro(cfg: dict) -> str:

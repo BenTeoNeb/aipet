@@ -14,8 +14,6 @@ Stored in the family memory as `jeux/quiz.json` (data; texts are French).
 from __future__ import annotations
 
 import asyncio
-import json
-import threading
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -29,6 +27,7 @@ from aipet.games.common import (
     STALE_PREPARATION,
     UNKNOWN_PLAYER,
     Activity,
+    JsonStore,
     cancel_preparation,
     child_level,
     days_in_a_row,
@@ -105,22 +104,15 @@ class Game:
         return {"number": self.index + 1, "question": q["question"], "choices": q.get("choices") or []}
 
 
-class QuizStore:
+class QuizStore(JsonStore):
     """`jeux/quiz.json`: games per player, best score per theme, best streak, days played."""
 
     def __init__(self, memory_root: Path):
-        self.path = Path(memory_root) / GAMES_DIR / "quiz.json"
-        self._lock = threading.Lock()
-
-    def load(self) -> dict:
-        try:
-            return json.loads(self.path.read_text())
-        except (OSError, ValueError):
-            return {"players": {}}
+        super().__init__(Path(memory_root) / GAMES_DIR / "quiz.json", {"players": {}})
 
     def save_game(self, game: Game, when) -> dict:
         """Record a finished game; return the player's records after it."""
-        with self._lock:
+        with self.lock:
             data = self.load()
             p = data["players"].setdefault(game.player, {"games": [], "best": {}, "best_streak": 0, "play_days": []})
             p["games"].append(
@@ -156,10 +148,7 @@ class QuizStore:
             day = when.date().isoformat()
             if day not in p["play_days"]:
                 p["play_days"].append(day)
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            tmp = self.path.with_suffix(".tmp")
-            tmp.write_text(json.dumps(data, ensure_ascii=False, indent=1))
-            tmp.replace(self.path)
+            self.save(data)
             return {
                 "new_record": new_record and previous is not None,
                 "previous_best": previous,

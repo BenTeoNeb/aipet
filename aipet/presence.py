@@ -3,11 +3,13 @@ pet can say « ça fait longtemps ! » — and never reproach it."""
 
 from __future__ import annotations
 
-import json
 from datetime import datetime
 from pathlib import Path
 
+from loguru import logger
+
 from aipet import rhythm
+from aipet.fileio import atomic_write_json, load_json, lock_for
 from aipet.memory.store import now
 
 ANYONE = "_any"
@@ -19,25 +21,24 @@ class Presence:
         self.before: dict[str, str] = self._load()  # as it was when this conversation started
 
     def _load(self) -> dict[str, str]:
-        try:
-            return json.loads(self.file.read_text())
-        except (OSError, ValueError):
-            return {}
+        data = load_json(self.file, {})
+        return data if isinstance(data, dict) else {}
 
     def new_conversation(self):
         self.before = self._load()
 
     def note(self, name: str | None):
         """Someone talks now (a child known for sure, or None)."""
-        data = self._load()
         stamp = now().isoformat(timespec="minutes")
-        data[ANYONE] = stamp
-        if name:
-            data[name] = stamp
-        try:
-            self.file.write_text(json.dumps(data, ensure_ascii=False))
-        except OSError:
-            pass
+        with lock_for(self.file):
+            data = self._load()
+            data[ANYONE] = stamp
+            if name:
+                data[name] = stamp
+            try:
+                atomic_write_json(self.file, data, indent=None)
+            except OSError as e:
+                logger.warning(f"Presence not saved: {e}")
 
     def lines(self) -> str:
         """French prompt lines: when the pet last talked with anyone, and with each child."""

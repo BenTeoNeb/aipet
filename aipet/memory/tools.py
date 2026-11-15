@@ -77,7 +77,8 @@ def register_tools(llm, mem: Memory, budget_exhausted: Callable[[], bool] = lamb
             words = [w for w in re.findall(r"\w+", normalize_text(what)) if w not in STOPWORDS and len(w) > 2]
             if len(words) >= 2:
                 res["log_lines_removed"] = await asyncio.to_thread(session_log.scrub, words)
-        logger.info(f"🧽 forget({what!r}) → {res}")
+        # Never the forgotten words themselves: they would land in aipet.log right after being scrubbed.
+        logger.info(f"🧽 forget({len(what.split())} words, who={'yes' if who else 'no'}) → {res}")
         # Instructions back to the model (French on purpose).
         if res.get("refused"):
             res["instruction"] = "Demande gentiment ce qu'il faut oublier exactement, en quelques mots."

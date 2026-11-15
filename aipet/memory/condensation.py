@@ -206,16 +206,8 @@ async def condense(
 
     pet_name = character.of(cfg).name
     async with mem._lock:
-        # Notes taken during the model call go to a new a_trier.md: only the ones already
-        # present are processed (and deleted).
-        notes_f, in_progress = mem.root / "a_trier.md", mem.root / "a_trier.en-cours.md"
-        if notes_f.exists():
-            if in_progress.exists():  # leftover from a previous failure: accumulate
-                in_progress.write_text(in_progress.read_text() + notes_f.read_text())
-                notes_f.unlink()
-            else:
-                notes_f.replace(in_progress)
-        notes = in_progress.read_text() if in_progress.exists() else "(aucune)"
+        # Notes taken during the model call go to a new a_trier.md: only these ones are processed.
+        notes = await asyncio.to_thread(mem.take_notes) or "(aucune)"
         prompt = (
             f"# Ce que {pet_name} sait déjà\n{mem.context_block(full_stories=True)}\n\n"
             f"# Notes prises pendant la conversation\n{notes}\n\n"
@@ -226,7 +218,10 @@ async def condense(
         update = await asyncio.wait_for(asyncio.to_thread(_call_llm, cfg, prompt), timeout)
         changed = await asyncio.to_thread(mem.apply, update, started, allowed_new_names)
         await asyncio.to_thread(mem.save_transcript, started, turns)
-        in_progress.unlink(missing_ok=True)
-        mem.purge_transcripts(cfg.get("memory", {}).get("keep_transcripts_days", 30))
+        await asyncio.to_thread(mem.notes_done)
+        try:
+            await asyncio.to_thread(mem.purge_transcripts, cfg.get("memory", {}).get("keep_transcripts_days", 30))
+        except OSError as e:  # never a reason to condense the same chunk again
+            logger.warning(f"Old transcripts not purged: {e}")
         logger.info(f"Memory condensed in {(now() - t0).total_seconds():.1f}s: {changed}")
         return changed

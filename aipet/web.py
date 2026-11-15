@@ -120,7 +120,7 @@ def _memory():
 
     cfg = load_config()
     pet = character.of(cfg)
-    return Memory(paths.memory_dir(cfg, pet.id), pet.name)
+    return Memory.shared(paths.memory_dir(cfg, pet.id), pet.name)
 
 
 @app.get("/debug/memory", include_in_schema=False)
@@ -164,15 +164,9 @@ async def debug_session(name: str):
 @app.post("/debug/memory/delete", include_in_schema=False)
 async def debug_memory_delete(path: str, x_pet: str | None = Header(None), origin: str | None = Header(None)):
     """Parental control: delete a memory file."""
-    from aipet.memory.store import SUMMARY_FILE
-
     _guard(x_pet, origin)
-    mem = _memory()
-    p = (mem.root / path).resolve()
-    if mem.root.resolve() not in p.parents or not p.is_file() or p.name == SUMMARY_FILE:
+    if not await asyncio.to_thread(_memory().delete, path):
         return {"ok": False, "reason": "file cannot be deleted"}
-    p.unlink()
-    mem.wipe_history()  # deleted for real: not kept in older versions of the memory
     return {"ok": True}
 
 
