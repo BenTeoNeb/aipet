@@ -31,6 +31,9 @@ versions follow [Semantic Versioning](https://semver.org/) once the first releas
   was not written atomically.
 - The "retry if the model is slow" never fired through OpenRouter (it only bounded the headers).
 - Long stories recharged the pet's energy instead of draining it.
+- On the Pi, a noise or a background voice just after the child spoke cancelled every reply before
+  a sound came out (« bip, puis rien »). Between the child's turn and the pet's reply, voice alone no
+  longer starts a turn: the child who goes on talking still cuts in once words are transcribed.
 - A tired pet said goodbye for its nap but never hung up (no `[fin]` when the pet itself ends the
   conversation), and answered the next « d'accord ? » as if awake: its goodbye now carries `[fin]`,
   and a goodbye while very tired starts a real nap (from its current level, never during a sad

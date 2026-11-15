@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import asyncio
 import random
+import time
 from collections.abc import Callable
 
 from loguru import logger
@@ -364,6 +365,9 @@ class UnfinishedSentenceWait:
         self._cancel()
 
 
+REPLY_PENDING_SECS = 10  # the pet's reply is awaited this long after the child's turn (then voice starts a turn again)
+
+
 class QuietVADUserTurnStartStrategy(BaseUserTurnStartStrategy):
     """The child's turn starts when they start speaking, but only while the pet is silent.
 
@@ -373,23 +377,33 @@ class QuietVADUserTurnStartStrategy(BaseUserTurnStartStrategy):
     makes Pipecat forget the end of speech it already saw, and wait a fixed safety delay (the STT's
     p99 latency minus the VAD silence, 1.8 s for OpenAI) instead of asking Smart Turn whether the
     sentence is finished.
+
+    Between the end of the child's turn and the end of the pet's reply, voice alone does not start
+    a turn either: in a lively room (seen on the Pi), a noise or a voice in the background just after
+    the child spoke cancelled every reply before a sound came out. The child who goes on talking
+    still cuts in, once the transcript has words (MinWords strategy, 1 word while the pet is silent).
     """
 
-    def __init__(self, **kwargs):
+    def __init__(self, clock: Callable[[], float] = time.monotonic, **kwargs):
         super().__init__(**kwargs)
         self._bot_speaking = False
         self._user_speaking = False
+        self._clock = clock
+        self._reply_until = 0.0  # a reply is on its way until then (or until the pet stops speaking)
+
+    async def handle_user_turn_stopped(self):
+        self._reply_until = self._clock() + REPLY_PENDING_SECS
 
     async def process_frame(self, frame):
         if isinstance(frame, BotStartedSpeakingFrame):
             self._bot_speaking = True
         elif isinstance(frame, BotStoppedSpeakingFrame):
-            self._bot_speaking = False
+            self._bot_speaking, self._reply_until = False, 0.0
             if self._user_speaking:  # the child was already talking when the pet finished
                 await self.report_user_turn_started()
         elif isinstance(frame, VADUserStartedSpeakingFrame):
             self._user_speaking = True
-            if not self._bot_speaking:
+            if not self._bot_speaking and self._clock() >= self._reply_until:
                 await self.report_user_turn_started()
         elif isinstance(frame, VADUserStoppedSpeakingFrame):
             self._user_speaking = False

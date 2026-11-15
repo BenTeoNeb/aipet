@@ -398,6 +398,35 @@ def test_turn_starts_on_voice_only_while_the_pet_is_silent():
     asyncio.run(run())
 
 
+def test_voice_alone_does_not_cancel_the_reply_on_its_way():
+    """Seen on the Pi: a noise or a background voice just after the child spoke cancelled every
+    reply before a sound came out (« bip, then nothing »)."""
+    from pipecat.frames.frames import BotStartedSpeakingFrame, BotStoppedSpeakingFrame, VADUserStartedSpeakingFrame
+
+    t = [0.0]
+    s = turns.QuietVADUserTurnStartStrategy(clock=lambda: t[0])
+    started = []
+
+    async def report(*a, **kw):
+        started.append(True)
+
+    s.report_user_turn_started = report
+
+    async def run():
+        await s.handle_user_turn_stopped()  # the child's turn ends: the reply is on its way
+        await s.process_frame(VADUserStartedSpeakingFrame())  # noise: no turn (the transcript decides)
+        assert started == []
+        await s.process_frame(BotStartedSpeakingFrame())
+        await s.process_frame(BotStoppedSpeakingFrame())  # still noisy when the pet stops: as before
+        assert len(started) == 1
+        await s.handle_user_turn_stopped()
+        t[0] += turns.REPLY_PENDING_SECS + 1  # no reply came ([silence]): voice starts turns again
+        await s.process_frame(VADUserStartedSpeakingFrame())
+        assert len(started) == 2
+
+    asyncio.run(run())
+
+
 def test_pipeline_uses_the_voice_start_unless_disabled(monkeypatch, tmp_path):
     from aipet import pipeline
 
