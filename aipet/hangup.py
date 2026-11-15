@@ -63,7 +63,8 @@ class HangUp(FrameProcessor):
             return
         reason = self._reason()
         if not reason:
-            return  # woken up meanwhile (recharged by a parent, morning)
+            self._asleep_reply = False  # woken up meanwhile (recharged by a parent, morning)
+            return
         logger.info(f"📞 Hanging up ({reason})")
         self._slog.event("hang_up", reason=reason)
         self._asleep_reply = False
@@ -79,8 +80,11 @@ class HangUp(FrameProcessor):
             self._asleep_reply = True
         elif isinstance(frame, (UserStartedSpeakingFrame, BotStartedSpeakingFrame)):
             self._cancel()  # someone speaks: decide again when it ends
-        elif isinstance(frame, BotStoppedSpeakingFrame) and self._reason():
-            self._cancel()
-            delay = AFTER_SLEEPY_REPLY_SECS if self._asleep_reply else self._after
-            self._task = start(self._later(delay), "hang up")
+        elif isinstance(frame, BotStoppedSpeakingFrame):
+            if self._reason():
+                self._cancel()
+                delay = AFTER_SLEEPY_REPLY_SECS if self._asleep_reply else self._after
+                self._task = start(self._later(delay), "hang up")
+            else:
+                self._asleep_reply = False  # awake and talking: an old sleepy reply no longer counts
         await self.push_frame(frame, direction)

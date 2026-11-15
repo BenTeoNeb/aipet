@@ -214,6 +214,7 @@ class StoryGame(Activity):
     async def start(self, idea: str = "", resume: bool = False, with_children: bool = False) -> dict:
         player = self.host.player()
         if resume:
+            self.cancel_preparation()  # a new story still being written must not replace this one
             story = self.unfinished(player)
             if not story:
                 return {"error": "Pas d'histoire en cours à reprendre : propose d'en commencer une nouvelle."}

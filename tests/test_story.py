@@ -212,6 +212,33 @@ def test_a_preparation_stopped_meanwhile_starts_nothing(env, monkeypatch):
     assert g.story["title"] == "Lente" and res[0].get("cancelled") and "title" in res[1]
 
 
+def test_resuming_cancels_a_story_being_prepared(env, monkeypatch):
+    import threading
+
+    mem, _, _ = env
+    g = game(mem)
+    asyncio.run(g.start("un robot"))
+    g.stop()  # « Histoire 1 » is unfinished
+    release = threading.Event()
+
+    def slow_plan(*a, **kw):
+        release.wait(2)
+        return plan("Nouvelle", STEPS_DAY)
+
+    monkeypatch.setattr(story_mod, "generate_plan", slow_plan)
+
+    async def run():
+        new = asyncio.create_task(g.start("un dragon"))
+        await asyncio.sleep(0.05)
+        resumed = await g.start(resume=True)  # « non, la suite ! »
+        release.set()
+        return resumed, await new
+
+    resumed, new = asyncio.run(run())
+    assert resumed["resumed"] == "Histoire 1" and new.get("cancelled")
+    assert g.story["title"] == "Histoire 1"
+
+
 async def _two_starts(g, release):
     first = asyncio.create_task(g.start("un loup"))
     await asyncio.sleep(0.05)

@@ -290,8 +290,10 @@ def make_llm(cfg: dict, system: str):
     if p == "openrouter":
         from pipecat.services.openrouter.llm import OpenRouterLLMService
 
+        from aipet.llm_retry import RetryingOpenRouterLLMService  # retry on the first chunk, not the headers
+
         body = _openrouter_body(r, "conversation")
-        return OpenRouterLLMService(
+        return RetryingOpenRouterLLMService(
             api_key=_api_key(r, "openrouter"),
             base_url=r.get("url") or OPENROUTER_URL,
             settings=OpenRouterLLMService.Settings(
@@ -307,7 +309,9 @@ def make_llm(cfg: dict, system: str):
     if p == "openai":
         from pipecat.services.openai.llm import OpenAILLMService
 
-        return OpenAILLMService(
+        from aipet.llm_retry import RetryingOpenAILLMService
+
+        return RetryingOpenAILLMService(
             api_key=_api_key(r, "openai"),
             base_url=r.get("url"),
             settings=OpenAILLMService.Settings(model=r["model"], system_instruction=system),

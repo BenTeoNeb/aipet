@@ -364,8 +364,8 @@ class Conversation(Host):
         """On wake: after a long pause, start from a fresh conversation (everything is already
         condensed) and refresh the date in the system prompt."""
         self.presence.new_conversation()  # « last time we talked », for this session
-        if self.rhythm:  # the school-holiday calendar, off the event loop (network at most weekly)
-            await asyncio.to_thread(self.rhythm.refresh_holidays, now().date())
+        if self.rhythm:  # the school-holiday calendar, in the background (network at most weekly)
+            self._tasks.spawn(self._refresh_holidays(self.rhythm), "school holidays")
         self.sleep.woke_up()
         pause = (now() - self.sleep.last_activity).total_seconds() / 60
         if pause > self.forget_after_min:
@@ -374,6 +374,12 @@ class Conversation(Host):
             self.memory.forget_condensed()
         self.sleep.last_activity = now()
         await self.refresh_prompt()
+
+    async def _refresh_holidays(self, rhythm: Rhythm):
+        """Never awaited by the wake: a slow network must not delay listening."""
+        changed = await asyncio.to_thread(rhythm.refresh_holidays, now().date())
+        if changed:
+            await self.refresh_prompt()
 
     def on_sleep(self):
         """The pet goes back to waiting for its wake word (headless mode): whoever talks next must say

@@ -50,6 +50,18 @@ def test_preparation_failed_or_stale():
     assert asyncio.run(game.prepare(lambda: "plan", failed="x")) == ("plan", None)
 
 
+def test_a_preparation_that_never_ends_is_given_up(monkeypatch):
+    import threading
+
+    from aipet.games import common
+
+    monkeypatch.setattr(common, "PREPARE_TIMEOUT_SECS", 0.05)
+    release = threading.Event()
+    _, refused = asyncio.run(Activity().prepare(lambda: release.wait(2), failed="Trop long."))
+    release.set()
+    assert refused == {"error": "Trop long."}
+
+
 def test_difficulty_steps():
     assert adjust_difficulty(5, up=True, down=False) == 5
     assert adjust_difficulty(1, up=False, down=True) == 1

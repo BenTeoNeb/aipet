@@ -96,3 +96,46 @@ def test_holidays_cache_and_offline(tmp_path, monkeypatch):
     assert len(rhythm.school_holidays("C", date(2026, 11, 30), cache)) == 1  # stale cache still used
     assert json.loads(cache.read_text())["zone"] == "C"
     assert rhythm.school_holidays("A", date(2026, 11, 30), cache) == []  # other zone, no data: no holidays
+
+
+def test_a_failed_holiday_fetch_is_retried_the_next_day_only(tmp_path, monkeypatch):
+    cache = tmp_path / "holidays.json"
+    cache.write_text(json.dumps({"zone": "C", "fetched": "2026-01-01", "records": []}))
+    calls = []
+
+    def offline(zone, since):
+        calls.append(zone)
+        raise OSError("no network")
+
+    monkeypatch.setattr(rhythm, "fetch_holidays", offline)
+    rhythm.school_holidays("C", date(2026, 11, 30), cache)
+    rhythm.school_holidays("C", date(2026, 11, 30), cache)  # another wake the same day
+    assert calls == ["C"]
+    rhythm.school_holidays("C", date(2026, 12, 1), cache)
+    assert calls == ["C", "C"]
+
+
+def test_waking_up_never_waits_for_the_holiday_calendar(tmp_path):
+    import asyncio
+    import threading
+
+    from pipecat.processors.aggregators.llm_context import LLMContext
+
+    from aipet.conversation import Conversation
+    from aipet.memory import Memory
+
+    release = threading.Event()
+
+    class SlowRhythm(rhythm.Rhythm):
+        def refresh_holidays(self, today):
+            release.wait(2)  # a slow network
+            return False
+
+    k = Conversation(Memory(tmp_path, "Flocon"), {"memory": {}}, LLMContext(), "BASE", rhythm=SlowRhythm())
+
+    async def run():
+        await asyncio.wait_for(k.on_wake(), 0.5)  # not blocked by the fetch
+        release.set()
+        k.unbind()
+
+    asyncio.run(run())

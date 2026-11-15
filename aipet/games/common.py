@@ -106,7 +106,10 @@ class Activity:
         self._preparation += 1
         number = self._preparation
         try:
-            result = await asyncio.to_thread(make, *args)
+            result = await asyncio.wait_for(asyncio.to_thread(make, *args), PREPARE_TIMEOUT_SECS)
+        except TimeoutError:
+            logger.warning(f"{type(self).__name__}: preparation too slow, given up")
+            return None, {"error": failed}
         except Exception:
             logger.exception(f"{type(self).__name__}: preparation failed")
             return None, {"error": failed}
@@ -117,6 +120,11 @@ class Activity:
     def cancel_preparation(self):
         """The activity stops: a preparation still running must not start it."""
         self._preparation += 1
+
+
+# A preparation (lesson or story plan) is given up after this, just before the turn's own limit
+# (`tool_give_up_after_secs`, 60 s): the model can still say something kind.
+PREPARE_TIMEOUT_SECS = 50
 
 
 def theme_key(theme: str) -> str:

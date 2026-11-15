@@ -19,8 +19,10 @@ from pathlib import Path
 from loguru import logger
 from pipecat.frames.frames import (
     BotStartedSpeakingFrame,
+    BotStoppedSpeakingFrame,
     LLMContextFrame,
     UserStartedSpeakingFrame,
+    UserStoppedSpeakingFrame,
 )
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
@@ -103,15 +105,16 @@ class Energy:
         return {"level": round(self.level(), 3), "state": self.state()}
 
     # ---------------------------------------------------------------- events
-    def activity(self):
-        """Someone spoke (child or the pet)."""
+    def activity(self, continuous: bool = False):
+        """Someone spoke (child or the pet). `continuous`: someone stops speaking, so the whole
+        time since the start of that speech was talking (a 4-minute story drains, it is no rest)."""
         self._wake_if_rested()
         if self._asleep:
             return  # talking to a sleeping pet neither drains nor resets its nap
         now = self.clock()
         if self._last_activity is not None:
             gap = now - self._last_activity
-            if gap <= ACTIVE_GAP:
+            if gap <= ACTIVE_GAP or continuous:
                 self._level -= gap * self.drain
             else:
                 self._level = min(1.0, self._level + (gap - ACTIVE_GAP) * self.charge)
@@ -192,8 +195,11 @@ class SleepGate(FrameProcessor):
 
     async def process_frame(self, frame, direction: FrameDirection):
         await super().process_frame(frame, direction)
-        if isinstance(frame, (UserStartedSpeakingFrame, BotStartedSpeakingFrame)) and self._energy:
-            self._energy.activity()
+        if self._energy:
+            if isinstance(frame, (UserStartedSpeakingFrame, BotStartedSpeakingFrame)):
+                self._energy.activity()
+            elif isinstance(frame, (UserStoppedSpeakingFrame, BotStoppedSpeakingFrame)):
+                self._energy.activity(continuous=True)
         if isinstance(frame, LLMContextFrame) and direction == FrameDirection.DOWNSTREAM:
             reason = self._sleep_reason()
             if reason:

@@ -153,6 +153,15 @@ def test_the_sleeping_pet_hangs_up():
         state["reason"] = None  # a parent recharged it meanwhile: no hang-up
         await asyncio.sleep(0.1)
         assert hung == ["night"]
+        # A sleepy reply, then a recharge and a normal talk: a later goodbye waits the usual time.
+        await send(SleepyReplyFrame("zzz", append_to_context=False))
+        await send(BotStoppedSpeakingFrame())  # awake again (reason None)
+        h._after = 5
+        state["reason"] = "goodbye"
+        await send(BotStoppedSpeakingFrame())
+        await asyncio.sleep(1.1)
+        assert hung == ["night"]  # not hung up after 1 s
+        h._cancel()
 
     asyncio.run(go())
 
@@ -192,3 +201,14 @@ def test_reading_the_state_changes_nothing():
     assert "woke_up" not in events
     e.activity()  # the next child message really wakes it up
     assert events.count("woke_up") == 1
+
+
+def test_a_long_story_drains_instead_of_recharging():
+    c = Clock()
+    e = Energy(talk_minutes=20, recharge_minutes=30, clock=c)
+    e.activity()
+    before = e.level()
+    e.activity()  # the pet starts a story…
+    c.t += 240
+    e.activity(continuous=True)  # …and stops 4 minutes later
+    assert e.level() < before - 0.15  # 4 of 20 minutes spent

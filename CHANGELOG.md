@@ -16,6 +16,23 @@ versions follow [Semantic Versioning](https://semver.org/) once the first releas
 - Parents' and debug pages could block the audio while reading logs; the school-holiday calendar
   was fetched on the audio event loop.
 - Closing an old browser tab cleared the newer tab's session.
+- `search_memory` found the pending notes, which quote forget requests word for word.
+- A forget request or a parent's correction did not reach the conversation in progress (context,
+  system prompt); Pipecat's debug lines copied what was said into the log file.
+- A one-word forget about someone only cleaned their card; any parent correction (not only a
+  deletion) now wipes the git history; a condensation running during a parent's correction could
+  write the old text back; a card deleted by a parent came back at the next condensation.
+- A cough or a dropped transcript got « Hmm… » then an apology; the end of a filler cancelled an
+  `[attends]` wait; a tool loop kept pushing the turn's deadline back.
+- Guess game: a yes to a property question (« c'est rouge ? ») counted as a win.
+- Spoken-text cleanup cut « 4. » or « - » in mid-sentence; « 7 * 5 » split across chunks.
+- A cancelled tool call kept the Pi's microphone open for up to 60 s; `[parle:Marie Lou]` was spoken.
+- A slow school-holiday server delayed the wake (and was retried on every wake); the cache file
+  was not written atomically.
+- The "retry if the model is slow" never fired through OpenRouter (it only bounded the headers).
+- Long stories recharged the pet's energy instead of draining it.
+- Resuming a story while another was being prepared let the new one replace it; preparations had
+  no overall time limit; a goodbye after a recharge hung up after 1 s.
 
 ### Security
 - Debug and parents' routes answer connections from this machine only, even with `--host 0.0.0.0`.

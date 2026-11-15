@@ -83,7 +83,7 @@ def test_compatible_server_without_key(monkeypatch):
     llm = engines.make_llm(
         cfg(conversation={"provider": "openai", "model": "qwen3", "url": "http://localhost:11434/v1"}), "x"
     )
-    assert type(llm).__name__ == "OpenAILLMService"
+    assert "OpenAILLMService" in [c.__name__ for c in type(llm).__mro__]
 
 
 def test_describe():
@@ -124,7 +124,7 @@ def test_conversation_all_providers(provider, cls, monkeypatch):
         GoogleVertexLLMService, "_get_credentials", staticmethod(lambda *a, **k: Credentials(token="fake-token"))
     )
     llm = build(engines.make_llm, cfg(conversation={"provider": provider}), "Tu es Flocon.")
-    assert type(llm).__name__ == cls
+    assert cls in [c.__name__ for c in type(llm).__mro__]  # possibly wrapped (llm_retry)
     # What the rest of the code needs, whatever the provider:
     assert type(llm).Settings(system_instruction="new instructions")  # refresh_prompt
     assert hasattr(llm, "register_function") and hasattr(llm, "event_handler")

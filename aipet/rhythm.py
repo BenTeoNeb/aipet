@@ -18,6 +18,7 @@ from pathlib import Path
 from loguru import logger
 
 from aipet import paths
+from aipet.fileio import atomic_write_json
 from aipet.timefmt import MONTHS_FR, TZ, WEEKDAYS_FR
 
 CACHE = paths.cache_dir() / "school_holidays.json"  # shared by the household's pets
@@ -100,14 +101,18 @@ def school_holidays(zone: str, today: date, cache: Path = CACHE, fetch: bool = T
     except (OSError, ValueError):
         pass
     fresh = data.get("zone") == zone and data.get("fetched", "") >= (today - timedelta(days=REFRESH_DAYS)).isoformat()
-    if not fresh and fetch:
+    tried_today = data.get("zone") == zone and data.get("tried") == today.isoformat()
+    if not fresh and not tried_today and fetch:
         try:
             records = fetch_holidays(zone, today - timedelta(days=30))
             data = {"zone": zone, "fetched": today.isoformat(), "records": records}
-            cache.parent.mkdir(parents=True, exist_ok=True)
-            cache.write_text(json.dumps(data, ensure_ascii=False))
-        except Exception as e:  # no network: keep the old cache, if any
+        except Exception as e:  # no network: keep the old cache, if any, and try again tomorrow
             logger.warning(f"School holiday calendar unavailable ({e}); using the cache")
+            if data.get("zone") != zone:
+                return []
+            data = {**data, "tried": today.isoformat()}
+        cache.parent.mkdir(parents=True, exist_ok=True)
+        atomic_write_json(cache, data)  # shared by the household's pets: never half-written
     return _parse_holidays(data.get("records", [])) if data.get("zone") == zone else []
 
 
@@ -136,10 +141,13 @@ class Rhythm:
         keys = ("zone", "wednesday_school", "weekday_bedtime", "weekday_wakeup", "weekend_bedtime", "weekend_wakeup")
         return cls(**{k: str(r[k]) for k in keys if k in r})  # type: ignore[arg-type]  # str fields only
 
-    def refresh_holidays(self, today: date) -> None:
-        """Update the calendar cache from the network if it is old (blocking: run it in a thread)."""
+    def refresh_holidays(self, today: date) -> bool:
+        """Update the calendar cache from the network if it is old (blocking: run it in a thread).
+        Returns True if the holidays changed."""
+        before = self.holidays
         self.holidays = school_holidays(self.zone, today)
         self._holidays_day = today
+        return self.holidays != before
 
     def _holidays(self, today: date) -> list[Holiday]:
         """From the cache only (called while building the prompt, on the event loop); read again
