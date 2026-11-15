@@ -13,21 +13,15 @@
 
 from __future__ import annotations
 
-import asyncio
-
 from loguru import logger
 
 from aipet import engines
 from aipet.games.common import (
     GAMES_DIR,
     PREPARING_NOTE,
-    STALE_PREPARATION,
     UNKNOWN_PLAYER,
     Activity,
     JsonStore,
-    cancel_preparation,
-    is_stale,
-    new_preparation,
     pet_intro,
     theme_key,
 )
@@ -159,16 +153,12 @@ class LearnGame(Activity):
             f"{player}, en {school}" if school else (player if player != UNKNOWN_PLAYER else "un enfant de 5 à 10 ans")
         )
         seen = [t["topic"] for t in p.get("topics", [])][-RECENT_TOPICS:]
-        prep = new_preparation(self)
-        try:
-            plan = await asyncio.to_thread(generate_lesson, self.cfg, topic, domain, who, level, seen)
-        except Exception as e:
-            logger.warning(f"Lesson plan failed: {e}")
-            return {
-                "error": "La leçon n'a pas pu être préparée : explique simplement toi-même, ou propose autre chose."
-            }
-        if is_stale(self, prep):
-            return STALE_PREPARATION
+        plan, refused = await self.prepare(
+            generate_lesson, self.cfg, topic, domain, who, level, seen,
+            failed="La leçon n'a pas pu être préparée : explique simplement toi-même, ou propose autre chose.",
+        )  # fmt: skip
+        if refused:
+            return refused
         if len(plan.get("discoveries", [])) < 2:
             return {"error": "Plan incomplet : explique simplement toi-même."}
         self.lesson = {"player": player, "topic": topic, "domain": domain or "découverte", "level": level,
@@ -238,7 +228,7 @@ class LearnGame(Activity):
 
     def stop(self):
         """The activity ends mid-lesson: nothing is recorded (the child did not finish)."""
-        cancel_preparation(self)
+        self.cancel_preparation()
         self.lesson = None
 
     # ------------------------------------------------------------------ prompt and labels
@@ -277,32 +267,14 @@ class LearnGame(Activity):
 def register_tools(llm, game: LearnGame) -> list:
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 
-    async def budget_ok(params) -> bool:
-        if refused := game.budget_refused():
-            await params.result_callback(refused)
-            return False
-        return True
-
-    async def suggest(params):
-        if await budget_ok(params):
-            await params.result_callback(game.suggest())
-
-    async def start(params):
-        if await budget_ok(params):
-            a = params.arguments
-            await params.result_callback(await game.start(a.get("topic", ""), a.get("domain", "")))
-
-    async def nxt(params):
-        a = params.arguments
-        await params.result_callback(game.next(a.get("understood", ""), a.get("discovery_done")))
-
-    async def end(params):
-        a = params.arguments
-        await params.result_callback(
-            game.end(
-                a.get("retained", ""), bool(a.get("liked", True)), bool(a.get("bonus_done")), a.get("new_questions")
-            )
+    suggest = game.tool(lambda a: game.suggest(), budget=True)
+    start = game.tool(lambda a: game.start(a.get("topic", ""), a.get("domain", "")), budget=True)
+    nxt = game.tool(lambda a: game.next(a.get("understood", ""), a.get("discovery_done")))
+    end = game.tool(
+        lambda a: game.end(
+            a.get("retained", ""), bool(a.get("liked", True)), bool(a.get("bonus_done")), a.get("new_questions")
         )
+    )
 
     llm.register_function("learn_suggest", suggest)
     llm.register_function("learn_start", start, cancel_on_interruption=False)  # see PREPARING_NOTE

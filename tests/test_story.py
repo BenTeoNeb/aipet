@@ -219,6 +219,7 @@ async def _two_starts(g, release):
 
 def test_preparation_tools_are_asynchronous():
     from aipet.games import learn, quiz, yes_no
+    from aipet.games.common import Activity
 
     seen = {}
 
@@ -227,7 +228,7 @@ def test_preparation_tools_are_asynchronous():
             seen[name] = kw.get("cancel_on_interruption", True)
 
     for mod in (story_mod, quiz, learn, yes_no):
-        mod.register_tools(LLM(), type("G", (), {"keeper": None})())
+        mod.register_tools(LLM(), Activity())
     assert {n: seen[n] for n in ("story_start", "quiz_start", "learn_start", "yesno_start")} == dict.fromkeys(
         ("story_start", "quiz_start", "learn_start", "yesno_start"), False
     )

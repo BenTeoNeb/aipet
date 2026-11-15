@@ -2,16 +2,21 @@
 
 from __future__ import annotations
 
+import asyncio
 import copy
 import re
+from collections.abc import Callable
 from datetime import date, timedelta
 from pathlib import Path
+from typing import Any
+
+from loguru import logger
 
 from aipet import character
 from aipet.fileio import atomic_write_json, load_json, lock_for
 from aipet.memory.text import normalize_text, without_article
-from aipet.memory.tools import TOOLS_EXHAUSTED
 from aipet.session_log import NO_LOG
+from aipet.tool_gate import tool_handler
 
 UNKNOWN_PLAYER = "famille"  # games played while the pet doesn't know (for sure) who is talking
 GAMES_DIR = "jeux"  # in the family memory (data)
@@ -61,6 +66,7 @@ class Activity:
     def __init__(self, host: Host | None = None, slog=None):
         self.host = host or Host()
         self.slog = slog or NO_LOG
+        self._preparation = 0  # see prepare()
 
     def register_tools(self, llm) -> list:
         """Register its tools with the LLM; return their FunctionSchema."""
@@ -77,9 +83,29 @@ class Activity:
     def stop(self):
         """The activity ends (finished, replaced, good night…): forget the running round."""
 
-    def budget_refused(self) -> dict | None:
-        """For its tools: the answer to give when this turn already used too many tools."""
-        return TOOLS_EXHAUSTED if self.host.tool_budget_exhausted() else None
+    def tool(self, call: Callable[[dict], Any], *, budget: bool = False) -> Callable:
+        """A tool handler calling `call(arguments)`; with `budget`, the call counts against the
+        per-turn tool budget (for tools that start something or search)."""
+        return tool_handler(call, self.host.tool_budget_exhausted if budget else None)
+
+    async def prepare(self, make: Callable[..., Any], *args, failed: str) -> tuple[Any, dict | None]:
+        """Run a slow preparation (a model call) off the event loop. Returns (result, None), or
+        (None, answer for the model) when it failed — `failed` is that answer, French — or when the
+        activity was stopped or restarted meanwhile (see PREPARING_NOTE)."""
+        self._preparation += 1
+        number = self._preparation
+        try:
+            result = await asyncio.to_thread(make, *args)
+        except Exception:
+            logger.exception(f"{type(self).__name__}: preparation failed")
+            return None, {"error": failed}
+        if self._preparation != number:
+            return None, STALE_PREPARATION
+        return result, None
+
+    def cancel_preparation(self):
+        """The activity stops: a preparation still running must not start it."""
+        self._preparation += 1
 
 
 def theme_key(theme: str) -> str:
@@ -87,6 +113,29 @@ def theme_key(theme: str) -> str:
     t = normalize_text(theme).strip()
     t = re.sub(r"^(les |le |la |l'|l’|un |une |des |du |de la |de l'|d'|d’)", "", t)
     return without_article(t).strip()
+
+
+MIN_DIFFICULTY, MAX_DIFFICULTY = 1, 5
+
+
+def adjust_difficulty(before: int, up: bool, down: bool) -> int:
+    """One step up after a game well played, one step down after a hard one, within 1..5."""
+    if up:
+        return min(MAX_DIFFICULTY, before + 1)
+    if down:
+        return max(MIN_DIFFICULTY, before - 1)
+    return before
+
+
+def level_change(before: int, after: int) -> str | None:
+    return "up" if after > before else "down" if after < before else None
+
+
+def mark_played(player_data: dict, day: date) -> None:
+    """Remember the day a child played (for « days in a row »)."""
+    days = player_data.setdefault("play_days", [])
+    if day.isoformat() not in days:
+        days.append(day.isoformat())
 
 
 def days_in_a_row(play_days: list[str], today: date) -> int:
@@ -132,18 +181,3 @@ PREPARING_NOTE = (
 )
 STALE_PREPARATION = {"cancelled": True, "note": "Cette activité a été arrêtée ou remplacée pendant sa "
                      "préparation : ne la commence pas, continue la conversation."}  # fmt: skip
-
-
-def new_preparation(game) -> int:
-    """Start a preparation: any earlier one of this game becomes stale. Returns its number."""
-    game._preparation = getattr(game, "_preparation", 0) + 1
-    return game._preparation
-
-
-def cancel_preparation(game):
-    """The activity stops: a preparation still running must not start it."""
-    game._preparation = getattr(game, "_preparation", 0) + 1
-
-
-def is_stale(game, number: int) -> bool:
-    return getattr(game, "_preparation", 0) != number

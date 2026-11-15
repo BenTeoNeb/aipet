@@ -77,7 +77,7 @@ def test_tool_budget_per_turn(tmp_path):
         def register_function(self, name, handler):
             handlers[name] = handler
 
-    memory.register_tools(FakeLLM(), mem, gate.exhausted)
+    memory.register_tools(FakeLLM(), mem, gate.count_call)
     results = []
 
     class P:

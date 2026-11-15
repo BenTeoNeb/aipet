@@ -7,10 +7,36 @@ At most MAX_TOOLS_PER_TURN calls per child message: avoids slow loops.
 
 from __future__ import annotations
 
+import inspect
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 from loguru import logger
 
-from aipet.memory.tools import MAX_TOOLS_PER_TURN
 from aipet.session_log import NO_LOG
+
+MAX_TOOLS_PER_TURN = 4
+# Model-facing (French on purpose).
+TOOLS_EXHAUSTED = {"error": "Tu as déjà beaucoup cherché pour ce tour : réponds maintenant avec ce que tu sais."}
+
+
+def tool_handler(
+    call: Callable[[dict], Any | Awaitable[Any]], budget_exhausted: Callable[[], bool] | None = None
+) -> Callable:
+    """A Pipecat function handler from `call(arguments) -> result` (sync or async). With
+    `budget_exhausted`, each call counts against the per-turn tool budget and is refused past it.
+    (A handler that raises is answered with an error by Pipecat itself.)"""
+
+    async def handler(params):
+        if budget_exhausted and budget_exhausted():
+            await params.result_callback(TOOLS_EXHAUSTED)
+            return
+        result = call(params.arguments)
+        if inspect.isawaitable(result):
+            result = await result
+        await params.result_callback(result)
+
+    return handler
 
 
 class ToolGate:
@@ -43,8 +69,8 @@ class ToolGate:
     def new_turn(self):
         self.calls = 0
 
-    def exhausted(self) -> bool:
-        """Counts a call; True when this turn already used its budget."""
+    def count_call(self) -> bool:
+        """Counts a tool call; True when this turn already used its budget (the call is refused)."""
         self.calls += 1
         if self.calls > MAX_TOOLS_PER_TURN:
             logger.warning(f"Tool budget exhausted ({self.calls - 1} calls this turn)")

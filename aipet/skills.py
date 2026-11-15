@@ -177,16 +177,10 @@ def register_tools(llm, conversation) -> list:
     FunctionSchema."""
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 
-    from aipet.memory.tools import TOOLS_EXHAUSTED
+    from aipet.tool_gate import tool_handler
 
-    async def use(params):
-        if conversation.tool_budget_exhausted():
-            await params.result_callback(TOOLS_EXHAUSTED)
-            return
-        await params.result_callback(await conversation.use_skill(params.arguments.get("name", "")))
-
-    async def end(params):
-        await params.result_callback(await conversation.end_skill())
+    use = tool_handler(lambda a: conversation.use_skill(a.get("name", "")), conversation.tool_budget_exhausted)
+    end = tool_handler(lambda a: conversation.end_skill())
 
     llm.register_function("use_skill", use)
     llm.register_function("end_skill", end)

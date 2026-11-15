@@ -17,7 +17,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import uuid
 from datetime import datetime
 
@@ -26,13 +25,9 @@ from loguru import logger
 from aipet import character, engines
 from aipet.games.common import (
     PREPARING_NOTE,
-    STALE_PREPARATION,
     UNKNOWN_PLAYER,
     Activity,
     JsonStore,
-    cancel_preparation,
-    is_stale,
-    new_preparation,
     pet_intro,
     theme_key,
 )
@@ -240,7 +235,6 @@ class StoryGame(Activity):
         steps = STEPS_SHORT if evening or level in LITTLE_ONES else STEPS_DAY
         who = f"{player}, en {level}" if level else (player if player != UNKNOWN_PLAYER else "un enfant de 5 à 10 ans")
         past = [s["title"] for s in self.store.load()["stories"]][-15:]
-        prep = new_preparation(self)
         present = self._present(player)
         guests = None
         if present and self._guests_allowed(player, with_children):
@@ -248,17 +242,12 @@ class StoryGame(Activity):
                 guests = [*present, character.of(self.cfg).name]
             except Exception:
                 guests = present
-        try:
-            plan = await asyncio.to_thread(
-                generate_plan, self.cfg, idea, who, steps, evening, self.recurring(player), past, guests
-            )
-        except Exception as e:
-            logger.warning(f"Story plan failed: {e}")
-            return {
-                "error": "L'histoire n'a pas pu être préparée : raconte-en une simple toi-même, ou propose autre chose."
-            }
-        if is_stale(self, prep):
-            return STALE_PREPARATION
+        plan, refused = await self.prepare(
+            generate_plan, self.cfg, idea, who, steps, evening, self.recurring(player), past, guests,
+            failed="L'histoire n'a pas pu être préparée : raconte-en une simple toi-même, ou propose autre chose.",
+        )  # fmt: skip
+        if refused:
+            return refused
         if len(plan.get("steps", [])) < 3:
             return {"error": "Plan incomplet : raconte une histoire simple toi-même."}
         real = self._real_names()
@@ -320,7 +309,7 @@ class StoryGame(Activity):
 
     def stop(self):
         """The activity ends mid-story: it stays unfinished, to be resumed another time."""
-        cancel_preparation(self)
+        self.cancel_preparation()
         if self.story:
             self._save_story(self.story)
             self._ev("story_paused", title=self.story["title"], step=self.story["step"])
@@ -410,26 +399,13 @@ class StoryGame(Activity):
 def register_tools(llm, game: StoryGame) -> list:
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 
-    async def start(params):
-        if refused := game.budget_refused():
-            await params.result_callback(refused)
-            return
-        a = params.arguments
-        await params.result_callback(
-            await game.start(a.get("idea", ""), bool(a.get("resume")), bool(a.get("with_children")))
-        )
-
-    async def nxt(params):
-        a = params.arguments
-        await params.result_callback(
-            game.next_step(a.get("what_happened", ""), a.get("child_ideas", ""), a.get("step_done"))
-        )
-
-    async def end(params):
-        a = params.arguments
-        await params.result_callback(
-            game.end(a.get("reaction", ""), a.get("favourite_characters"), a.get("character_updates"))
-        )
+    start = game.tool(
+        lambda a: game.start(a.get("idea", ""), bool(a.get("resume")), bool(a.get("with_children"))), budget=True
+    )
+    nxt = game.tool(lambda a: game.next_step(a.get("what_happened", ""), a.get("child_ideas", ""), a.get("step_done")))
+    end = game.tool(
+        lambda a: game.end(a.get("reaction", ""), a.get("favourite_characters"), a.get("character_updates"))
+    )
 
     llm.register_function("story_start", start, cancel_on_interruption=False)  # see PREPARING_NOTE
     llm.register_function("story_next", nxt)

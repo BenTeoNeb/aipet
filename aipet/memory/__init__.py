@@ -17,7 +17,8 @@ from aipet.memory.condensation import SCHEMA, condense, turns_from_messages
 from aipet.memory.keeper import MemoryKeeper
 from aipet.memory.speakers import Speakers
 from aipet.memory.store import Memory, now, parse_card, render_card, spoken_date
-from aipet.memory.tools import MAX_TOOLS_PER_TURN, MEMORY_TOOLS, TOOLS_EXHAUSTED, register_tools
+from aipet.memory.tools import MEMORY_TOOLS, register_tools
+from aipet.tool_gate import MAX_TOOLS_PER_TURN, TOOLS_EXHAUSTED
 
 __all__ = [
     "MAX_TOOLS_PER_TURN",

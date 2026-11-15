@@ -10,6 +10,7 @@ from loguru import logger
 
 from aipet.memory.store import SEARCH_KINDS, Memory
 from aipet.memory.text import STOPWORDS, normalize_text
+from aipet.tool_gate import tool_handler
 
 # --------------------------------------------------------------------------
 # Tools for the model
@@ -35,9 +36,8 @@ MEMORY_INSTRUCTIONS = """
 """
 
 
-MAX_TOOLS_PER_TURN = 4
 MEMORY_TOOLS = {"search_memory", "read_memory", "forget"}
-TOOLS_EXHAUSTED = {"error": "Tu as déjà beaucoup cherché pour ce tour : réponds maintenant avec ce que tu sais."}
+READ_MAX_CHARS = 4000  # of a file read by the model
 
 
 def register_tools(llm, mem: Memory, budget_exhausted: Callable[[], bool] = lambda: False):
@@ -47,29 +47,19 @@ def register_tools(llm, mem: Memory, budget_exhausted: Callable[[], bool] = lamb
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
     from pipecat.adapters.llm.schemas.tools_schema import ToolsSchema
 
-    async def search_memory(params):
-        if budget_exhausted():
-            await params.result_callback(TOOLS_EXHAUSTED)
-            return
-        a = params.arguments
+    async def search_memory(a: dict):
         res = await asyncio.to_thread(mem.search, a.get("query", ""), a.get("kind", "all"))
         logger.info(f"🔎 search_memory({a}) → {len(res)} result(s)")
-        await params.result_callback({"results": res} if res else {"results": [], "note": "rien trouvé"})
+        return {"results": res} if res else {"results": [], "note": "rien trouvé"}
 
-    async def read_memory(params):
-        if budget_exhausted():
-            await params.result_callback(TOOLS_EXHAUSTED)
-            return
-        path = params.arguments.get("path", "")
+    def read_memory(a: dict):
+        path = a.get("path", "")
         txt = mem.read(path)
         logger.info(f"📖 read_memory({path}) → {'ok' if txt else 'not found'}")
-        await params.result_callback({"content": txt[:4000]} if txt else {"error": "fichier introuvable"})
+        return {"content": txt[:READ_MAX_CHARS]} if txt else {"error": "fichier introuvable"}
 
-    async def forget(params):
-        if budget_exhausted():
-            await params.result_callback(TOOLS_EXHAUSTED)
-            return
-        what, who = params.arguments.get("what", ""), params.arguments.get("who")
+    async def forget(a: dict):
+        what, who = a.get("what", ""), a.get("who")
         # Short lock on the files only: never waits for a running condensation.
         res = await asyncio.to_thread(mem.forget, what, who)
         if not res.get("refused"):  # the session logs keep the transcripts too
@@ -88,11 +78,10 @@ def register_tools(llm, mem: Memory, budget_exhausted: Callable[[], bool] = lamb
                 "Rien trouvé avec ces mots exacts. La demande est notée et sera appliquée au "
                 "résumé ; ne dis pas que c'est déjà effacé."
             )
-        await params.result_callback(res)
+        return res
 
-    llm.register_function("forget", forget)
-    llm.register_function("search_memory", search_memory)
-    llm.register_function("read_memory", read_memory)
+    for name, call in (("forget", forget), ("search_memory", search_memory), ("read_memory", read_memory)):
+        llm.register_function(name, tool_handler(call, budget_exhausted))
 
     # Tool descriptions are model-facing (French on purpose).
     return ToolsSchema(

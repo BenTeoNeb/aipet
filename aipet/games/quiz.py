@@ -13,7 +13,6 @@ Stored in the family memory as `jeux/quiz.json` (data; texts are French).
 
 from __future__ import annotations
 
-import asyncio
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -24,14 +23,13 @@ from aipet import engines
 from aipet.games.common import (
     GAMES_DIR,
     PREPARING_NOTE,
-    STALE_PREPARATION,
     UNKNOWN_PLAYER,
     Activity,
     JsonStore,
-    cancel_preparation,
+    adjust_difficulty,
     days_in_a_row,
-    is_stale,
-    new_preparation,
+    level_change,
+    mark_played,
     pet_intro,
     theme_key,
 )
@@ -133,22 +131,14 @@ class QuizStore(JsonStore):
             ratio = game.score / max(len(game.questions), 1)
             diffs = p.setdefault("difficulty", {})
             before = diffs.get(key, game.difficulty)
-            after = (
-                min(5, before + 1)
-                if ratio >= LEVEL_UP_RATIO
-                else max(1, before - 1)
-                if ratio <= LEVEL_DOWN_RATIO
-                else before
-            )
+            after = adjust_difficulty(before, up=ratio >= LEVEL_UP_RATIO, down=ratio <= LEVEL_DOWN_RATIO)
             diffs[key] = after
             previous = p["best"].get(key)
             new_record = previous is None or game.score > previous["score"]
             if new_record:
                 p["best"][key] = {"theme": game.theme, "score": game.score, "total": len(game.questions)}
             p["best_streak"] = max(p.get("best_streak", 0), game.best_streak)
-            day = when.date().isoformat()
-            if day not in p["play_days"]:
-                p["play_days"].append(day)
+            mark_played(p, when.date())
             self.save(data)
             return {
                 "new_record": new_record and previous is not None,
@@ -156,7 +146,7 @@ class QuizStore(JsonStore):
                 "best_streak": p["best_streak"],
                 "days_in_a_row": days_in_a_row(p["play_days"], when.date()),
                 "difficulty": after,
-                "level_change": "up" if after > before else "down" if after < before else None,
+                "level_change": level_change(before, after),
             }
 
     def difficulty(self, player: str, theme: str) -> int:
@@ -252,16 +242,12 @@ class Quiz(Activity):
         player = self.player()
         level = child_level(self.root, player, now().date()) if player != UNKNOWN_PLAYER else None
         difficulty = self.store.difficulty(player, theme)
-        prep = new_preparation(self)
-        try:
-            questions = await asyncio.to_thread(
-                generate_questions, self.cfg, theme, level, self.store.asked(theme), count, difficulty
-            )
-        except Exception as e:
-            logger.warning(f"Quiz preparation failed: {e}")
-            return {"error": "Le quiz n'a pas pu être préparé. Propose un autre jeu ou réessaie plus tard."}
-        if is_stale(self, prep):
-            return STALE_PREPARATION
+        questions, refused = await self.prepare(
+            generate_questions, self.cfg, theme, level, self.store.asked(theme), count, difficulty,
+            failed="Le quiz n'a pas pu être préparé. Propose un autre jeu ou réessaie plus tard.",
+        )  # fmt: skip
+        if refused:
+            return refused
         if len(questions) < 3:
             return {"error": "Pas assez de nouvelles questions sur ce thème : propose un autre thème."}
         self.game = Game(player, theme, level, questions, difficulty=difficulty)
@@ -282,7 +268,7 @@ class Quiz(Activity):
 
     def stop(self):
         """Activity ended, sleep, reset: an unfinished quiz is dropped."""
-        cancel_preparation(self)
+        self.cancel_preparation()
         self.game = None
 
     def answer(self, correct: bool, question_number: int | None = None) -> dict:
@@ -333,25 +319,9 @@ def register_tools(llm, quiz: Quiz) -> list:
     """Register the quiz tools with the LLM; return their FunctionSchema."""
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 
-    async def budget_ok(params) -> bool:
-        if refused := quiz.budget_refused():
-            await params.result_callback(refused)
-            return False
-        return True
-
-    async def history(params):
-        if await budget_ok(params):
-            await params.result_callback(quiz.history())
-
-    async def start(params):
-        if await budget_ok(params):
-            a = params.arguments
-            await params.result_callback(await quiz.start(a.get("theme", ""), a.get("count", DEFAULT_QUESTIONS)))
-
-    async def answer(params):
-        a = params.arguments
-        await params.result_callback(quiz.answer(bool(a.get("correct")), a.get("question_number")))
-
+    history = quiz.tool(lambda a: quiz.history(), budget=True)
+    start = quiz.tool(lambda a: quiz.start(a.get("theme", ""), a.get("count", DEFAULT_QUESTIONS)), budget=True)
+    answer = quiz.tool(lambda a: quiz.answer(bool(a.get("correct")), a.get("question_number")))
     llm.register_function("quiz_history", history)
     llm.register_function("quiz_start", start, cancel_on_interruption=False)  # see PREPARING_NOTE
     llm.register_function("quiz_answer", answer)

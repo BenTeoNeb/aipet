@@ -189,15 +189,8 @@ class GuessGame(Activity):
 def register_tools(llm, game: GuessGame) -> list:
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 
-    async def start(params):
-        if refused := game.budget_refused():
-            await params.result_callback(refused)
-            return
-        await params.result_callback(game.start())
-
-    async def end(params):
-        a = params.arguments
-        await params.result_callback(game.end(bool(a.get("found")), a.get("answer", "")))
+    start = game.tool(lambda a: game.start(), budget=True)
+    end = game.tool(lambda a: game.end(bool(a.get("found")), a.get("answer", "")))
 
     llm.register_function("guess_start", start)
     llm.register_function("guess_end", end)

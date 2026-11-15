@@ -13,7 +13,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import re
 from dataclasses import dataclass
 
@@ -23,14 +22,13 @@ from aipet import engines
 from aipet.games.common import (
     GAMES_DIR,
     PREPARING_NOTE,
-    STALE_PREPARATION,
     UNKNOWN_PLAYER,
     Activity,
     JsonStore,
-    cancel_preparation,
+    adjust_difficulty,
     days_in_a_row,
-    is_stale,
-    new_preparation,
+    level_change,
+    mark_played,
     pet_intro,
 )
 from aipet.memory.cards import child_level
@@ -144,16 +142,12 @@ class YesNoGame(Activity):
         hist = self.history(player)
         level = child_level(self.root, player, now().date()) if player != UNKNOWN_PLAYER else None
         asked = self.store.load().get("asked", [])[-MAX_EXCLUDED:]
-        prep = new_preparation(self)
-        try:
-            questions = await asyncio.to_thread(
-                generate_questions, self.cfg, player, level, hist["difficulty"], asked, QUESTIONS_PREPARED
-            )
-        except Exception as e:
-            logger.warning(f"Ni oui ni non preparation failed: {e}")
-            return {"error": "Le jeu n'a pas pu être préparé. Propose un autre jeu ou réessaie plus tard."}
-        if is_stale(self, prep):
-            return STALE_PREPARATION
+        questions, refused = await self.prepare(
+            generate_questions, self.cfg, player, level, hist["difficulty"], asked, QUESTIONS_PREPARED,
+            failed="Le jeu n'a pas pu être préparé. Propose un autre jeu ou réessaie plus tard.",
+        )  # fmt: skip
+        if refused:
+            return refused
         if len(questions) < 5:
             return {"error": "Pas assez de nouvelles questions : propose un autre jeu."}
         self.round = Round(player, hist["difficulty"], questions)
@@ -210,7 +204,7 @@ class YesNoGame(Activity):
 
     def stop(self):
         """The game ends without a winner or loser (activity ended, sleep…): keep its result."""
-        cancel_preparation(self)
+        self.cancel_preparation()
         if self.round and self.round.held:
             self._finish(lost_on=None, stopped=True)
         self.round = None
@@ -225,13 +219,10 @@ class YesNoGame(Activity):
                                "stopped": stopped, "difficulty": r.difficulty})  # fmt: skip
             p["best"] = max(previous_best, r.held)
             before = p.get("difficulty", START_DIFFICULTY)
-            if r.held >= LEVEL_UP_AT:
-                p["difficulty"] = min(5, before + 1)
-            elif lost_on and r.held < LEVEL_DOWN_BELOW:
-                p["difficulty"] = max(1, before - 1)
-            day = when.date().isoformat()
-            if day not in p["play_days"]:
-                p["play_days"].append(day)
+            p["difficulty"] = adjust_difficulty(
+                before, up=r.held >= LEVEL_UP_AT, down=bool(lost_on) and r.held < LEVEL_DOWN_BELOW
+            )
+            mark_played(p, when.date())
             data["asked"] = (data.get("asked", []) + r.questions[: r.next_index])[-MAX_EXCLUDED:]
             self.store.save(data)
         self.round = None
@@ -241,19 +232,14 @@ class YesNoGame(Activity):
             "new_record": r.held > previous_best and previous_best > 0,
             "best": p["best"],
             "difficulty": after,
-            "level_change": "up" if after > before else "down" if after < before else None,
+            "level_change": level_change(before, after),
         }
 
 
 def register_tools(llm, game: YesNoGame) -> list:
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
 
-    async def start(params):
-        if refused := game.budget_refused():
-            await params.result_callback(refused)
-            return
-        await params.result_callback(await game.start())
-
+    start = game.tool(lambda a: game.start(), budget=True)
     llm.register_function("yesno_start", start, cancel_on_interruption=False)  # see PREPARING_NOTE
     return [
         FunctionSchema(

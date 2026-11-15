@@ -192,7 +192,7 @@ class Conversation(Host):
         return self.last_assistant_text()
 
     def tool_budget_exhausted(self) -> bool:
-        return self.tools.exhausted()
+        return self.tools.count_call()
 
     def refresh_prompt_soon(self):
         if self._worker:
