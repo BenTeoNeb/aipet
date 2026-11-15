@@ -13,7 +13,7 @@ from loguru import logger
 from pipecat.transports.local.audio import LocalAudioTransport, LocalAudioTransportParams
 from pipecat.workers.runner import WorkerRunner
 
-from aipet import env, migrate, session_log
+from aipet import character, env, migrate, session_log
 from aipet.config import load_config
 from aipet.session import Session
 from aipet.wake import WakeWordGate
@@ -78,7 +78,9 @@ async def main(use_wake: bool, input_device: int | None, output_device: int | No
 
     runner = WorkerRunner()
     await runner.add_workers(session.worker)
-    logger.info(f"{a['name']} {'is waiting for its wake word' if use_wake else 'is listening'}… (Ctrl+C to quit)")
+    logger.info(
+        f"{character.of(cfg).name} {'is waiting for its wake word' if use_wake else 'is listening'}… (Ctrl+C to quit)"
+    )
     try:
         await runner.run()
     finally:
