@@ -13,6 +13,8 @@
 from __future__ import annotations
 
 import asyncio
+from abc import ABC, abstractmethod
+from collections.abc import Coroutine
 
 from pipecat.frames.frames import LLMRunFrame
 
@@ -20,24 +22,31 @@ from aipet import session_log
 from aipet.config import config_snapshot, load_config
 from aipet.pipeline import build_worker
 from aipet.prompts import GREETING
+from aipet.tasks import BackgroundTasks
 
 
-class Session:
+class Session(ABC):
     mode = ""
 
     def __init__(self, transport, **build_kwargs):
         self.cfg = load_config()
         self.log = session_log.SessionLog(self.mode)
         self._closed = False
+        self._tasks = BackgroundTasks()
         self.worker, self.context, self.conversation = build_worker(
             transport, session_log=self.log, on_hang_up=self.hang_up, **build_kwargs
         )
 
-    async def hang_up(self, reason: str):
-        raise NotImplementedError
+    @abstractmethod
+    async def hang_up(self, reason: str): ...
+
+    def spawn(self, coro: Coroutine, name: str) -> asyncio.Task:
+        """Run in the background (kept referenced, failures logged)."""
+        return self._tasks.spawn(coro, name)
 
     async def open(self, greet: bool = True, **log_info):
-        self._closed = False
+        if self._closed:  # the wake word fired while shutting down
+            return
         self.log.start(config=config_snapshot(self.cfg), **log_info)
         await self.conversation.on_wake()
         if greet:
@@ -54,7 +63,7 @@ class Session:
             if self.log.path == current:  # not woken up again in the meantime
                 self.log.end("sleep")
 
-        asyncio.get_running_loop().create_task(condense_then_close())
+        self.spawn(condense_then_close(), "condense after sleep")
 
     async def close(self, reason: str, condensation: str = "end of conversation"):
         if self._closed:

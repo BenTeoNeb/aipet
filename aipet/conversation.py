@@ -41,6 +41,7 @@ from aipet.presence import Presence
 from aipet.session_log import NO_LOG
 from aipet.skills import Skills
 from aipet.sleep import SleepState
+from aipet.tasks import BackgroundTasks
 from aipet.tool_gate import ToolGate
 
 PROMPT_REFRESH_MIN = 10  # keep « Maintenant » (the time in the system prompt) current
@@ -132,6 +133,7 @@ class Conversation(Host):
         self.started = now()
         self._prompt_refreshed = now()
         self._llm = self._worker = None
+        self._tasks = BackgroundTasks()
 
     # --- the running pipeline ------------------------------------------------
     def bind(self, llm, worker):
@@ -141,6 +143,9 @@ class Conversation(Host):
     def unbind(self):
         """The session is ending: no more system-prompt refreshes."""
         self._llm = self._worker = None
+        self._tasks.cancel_all()
+        if self.wait:
+            self.wait.cancel()
 
     # --- system prompt -------------------------------------------------------
     def system_prompt(self) -> str:
@@ -191,7 +196,7 @@ class Conversation(Host):
     def refresh_prompt_soon(self):
         if self._worker:
             self._prompt_refreshed = now()
-            asyncio.get_running_loop().create_task(self.refresh_prompt())
+            self._tasks.spawn(self.refresh_prompt(), "refresh prompt")
 
     def confirmed_names(self) -> set[str]:
         """Names a new memory card may be created for: confirmed by a child, or already known."""
@@ -315,6 +320,8 @@ class Conversation(Host):
         """On wake: after a long pause, start from a fresh conversation (everything is already
         condensed) and refresh the date in the system prompt."""
         self.presence.new_conversation()  # « last time we talked », for this session
+        if self.rhythm:  # the school-holiday calendar, off the event loop (network at most weekly)
+            await asyncio.to_thread(self.rhythm.refresh_holidays, now().date())
         self.sleep.woke_up()
         pause = (now() - self.sleep.last_activity).total_seconds() / 60
         if pause > self.forget_after_min:

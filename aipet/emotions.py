@@ -296,8 +296,8 @@ class EmotionTagFilter(FrameProcessor):
                     if self._on_tag:
                         try:
                             await self._on_tag(value)
-                        except Exception as e:
-                            logger.warning(f"Tag {value!r}: {e}")
+                        except Exception:  # a bug in a tag handler must not cut the voice, but must show
+                            logger.exception(f"Tag {value!r} failed")
                     continue
                 if self._muted:
                     continue
@@ -383,5 +383,5 @@ class EmotionEmitter(FrameProcessor):
         if self._on_emotion:
             try:
                 await self._on_emotion(emotion)
-            except Exception as e:  # a broken screen must not cut the voice
-                logger.warning(f"on_emotion failed: {e}")
+            except Exception:  # a broken screen must not cut the voice
+                logger.exception("on_emotion failed")

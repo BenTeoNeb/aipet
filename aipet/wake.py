@@ -27,6 +27,8 @@ from pipecat.frames.frames import (
 )
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
+from aipet.tasks import start
+
 CHUNK = 1280  # 80 ms at 16 kHz, the size openWakeWord expects
 
 
@@ -122,7 +124,7 @@ class WakeWordGate(FrameProcessor):
 
     def _arm_idle(self):
         self._cancel_idle()
-        self._idle_task = asyncio.create_task(self._idle_countdown())
+        self._idle_task = start(self._idle_countdown(), "wake idle countdown")
 
     def _cancel_idle(self):
         if self._idle_task and not self._idle_task.done():
@@ -132,7 +134,7 @@ class WakeWordGate(FrameProcessor):
     def _arm_watchdog(self):
         if self._watchdog and not self._watchdog.done():
             self._watchdog.cancel()
-        self._watchdog = asyncio.create_task(self._watchdog_countdown())
+        self._watchdog = start(self._watchdog_countdown(), "wake watchdog")
 
     async def _watchdog_countdown(self):
         try:

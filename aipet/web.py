@@ -24,6 +24,7 @@ from pipecat.runner.types import RunnerArguments, SmallWebRTCRunnerArguments
 from pipecat.transports.base_transport import TransportParams
 from pipecat.transports.smallwebrtc.transport import SmallWebRTCTransport
 from pipecat.workers.runner import WorkerRunner
+from pydantic import BaseModel
 
 from aipet import character, engines, env, migrate, monitoring, parents, paths, session_log, skills
 from aipet.config import load_config
@@ -34,11 +35,12 @@ from aipet.rhythm import TZ, Rhythm
 from aipet.session import Session
 
 STATIC = Path(__file__).parent / "static"
+HANG_UP_FALLBACK_SECS = 5  # the page closes the call itself; the server does it if the page did not
 
 
 # Our page replaces the runner's default UI (routes declared before main()).
 @app.get("/", include_in_schema=False)
-async def index():
+def index():
     return HTMLResponse(render_index(character.of(load_config())))
 
 
@@ -56,13 +58,15 @@ def render_index(pet) -> str:
 
 
 @app.get("/config.json", include_in_schema=False)
-async def public_config():
+def public_config():
     cfg = load_config()
     return {"name": character.of(cfg).name}
 
 
-# --- Debug: state of the current session (only one at a time) -------------
-SESSION: dict = {}
+# --- Debug: state of the current session ------------------------------------
+# Route handlers that only read files are plain `def`: FastAPI runs them in its thread pool, so a
+# parent browsing the dashboard never blocks the event loop that carries the live audio.
+SESSION: dict = {}  # the latest browser session (context, conversation, started, session)
 
 
 def _jsonable(obj):
@@ -115,6 +119,16 @@ def _guard(x_pet: str | None, origin: str | None):
         raise HTTPException(403, f"origin refused: {origin}")
 
 
+def _session_file(name: str) -> Path:
+    """A session log by its file name (never a path)."""
+    if not re.fullmatch(r"[\w-]+\.jsonl", name):
+        raise HTTPException(400, "invalid name")
+    p = session_log.SESSIONS / name
+    if not p.is_file():
+        raise HTTPException(404, "session not found")
+    return p
+
+
 def _memory():
     from aipet.memory import Memory
 
@@ -124,7 +138,7 @@ def _memory():
 
 
 @app.get("/debug/memory", include_in_schema=False)
-async def debug_memory():
+def debug_memory():
     mem = _memory()
     return {
         "dir": str(mem.root),
@@ -141,23 +155,18 @@ async def debug_memory():
 
 
 @app.get("/debug/memory/search", include_in_schema=False)
-async def debug_memory_search(q: str, kind: str = "all"):
+def debug_memory_search(q: str, kind: str = "all"):
     return _memory().search(q, kind, limit=10)
 
 
 @app.get("/debug/sessions", include_in_schema=False)
-async def debug_sessions():
+def debug_sessions():
     return session_log.list_sessions()
 
 
 @app.get("/debug/sessions/{name}", include_in_schema=False)
-async def debug_session(name: str):
-    if not re.fullmatch(r"[\w-]+\.jsonl", name):
-        raise HTTPException(400, "invalid name")
-    p = session_log.SESSIONS / name
-    if not p.is_file():
-        raise HTTPException(404, "session not found")
-    ev = session_log.read_session(p)
+def debug_session(name: str):
+    ev = session_log.read_session(_session_file(name))
     return {"name": name, "summary": session_log.summarize(ev), "events": ev}
 
 
@@ -225,7 +234,7 @@ async def debug_reset(x_pet: str | None = Header(None), origin: str | None = Hea
 
 # --- Parents' space (/parents) and technical monitoring ---------------------
 @app.get("/parents", include_in_schema=False)
-async def parents_page():
+def parents_page():
     pet = character.of(load_config())
     return HTMLResponse((STATIC / "parents.html").read_text().replace("PET_NAME", html.escape(pet.name)))
 
@@ -240,7 +249,7 @@ def _day(d: str | None):
 
 
 @app.get("/debug/parents/days", include_in_schema=False)
-async def parents_days():
+def parents_days():
     return parents.days_with_sessions()
 
 
@@ -248,35 +257,39 @@ async def parents_days():
 async def parents_day(d: str | None = None):
     cfg = load_config()
     pet = character.of(cfg)
-    digest = parents.day_digest(_day(d), pet)
+    digest = await asyncio.to_thread(parents.day_digest, _day(d), pet)
     energy = _energy(SESSION.get("conversation")).snapshot() if cfg.get("energy", {}).get("enabled", True) else None
     return {**digest, "pet": pet.name, "energy": energy, "asleep": _asleep_outside_session(cfg)}
 
 
 @app.get("/debug/parents/thread/{name}", include_in_schema=False)
-async def parents_thread(name: str):
-    if not re.fullmatch(r"[\w-]+\.jsonl", name):
-        raise HTTPException(400, "invalid name")
-    p = paths.logs_dir() / "sessions" / name
-    if not p.is_file():
-        raise HTTPException(404, "session not found")
-    return {"name": name, "items": parents.thread(session_log.read_session(p), character.of(load_config()))}
+def parents_thread(name: str):
+    events = session_log.read_session(_session_file(name))
+    return {"name": name, "items": parents.thread(events, character.of(load_config()))}
 
 
 @app.get("/debug/parents/review", include_in_schema=False)
-async def parents_review():
+def parents_review():
     return parents.review(_memory().root, character.of(load_config()))
 
 
+class SeenBody(BaseModel):
+    ids: list[str] = []
+
+
+class EditBody(BaseModel):
+    path: str
+    change: dict = {}
+
+
 @app.post("/debug/parents/seen", include_in_schema=False)
-async def parents_seen(request: Request):
-    body = await request.json()
-    parents.mark_seen([str(i) for i in body.get("ids", [])][:500])
+def parents_seen(body: SeenBody):
+    parents.mark_seen(body.ids[:500])
     return {"ok": True}
 
 
 @app.get("/debug/memory/structured", include_in_schema=False)
-async def memory_structured(path: str):
+def memory_structured(path: str):
     try:
         return parents.structured(_memory().root, path)
     except ValueError as e:
@@ -284,10 +297,9 @@ async def memory_structured(path: str):
 
 
 @app.post("/debug/memory/edit", include_in_schema=False)
-async def memory_edit(request: Request):
-    body = await request.json()
+async def memory_edit(body: EditBody):
     try:
-        res = parents.edit(_memory(), str(body.get("path", "")), body.get("change") or {})
+        res = await asyncio.to_thread(parents.edit, _memory(), body.path, body.change)
     except ValueError as e:
         return {"ok": False, "reason": str(e)}
     conversation = SESSION.get("conversation")
@@ -297,18 +309,13 @@ async def memory_edit(request: Request):
 
 
 @app.get("/debug/tech/latency", include_in_schema=False)
-async def tech_latency(days: int = 7):
+def tech_latency(days: int = 7):
     return monitoring.latency_days(min(days, 60))
 
 
 @app.get("/debug/tech/latency/{name}", include_in_schema=False)
-async def tech_latency_session(name: str):
-    if not re.fullmatch(r"[\w-]+\.jsonl", name):
-        raise HTTPException(400, "invalid name")
-    p = paths.logs_dir() / "sessions" / name
-    if not p.is_file():
-        raise HTTPException(404, "session not found")
-    return monitoring.latency(session_log.read_session(p))
+def tech_latency_session(name: str):
+    return monitoring.latency(session_log.read_session(_session_file(name)))
 
 
 @app.get("/debug/tech/costs", include_in_schema=False)
@@ -318,7 +325,7 @@ async def tech_costs(days: int = 30):
 
 
 @app.get("/debug/tech/errors", include_in_schema=False)
-async def tech_errors(days: int = 14):
+def tech_errors(days: int = 14):
     return monitoring.errors(min(days, 60))
 
 
@@ -335,15 +342,16 @@ class WebSession(Session):
         await self.worker.queue_frames([RTVIServerMessageFrame(data={"type": "hang_up", "reason": reason})])
 
         async def fallback():
-            await asyncio.sleep(5)
+            await asyncio.sleep(HANG_UP_FALLBACK_SECS)
             await self.close(f"hung up ({reason})")
 
-        asyncio.get_running_loop().create_task(fallback())
+        self.spawn(fallback(), "hang-up fallback")
 
     async def close(self, reason: str, condensation: str = "end of conversation"):
         if self._closed:
             return
-        SESSION.clear()
+        if SESSION.get("session") is self:  # a newer tab keeps its own debug state
+            SESSION.clear()
         await super().close(reason, condensation)
         await self.worker.cancel()
 
@@ -357,7 +365,10 @@ async def bot(runner_args: RunnerArguments):
         params=TransportParams(audio_in_enabled=True, audio_out_enabled=True),
     )
     session = WebSession(transport, mute_while_speaking=False)
-    SESSION.update(context=session.context, conversation=session.conversation, started=time.time())
+    if SESSION:
+        logger.warning("A second browser session started: the debug panel now follows the new one")
+    SESSION.clear()
+    SESSION.update(session=session, context=session.context, conversation=session.conversation, started=time.time())
 
     @transport.event_handler("on_client_connected")
     async def on_client_connected(transport, client):

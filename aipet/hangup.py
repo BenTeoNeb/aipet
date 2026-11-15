@@ -24,6 +24,7 @@ from pipecat.frames.frames import (
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
 from aipet.session_log import NO_LOG
+from aipet.tasks import start
 
 AFTER_SLEEPY_REPLY_SECS = 1.0
 
@@ -81,5 +82,5 @@ class HangUp(FrameProcessor):
         elif isinstance(frame, BotStoppedSpeakingFrame) and self._reason():
             self._cancel()
             delay = AFTER_SLEEPY_REPLY_SECS if self._asleep_reply else self._after
-            self._task = asyncio.create_task(self._later(delay))
+            self._task = start(self._later(delay), "hang up")
         await self.push_frame(frame, direction)

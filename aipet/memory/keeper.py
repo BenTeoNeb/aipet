@@ -17,6 +17,7 @@ from loguru import logger
 from aipet.memory.condensation import condense, turns_from_messages
 from aipet.memory.store import Memory, now
 from aipet.session_log import NO_LOG
+from aipet.tasks import start
 
 MAX_CONDENSE_FAILURES = 3  # then the raw transcript is kept and the context moves on
 
@@ -68,7 +69,7 @@ class MemoryKeeper:
 
     def arm_pause(self):
         self.cancel_pause()
-        self._timer = asyncio.create_task(self._pause_then_checkpoint())
+        self._timer = start(self._pause_then_checkpoint(), "condense after a pause")
 
     def cancel_pause(self):
         if self._timer and not self._timer.done():
@@ -86,7 +87,7 @@ class MemoryKeeper:
             return
         if self._retry_after and now() < self._retry_after and reason not in ("manual", "sleep", "shutdown"):
             return  # the last condensation failed: back off
-        self._running = asyncio.create_task(self.checkpoint(reason))
+        self._running = start(self.checkpoint(reason), "condensation")
 
     async def checkpoint(self, reason: str = "manual", trim: bool = True) -> list[str]:
         async with self._ck_lock:  # never two condensations of the same chunk at once

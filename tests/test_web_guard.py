@@ -35,3 +35,43 @@ def test_writes_still_guarded(client):
     assert client.post("/debug/reset").status_code == 403
     assert client.post("/config.json").status_code in (404, 405)  # unrelated route untouched
     assert client.get("/config.json").status_code == 200
+
+
+H = {"X-Pet": "1", "Origin": "http://localhost:7860"}
+
+
+def test_bad_bodies_and_names_are_client_errors(client):
+    assert client.post("/debug/parents/seen", json=["not", "a", "dict"], headers=H).status_code == 422
+    assert client.post("/debug/memory/edit", json={"change": {}}, headers=H).status_code == 422
+    assert client.get("/debug/parents/thread/..%2Fx.jsonl", headers=H).status_code in (400, 404)
+    assert client.get("/debug/tech/latency/nope.jsonl", headers=H).status_code == 404
+
+
+def test_closing_an_old_tab_keeps_the_new_tabs_session(tmp_path, monkeypatch):
+    import asyncio
+
+    from pipecat.processors.frame_processor import FrameProcessor
+
+    from aipet import session_log, web
+
+    class Transport:
+        def input(self):
+            return FrameProcessor()
+
+        def output(self):
+            return FrameProcessor()
+
+    monkeypatch.setenv("PET_HOME", str(tmp_path))
+    monkeypatch.setattr(session_log, "SESSIONS", tmp_path / "sessions")
+
+    async def go():
+        old, new = (web.WebSession(Transport(), mute_while_speaking=False) for _ in range(2))
+        for s in (old, new):
+            s.worker.cancel = lambda: asyncio.sleep(0)
+        web.SESSION.update(session=new, conversation=new.conversation)
+        await old.close("browser disconnected")
+        assert web.SESSION["session"] is new
+        await new.close("browser disconnected")
+        assert not web.SESSION
+
+    asyncio.run(go())

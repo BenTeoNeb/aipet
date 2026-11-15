@@ -59,3 +59,29 @@ def test_open_pause_and_close(tmp_path, monkeypatch):
         assert s.conversation._worker is None  # no prompt refresh after the end
 
     asyncio.run(go())
+
+
+def test_background_failures_are_logged_and_closed_sessions_stay_closed(tmp_path, monkeypatch):
+    from loguru import logger
+
+    monkeypatch.setenv("PET_HOME", str(tmp_path))
+    monkeypatch.setattr(session_log, "SESSIONS", tmp_path / "sessions")
+    errors = []
+    sink = logger.add(lambda m: errors.append(m), level="ERROR")
+
+    async def boom():
+        raise RuntimeError("boom")
+
+    async def go():
+        s = FakeSession()
+        s.spawn(boom(), "test task")
+        await asyncio.sleep(0.01)
+        await s.close("shutdown")
+        await s.open(greet=False)  # e.g. the wake word during shutdown
+        assert not s.log.active
+
+    try:
+        asyncio.run(go())
+    finally:
+        logger.remove(sink)
+    assert any("test task" in str(m) and "boom" in str(m) for m in errors)

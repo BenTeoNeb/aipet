@@ -11,7 +11,7 @@ from __future__ import annotations
 import json
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime, time, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -95,15 +95,16 @@ def fetch_holidays(zone: str, since: date) -> list[dict]:
         return json.load(resp).get("results", [])
 
 
-def school_holidays(zone: str, today: date, cache: Path = CACHE) -> list[Holiday]:
-    """Holidays from the local cache, refreshed from the official calendar at most once a week."""
+def school_holidays(zone: str, today: date, cache: Path = CACHE, fetch: bool = True) -> list[Holiday]:
+    """Holidays from the local cache, refreshed from the official calendar at most once a week
+    (`fetch=False`: the cache only, never the network — for the event loop)."""
     data = {}
     try:
         data = json.loads(cache.read_text())
     except (OSError, ValueError):
         pass
     fresh = data.get("zone") == zone and data.get("fetched", "") >= (today - timedelta(days=REFRESH_DAYS)).isoformat()
-    if not fresh:
+    if not fresh and fetch:
         try:
             records = fetch_holidays(zone, today - timedelta(days=30))
             data = {"zone": zone, "fetched": today.isoformat(), "records": records}
@@ -131,6 +132,7 @@ class Rhythm:
     weekend_bedtime: str = "21:30"  # Saturday and Sunday evenings
     weekend_wakeup: str = "08:30"  # Saturday and Sunday mornings
     holidays: list[Holiday] | None = None  # injected (tests) or loaded lazily
+    _holidays_day: date | None = field(default=None, repr=False)  # day the cache was last read
 
     @classmethod
     def from_config(cls, cfg: dict) -> Rhythm:
@@ -138,10 +140,20 @@ class Rhythm:
         keys = ("zone", "wednesday_school", "weekday_bedtime", "weekday_wakeup", "weekend_bedtime", "weekend_wakeup")
         return cls(**{k: str(r[k]) for k in keys if k in r})
 
+    def refresh_holidays(self, today: date) -> None:
+        """Update the calendar cache from the network if it is old (blocking: run it in a thread)."""
+        self.holidays = school_holidays(self.zone, today)
+        self._holidays_day = today
+
     def _holidays(self, today: date) -> list[Holiday]:
-        if self.holidays is None:
-            self.holidays = school_holidays(self.zone, today)
-        return self.holidays
+        """From the cache only (called while building the prompt, on the event loop); read again
+        each day so a long-running pet sees the new calendar."""
+        if self._holidays_day is None and self.holidays is not None:
+            return self.holidays  # injected
+        if self._holidays_day != today:
+            self.holidays = school_holidays(self.zone, today, fetch=False)
+            self._holidays_day = today
+        return self.holidays or []
 
     def holiday_on(self, d: date) -> Holiday | None:
         midnight = datetime.combine(d, time(12), TZ)

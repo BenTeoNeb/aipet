@@ -38,6 +38,7 @@ from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 from pipecat.turns.user_start.base_user_turn_start_strategy import BaseUserTurnStartStrategy
 
 from aipet.session_log import NO_LOG
+from aipet.tasks import start
 
 # Spoken lines (French content): neutral defaults, each character pack has its own ([lines]).
 TOOL_SECOND_FILLER_SECS = 9
@@ -85,7 +86,7 @@ class ShortReplyKeeper(FrameProcessor):
             self._bot_speaking = False
             if self._held:
                 self._cancel()
-                self._task = asyncio.create_task(self._release_later())
+                self._task = start(self._release_later(), "short reply release")
         elif isinstance(frame, UserStartedSpeakingFrame):
             self._user_speaking = True
             self._cancel()
@@ -153,7 +154,7 @@ class SilenceNudge(FrameProcessor):
             if self._nudging:
                 self._nudging = False  # one nudge per silence
             else:
-                self._task = asyncio.create_task(self._nudge_later())
+                self._task = start(self._nudge_later(), "silence nudge")
         elif isinstance(
             frame,
             (BotStartedSpeakingFrame, UserStartedSpeakingFrame, TranscriptionFrame, InterimTranscriptionFrame),
@@ -203,8 +204,10 @@ class ThinkingFiller(FrameProcessor):
 
     def _start(self, tool: bool = False):
         self._cancel()
-        self._task = asyncio.create_task(self._fill_later(tool))
-        self._deadline_task = asyncio.create_task(self._give_up_later(self._tool_deadline if tool else self._deadline))
+        self._task = start(self._fill_later(tool), "thinking filler")
+        self._deadline_task = start(
+            self._give_up_later(self._tool_deadline if tool else self._deadline), "thinking deadline"
+        )
 
     async def _give_up_later(self, deadline: float):
         """Maximum duration of a turn: no text from the model (tool loop, network…) → give up
@@ -310,7 +313,7 @@ class UnfinishedSentenceWait:
         logger.info(f"⏸️  [attends]: the child has not finished, waiting {self.delay:.1f} s")
         self._ev("wait", in_a_row=self._in_a_row, delay_s=self.delay)
         self._cancel()
-        self._task = asyncio.create_task(self._later())
+        self._task = start(self._later(), "unfinished sentence wait")
 
     async def _later(self):
         try:
