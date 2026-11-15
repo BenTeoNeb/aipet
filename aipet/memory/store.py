@@ -73,6 +73,8 @@ from aipet.memory.updates import plan_update
 from aipet.timefmt import MONTHS_FR, TZ, WEEKDAYS_FR, now, spoken_date  # noqa: F401
 
 NOTES_FILE, NOTES_IN_PROGRESS = "a_trier.md", "a_trier.en-cours.md"
+DELETED_CARDS_FILE = "fiches_supprimees.json"  # names whose card a parent deleted
+FORGET_NOTE = "DEMANDE D'OUBLI"
 # A forget request also cleans what is not on disk yet (the conversation waiting to be condensed);
 # conversations are condensed well within this delay.
 FORGET_PENDING_SECS = 6 * 3600
@@ -211,7 +213,7 @@ class Memory:
         """Keyword search: accent-insensitive, stopwords ignored; short words match whole
         (« chat » does not find « château »), long words by their prefix; YYYY-MM-DD dates;
         recent memories ranked higher. Returns [{"file", "excerpt"}]."""
-        folder = SEARCH_KINDS[kind] if kind in SEARCH_KINDS else kind  # tolerate a raw directory name
+        folder = SEARCH_KINDS.get(kind)  # an unknown kind searches everything allowed
         q = normalize_text(query)
         dates = re.findall(r"\d{4}-\d{2}-\d{2}", q)
         q = re.sub(r"\d{4}-\d{2}-\d{2}", " ", q)
@@ -227,7 +229,7 @@ class Memory:
 
         pats = [pattern(t) for t in terms]
         hits = []
-        for p in self.files():
+        for p in self.readable():  # never the pending notes: they quote forget requests
             rel = self._rel(p)
             if folder and not rel.startswith(folder):
                 continue
@@ -310,11 +312,12 @@ class Memory:
                 n = sum(len(v) for v in sec.values()) - sum(len(v) for v in new.values())
                 if n:
                     changed(p, render_card(meta, new), n)
-            if req.broad:
+            everywhere = req.everywhere
+            if req.broad or req.who:
                 life = self.root / LIFE_FILE
                 if life.exists():
                     sections = parse_life(life.read_text(encoding="utf-8"))
-                    new = {k: [c for c in v if not req.contains_all(c)] for k, v in sections.items()}
+                    new = {k: [c for c in v if not everywhere(c)] for k, v in sections.items()}
                     n = sum(map(len, sections.values())) - sum(map(len, new.values()))
                     if n:
                         changed(life, render_life(new, self.pet_name), n)
@@ -326,7 +329,7 @@ class Memory:
                 if summary.exists():
                     texts.append(summary)
                 for p in texts:
-                    text, n = scrub_sentences(p.read_text(encoding="utf-8"), req.contains_all)
+                    text, n = scrub_sentences(p.read_text(encoding="utf-8"), everywhere)
                     if n:
                         changed(p, text, n)
                 # Game records and the story universe (guessed answers, quiz questions, characters).
@@ -338,20 +341,25 @@ class Memory:
                         data = load_json(p, None)
                         if data is None:
                             continue
-                        cleaned = scrub_value(data, req.contains_all)
+                        cleaned = scrub_value(data, everywhere)
                         if cleaned != data:
                             atomic_write_json(p, cleaned)
                             res["removed_items"] += 1
                             res["files"].append(self._rel(p))
             with open(self.root / NOTES_FILE, "a", encoding="utf-8") as f:  # the condensation cleans the summary too
                 f.write(
-                    f"- {now():%Y-%m-%d %H:%M} : DEMANDE D'OUBLI{f' (concerne {req.who})' if req.who else ''} "
+                    f"- {now():%Y-%m-%d %H:%M} : {FORGET_NOTE}{f' (concerne {req.who})' if req.who else ''} "
                     f"→ effacer du résumé : {req.what}\n"
                 )
-            res["removed_items"] += self._scrub_transcripts(req.matches)
+            res["removed_items"] += self._scrub_transcripts(lambda t: req.matches(t) or everywhere(t))
             if res["removed_items"]:
                 self.wipe_history()  # git would otherwise keep the forgotten text in older versions
             return res
+
+    def recently_forgotten(self):
+        """Matcher for what recent forget requests removed (None if there are none)."""
+        self._forgotten = [r for r in self._forgotten if time.monotonic() - r.at < FORGET_PENDING_SECS]
+        return self._pending_match() if self._forgotten else None
 
     def _pending_match(self, owner: str = ""):
         """Matches text that a recent forget request removed (for what was not on disk yet)."""
@@ -390,9 +398,32 @@ class Memory:
         if ".git" in p.relative_to(root).parts or p.name in (SUMMARY_FILE, ".gitignore"):
             return False
         with self._files_lock:
+            if p.parent == root / DIR_FAMILY:  # not re-created by the next condensation
+                name = parse_card(p.read_text(encoding="utf-8"))[0].get("prenom", p.stem)
+                self._block_card(name)
             p.unlink()
             self.wipe_history("Memory (history cleared after a parent deleted a file)")
         return True
+
+    def blocked_cards(self) -> set[str]:
+        """Names whose card a parent deleted: the condensation never re-creates them by itself."""
+        return set(load_json(self.root / DELETED_CARDS_FILE, []))
+
+    def _block_card(self, name: str) -> None:
+        names = self.blocked_cards() | {normalize_text(name)}
+        atomic_write_json(self.root / DELETED_CARDS_FILE, sorted(names))
+
+    def forget_pending(self, text: str, who: str | None = None) -> None:
+        """A parent removed `text`: also keep it out of what is still pending (a condensation
+        running, the conversation not condensed yet), like a forget request said out loud."""
+        req = ForgetRequest.parse(text, who)
+        if req.words:
+            with self._files_lock:
+                self._forgotten.append(req)
+
+    def summary_text(self) -> str:
+        p = self.root / SUMMARY_FILE
+        return p.read_text(encoding="utf-8") if p.exists() else ""
 
     def wipe_history(self, message: str = "Memory (history cleared after a forget request)"):
         """Forget for real: start the memory's git history again from the current files."""
@@ -420,15 +451,27 @@ class Memory:
                         f.write(json.dumps(t, ensure_ascii=False) + "\n")
         return p
 
-    def apply(self, update: dict, when: datetime, allowed_new_names: set[str] | None = None) -> list[str]:
+    def apply(
+        self,
+        update: dict,
+        when: datetime,
+        allowed_new_names: set[str] | None = None,
+        summary_before: str | None = None,
+    ) -> list[str]:
         """Apply the structured updates produced by the model (see SCHEMA).
         Everything is computed first, then written at once: an error midway writes nothing
-        (no duplicated memory when the condensation is retried)."""
+        (no duplicated memory when the condensation is retried). `summary_before`: the summary the
+        model was shown; if a parent rewrote it meanwhile, the parent's version wins."""
         with self._files_lock:  # cleaned of anything forgotten while the model was writing it
+            if summary_before is not None and self.summary_text() != summary_before:
+                logger.info("Summary changed during the condensation (a parent's correction): kept")
+                update = {k: v for k, v in update.items() if k != "pet_summary"}
             return self._apply(self._scrub_update(update), when, allowed_new_names)
 
     def _apply(self, update: dict, when: datetime, allowed_new_names: set[str] | None = None) -> list[str]:
-        planned = plan_update(self.root, self.pet_name, self._summary_title(), update, when, allowed_new_names)
+        planned = plan_update(
+            self.root, self.pet_name, self._summary_title(), update, when, allowed_new_names, self.blocked_cards()
+        )
         for p, content in planned.files.items():  # atomic write, file by file
             if content is None:
                 p.unlink(missing_ok=True)

@@ -71,11 +71,12 @@ def plan_update(
     update: dict,
     when: datetime,
     allowed_new_names: set[str] | None = None,
+    blocked_names: set[str] = frozenset(),  # type: ignore[assignment]
 ) -> PendingWrites:
     w = PendingWrites(root)
     _memory_entry(w, update.get("memory") or {}, when)
     for person in update.get("people") or []:
-        _person(w, person, when, allowed_new_names)
+        _person(w, person, when, allowed_new_names, blocked_names)
     _history(w, update.get("memory") or {}, when)
     for story in update.get("stories") or []:
         _story(w, story, when)
@@ -101,13 +102,22 @@ def _memory_entry(w: PendingWrites, mem: dict, when: datetime):
     )
 
 
-def _person(w: PendingWrites, person: dict, when: datetime, allowed_new_names: set[str] | None):
+def _person(
+    w: PendingWrites,
+    person: dict,
+    when: datetime,
+    allowed_new_names: set[str] | None,
+    blocked_names: set[str] = frozenset(),  # type: ignore[assignment]
+):
     """What was learned about someone, on their card."""
     name = (person.get("name") or "").strip()
     if not name or normalize_text(name) in GENERIC_NAMES:
         return
     p = w.root / DIR_FAMILY / f"{slug(name)}.md"
     txt = w.current(p)
+    if txt is None and normalize_text(name) in blocked_names:
+        logger.info("Card not re-created: a parent deleted it")
+        return
     if (
         txt is None
         and allowed_new_names is not None

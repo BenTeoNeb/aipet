@@ -134,7 +134,9 @@ def _register_tools(llm, mem: Memory, conversation: Conversation) -> None:
     base_tools = MEMORY_TOOLS | skills.SKILL_TOOLS
     tools = ToolsSchema(
         standard_tools=[
-            *register_tools(llm, mem, conversation.tool_budget_exhausted).standard_tools,
+            *register_tools(
+                llm, mem, conversation.tool_budget_exhausted, conversation.forget_in_context
+            ).standard_tools,
             *skills.register_tools(llm, conversation),
             *(schema for game in conversation.games for schema in game.register_tools(llm)),
         ]

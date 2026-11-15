@@ -29,6 +29,7 @@ from pydantic import BaseModel
 from aipet import character, engines, env, migrate, monitoring, parents, paths, session_log, skills
 from aipet.config import load_config
 from aipet.energy import Energy
+from aipet.memory.forget import ForgetRequest
 from aipet.prompts import build_system_prompt
 from aipet.rhythm import TZ, Rhythm
 from aipet.session import Session
@@ -179,6 +180,9 @@ async def debug_memory_delete(path: str):
     """Parental control: delete a memory file."""
     if not await asyncio.to_thread(_memory().delete, path):
         return {"ok": False, "reason": "file cannot be deleted"}
+    conversation = SESSION.get("conversation")
+    if conversation:  # the running pet forgets it right away (its system prompt held the file)
+        await conversation.refresh_prompt()
     return {"ok": True}
 
 
@@ -303,8 +307,13 @@ async def memory_edit(body: EditBody):
         res = await asyncio.to_thread(parents.edit, _memory(), body.path, body.change)
     except ValueError as e:
         return {"ok": False, "reason": str(e)}
+    gone = res.pop("gone", None)
     conversation = SESSION.get("conversation")
     if conversation:  # the running pet sees the correction right away
+        if gone:
+            req = ForgetRequest.parse(gone)
+            if req.words:
+                conversation.scrub_context(req.contains_all)
         await conversation.refresh_prompt()
     return res
 

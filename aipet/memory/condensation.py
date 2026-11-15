@@ -8,7 +8,7 @@ from datetime import datetime
 from loguru import logger
 
 from aipet.memory.cards import SUMMARY_MAX
-from aipet.memory.store import Memory
+from aipet.memory.store import FORGET_NOTE, Memory
 from aipet.timefmt import now, spoken_date
 
 # --------------------------------------------------------------------------
@@ -210,6 +210,7 @@ async def condense(
     async with mem._lock:
         # Notes taken during the model call go to a new a_trier.md: only these ones are processed.
         notes = await asyncio.to_thread(mem.take_notes) or "(aucune)"
+        summary_before = await asyncio.to_thread(mem.summary_text)
         prompt = (
             f"# Ce que {pet_name} sait déjà\n{mem.context_block(full_stories=True)}\n\n"
             f"# Notes prises pendant la conversation\n{notes}\n\n"
@@ -218,9 +219,11 @@ async def condense(
         t0 = now()
         # On failure (network, timeout), notes stay in a_trier.en-cours.md for next time.
         update = await asyncio.wait_for(asyncio.to_thread(_call_llm, cfg, prompt), timeout)
-        changed = await asyncio.to_thread(mem.apply, update, started, allowed_new_names)
+        changed = await asyncio.to_thread(mem.apply, update, started, allowed_new_names, summary_before)
         await asyncio.to_thread(mem.save_transcript, started, turns)
         await asyncio.to_thread(mem.notes_done)
+        if FORGET_NOTE in notes:  # the summary was cleaned only now: older versions must go too
+            await asyncio.to_thread(mem.wipe_history)
         try:
             await asyncio.to_thread(mem.purge_transcripts, cfg.get("memory", {}).get("keep_transcripts_days", 30))
         except OSError as e:  # never a reason to condense the same chunk again

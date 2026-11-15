@@ -48,6 +48,23 @@ class ForgetRequest:
     def matches(self, text: str) -> bool:
         return self.contains_all(text) if self.broad else self.in_phrase(text)
 
+    def everywhere(self, text: str) -> bool:
+        """Sentences removed outside the person's card: every important word (two or more), or,
+        for a request about someone, their word(s) together with that person's name."""
+        if self.broad:
+            return self.contains_all(text)
+        if not self.who:
+            return False
+        name = normalize_text(self.who)
+        return self.contains_all(text) and bool(re.search(r"\b" + re.escape(name) + r"\b", normalize_text(text)))
+
+    @property
+    def log_words(self) -> list[str]:
+        """Words a log line must all contain to be removed (the name too for a one-word request)."""
+        if self.broad or not self.who:
+            return list(self.words)
+        return [*self.words, *re.findall(r"\w+", normalize_text(self.who))]
+
     def about(self, name: str) -> bool:
         return self.who is not None and slug(self.who) == slug(name)
 

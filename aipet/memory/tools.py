@@ -3,13 +3,12 @@
 from __future__ import annotations
 
 import asyncio
-import re
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 
 from loguru import logger
 
+from aipet.memory.forget import ForgetRequest
 from aipet.memory.store import SEARCH_KINDS, Memory
-from aipet.memory.text import STOPWORDS, normalize_text
 from aipet.tool_gate import tool_handler
 
 # --------------------------------------------------------------------------
@@ -40,9 +39,16 @@ MEMORY_TOOLS = {"search_memory", "read_memory", "forget"}
 READ_MAX_CHARS = 4000  # of a file read by the model
 
 
-def register_tools(llm, mem: Memory, budget_exhausted: Callable[[], bool] = lambda: False):
+def register_tools(
+    llm,
+    mem: Memory,
+    budget_exhausted: Callable[[], bool] = lambda: False,
+    on_forget: Callable[[Callable[[str], bool]], Awaitable[None]] | None = None,
+):
     """Register the memory tools with the LLM; returns the ToolsSchema for the context.
-    `budget_exhausted` counts each call against the per-turn tool budget (tool_gate.ToolGate)."""
+    `budget_exhausted` counts each call against the per-turn tool budget (tool_gate.ToolGate).
+    `on_forget(match)`: the running conversation drops what was just forgotten (its context and
+    system prompt still hold it)."""
 
     from pipecat.adapters.llm.schemas.function_schema import FunctionSchema
     from pipecat.adapters.llm.schemas.tools_schema import ToolsSchema
@@ -62,10 +68,13 @@ def register_tools(llm, mem: Memory, budget_exhausted: Callable[[], bool] = lamb
         what, who = a.get("what", ""), a.get("who")
         # Short lock on the files only: never waits for a running condensation.
         res = await asyncio.to_thread(mem.forget, what, who)
-        if not res.get("refused"):  # the session logs keep the transcripts too
-            from aipet import session_log
+        if not res.get("refused"):
+            req = ForgetRequest.parse(what, who)
+            if on_forget:  # first: the next model call (and its debug log) must not carry it again
+                await on_forget(lambda t: req.matches(t) or req.everywhere(t))
+            from aipet import session_log  # the session logs keep the transcripts too
 
-            words = [w for w in re.findall(r"\w+", normalize_text(what)) if w not in STOPWORDS and len(w) > 2]
+            words = req.log_words
             if len(words) >= 2:
                 res["log_lines_removed"] = await asyncio.to_thread(session_log.scrub, words)
         # Never the forgotten words themselves: they would land in aipet.log right after being scrubbed.

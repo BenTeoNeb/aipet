@@ -71,9 +71,16 @@ def setup_file_logging(keep_days: int = 14):
         rotation="10 MB",
         retention=f"{keep_days} days",
         level="DEBUG",
+        # Pipecat's debug lines copy what was said (system prompt with the memory, TTS text, context
+        # frames): kept out of the file, where a forget request could not reach the next ones.
+        filter=_file_filter,
         enqueue=True,
         encoding="utf-8",
     )
+
+
+def _file_filter(record) -> bool:
+    return record["level"].no >= logger.level("INFO").no or not (record["name"] or "").startswith("pipecat")
 
 
 def scrub(words: list[str]) -> int:

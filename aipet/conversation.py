@@ -32,6 +32,7 @@ from pipecat.processors.frame_processor import FrameProcessor
 
 from aipet import character, school
 from aipet.games.common import Activity, Host
+from aipet.memory.forget import scrub_value
 from aipet.memory.keeper import MemoryKeeper
 from aipet.memory.life_moments import LifeMoments
 from aipet.memory.speakers import Speakers, speaker_instructions
@@ -177,6 +178,44 @@ class Conversation(Host):
         delta = type(self._llm).Settings(system_instruction=self.system_prompt())
         await self._worker.queue_frames([LLMUpdateSettingsFrame(delta=delta)])
 
+    # --- forgetting ----------------------------------------------------------
+    async def forget_in_context(self, match) -> None:
+        """Something was just forgotten (said out loud, or removed by a parent): the conversation
+        in progress must not keep it either (the model would repeat it, and every call would send
+        it to the cloud again). The system prompt is rebuilt from the cleaned memory."""
+        self.scrub_context(match)
+        await self.refresh_prompt()
+
+    def scrub_context(self, match, skip: dict | None = None) -> int:
+        """Remove the matching sentences from the context; a `forget` call's arguments never stay
+        (they quote what was forgotten). `skip`: a message left as is (the child's new one).
+        Returns the number of messages changed."""
+        changed = 0
+        messages = self.context.get_messages()
+        for m in messages:
+            if not isinstance(m, dict) or m is skip:
+                continue
+            for call in m.get("tool_calls") or []:
+                fn = call.get("function") if isinstance(call, dict) else None
+                if isinstance(fn, dict) and fn.get("name") == "forget" and fn.get("arguments") != "{}":
+                    fn["arguments"] = "{}"
+                    changed += 1
+            if m.get("role") not in ("user", "assistant"):
+                continue
+            c = m.get("content")
+            if isinstance(c, str) and match(c):
+                m["content"] = scrub_value(c, match) or "(effacé à la demande)"
+                changed += 1
+            elif isinstance(c, list):
+                for part in c:
+                    if isinstance(part, dict) and isinstance(part.get("text"), str) and match(part["text"]):
+                        part["text"] = scrub_value(part["text"], match) or "(effacé à la demande)"
+                        changed += 1
+        if changed:
+            self.context.set_messages(messages)
+            logger.info(f"🧽 Forgotten text removed from {changed} message(s) of the conversation")
+        return changed
+
     # --- Host (what the games may use) ---------------------------------------
     @property
     def rhythm(self) -> Rhythm | None:
@@ -246,6 +285,9 @@ class Conversation(Host):
         )
         if m is None:
             return
+        forgotten = self.mem.recently_forgotten()
+        if forgotten:  # a forget call racing its own message into the context: cleaned now
+            self.scrub_context(forgotten, skip=m)
         raw = _text(m)
         new = not raw.startswith(LABEL_START)
         if new:  # look for a name before labelling

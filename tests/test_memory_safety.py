@@ -130,3 +130,122 @@ def test_forget_reaches_game_records(tmp_path):
     mem.forget("le chien de mamie Rose")
     left = (games / "devine.json").read_text() + (mem.root / "histoires" / "univers.json").read_text()
     assert "mamie" not in left and "rigolo" in left and '"found": true' in left
+
+
+def test_search_never_finds_pending_forget_notes(tmp_path):
+    mem = Memory(tmp_path, "Flocon")
+    mem.forget("le cadeau de maman")
+    assert "cadeau" in (mem.root / store.NOTES_FILE).read_text()  # quoted for the condensation…
+    assert mem.search("cadeau maman") == []  # …but never found by the pet
+    assert mem.search("cadeau maman", kind="../") == []  # an unknown kind cannot widen the search
+
+
+def test_a_one_word_forget_about_someone_reaches_their_memories(tmp_path):
+    mem = Memory(tmp_path, "Flocon")
+    (mem.root / "famille" / "lea.md").write_text("---\nprenom: Léa\n---\n# Léa\n\n## Faits\n- le divorce\n")
+    (mem.root / "souvenirs" / "2026-11-10.md").write_text(
+        "# Mardi\n\n## 18h00\nLéa parle du divorce. Noam a vu un divorce au cinéma. Léa aime le piano.\n"
+    )
+    mem.forget("divorce", who="Léa")
+    day = (mem.root / "souvenirs" / "2026-11-10.md").read_text()
+    assert "Léa parle du divorce" not in day
+    assert "Noam a vu un divorce au cinéma." in day and "Léa aime le piano." in day  # other sentences kept
+    assert "divorce" not in (mem.root / "famille" / "lea.md").read_text()
+    assert store.ForgetRequest.parse("divorce", "Léa").log_words == ["divorce", "lea"]
+
+
+def test_any_parent_correction_leaves_no_old_version_in_git(tmp_path):
+    mem = Memory(tmp_path, "Flocon")
+    card = mem.root / "famille" / "noam.md"
+    card.write_text("---\nprenom: Noam\n---\n# Noam\n\n## Faits\n- confidence : a peur du noir\n")
+    (mem.root / store.SUMMARY_FILE).write_text("# Résumé\n\nNoam fait des cauchemars.\n")
+    mem._commit("card")
+    parents.edit(mem, "famille/noam.md", {"section": "Faits", "index": 0,
+                                          "expected": "confidence : a peur du noir", "text": "aime les veilleuses"})  # fmt: skip
+    assert "peur" not in git_log(mem)
+    parents.edit(mem, store.SUMMARY_FILE, {"text": "# Résumé\n\nNoam aime les veilleuses."})
+    assert "cauchemars" not in git_log(mem)
+
+
+def test_a_parent_correction_during_a_condensation_wins(tmp_path, monkeypatch):
+    mem = Memory(tmp_path, "Flocon")
+    card = mem.root / "famille" / "noam.md"
+    card.write_text("---\nprenom: Noam\n---\n# Noam\n\n## Faits\n- a peur du noir\n")
+
+    def model_answers_after_the_parent(cfg, prompt):
+        parents.edit(mem, "famille/noam.md", {"section": "Faits", "index": 0, "expected": "a peur du noir", "text": ""})
+        parents.edit(mem, store.SUMMARY_FILE, {"text": "# Résumé\n\nNoam aime le foot."})
+        return update(
+            people=[{"name": "Noam", "likes": [], "dislikes": [], "facts": ["a peur du noir"], "remove": []}],
+            pet_summary="Noam a peur du noir.",
+        )
+
+    monkeypatch.setattr(condensation, "_call_llm", model_answers_after_the_parent)
+    turns = [{"role": "user", "text": "J'ai peur du noir."}]
+    asyncio.run(condensation.condense(mem, {"memory": {}}, turns, memory_now()))
+    assert "peur" not in card.read_text()
+    assert mem.summary_text() == "# Résumé\n\nNoam aime le foot.\n"
+
+
+def test_a_card_deleted_by_a_parent_is_not_recreated(tmp_path):
+    mem = Memory(tmp_path, "Flocon")
+    (mem.root / "famille" / "noam.md").write_text("---\nprenom: Noam\n---\n# Noam\n\n## Aime\n- le foot\n")
+    assert mem.delete("famille/noam.md")
+    person = {"name": "Noam", "likes": ["le foot"], "dislikes": [], "facts": [], "remove": []}
+    mem.apply(update(people=[person]), memory_now(), allowed_new_names={"Noam"})
+    assert not (mem.root / "famille" / "noam.md").exists()
+
+
+def test_parent_edit_checks_the_real_path(tmp_path):
+    mem = Memory(tmp_path, "Flocon")
+    (mem.root / store.LIFE_FILE).write_text(store.render_life({store.LIFE_JOKES: ["avec Mila : les chaussettes"]}))
+    parents.edit(mem, "famille/../MA_VIE.md", {"section": store.LIFE_JOKES, "index": 0,
+                                               "expected": "avec Mila : les chaussettes", "text": ""})  # fmt: skip
+    assert "prenom:" not in (mem.root / store.LIFE_FILE).read_text()  # still the life format, not a card
+
+
+def test_forget_reaches_the_conversation_in_progress(tmp_path):
+    from pipecat.processors.aggregators.llm_context import LLMContext
+
+    from aipet.conversation import Conversation
+    from aipet.memory.tools import register_tools
+
+    mem = Memory(tmp_path, "Flocon")
+    ctx = LLMContext()
+    k = Conversation(mem, {"memory": {}}, ctx, "BASE")
+    ctx.set_messages([
+        {"role": "user", "content": "Le cadeau de maman est un vélo. J'aime les crêpes."},
+        {"role": "assistant", "content": "Super !", "tool_calls": [
+            {"id": "1", "type": "function", "function": {"name": "forget", "arguments": '{"what": "cadeau maman"}'}}]},
+    ])  # fmt: skip
+
+    class Llm:
+        def register_function(self, name, fn):
+            setattr(self, name, fn)
+
+    llm = Llm()
+    register_tools(llm, mem, on_forget=k.forget_in_context)
+
+    class Params:
+        arguments = {"what": "le cadeau de maman"}
+        result = None
+
+        async def result_callback(self, res, properties=None):
+            self.result = res
+
+    asyncio.run(llm.forget(Params()))
+    text = json.dumps(ctx.get_messages(), ensure_ascii=False)
+    assert "cadeau" not in text and "crêpes" in text
+
+
+def test_pipecat_debug_lines_stay_out_of_the_log_file():
+    from loguru import logger
+
+    from aipet.session_log import _file_filter
+
+    def rec(name, level):
+        return {"name": name, "level": logger.level(level)}
+
+    assert not _file_filter(rec("pipecat.services.openai.base_llm", "DEBUG"))
+    assert _file_filter(rec("pipecat.services.llm_service", "WARNING"))
+    assert _file_filter(rec("aipet.turns", "DEBUG"))

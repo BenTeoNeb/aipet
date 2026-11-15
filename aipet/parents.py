@@ -312,6 +312,7 @@ def safe_path(root: Path, rel: str) -> Path:
 def structured(root: Path, rel: str) -> dict:
     """A memory file as data the page can edit item by item."""
     p = safe_path(root, rel)
+    rel = p.relative_to(root.resolve()).as_posix()  # « famille/../MA_VIE.md » is MA_VIE.md
     if rel in EDITABLE_JSON:
         return {"kind": EDITABLE_JSON[rel], "path": rel, "data": json.loads(p.read_text())}
     if p.suffix == ".md" and (rel.startswith(DIR_FAMILY + "/") or rel == LIFE_FILE):
@@ -331,13 +332,13 @@ def edit(mem: Memory, rel: str, change: dict) -> dict:
     """
     root = mem.root
     p = safe_path(root, rel)
-    removed = False  # an item deleted: the git history must not keep it either
+    rel = p.relative_to(root.resolve()).as_posix()  # checks on the real path, not on « a/../b »
+    gone: str | None = None  # text a parent removed or rewrote: out of the running conversation too
     with mem._files_lock, lock_for(p):  # the games lock their JSON file the same way
         if rel in EDITABLE_JSON:
             data = json.loads(p.read_text(encoding="utf-8"))
             what = _edit_json(EDITABLE_JSON[rel], data, change)
             atomic_write_json(p, data)
-            removed = bool(change.get("delete"))
         elif p.suffix == ".md" and (rel.startswith(DIR_FAMILY + "/") or rel == LIFE_FILE):
             meta, sections = parse_card(p.read_text())
             items = sections.get(str(change.get("section", "")), [])
@@ -346,11 +347,13 @@ def edit(mem: Memory, rel: str, change: dict) -> dict:
                 raise ValueError("la fiche a changé entre-temps : recharge la page")
             new = (change.get("text") or "").strip()
             what = f"« {items[i]} » → « {new} »" if new else f"« {items[i]} » retiré"
+            gone = items[i]
+            # A condensation running now must not write it back.
+            mem.forget_pending(gone, None if rel == LIFE_FILE else meta.get("prenom", p.stem))
             if new:
                 items[i] = new
             else:
                 items.pop(i)
-            removed = not new
             if rel == LIFE_FILE:
                 atomic_write_text(p, render_life(sections, mem.pet_name))
             else:
@@ -360,11 +363,13 @@ def edit(mem: Memory, rel: str, change: dict) -> dict:
             what = "résumé réécrit"
         else:
             raise ValueError("ce fichier ne se corrige pas ici")
-        if removed:  # a deleted confidence must not stay readable, not even in the commit message
-            mem.wipe_history(f"Correction par un parent ({rel}) : élément retiré, anciennes versions effacées")
-        else:
-            mem._commit(f"Correction par un parent ({rel}) : {what}"[:300])
-    return {"ok": True, "change": what}
+        # Removed or rewritten, the old text must not stay readable: not in older versions, not in
+        # the commit message.
+        mem.wipe_history(f"Correction par un parent ({rel}), anciennes versions effacées")
+    res: dict = {"ok": True, "change": what}
+    if gone:
+        res["gone"] = gone
+    return res
 
 
 def _edit_json(kind: str, data: dict, c: dict) -> str:
