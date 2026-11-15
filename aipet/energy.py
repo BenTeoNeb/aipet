@@ -128,6 +128,16 @@ class Energy:
         self._check_state()
         self._save()
 
+    def nap(self):
+        """The pet said goodbye to go and nap (tired, not empty yet): it really sleeps, at least
+        until it recharges from VERY_TIRED to its wake-up level."""
+        if self._asleep:
+            return
+        self._level = min(self.level(), VERY_TIRED)
+        self._asleep, self._last_activity = True, self.clock()
+        self._log("fell_asleep", why="said goodbye")
+        self._save()
+
     def protect(self):
         """A sad or comforting moment: postpone the nap."""
         self._protect_until = self.clock() + PROTECT_SECS

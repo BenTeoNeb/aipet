@@ -89,9 +89,14 @@ class SleepState:
         self.closing = False
 
     def goodbye(self):
-        logger.info("👋 The child closes the conversation: the pet will hang up")
+        """[fin]: the pet closes the conversation and hangs up after its last words. If it was tired,
+        the nap it announced is real: a « d'accord » or a quick reconnect gets a sleepy reply, not
+        the whole conversation again."""
+        logger.info("👋 The pet closes the conversation: it will hang up")
         self.closing = True
         self.slog.event("goodbye")
+        if self.energy and self.energy.state() in ("tired", "very_tired"):
+            self.energy.nap()
 
     def goodnight(self, text: str) -> str | None:
         """« Non non, dodo là »: the instruction for the pet (French), or None. Near bedtime the pet
@@ -124,12 +129,13 @@ class SleepState:
             state = self.energy.state()
             if state == "tired":
                 hints.append(
-                    f"tu commences à être {g('fatigué', 'fatiguée')} : dis-le avec des mots (« Ouaaah… »), jamais « *bâille* », et propose des choses calmes"
+                    f"tu commences à être {g('fatigué', 'fatiguée')} : dis-le avec des mots (« Ouaaah… »), jamais « *bâille* », "
+                    "et propose des choses calmes ; si tu pars faire ta sieste, dis au revoir avec [fin]"
                 )
             elif state == "very_tired":
                 hints.append(
                     f"tu es très {g('fatigué', 'fatiguée')} : termine en une ou deux phrases, puis dis au revoir joyeusement pour aller "
-                    "faire ta sieste (sauf si l'enfant a de la peine : reste avec lui)"
+                    "faire ta sieste, avec [fin] (sauf si l'enfant a de la peine : reste avec lui)"
                 )
         if self.rhythm:
             t = now()

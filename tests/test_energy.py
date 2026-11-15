@@ -212,3 +212,34 @@ def test_a_long_story_drains_instead_of_recharging():
     c.t += 240
     e.activity(continuous=True)  # …and stops 4 minutes later
     assert e.level() < before - 0.15  # 4 of 20 minutes spent
+
+
+def test_a_tired_pet_saying_goodbye_really_naps(tmp_path):
+    """Seen in a real session: tired, the pet said « c'est l'heure de ma sieste, file jouer » but
+    kept the conversation open, and answered the child's « d'accord ? » as if nothing happened."""
+    from pipecat.processors.aggregators.llm_context import LLMContext as Ctx
+
+    from aipet.memory import Memory
+
+    c = Clock()
+    e = Energy(talk_minutes=20, recharge_minutes=30, wake_at=0.5, clock=c)
+    e.activity()
+    talk(e, c, 13)  # tired, not empty
+    assert e.state() == "tired" and not e.asleep
+    k = Conversation(Memory(tmp_path, "Flocon"), {"memory": {}}, Ctx(), "BASE", energy=e)
+    asyncio.run(k.on_tag("fin"))
+    assert k.sleep.hang_up_reason() == "goodbye" and e.asleep
+    k.context.add_message({"role": "user", "content": "D'accord ?"})
+    k.tag_last_user_message()
+    assert k.sleep.hang_up_reason() == "nap"  # a sleepy reply, then it hangs up
+    c.t += 5 * 60
+    assert e.asleep  # a real nap, not a few seconds
+    c.t += 10 * 60
+    assert not e.asleep
+
+
+def test_the_pet_ends_its_own_goodbyes_with_fin():
+    from aipet import config, prompts
+
+    p = prompts.build_system_prompt(config.load_config())
+    assert "TOI qui la termines" in p
