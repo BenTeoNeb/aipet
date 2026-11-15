@@ -34,7 +34,7 @@ class Session(ABC):
         self._closed = False
         self._tasks = BackgroundTasks()
         self.worker, self.context, self.conversation = build_worker(
-            transport, session_log=self.log, on_hang_up=self.hang_up, **build_kwargs
+            transport, session_log=self.log, on_hang_up=self.hang_up, cfg=self.cfg, **build_kwargs
         )
 
     @abstractmethod

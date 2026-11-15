@@ -169,15 +169,17 @@ Built on [Pipecat](https://github.com/pipecat-ai/pipecat). The main pieces:
 ```
 aipet/
   config.py, env.py, paths.py   configuration, .env and PET_* variables, per-pet folders
+  fileio.py, tasks.py, timefmt.py  locks and atomic writes; background tasks; clock and French dates
   character.py                  character packs (load and check)
   prompts.py                    system prompt (French) and startup safety check
   pipeline.py                   pipeline shared by the web and headless modes
   session.py, hangup.py         one conversation's lifecycle; the pet hanging up by itself
   conversation.py               labels, system prompt, control tags (coordinates the parts below)
   sleep.py, presence.py         sleep, good night and goodbye; when each child last talked
-  tool_gate.py                  tools sent to the model, per-turn budget
-  engines.py                    speech recognition, models and voice providers
-  memory/                       store, condensation (keeper), tools, speakers, « Ma vie » moments
+  tool_gate.py                  tools sent to the model, per-turn budget, tool handlers
+  engines.py, openrouter_tts.py speech recognition, models and voice providers
+  memory/                       store (Memory), cards (file format), updates, forget, repo (git),
+                                condensation (keeper), tools, speakers, « Ma vie » moments
   games/                        quiz, yes/no, guess, story, learn (common.py: Activity, Host)
   skills.py, builtin_skills/    SKILL.md activities
   rhythm.py, energy.py          time, school calendar, tiredness

@@ -24,6 +24,7 @@ from pipecat.frames.frames import (
 )
 from pipecat.processors.frame_processor import FrameDirection, FrameProcessor
 
+from aipet import paths
 from aipet.fileio import atomic_write_json, load_json
 from aipet.hangup import SleepyReplyFrame
 from aipet.session_log import NO_LOG
@@ -61,21 +62,36 @@ class Energy:
         self._last_state = "normal"
         self._load()
 
+    @classmethod
+    def from_config(cls, cfg: dict, slog=None) -> Energy | None:
+        """The pet's energy counter from [energy] (None when disabled), saved in its state folder."""
+        ec = cfg.get("energy", {})
+        if not ec.get("enabled", True):
+            return None
+        return cls(
+            ec.get("talk_minutes", 20),
+            ec.get("recharge_minutes", 30),
+            ec.get("wake_up_at", 0.5),
+            state_file=paths.state_dir() / "energy.json",
+            slog=slog,
+        )
+
     # ---------------------------------------------------------------- state
+    # Reading the state never changes it (the debug and parents' pages poll it): a rested pet counts
+    # as awake right away, and actually wakes up (logged) at the next activity.
     def level(self) -> float:
         """Current level, counting the recharge since the last activity."""
-        now = self.clock()
-        idle = 0.0 if self._last_activity is None else max(0.0, now - self._last_activity - ACTIVE_GAP)
-        level = min(1.0, self._level + idle * self.charge)
-        if self._asleep and level >= self.wake_at:
-            self._asleep, self._level, self._last_activity = False, level, now
-            self._log("woke_up")
-        return level
+        idle = 0.0 if self._last_activity is None else max(0.0, self.clock() - self._last_activity - ACTIVE_GAP)
+        return min(1.0, self._level + idle * self.charge)
 
     @property
     def asleep(self) -> bool:
-        self.level()  # may wake him up
-        return self._asleep
+        return self._asleep and self.level() < self.wake_at
+
+    def _wake_if_rested(self):
+        if self._asleep and not self.asleep:
+            self._asleep, self._level, self._last_activity = False, self.level(), self.clock()
+            self._log("woke_up")
 
     def state(self) -> str:
         if self.asleep:
@@ -89,6 +105,7 @@ class Energy:
     # ---------------------------------------------------------------- events
     def activity(self):
         """Someone spoke (child or the pet)."""
+        self._wake_if_rested()
         if self._asleep:
             return  # talking to a sleeping pet neither drains nor resets its nap
         now = self.clock()

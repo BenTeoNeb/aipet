@@ -29,7 +29,6 @@ from pydantic import BaseModel
 from aipet import character, engines, env, migrate, monitoring, parents, paths, session_log, skills
 from aipet.config import load_config
 from aipet.energy import Energy
-from aipet.pipeline import STATE_DIR
 from aipet.prompts import build_system_prompt
 from aipet.rhythm import TZ, Rhythm
 from aipet.session import Session
@@ -205,9 +204,8 @@ def _energy(conversation) -> Energy:
     """The live energy counter during a session, else the saved one (read from disk)."""
     if conversation and conversation.sleep.energy:
         return conversation.sleep.energy
-    ec = load_config().get("energy", {})
-    return Energy(ec.get("talk_minutes", 20), ec.get("recharge_minutes", 30), ec.get("wake_up_at", 0.5),
-                  state_file=STATE_DIR / "energy.json")  # fmt: skip
+    cfg = load_config()
+    return Energy.from_config({**cfg, "energy": {**cfg.get("energy", {}), "enabled": True}})
 
 
 @app.post("/debug/energy/recharge", include_in_schema=False)

@@ -156,7 +156,7 @@ N'écris jamais d'autres crochets.
 RESP_KEY = "pet_response"  # reply number, stored in the LLMFullResponseStartFrame metadata
 
 
-def _letters(text: str) -> int:
+def letter_count(text: str) -> int:
     """Length without whitespace: insensitive to whitespace tweaks made by TTS."""
     return sum(1 for c in text if not c.isspace())
 
@@ -301,7 +301,7 @@ class EmotionTagFilter(FrameProcessor):
                     continue
                 if self._muted:
                     continue
-                self._count += _letters(value)
+                self._count += letter_count(value)
                 # Normal case, no tag: the original frame goes through unchanged.
                 same = len(pieces) == 1 and value == frame.text
                 await self.push_frame(frame if same else self._text_like(frame, value), direction)
@@ -360,7 +360,7 @@ class EmotionEmitter(FrameProcessor):
             self._count = 0
             self._pending = [e for e in self._pending if e.response >= self._response]  # stale leftovers
         elif isinstance(frame, AggregatedTextFrame) and not isinstance(frame, TTSTextFrame):
-            self._count += _letters(frame.text)
+            self._count += letter_count(frame.text)
             await self._release(
                 lambda e: e.response < self._response or (e.response == self._response and e.offset < self._count)
             )

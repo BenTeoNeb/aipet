@@ -173,3 +173,22 @@ def test_goodbye_hangs_up_unless_the_child_goes_on(tmp_path):
     k.context.add_message({"role": "user", "content": "Attends, encore une question !"})
     k.tag_last_user_message()
     assert k.sleep.hang_up_reason() is None
+
+
+def test_reading_the_state_changes_nothing():
+    events = []
+
+    class Log:
+        def event(self, type_, **kw):
+            events.append(type_)
+
+    c = Clock()
+    e = Energy(talk_minutes=1, recharge_minutes=10, clock=c, slog=Log())
+    e.activity()
+    talk(e, c, 2, every=10)
+    c.t += 3600  # rested
+    for _ in range(3):  # the parents' page polling
+        assert not e.asleep and e.snapshot()["state"] != "asleep"
+    assert "woke_up" not in events
+    e.activity()  # the next child message really wakes it up
+    assert events.count("woke_up") == 1
