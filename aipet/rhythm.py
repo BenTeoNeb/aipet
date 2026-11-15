@@ -256,8 +256,7 @@ def ago(then: datetime, now: datetime) -> str:
         hours = int(minutes // 60)
         if hours < 3:
             return f"il y a {hours} heure{'s' if hours > 1 else ''}"
-        part = "ce matin" if then.hour < 12 else "cet après-midi" if then.hour < 18 else "ce soir"
-        return part
+        return "ce matin" if then.hour < 12 else "cet après-midi" if then.hour < 18 else "ce soir"
     if days == 1:
         return "hier matin" if then.hour < 12 else "hier après-midi" if then.hour < 18 else "hier soir"
     if days == 2:

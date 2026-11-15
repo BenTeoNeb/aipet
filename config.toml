@@ -43,7 +43,7 @@ tool_give_up_after_secs = 60  # same while a tool runs (story or lesson plan): l
 # The code depends on no provider (everything goes through engines.py). Common keys:
 #   provider, model, region (optional), url (OpenAI-compatible API: Mistral, Ollama,
 #   OpenRouter…), key_env = NAME of the environment variable holding the API key (never the key).
-# One-off override: FLOCON_CONVERSATION_MODEL=…, FLOCON_TTS_PROVIDER=…, etc.
+# One-off override: PET_CONVERSATION_MODEL=…, PET_TTS_PROVIDER=…, etc.
 # Speech recognition and synthesis stay in the cloud: too slow locally on the Pi.
 
 [engines.stt]

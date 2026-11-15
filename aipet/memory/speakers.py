@@ -181,6 +181,3 @@ def _resembles(name: str, known: list[str]) -> str | None:
         if r > score:
             best, score = n, r
     return best if score >= 0.6 else None
-
-
-TAG_RE = re.compile(r"^⟦[^⟧]*⟧\s*")

@@ -6,9 +6,7 @@ from pathlib import Path
 from loguru import logger
 
 from aipet import character, engines
-from aipet.paths import CONFIG_PATH, ROOT  # noqa: F401  (ROOT: re-exported)
-
-PACKAGE_DIR = Path(__file__).parent
+from aipet.paths import CONFIG_PATH
 
 
 def load_config() -> dict:
