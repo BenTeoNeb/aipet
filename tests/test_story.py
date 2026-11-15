@@ -20,7 +20,11 @@ class Who:
 
 class Keeper(Host):
     def __init__(self, name, rhythm=None):
-        self.who, self.rhythm = Who(name), rhythm
+        self.who, self._rhythm = Who(name), rhythm
+
+    @property
+    def rhythm(self):
+        return self._rhythm
 
 
 def plan(title, steps, characters=("Plumette",)):

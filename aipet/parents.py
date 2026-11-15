@@ -59,7 +59,7 @@ def _marker(e: dict, pet: Character) -> tuple[str, str] | None:
     """(icon, French text) for an event worth showing in the conversation, else None."""
     t, n = e["type"], pet.name
     if t == "skill_start":
-        return "🎲", f"Activité : {SKILL_LABELS.get(e.get('name'), e.get('name'))}"
+        return "🎲", f"Activité : {SKILL_LABELS.get(e.get('name', ''), e.get('name'))}"
     if t == "guess_end":
         q = e.get("questions")
         if e.get("found"):
@@ -280,8 +280,8 @@ def review(memory_root: Path, pet: Character, today: date | None = None, days: i
     # Confidences live in the cards, not in the logs.
     for p in sorted((memory_root / DIR_FAMILY).glob("*.md")):
         meta, sec = parse_card(p.read_text())
-        for items in sec.values():
-            for item in items:
+        for card_items in sec.values():
+            for item in card_items:
                 if normalize_text(item).startswith("confidence"):
                     flag("confidence", "", f"Confidence de {meta.get('prenom', p.stem)}", item,
                          key=f"{p.name}:{item}")  # fmt: skip
@@ -340,7 +340,7 @@ def edit(mem: Memory, rel: str, change: dict) -> dict:
             removed = bool(change.get("delete"))
         elif p.suffix == ".md" and (rel.startswith(DIR_FAMILY + "/") or rel == LIFE_FILE):
             meta, sections = parse_card(p.read_text())
-            items = sections.get(change.get("section"), [])
+            items = sections.get(str(change.get("section", "")), [])
             i = int(change.get("index", -1))
             if not (0 <= i < len(items)) or items[i] != change.get("expected"):
                 raise ValueError("la fiche a changé entre-temps : recharge la page")

@@ -28,14 +28,16 @@ class HeadlessSession(Session):
 
     def __init__(self, transport, wake_cfg: dict | None, **build_kwargs):
         w = wake_cfg
-        self.gate = (
+        self.gate: WakeWordGate | None = (
             WakeWordGate(
                 model=w.get("model", "hey_jarvis"),
                 threshold=w.get("threshold", 0.5),
                 idle_timeout=w.get("sleep_after_secs", 8),
                 ack=w.get("response", "sound"),
                 max_awake=w.get("max_awake_secs", 120),
-                on_wake=lambda: self.open(greet=False, wake_score=round(self.gate.last_score, 3)),
+                on_wake=lambda: self.open(
+                    greet=False, wake_score=round(self.gate.last_score, 3) if self.gate else None
+                ),
                 on_sleep=self.pause,
             )
             if w

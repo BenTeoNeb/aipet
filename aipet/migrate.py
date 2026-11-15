@@ -43,7 +43,7 @@ def migrate_legacy(legacy: Path | None = None, home: Path | None = None) -> list
     """Move what is left to move; returns what was moved (empty when there is nothing to do)."""
     legacy = legacy or legacy_home()
     home = home or paths.home()
-    done = []
+    done: list[str] = []
     if not legacy.is_dir():
         return done
     for src, dst in moves(legacy, home):

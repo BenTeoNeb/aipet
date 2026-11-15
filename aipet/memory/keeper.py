@@ -10,7 +10,8 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Awaitable, Callable
-from datetime import timedelta
+from datetime import datetime, timedelta
+from typing import Any
 
 from loguru import logger
 
@@ -47,9 +48,10 @@ class MemoryKeeper:
         self.on_condensed = on_condensed  # e.g. refresh the system prompt (it shows the memory)
         self.slog = slog or NO_LOG
         self.done = 0  # messages already condensed (index in the context)
-        self.segment_start = None  # time of the first non-condensed message
-        self.last = {"when": None, "reason": None, "changes": [], "error": None}
-        self._failures, self._retry_after = 0, None  # condensation failures (backoff)
+        self.segment_start: datetime | None = None  # time of the first non-condensed message
+        self.last: dict[str, Any] = {"when": None, "reason": None, "changes": [], "error": None}
+        self._failures = 0  # condensation failures in a row (backoff)
+        self._retry_after: datetime | None = None  # condensation failures (backoff)
         self._timer: asyncio.Task | None = None
         self._running: asyncio.Task | None = None
         self._ck_lock = asyncio.Lock()

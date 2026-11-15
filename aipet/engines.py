@@ -29,6 +29,7 @@ import copy
 import json
 import os
 from datetime import datetime
+from typing import Any
 
 from loguru import logger
 from pipecat.transcriptions.language import Language
@@ -45,7 +46,7 @@ PROVIDERS = {
     "tts": ("google", "openai", "elevenlabs", "openrouter"),
 }
 
-DEFAULTS = {
+DEFAULTS: dict[str, dict[str, Any]] = {
     # Chirp 3: much better than latest_long on short sentences; available in "eu"/"us".
     "stt": {"provider": "google", "model": "chirp_3", "region": "eu"},
     "conversation": {"provider": "google-vertex", "model": "gemini-3.6-flash"},
@@ -104,7 +105,7 @@ SAFETY_SETTINGS = [
 def _openrouter_body(r: dict, role: str) -> dict:
     """OpenRouter-only request fields: routing preferences and reasoning effort. Conversation
     defaults to minimal reasoning (voice: the first word must come fast)."""
-    body = {"provider": {**OPENROUTER_ROUTING, **(r.get("routing") or {})}}
+    body: dict[str, Any] = {"provider": {**OPENROUTER_ROUTING, **(r.get("routing") or {})}}
     effort = r.get("reasoning", "minimal" if role == "conversation" else None)
     if effort:
         body["reasoning"] = {"effort": effort}
@@ -179,7 +180,7 @@ def _project() -> str:
 
 def describe(cfg: dict) -> dict:
     """Human-readable summary (session log, debug panel, startup log)."""
-    out = {}
+    out: dict[str, Any] = {}
     for role in ROLES:
         r = settings(cfg, role)
         name = r.get("voice") if role == "tts" else r.get("model")
@@ -364,76 +365,92 @@ def complete_json(
 ) -> dict:
     r = settings(cfg, role, activity)
     p = r["provider"]
-
+    args = (r, p, role, activity, system, prompt, schema, timeout)
     if p in ("google-vertex", "google"):
-        from google import genai
-        from google.genai import types
-
-        http = types.HttpOptions(timeout=int(timeout * 1000))
-        client = (
-            genai.Client(api_key=_api_key(r, "google"), http_options=http)
-            if p == "google"
-            else genai.Client(
-                vertexai=True, project=_project(), location=r.get("region") or "global", http_options=http
-            )
-        )
-        resp = client.models.generate_content(
-            model=r["model"],
-            contents=prompt,
-            config=types.GenerateContentConfig(
-                system_instruction=system, response_mime_type="application/json", response_json_schema=schema
-            ),
-        )
-        u = getattr(resp, "usage_metadata", None)
-        if u:
-            _log_usage(r, role, activity, u.prompt_token_count, (u.candidates_token_count or 0)
-                       + (u.thoughts_token_count or 0), u.cached_content_token_count)  # fmt: skip
-        return json.loads(resp.text)
-
+        return _json_google(*args)
     if p in ("anthropic-vertex", "anthropic"):
-        import anthropic
-
-        client = (
-            anthropic.Anthropic(api_key=_api_key(r, "anthropic"), timeout=timeout, max_retries=1)
-            if p == "anthropic"
-            else anthropic.AnthropicVertex(
-                project_id=_project(), region=r.get("region") or "global", timeout=timeout, max_retries=1
-            )
-        )
-        resp = client.messages.create(
-            model=r["model"],
-            max_tokens=16000,
-            system=system,
-            output_config={"effort": "medium", "format": {"type": "json_schema", "schema": schema}},
-            messages=[{"role": "user", "content": prompt}],
-        )
-        if u := getattr(resp, "usage", None):
-            _log_usage(r, role, activity, u.input_tokens, u.output_tokens, getattr(u, "cache_read_input_tokens", 0))
-        if resp.stop_reason == "refusal":
-            raise RuntimeError("answer refused by the model")
-        return json.loads(next(b.text for b in resp.content if b.type == "text"))
-
+        return _json_anthropic(*args)
     if p in ("openai", "openrouter"):
-        from openai import OpenAI
-
-        url = r.get("url") or (OPENROUTER_URL if p == "openrouter" else None)
-        client = OpenAI(api_key=_api_key(r, p), base_url=url, timeout=timeout, max_retries=1)
-        resp = client.chat.completions.create(
-            model=r["model"],
-            messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
-            response_format={
-                "type": "json_schema",
-                "json_schema": {"name": "response", "strict": True, "schema": _strict_schema(schema)},
-            },
-            extra_body=_openrouter_body(r, role) if p == "openrouter" else None,
-        )
-        if getattr(resp, "usage", None):
-            details = getattr(resp.usage, "prompt_tokens_details", None)
-            _log_usage(r, role, activity, resp.usage.prompt_tokens, resp.usage.completion_tokens,
-                       getattr(details, "cached_tokens", 0) if details else 0)  # fmt: skip
-        text = resp.choices[0].message.content or ""
-        return json.loads(text.strip().removeprefix("```json").removesuffix("```"))
+        return _json_openai(*args)
     raise UnknownEngine(p)
+
+
+def _json_google(
+    r: dict, p: str, role: str, activity: str | None, system: str, prompt: str, schema: dict, timeout: float
+) -> dict:
+    from google import genai
+    from google.genai import types
+
+    http = types.HttpOptions(timeout=int(timeout * 1000))
+    client = (
+        genai.Client(api_key=_api_key(r, "google"), http_options=http)
+        if p == "google"
+        else genai.Client(vertexai=True, project=_project(), location=r.get("region") or "global", http_options=http)
+    )
+    resp = client.models.generate_content(
+        model=r["model"],
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            system_instruction=system, response_mime_type="application/json", response_json_schema=schema
+        ),
+    )
+    u = getattr(resp, "usage_metadata", None)
+    if u:
+        _log_usage(r, role, activity, u.prompt_token_count, (u.candidates_token_count or 0)
+                       + (u.thoughts_token_count or 0), u.cached_content_token_count)  # fmt: skip
+    if not resp.text:
+        raise RuntimeError("empty answer from the model")
+    return json.loads(resp.text)
+
+
+def _json_anthropic(
+    r: dict, p: str, role: str, activity: str | None, system: str, prompt: str, schema: dict, timeout: float
+) -> dict:
+    import anthropic
+
+    client = (
+        anthropic.Anthropic(api_key=_api_key(r, "anthropic"), timeout=timeout, max_retries=1)
+        if p == "anthropic"
+        else anthropic.AnthropicVertex(
+            project_id=_project(), region=r.get("region") or "global", timeout=timeout, max_retries=1
+        )
+    )
+    resp = client.messages.create(
+        model=r["model"],
+        max_tokens=16000,
+        system=system,
+        output_config={"effort": "medium", "format": {"type": "json_schema", "schema": schema}},
+        messages=[{"role": "user", "content": prompt}],
+    )
+    if u := getattr(resp, "usage", None):
+        _log_usage(r, role, activity, u.input_tokens, u.output_tokens, getattr(u, "cache_read_input_tokens", 0))
+    if resp.stop_reason == "refusal":
+        raise RuntimeError("answer refused by the model")
+    return json.loads(next(b.text for b in resp.content if b.type == "text"))
+
+
+def _json_openai(
+    r: dict, p: str, role: str, activity: str | None, system: str, prompt: str, schema: dict, timeout: float
+) -> dict:
+    from openai import OpenAI
+
+    url = r.get("url") or (OPENROUTER_URL if p == "openrouter" else None)
+    client = OpenAI(api_key=_api_key(r, p), base_url=url, timeout=timeout, max_retries=1)
+    resp = client.chat.completions.create(
+        model=r["model"],
+        messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
+        response_format={
+            "type": "json_schema",
+            "json_schema": {"name": "response", "strict": True, "schema": _strict_schema(schema)},
+        },
+        extra_body=_openrouter_body(r, role) if p == "openrouter" else None,
+    )
+    if usage := getattr(resp, "usage", None):
+        details = getattr(usage, "prompt_tokens_details", None)
+        _log_usage(r, role, activity, usage.prompt_tokens, usage.completion_tokens,
+                       getattr(details, "cached_tokens", 0) if details else 0)  # fmt: skip
+    text = resp.choices[0].message.content or ""
+    return json.loads(text.strip().removeprefix("```json").removesuffix("```"))
 
 
 # ---------------------------------------------------------------------------

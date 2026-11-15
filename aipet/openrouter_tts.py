@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from openai import BadRequestError
 from pipecat.frames.frames import ErrorFrame, LLMFullResponseStartFrame, TTSAudioRawFrame, TTSSpeakFrame
 from pipecat.services.openai.tts import OpenAITTSService
@@ -17,6 +19,8 @@ class OpenRouterTTSService(OpenAITTSService):
     spoken with the voice of the emotion in force where it starts (same character offsets as the
     face animation); a new reply starts with `base_voice`. Canned lines (TTSSpeakFrame: fillers,
     sleepy lines) always use `base_voice`."""
+
+    _settings: Any  # Pipecat's settings object (model, voice, speed), untyped upstream
 
     def __init__(self, *, base_voice: str, emotion_voices: dict[str, str] | None = None, **kw):
         super().__init__(**kw)

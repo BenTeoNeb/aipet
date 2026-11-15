@@ -211,6 +211,7 @@ class YesNoGame(Activity):
 
     def _finish(self, lost_on: str | None, stopped: bool = False) -> dict:
         r, when = self.round, now()
+        assert r is not None  # only called during a round
         with self.store.lock:
             data = self.store.load()
             p = self._player_data(data, r.player)

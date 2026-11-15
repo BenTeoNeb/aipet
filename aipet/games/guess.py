@@ -157,14 +157,15 @@ class GuessGame(Activity):
     def _child_said(self, answer: str) -> bool:
         """True if the child's last message contains the answer (it just revealed it)."""
         words = answer_words(answer)
-        return bool(words) and bool(words & answer_words(self.round.last_reply))
+        return bool(words) and self.round is not None and bool(words & answer_words(self.round.last_reply))
 
     def _win_confirmed(self, answer: str) -> bool:
         pet_said = self.host.last_pet_line()
-        return confirms_guess(answer, pet_said, self.round.last_reply)
+        return self.round is not None and confirms_guess(answer, pet_said, self.round.last_reply)
 
     def _record(self, found: bool, answer: str) -> dict:
         r = self.round
+        assert r is not None  # only called during a round
         with self.store.lock:
             data = self.store.load()
             p = data["players"].setdefault(r.player, {"games": []})

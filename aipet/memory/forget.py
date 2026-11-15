@@ -49,7 +49,7 @@ class ForgetRequest:
         return self.contains_all(text) if self.broad else self.in_phrase(text)
 
     def about(self, name: str) -> bool:
-        return bool(self.who) and slug(self.who) == slug(name)
+        return self.who is not None and slug(self.who) == slug(name)
 
 
 def scrub_sentences(text: str, match) -> tuple[str, int]:

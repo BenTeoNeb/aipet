@@ -22,9 +22,14 @@ activities, other languages, better turn-taking.
 
 ```bash
 uv sync
+uvx pre-commit install          # optional: the same checks before each commit
 uv run ruff check . && uv run ruff format --check .
-uv run pytest
+uv run mypy
+uv run pytest                   # with coverage; CI fails below the floor in pyproject.toml
 ```
+
+Please follow the [code of conduct](CODE_OF_CONDUCT.md), and add a line to
+[CHANGELOG.md](CHANGELOG.md) under « Unreleased » for anything a user or a parent would notice.
 
 Keep pull requests focused, with tests for new behaviour. A new pet only needs a folder in
 `characters/` and a passing test suite.

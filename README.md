@@ -251,14 +251,15 @@ on the device: use a key with a spending limit), and installs the `aipet` system
 
 ```bash
 uv sync
-uv run pytest                                   # ~15 s, no network access
+uv run pytest                                   # ~20 s, no network access, with coverage
 uv run ruff check . && uv run ruff format --check .
+uv run mypy                                     # type check
 cd frontend && npm ci && npm run build          # only when updating the Pipecat JS client
 ```
 
 Tests fake every model and audio service, and fail on any non-local connection, so running them never
-costs anything. Checks against real models are done by hand, outside the suite. CI runs the lint and
-the tests on every push.
+costs anything. Checks against real models are done by hand, outside the suite. CI runs the lint, the type
+check and the tests (with a coverage floor) on every push.
 
 Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).
 

@@ -78,7 +78,7 @@ class Skills:
         self.active: str | None = None
         self.slog = slog or NO_LOG
         self._cache: dict[str, Skill] = {}
-        self._signature = None
+        self._signature: tuple[tuple[str, int], ...] | None = None
         self.errors: dict[str, str] = {}
 
     @classmethod

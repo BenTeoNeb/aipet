@@ -208,7 +208,9 @@ def _energy(conversation) -> Energy:
     if conversation and conversation.sleep.energy:
         return conversation.sleep.energy
     cfg = load_config()
-    return Energy.from_config({**cfg, "energy": {**cfg.get("energy", {}), "enabled": True}})
+    energy = Energy.from_config({**cfg, "energy": {**cfg.get("energy", {}), "enabled": True}})
+    assert energy is not None  # enabled above
+    return energy
 
 
 @app.post("/debug/energy/recharge", include_in_schema=False)

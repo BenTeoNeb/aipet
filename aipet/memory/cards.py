@@ -39,7 +39,9 @@ DIR_FAMILY, DIR_MEMORIES, DIR_STORIES, DIR_CONVERSATIONS = "famille", "souvenirs
 # Person cards: simple frontmatter + bulleted sections
 # --------------------------------------------------------------------------
 def parse_card(text: str) -> tuple[dict, dict[str, list[str]]]:
-    meta, sections, cur = {}, {s: [] for s in SECTIONS}, None
+    meta: dict[str, str] = {}
+    sections: dict[str, list[str]] = {s: [] for s in SECTIONS}
+    cur: str | None = None
     body = text
     if text.startswith("---"):
         _, fm, body = text.split("---", 2)

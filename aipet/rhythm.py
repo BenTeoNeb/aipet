@@ -134,7 +134,7 @@ class Rhythm:
     def from_config(cls, cfg: dict) -> Rhythm:
         r = cfg.get("rhythm", {})
         keys = ("zone", "wednesday_school", "weekday_bedtime", "weekday_wakeup", "weekend_bedtime", "weekend_wakeup")
-        return cls(**{k: str(r[k]) for k in keys if k in r})
+        return cls(**{k: str(r[k]) for k in keys if k in r})  # type: ignore[arg-type]  # str fields only
 
     def refresh_holidays(self, today: date) -> None:
         """Update the calendar cache from the network if it is old (blocking: run it in a thread)."""

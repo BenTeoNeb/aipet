@@ -222,7 +222,7 @@ class TagStripper:
 
     def feed(self, chunk: str) -> list[tuple[str, str]]:
         out: list[tuple[str, str]] = []
-        plain = []
+        plain: list[str] = []
         for c in chunk:
             if not self._held:
                 if c == "[":

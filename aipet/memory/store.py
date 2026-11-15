@@ -248,7 +248,7 @@ class Memory:
                 if matched or (dates and not terms):
                     score = 10 * matched + min(sum(found), 10) - min(age_days, 365) / 60
                     hits.append({"file": rel, "excerpt": ch.strip()[:600], "score": score})
-        hits.sort(key=lambda h: -h["score"])
+        hits.sort(key=lambda h: -float(h["score"]))
         return [{k: v for k, v in h.items() if k != "score"} for h in hits[:limit]]
 
     # ------------------------------------------------------------- writing

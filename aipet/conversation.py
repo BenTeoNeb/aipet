@@ -38,6 +38,7 @@ from aipet.memory.speakers import Speakers, speaker_instructions
 from aipet.memory.store import Memory
 from aipet.memory.tools import memory_instructions
 from aipet.presence import Presence
+from aipet.rhythm import Rhythm
 from aipet.session_log import NO_LOG
 from aipet.skills import Skills
 from aipet.sleep import SleepState
@@ -111,7 +112,7 @@ class Conversation(Host):
         self.mem, self.cfg, self.context, self.base_prompt = mem, cfg, context, base_prompt
         self.pet = character.of(cfg)
         self.slog = slog or NO_LOG
-        self.who = Speakers(self.pet.name, known=mem.known_names, slog=self.slog)
+        self.who: Speakers = Speakers(self.pet.name, known=mem.known_names, slog=self.slog)
         self.skills = skills or Skills([])
         self.wait = wait  # turns.UnfinishedSentenceWait ([attends] tag), or None
         self.sleep = SleepState(self.pet, rhythm, energy, self.slog)
@@ -178,7 +179,7 @@ class Conversation(Host):
 
     # --- Host (what the games may use) ---------------------------------------
     @property
-    def rhythm(self):
+    def rhythm(self) -> Rhythm | None:
         return self.sleep.rhythm
 
     @property

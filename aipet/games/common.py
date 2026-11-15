@@ -8,7 +8,7 @@ import re
 from collections.abc import Callable
 from datetime import date, timedelta
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
 
@@ -17,6 +17,10 @@ from aipet.fileio import atomic_write_json, load_json, lock_for
 from aipet.memory.text import normalize_text, without_article
 from aipet.session_log import NO_LOG
 from aipet.tool_gate import tool_handler
+
+if TYPE_CHECKING:
+    from aipet.memory.speakers import Speakers
+    from aipet.rhythm import Rhythm
 
 UNKNOWN_PLAYER = "famille"  # games played while the pet doesn't know (for sure) who is talking
 GAMES_DIR = "jeux"  # in the family memory (data)
@@ -27,9 +31,15 @@ class Host:
     defaults are a game played on its own (tests, tools): nobody known for sure, no tool budget,
     no system prompt to refresh."""
 
-    who = None  # memory.speakers.Speakers
-    rhythm = None  # rhythm.Rhythm
-    pet_name = "Toi"
+    who: Speakers | None = None
+
+    @property
+    def pet_name(self) -> str:
+        return "Toi"
+
+    @property
+    def rhythm(self) -> Rhythm | None:
+        return None
 
     def player(self) -> str:
         """The child talking, if known for sure; else the family."""

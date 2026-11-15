@@ -7,12 +7,30 @@ license = "AGPL-3.0-only"
 license-files = ["LICENSE", "THIRD_PARTY_NOTICES.md"]
 authors = [{ name = "Benjamin Farcy" }]
 requires-python = ">=3.11"
+keywords = ["voice-assistant", "children", "pipecat", "raspberry-pi", "llm", "french"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3",
+    "Natural Language :: French",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Multimedia :: Sound/Audio :: Speech",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
     "anthropic[vertex]>=2.8.0",
     "openwakeword>=0.6.0",
     "pipecat-ai[google,local,runner,silero,webrtc]>=1.15.0",
     "python-dotenv>=1.2.4",
 ]
+
+[project.urls]
+Homepage = "https://github.com/BenTeoNeb/aipet"
+Issues = "https://github.com/BenTeoNeb/aipet/issues"
+Changelog = "https://github.com/BenTeoNeb/aipet/blob/main/CHANGELOG.md"
 
 [project.scripts]
 pet-web = "aipet.web:run"            # web page (show + debug), http://localhost:7860
@@ -28,12 +46,28 @@ packages = ["aipet"]
 
 [dependency-groups]
 dev = [
+    "mypy>=2.4.1",
     "pytest>=9.2.0",
+    "pytest-cov>=7.1.0",
     "ruff>=0.17.4",
 ]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "--cov=aipet --cov-report=term-missing:skip-covered"
+
+[tool.coverage.run]
+branch = false
+
+[tool.coverage.report]
+fail_under = 85  # raise it as coverage grows; never lower it
+
+[tool.mypy]
+python_version = "3.11"
+packages = ["aipet"]
+ignore_missing_imports = true  # Pipecat and some providers ship without type hints
+warn_unused_ignores = true
+warn_redundant_casts = true
 
 [tool.ruff]
 line-length = 120
