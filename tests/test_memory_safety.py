@@ -115,3 +115,18 @@ def test_a_parent_can_delete_memory_files_but_not_git(tmp_path):
         assert not mem.delete(bad), bad
     assert (mem.root / ".git" / "config").exists()
     assert mem.delete("histoires/foret.md") and not (mem.root / "histoires" / "foret.md").exists()
+
+
+def test_forget_reaches_game_records(tmp_path):
+    mem = Memory(tmp_path, "Flocon")
+    games = mem.root / "jeux"
+    games.mkdir()
+    (games / "devine.json").write_text(
+        json.dumps({"players": {"Mila": {"games": [{"answer": "le chien de mamie Rose", "found": True}]}}})
+    )
+    (mem.root / "histoires" / "univers.json").write_text(
+        json.dumps({"characters": {"piko": {"name": "Piko", "traits": ["a peur du chien de mamie Rose", "rigolo"]}}})
+    )
+    mem.forget("le chien de mamie Rose")
+    left = (games / "devine.json").read_text() + (mem.root / "histoires" / "univers.json").read_text()
+    assert "mamie" not in left and "rigolo" in left and '"found": true' in left

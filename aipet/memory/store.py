@@ -31,10 +31,11 @@ from pathlib import Path
 from loguru import logger
 
 from aipet import school
-from aipet.fileio import atomic_write_text, lock_for
+from aipet.fileio import atomic_write_json, atomic_write_text, load_json, lock_for
 from aipet.memory.cards import (  # noqa: F401 (re-exported: the memory's public format)
     DIR_CONVERSATIONS,
     DIR_FAMILY,
+    DIR_GAMES,
     DIR_MEMORIES,
     DIR_STORIES,
     DISLIKES,
@@ -328,6 +329,20 @@ class Memory:
                     text, n = scrub_sentences(p.read_text(encoding="utf-8"), req.contains_all)
                     if n:
                         changed(p, text, n)
+                # Game records and the story universe (guessed answers, quiz questions, characters).
+                for p in [
+                    *sorted((self.root / DIR_GAMES).glob("*.json")),
+                    *sorted((self.root / DIR_STORIES).glob("*.json")),
+                ]:
+                    with lock_for(p):  # the games lock their file the same way
+                        data = load_json(p, None)
+                        if data is None:
+                            continue
+                        cleaned = scrub_value(data, req.contains_all)
+                        if cleaned != data:
+                            atomic_write_json(p, cleaned)
+                            res["removed_items"] += 1
+                            res["files"].append(self._rel(p))
             with open(self.root / NOTES_FILE, "a", encoding="utf-8") as f:  # the condensation cleans the summary too
                 f.write(
                     f"- {now():%Y-%m-%d %H:%M} : DEMANDE D'OUBLI{f' (concerne {req.who})' if req.who else ''} "

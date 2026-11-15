@@ -8,7 +8,8 @@ versions follow [Semantic Versioning](https://semver.org/) once the first releas
 ### Fixed
 - `pet-headless` crashed at startup (it read a config key that does not exist).
 - A forget request could be undone by a condensation running at the same time, and missed the
-  pet's life file, the stories and the card history; the forgotten words were also logged again.
+  pet's life file, the stories, the card history and the game records; the forgotten words were
+  also logged again.
 - The web page and the voice pipeline could write the memory at the same time; a parent deleting
   a file could reach the memory's `.git` folder; a corrupt game file was replaced by an empty one.
 - A deleted confidence stayed readable in the memory's git history (and in the commit message).

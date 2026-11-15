@@ -14,6 +14,7 @@ from loguru import logger
 
 from aipet import character
 from aipet.fileio import atomic_write_json, load_json, lock_for
+from aipet.memory.cards import DIR_GAMES
 from aipet.memory.text import normalize_text, without_article
 from aipet.session_log import NO_LOG
 from aipet.tool_gate import tool_handler
@@ -23,7 +24,7 @@ if TYPE_CHECKING:
     from aipet.rhythm import Rhythm
 
 UNKNOWN_PLAYER = "famille"  # games played while the pet doesn't know (for sure) who is talking
-GAMES_DIR = "jeux"  # in the family memory (data)
+GAMES_DIR = DIR_GAMES  # in the family memory (data)
 
 
 class Host:
