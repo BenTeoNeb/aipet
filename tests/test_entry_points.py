@@ -36,6 +36,17 @@ def test_headless_starts_and_shuts_down(tmp_path, monkeypatch):
     monkeypatch.setattr(headless, "WorkerRunner", FakeRunner)
     monkeypatch.setattr(session_log, "setup_file_logging", lambda days: None)
 
+    class FakeWakeGate(FrameProcessor):  # the real one downloads its model on first use
+        awake, last_score = False, 0.0
+
+        def __init__(self, **kw):
+            super().__init__()
+
+        def sleep(self):
+            pass
+
+    monkeypatch.setattr(headless, "WakeWordGate", FakeWakeGate)
+
     for use_wake in (False, True):
         asyncio.run(headless.main(use_wake, None, None))
     ends = [
