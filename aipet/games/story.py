@@ -37,6 +37,7 @@ from aipet.timefmt import now
 STORY_TOOLS = {"story_start", "story_next", "story_end"}
 STEPS_DAY, STEPS_SHORT = 5, 4  # short: evening or little ones
 MAX_MINUTES = 15
+STT_NAMES = 25  # character names given to speech recognition (the prompt must stay short)
 RECURRING_SHOWN = 6
 LITTLE_ONES = {"PS", "MS", "GS", "CP"}
 GUEST_EVERY = 3  # children in a story: when asked, otherwise at most one story in three
@@ -173,6 +174,16 @@ class StoryGame(Activity):
                        + (f", adoré par l'enfant ({loved} fois)" if loved else ""))  # fmt: skip
         return out
 
+    def names(self) -> list[str]:
+        """The running story's characters first, then the universe's most frequent ones."""
+        try:
+            chars = sorted(self.store.load()["characters"].values(), key=lambda c: -c.get("appearances", 0))
+        except (OSError, ValueError, KeyError):
+            chars = []
+        current = [c.get("name", "") for c in (self.story or {}).get("plan", {}).get("characters", [])]
+        names = [*current, *(c.get("name", "") for c in chars)]
+        return list(dict.fromkeys(n for n in names if n))[:STT_NAMES]
+
     def unfinished(self, player: str) -> dict | None:
         stories = [s for s in self.store.load()["stories"] if s["player"] == player and not s.get("finished")]
         return stories[-1] if stories else None
@@ -287,7 +298,11 @@ class StoryGame(Activity):
             return {"note": "C'était la dernière étape : raconte la fin (en tenant compte de ses choix), puis demande "
                     "si l'histoire lui a plu et quel personnage il a préféré, et appelle story_end."}  # fmt: skip
         step = s["plan"]["steps"][s["step"]]
-        return {"step": f"{s['step'] + 1} sur {total}", "event": step["event"], "choice": step.get("choice", "")}
+        out = {"step": f"{s['step'] + 1} sur {total}", "event": step["event"], "choice": step.get("choice", "")}
+        if s["step"] == total - 1:  # without this, the model sometimes said nothing: no ending told
+            out["note"] = ("Dernière étape : raconte-la maintenant, avec la fin de l'histoire (en tenant compte de "
+                           "ses choix), puis demande si l'histoire lui a plu et quel personnage il a préféré.")  # fmt: skip
+        return out
 
     def end(
         self, reaction: str = "", favourite_characters: list | None = None, character_updates: list | None = None
@@ -306,7 +321,10 @@ class StoryGame(Activity):
         self._ev("story_end", title=s["title"], player=s["player"], reaction=s["reaction"], favourites=s["favourites"])
         self.story = None
         self._refresh()
-        return {"saved": s["title"], "note": "Remercie l'enfant et propose autre chose (ou bonne nuit le soir)."}
+        out = {"saved": s["title"], "note": "Remercie l'enfant et propose autre chose (ou bonne nuit le soir)."}
+        if offer := self.host.next_offer():  # not another story by default: see variety.py
+            out["propose"] = offer
+        return out
 
     def stop(self):
         """The activity ends mid-story: it stays unfinished, to be resumed another time."""

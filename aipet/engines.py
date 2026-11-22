@@ -228,11 +228,26 @@ def make_stt(cfg: dict, hints: list[str]):
             settings=OpenAISTTService.Settings(
                 model=r["model"],
                 language=Language.FR,
-                # Model-facing hint, in French like the speech it transcribes.
-                prompt=("Prénoms possibles : " + ", ".join(hints) + ".") if hints else None,
+                prompt=_stt_prompt(hints),
             ),
         )
     raise UnknownEngine(p)
+
+
+def _stt_prompt(hints: list[str]) -> str | None:
+    # Model-facing hint, in French like the speech it transcribes.
+    return ("Prénoms et personnages possibles : " + ", ".join(hints) + ".") if hints else None
+
+
+def set_stt_hints(stt, hints: list[str]) -> None:
+    """Update the recognition hints during a session (a story brings new character names). OpenAI-
+    compatible transcription reads its prompt at each request; Google's phrase set is fixed at
+    start, so it keeps the names it started with."""
+    from pipecat.services.openai.stt import OpenAISTTService, OpenAISTTSettings
+
+    settings = getattr(stt, "_settings", None) if isinstance(stt, OpenAISTTService) else None
+    if isinstance(settings, OpenAISTTSettings):
+        settings.prompt = _stt_prompt(hints)
 
 
 # ---------------------------------------------------------------------------
@@ -255,8 +270,10 @@ def make_llm(cfg: dict, system: str):
             max_tokens=MAX_TOKENS,
             safety_settings=SAFETY_SETTINGS,  # explicit content filters (don't depend on defaults)
         )
+        from aipet.llm_retry import with_empty_reply_retry
+
         if p == "google":
-            return GoogleLLMService(
+            return with_empty_reply_retry(GoogleLLMService)(
                 api_key=_api_key(r, "google"),
                 settings=GoogleLLMService.Settings(**kwargs),
                 stream_idle_timeout_secs=15,
@@ -265,7 +282,7 @@ def make_llm(cfg: dict, system: str):
         from pipecat.services.google.vertex.llm import GoogleVertexLLMService
 
         # Gemini 3 is only served from "global".
-        return GoogleVertexLLMService(
+        return with_empty_reply_retry(GoogleVertexLLMService)(
             project_id=_project(),
             location=r.get("region") or "global",
             settings=GoogleVertexLLMService.Settings(**kwargs),
@@ -279,13 +296,19 @@ def make_llm(cfg: dict, system: str):
         llm_settings = AnthropicLLMService.Settings(
             model=r["model"], system_instruction=system, max_tokens=MAX_TOKENS, effort="low"
         )  # voice: fast
+        from aipet.llm_retry import with_empty_reply_retry
+
         if p == "anthropic":
-            return AnthropicLLMService(api_key=_api_key(r, "anthropic"), settings=llm_settings, **retry)
+            return with_empty_reply_retry(AnthropicLLMService)(
+                api_key=_api_key(r, "anthropic"), settings=llm_settings, **retry
+            )
         from anthropic import AsyncAnthropicVertex
 
         client = AsyncAnthropicVertex(project_id=_project(), region=r.get("region") or "global")
         # api_key ignored: authentication goes through the Vertex client (ADC).
-        return AnthropicLLMService(api_key="vertex", client=client, settings=llm_settings, **retry)
+        return with_empty_reply_retry(AnthropicLLMService)(
+            api_key="vertex", client=client, settings=llm_settings, **retry
+        )
 
     if p == "openrouter":
         from pipecat.services.openrouter.llm import OpenRouterLLMService
@@ -366,8 +389,10 @@ def complete_json(
     role: str = "condensation",
     timeout: float = 60,
     activity: str | None = None,
+    retries: int = 1,
 ) -> dict:
-    r = settings(cfg, role, activity)
+    """`retries`: on top of the first try (0 when the caller has its own deadline and fallback)."""
+    r = {**settings(cfg, role, activity), "retries": retries}
     p = r["provider"]
     args = (r, p, role, activity, system, prompt, schema, timeout)
     if p in ("google-vertex", "google"):
@@ -413,10 +438,10 @@ def _json_anthropic(
     import anthropic
 
     client = (
-        anthropic.Anthropic(api_key=_api_key(r, "anthropic"), timeout=timeout, max_retries=1)
+        anthropic.Anthropic(api_key=_api_key(r, "anthropic"), timeout=timeout, max_retries=r.get("retries", 1))
         if p == "anthropic"
         else anthropic.AnthropicVertex(
-            project_id=_project(), region=r.get("region") or "global", timeout=timeout, max_retries=1
+            project_id=_project(), region=r.get("region") or "global", timeout=timeout, max_retries=r.get("retries", 1)
         )
     )
     resp = client.messages.create(
@@ -439,14 +464,23 @@ def _json_openai(
     from openai import OpenAI
 
     url = r.get("url") or (OPENROUTER_URL if p == "openrouter" else None)
-    client = OpenAI(api_key=_api_key(r, p), base_url=url, timeout=timeout, max_retries=1)
-    resp = client.chat.completions.create(
-        model=r["model"],
-        messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
-        response_format={
+    client = OpenAI(api_key=_api_key(r, p), base_url=url, timeout=timeout, max_retries=r.get("retries", 1))
+    if str(r["model"]).startswith("anthropic/"):
+        # Claude refuses a big schema as a grammar (« compiled grammar is too large », e.g. an adventure
+        # world), strict or not: plain JSON mode, the schema in the instructions; the caller checks.
+        system += "\n\nRéponds uniquement avec un objet JSON qui suit ce schéma :\n" + json.dumps(
+            schema, ensure_ascii=False
+        )
+        response_format: dict = {"type": "json_object"}
+    else:
+        response_format = {
             "type": "json_schema",
             "json_schema": {"name": "response", "strict": True, "schema": _strict_schema(schema)},
-        },
+        }
+    resp = client.chat.completions.create(  # type: ignore[call-overload]
+        model=r["model"],
+        messages=[{"role": "system", "content": system}, {"role": "user", "content": prompt}],
+        response_format=response_format,
         extra_body=_openrouter_body(r, role) if p == "openrouter" else None,
     )
     if usage := getattr(resp, "usage", None):
@@ -454,7 +488,8 @@ def _json_openai(
         _log_usage(r, role, activity, usage.prompt_tokens, usage.completion_tokens,
                        getattr(details, "cached_tokens", 0) if details else 0)  # fmt: skip
     text = resp.choices[0].message.content or ""
-    return json.loads(text.strip().removeprefix("```json").removesuffix("```"))
+    start, end = text.find("{"), text.rfind("}")  # fences or a sentence around the object
+    return json.loads(text[start : end + 1] if start >= 0 and end > start else text)
 
 
 # ---------------------------------------------------------------------------

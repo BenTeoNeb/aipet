@@ -13,6 +13,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 from datetime import datetime, timedelta
 
 from loguru import logger
@@ -29,6 +30,7 @@ GOODNIGHT = re.compile(
 NOT_SLEEPY = re.compile(r"\b(pas|jamais) (encore )?(faire )?(dodo|dormir|au lit|me coucher)\b|\bveux pas\b")
 EVENING_WINDOW_MIN = 60  # « dodo » this close to bedtime (or later) puts the pet to sleep too
 BEDTIME_SOON_MIN = 15  # « bientôt l'heure de dormir »
+YAWN_EVERY = 6  # tired: the pet says so on the first tired turn, then only every N child turns
 
 
 def says_goodnight(text: str) -> bool:
@@ -47,6 +49,9 @@ class SleepState:
         self.asleep_until: datetime | None = None  # the child went to bed: the pet sleeps until morning
         self.closing = False  # the pet said goodbye ([fin]): it hangs up after its last words
         self._goodnight_pending = False  # the child said « dodo »: the pet says good night this turn…
+        self.story_running: Callable[[], bool] = lambda: False  # set by the conversation
+        self.adventure_running: Callable[[], bool] = lambda: False  # set by the conversation: never tired then
+        self._tired_turns = 0  # child turns since the pet got tired (to ration the yawns)
 
     # ---------------------------------------------------------------- state
     def reason(self) -> str | None:
@@ -121,22 +126,41 @@ class SleepState:
         return "l'enfant parle d'aller dormir : s'il va se coucher, dis-lui bonne nuit tendrement sans rien proposer"
 
     # ---------------------------------------------------------------- hints
-    def hints(self) -> list[str]:
-        """Short French hints for the pet's next reply: energy and bedtime."""
+    def hints(self, new_turn: bool = True) -> list[str]:
+        """Short French hints for the pet's next reply: energy and bedtime. `new_turn`: a new child
+        message (counts for rationing the yawns)."""
         hints = []
         g = self.pet.g
-        if self.energy:
+        if self.energy and not self.adventure_running():
             state = self.energy.state()
+            story = self.story_running()
             if state == "tired":
+                if new_turn:
+                    self._tired_turns += 1
+                if self._tired_turns % YAWN_EVERY == 1:  # the first tired turn, then now and then
+                    hints.append(
+                        f"tu commences à être {g('fatigué', 'fatiguée')} : dis-le une fois avec des mots (« Ouaaah… »), "
+                        "jamais « *bâille* », "
+                        + ("et continue l'histoire tranquillement" if story else "et propose des choses calmes")
+                    )
+                else:
+                    hints.append(
+                        f"tu es un peu {g('fatigué', 'fatiguée')}, mais tu l'as déjà dit : ne bâille pas, "
+                        + ("continue l'histoire tranquillement" if story else "reste calme")
+                    )
+            elif state == "very_tired" and story:
                 hints.append(
-                    f"tu commences à être {g('fatigué', 'fatiguée')} : dis-le avec des mots (« Ouaaah… »), jamais « *bâille* », "
-                    "et propose des choses calmes"
+                    f"tu es très {g('fatigué', 'fatiguée')}, mais finis d'abord l'histoire : va vers la fin (une ou deux "
+                    "étapes au plus), raconte la fin, demande si elle lui a plu, appelle story_end, et seulement après "
+                    "dis au revoir joyeusement pour aller faire ta sieste, avec [fin]"
                 )
             elif state == "very_tired":
                 hints.append(
                     f"tu es très {g('fatigué', 'fatiguée')} : termine en une ou deux phrases, puis dis au revoir joyeusement pour aller "
                     "faire ta sieste, avec [fin] (sauf si l'enfant a de la peine : reste avec lui)"
                 )
+            if state == "normal":
+                self._tired_turns = 0
         if self.rhythm:
             t = now()
             left = self.rhythm.minutes_to_bedtime(t)

@@ -11,7 +11,7 @@ from aipet.games.common import Activity, Host
 
 
 def make_games(cfg: dict, memory_root: Path, host: Host, slog=None) -> list[Activity]:
-    from aipet.games import guess, learn, quiz, story, yes_no
+    from aipet.games import adventure, guess, learn, quiz, story, yes_no
 
     return [
         quiz.Quiz(cfg, memory_root, host, slog=slog),
@@ -21,4 +21,5 @@ def make_games(cfg: dict, memory_root: Path, host: Host, slog=None) -> list[Acti
         ),
         story.StoryGame(cfg, memory_root, host, slog=slog),
         learn.LearnGame(cfg, memory_root, host, slog=slog),
+        adventure.AdventureGame(cfg, memory_root, host, slog=slog),
     ]

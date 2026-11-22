@@ -63,6 +63,10 @@ class Host:
     def tool_budget_exhausted(self) -> bool:
         return False
 
+    def next_offer(self) -> str:
+        """An activity just ended: what the pet should suggest next (French), or ""."""
+        return ""
+
     def refresh_prompt_soon(self):
         """The game's prompt section changed: send the model the new system prompt."""
 
@@ -90,6 +94,10 @@ class Activity:
     def prompt_section(self) -> str:
         """Its part of the system prompt while it runs (French), or ""."""
         return ""
+
+    def names(self) -> list[str]:
+        """Invented names the children may say (story characters…): hints for speech recognition."""
+        return []
 
     def stop(self):
         """The activity ends (finished, replaced, good night…): forget the running round."""

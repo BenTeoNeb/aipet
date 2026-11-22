@@ -82,6 +82,9 @@ reasoning = "low"            # ≈ 3.5-5 s per plan or quiz ("medium": 8-15 s, t
 [engines.preparation.activities]
 learn = { model = "google/gemini-3.8-flash" }
 yes_no = { model = "google/gemini-3.8-flash" }
+# Adventures: a whole world graph (places, objects, puzzles), checked by a solver; a model that
+# reasons better makes fewer broken worlds. Must fit the 50 s preparation limit (one repair included).
+adventure = { model = "google/gemini-3.8-flash", reasoning = "medium" }
 
 [engines.condensation]
 # Memory: not urgent, quality matters more (and it doesn't queue behind the conversation).
@@ -159,6 +162,7 @@ hang_up_after_secs = 8       # silence after his last words before hanging up (a
 
 [games]
 guess_max_questions = 20     # « devine à quoi je pense »: Flocon gives up and asks after this many questions
+adventure_drafts = true      # also offer the data model's reference adventures (docs/adventure/model), « (nouvelle version) »
 
 [family]
 # The children are not listed here: each pet learns their first names, ages and classes from them

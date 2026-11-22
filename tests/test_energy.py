@@ -260,3 +260,34 @@ def test_no_nap_after_goodbye_that_would_end_at_once():
     e.activity()
     talk(e, c, 17.5)
     assert e.state() == "very_tired" and not e.nap_after_goodbye() and not e._asleep
+
+
+def test_no_nap_in_the_middle_of_a_story():
+    """Seen in a real session: very tired, the pet left in the middle of the child's story."""
+    c = Clock()
+    e = Energy(talk_minutes=20, recharge_minutes=30, clock=c)
+    story = {"on": True}
+    e.keep_awake = lambda: story["on"]
+    e.activity()
+    talk(e, c, 25)
+    assert e.state() == "very_tired" and not e.asleep  # the story goes on
+    story["on"] = False
+    talk(e, c, 1)
+    assert e.asleep
+
+
+def test_never_tired_during_an_adventure():
+    """Asked by the parent: in an adventure, no yawning, no nap, no energy spent."""
+    c = Clock()
+    e = Energy(talk_minutes=20, recharge_minutes=30, clock=c)
+    adventure = {"on": False}
+    e.frozen = lambda: adventure["on"]
+    e.activity()
+    talk(e, c, 10)
+    level = e.level()
+    adventure["on"] = True
+    talk(e, c, 30)  # half an hour of adventure
+    assert abs(e.level() - level) < 0.01 and e.state() == "normal" and not e.asleep
+    adventure["on"] = False
+    talk(e, c, 1)
+    assert e.level() < level  # back to normal life afterwards

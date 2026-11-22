@@ -20,6 +20,7 @@ from __future__ import annotations
 import asyncio
 from collections.abc import Callable
 from datetime import date, timedelta
+from pathlib import Path
 
 from loguru import logger
 from pipecat.frames.frames import (
@@ -27,6 +28,8 @@ from pipecat.frames.frames import (
     LLMContextFrame,
     LLMUpdateSettingsFrame,
     UserStartedSpeakingFrame,
+    VADUserStartedSpeakingFrame,
+    VADUserStoppedSpeakingFrame,
 )
 from pipecat.processors.frame_processor import FrameProcessor
 
@@ -46,7 +49,9 @@ from aipet.sleep import SleepState
 from aipet.tasks import BackgroundTasks
 from aipet.timefmt import MONTHS_FR, now, spoken_date
 from aipet.tool_gate import ToolGate
+from aipet.variety import ActivityHistory
 
+OFFER_TURNS = 3  # idle child turns after the greeting or an activity that still carry the suggestion
 PROMPT_REFRESH_MIN = 10  # keep « Maintenant » (the time in the system prompt) current
 LABEL_START = "⟦"  # labels prefixed to the child's messages (memory.speakers.Speakers.tag)
 
@@ -109,6 +114,7 @@ class Conversation(Host):
         pause_secs: float = 25,
         max_turns: int = 8,
         keep: int = 12,
+        activity_logs: Path | None = None,
     ):
         self.mem, self.cfg, self.context, self.base_prompt = mem, cfg, context, base_prompt
         self.pet = character.of(cfg)
@@ -131,7 +137,18 @@ class Conversation(Host):
             on_condensed=self.refresh_prompt,
             slog=self.slog,
         )
+        # What to suggest when nothing is going on (see variety.py); bootstrapped from the logs.
+        self.activities = ActivityHistory(mem.root, activity_logs, self.slog)
+        self._offer_turns = 0  # idle child turns that still get the suggestion (set by next_offer)
+        self._offer = ""  # this idle moment's suggestion (computed once)
+        self._offer_for: str | None = None  # the child it was computed for
         self.games: list[Activity] = games(self) if games else []
+        self.on_vocabulary: Callable[[list[str]], None] | None = None  # see vocabulary()
+        self.sleep.story_running = self.story_running
+        self.sleep.adventure_running = self.adventure_running
+        if energy:
+            energy.keep_awake = self.story_running  # a story is finished before the nap
+            energy.frozen = self.adventure_running  # during an adventure, the pet is never tired
         self.forget_after_min = 30  # on wake after a longer pause: fresh context
         self.started = now()
         self._prompt_refreshed = now()
@@ -171,7 +188,16 @@ class Conversation(Host):
         ]
         return "\n\n".join(p.strip() for p in parts if p and p.strip()) + "\n"
 
+    def vocabulary(self) -> list[str]:
+        """Names speech recognition should know: the family, the pet, invented characters."""
+        names = sorted({*self.mem.known_names(), self.pet.name})
+        for g in self.games:
+            names += g.names()
+        return list(dict.fromkeys(names))
+
     async def refresh_prompt(self):
+        if self.on_vocabulary:  # a story started or moved on: its names, for the transcription
+            self.on_vocabulary(self.vocabulary())
         if not (self._llm and self._worker):
             return
         self._prompt_refreshed = now()
@@ -251,6 +277,8 @@ class Conversation(Host):
         previous = self.skills.active
         res = self.skills.use(name)
         if "skill" in res:
+            self.activities.played(self._player_or_none(), res["skill"], now().date())
+            self._offer_turns, self._offer = 0, ""  # an activity is going on: no suggestion
             if previous and previous != res["skill"]:
                 self.stop_games()  # the previous activity's game must not keep refereeing
             self.tools.apply(self.skills.all()[res["skill"]].tools)  # before the result: the next inference has them
@@ -259,6 +287,8 @@ class Conversation(Host):
 
     async def end_skill(self) -> dict:
         res = self.skills.end()
+        if offer := self.next_offer():
+            res["propose"] = offer
         self.stop_games()  # an unfinished game keeps its result
         self.tools.apply(())
         if "skill_ended" in res:
@@ -270,6 +300,50 @@ class Conversation(Host):
             self.skills.end(reason)
         self.stop_games()
         self.tools.apply(())
+
+    # --- suggestions ---------------------------------------------------------
+    def _player_or_none(self) -> str | None:
+        return self.who.current if self.who.current and self.who.certainty == "sure" else None
+
+    def _skill_labels(self) -> dict[str, str]:
+        return {n: (s.label or n) for n, s in self.skills.all().items()}
+
+    def next_offer(self) -> str:
+        """An activity just ended: what to suggest now (French), for the next idle turns too."""
+        self._offer_turns = OFFER_TURNS
+        self._offer = self.activities.offer(self._player_or_none(), self._skill_labels(), now().date())
+        return self._offer
+
+    def greeting(self) -> str:
+        """The instruction for the first words of a session (French), with this moment's suggestion."""
+        from aipet.prompts import GREETING
+
+        offer = self.next_offer()
+        return f"{GREETING} Idée du moment : {offer}." if offer else GREETING
+
+    def _offer_hint(self) -> str:
+        """While idle after the greeting or an activity, a few child turns keep the suggestion; the
+        child named now gets their own (computed once per idle moment)."""
+        if self._offer_turns <= 0:  # an activity is going on, or the moment has passed
+            return ""
+        if self.sleep.energy and self.sleep.energy.state() == "very_tired":
+            return ""
+        self._offer_turns -= 1
+        player = self._player_or_none()
+        if player and self._offer_for != player:
+            self._offer = self.activities.offer(player, self._skill_labels(), now().date())
+        self._offer_for = player or self._offer_for
+        return self._offer
+
+    def adventure_running(self) -> bool:
+        from aipet.games.adventure import AdventureGame
+
+        return any(isinstance(g, AdventureGame) and g.state and not g.state.ending for g in self.games)
+
+    def story_running(self) -> bool:
+        from aipet.games.story import StoryGame
+
+        return any(isinstance(g, StoryGame) and g.story for g in self.games)
 
     def stop_games(self):
         for game in self.games:
@@ -292,7 +366,7 @@ class Conversation(Host):
         new = not raw.startswith(LABEL_START)
         if new:  # look for a name before labelling
             self.who.from_speech(raw, self.last_assistant_text())
-        hints = self.sleep.hints()
+        hints = self.sleep.hints(new_turn=new)
         if new:
             hints = self._on_child_message(raw, hints)
         label = self.who.tag()
@@ -320,6 +394,8 @@ class Conversation(Host):
             child = self.who.current if self.who.certainty == "sure" else None
             calm = self.sleep.calm() and not self.skills.active
             hints = [h] if (h := self.life.hint(child, calm)) else []
+        if offer := self._offer_hint():
+            hints = [*hints, offer]
         return hints
 
     def last_assistant_text(self, before_child: bool = True) -> str:
@@ -409,6 +485,12 @@ class ConversationProcessor(FrameProcessor):
             c.memory.cancel_pause()
             if c.wait:
                 c.wait.child_speaks()
+        elif isinstance(frame, VADUserStartedSpeakingFrame):
+            if c.wait:
+                c.wait.voice_started()
+        elif isinstance(frame, VADUserStoppedSpeakingFrame):
+            if c.wait:
+                c.wait.voice_stopped()
         elif isinstance(frame, BotStoppedSpeakingFrame):
             c.memory.arm_pause()
             if c.wait:

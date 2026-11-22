@@ -1,7 +1,7 @@
 """Pipeline assembly (shared by web and headless modes): engines, memory, skills, filters.
 
 transport in → [wake gate] → STT → transcript filters → user aggregator → conversation (labels,
-memory) → sleep gate → [hang-up] → LLM → filler → text cleaning → emotion tags → TTS → transport
+memory) → sleep gate → [hang-up] → LLM → turn guard → filler → text cleaning → emotion tags → TTS → transport
 out → emotion emitter → assistant aggregator
 """
 
@@ -22,6 +22,7 @@ from pipecat.processors.aggregators.llm_response_universal import (
     LLMUserAggregatorParams,
 )
 from pipecat.processors.frame_processor import FrameProcessor
+from pipecat.turns.empty_user_turn import EmptyUserTurnConfig
 from pipecat.turns.user_mute.always_user_mute_strategy import AlwaysUserMuteStrategy
 from pipecat.turns.user_start.min_words_user_turn_start_strategy import MinWordsUserTurnStartStrategy
 from pipecat.turns.user_turn_strategies import UserTurnStrategies
@@ -44,9 +45,18 @@ from aipet.turns import (
     ShortReplyKeeper,
     SilenceNudge,
     ThinkingFiller,
+    TurnGuard,
     UnfinishedSentenceWait,
 )
 from aipet.wake import WakeWordGate
+
+# Pipecat's own recovery: the child's voice cut the pet off, but nothing was transcribed. Its default
+# note is in English; the pet asks again, in French (model-facing text).
+EMPTY_TURN_NOTE = (
+    "⟦système : l'enfant a peut-être dit quelque chose pendant que tu parlais, mais on ne l'a pas compris. "
+    "Ta réponse a été coupée là : il n'a entendu que ce qui est dans la conversation, peut-être rien. "
+    "Demande-lui gentiment de répéter, et redis ta question s'il l'a peut-être manquée.⟧"
+)
 
 
 def build_worker(
@@ -70,11 +80,19 @@ def build_worker(
     async def queue(frames):
         await worker.queue_frames(frames)
 
+    # The only way our own processors run the model: once the pet is idle (never two replies in a row).
+    guard = TurnGuard(slog=session_log)
     mem = Memory.shared(paths.memory_dir(cfg, pet.id), pet.name)
-    conversation = _conversation(cfg, mem, session_log, queue)
-    # Recognition hints: known first names (« Mila » rather than « Lila ») and the pet's.
-    stt = engines.make_stt(cfg, sorted({*mem.known_names(), pet.name}))
+    conversation = _conversation(cfg, mem, session_log, queue, guard)
+    # Recognition hints: known first names (« Mila » rather than « Lila »), the pet's, and the story
+    # characters (« Raya », not « Royal »), kept up to date as stories go.
+    stt = engines.make_stt(cfg, conversation.vocabulary())
+    conversation.on_vocabulary = lambda words: engines.set_stt_hints(stt, words)
     llm = engines.make_llm(cfg, conversation.system_prompt())
+    # An empty reply after a tool is asked again inside the service (llm_retry), unless the pet said
+    # goodbye or sleeps: then its silence is wanted.
+    llm.empty_reply_skip = lambda: conversation.sleep.closing or bool(conversation.sleep.reason())
+    llm.empty_reply_slog = session_log
     tts = engines.make_tts(cfg)
     _register_tools(llm, mem, conversation)
 
@@ -87,7 +105,7 @@ def build_worker(
     steps = _processors(
         cfg, pet, transport, conversation, stt, llm, tts,
         gate=gate, mute_while_speaking=mute_while_speaking, min_volume=min_volume,
-        session_log=session_log, on_hang_up=on_hang_up,
+        session_log=session_log, on_hang_up=on_hang_up, guard=guard,
     )  # fmt: skip
     worker = PipelineWorker(
         Pipeline(steps),
@@ -101,7 +119,7 @@ def build_worker(
     return worker, conversation.context, conversation
 
 
-def _conversation(cfg: dict, mem: Memory, session_log, queue) -> Conversation:
+def _conversation(cfg: dict, mem: Memory, session_log, queue, guard: TurnGuard | None = None) -> Conversation:
     lc, mc = cfg.get("listening", {}), cfg.get("memory", {})
     skill_set = skills.Skills.from_config(cfg, slog=session_log)
     logger.info(f"Skills: {', '.join(skill_set.all()) or 'none'}")
@@ -110,6 +128,7 @@ def _conversation(cfg: dict, mem: Memory, session_log, queue) -> Conversation:
         enabled=lc.get("wait_for_unfinished_sentence", True),
         slog=session_log,
         queue=queue,
+        guard=guard,
     )
     return Conversation(
         mem,
@@ -125,6 +144,7 @@ def _conversation(cfg: dict, mem: Memory, session_log, queue) -> Conversation:
         pause_secs=mc.get("condense_after_pause_secs", 25),
         max_turns=mc.get("condense_every_turns", 8),
         keep=mc.get("kept_messages", 12),
+        activity_logs=paths.logs_dir() / "sessions",
     )
 
 
@@ -165,6 +185,7 @@ def _user_aggregators(cfg: dict, context: LLMContext, *, min_volume: float | Non
                 ]
             ),
             user_mute_strategies=[AlwaysUserMuteStrategy()] if mute_while_speaking else [],
+            empty_user_turn=EmptyUserTurnConfig(interrupted_prompt=EMPTY_TURN_NOTE),
         ),
     )
 
@@ -183,9 +204,15 @@ def _processors(
     min_volume: float | None,
     session_log,
     on_hang_up,
+    guard: TurnGuard | None = None,
 ) -> list[FrameProcessor]:
     lc, ec, rc = cfg.get("listening", {}), cfg.get("energy", {}), cfg.get("responsiveness", {})
     energy = conversation.sleep.energy
+    guard = guard or TurnGuard(slog=session_log)
+
+    def busy_or_preparing() -> str:
+        return guard.busy() or ("preparing" if guard.preparing() else "")
+
     user_agg, assistant_agg = _user_aggregators(
         cfg, conversation.context, min_volume=min_volume, mute_while_speaking=mute_while_speaking
     )
@@ -206,7 +233,11 @@ def _processors(
 
     # One- or two-word replies while the pet speaks: held, then handled when it stops (only if the
     # mic stays open while it speaks, otherwise it would hear itself).
-    keep_short = [] if mute_while_speaking else [ShortReplyKeeper(lc.get("words_to_interrupt", 3), slog=session_log)]
+    keep_short = (
+        []
+        if mute_while_speaking
+        else [ShortReplyKeeper(lc.get("words_to_interrupt", 3), slog=session_log, guard=guard)]
+    )
     hang_up = (
         [HangUp(conversation.sleep.hang_up_reason, on_hang_up, after=ec.get("hang_up_after_secs", 8), slog=session_log)]
         if on_hang_up and ec.get("hang_up", True)
@@ -219,7 +250,11 @@ def _processors(
         TranscriptFilter(slog=session_log),  # drops nonsense transcripts, without a model call
         *keep_short,
         SilenceNudge(
-            waiting_for_an_answer, lc.get("nudge_after_silence_secs", 12), slog=session_log, lines=pet.lines["nudges"]
+            waiting_for_an_answer,
+            lc.get("nudge_after_silence_secs", 12),
+            slog=session_log,
+            lines=pet.lines["nudges"],
+            busy=busy_or_preparing,
         ),
         user_agg,
         conversation.processor(),  # labels each turn, condenses during pauses
@@ -232,6 +267,7 @@ def _processors(
         ),
         *hang_up,
         llm,
+        guard,  # sees the model's output, the tools, and the speech frames coming back up
         ThinkingFiller(
             rc.get("filler_after_secs", 3.5),
             rc.get("give_up_after_secs", 25),

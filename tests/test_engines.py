@@ -207,6 +207,28 @@ def test_json_openai_compatible(monkeypatch):
     assert seen["req"]["extra_body"] is None
 
 
+def test_json_claude_through_openrouter_uses_plain_json_mode(monkeypatch):
+    """Claude refuses a big schema as a grammar (« compiled grammar is too large »): plain JSON mode,
+    the schema in the instructions, and the object found even inside fences or a sentence."""
+    seen = {}
+
+    class FakeOpenAI:
+        def __init__(self, **kw):
+            self.chat = types.SimpleNamespace(completions=types.SimpleNamespace(create=self.create))
+
+        def create(self, **kw):
+            seen["req"] = kw
+            msg = types.SimpleNamespace(content="```json\n" + json.dumps(ANSWER) + "\n```\nVoilà !")
+            return types.SimpleNamespace(choices=[types.SimpleNamespace(message=msg)])
+
+    monkeypatch.setitem(sys.modules, "openai", types.SimpleNamespace(OpenAI=FakeOpenAI))
+    monkeypatch.setenv("OPEN_ROUTER_API", "k")
+    c = cfg(condensation={"provider": "openrouter", "model": "anthropic/claude-sonnet-5.5"})
+    assert engines.complete_json(c, "instructions", "text", SCHEMA) == ANSWER
+    assert seen["req"]["response_format"] == {"type": "json_object"}
+    assert "suit ce schéma" in seen["req"]["messages"][0]["content"]
+
+
 def test_openrouter_routing_and_reasoning(monkeypatch):
     seen = {}
 

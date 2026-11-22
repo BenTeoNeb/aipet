@@ -1,0 +1,1054 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Atelier des aventures</title>
+<style>
+  :root {
+    --bg: #fdf6ee; --panel: #ffffff; --text: #3a3442; --muted: #857d92; --line: #e6dfee; --edge: #b9afc8;
+    --accent: #e0607e; --accent-soft: #fff0f4; --marker: #f3eefa;
+    --win: #2f855a; --win-soft: #e6f6ec; --lose: #c0392b; --lose-soft: #fdecea;
+    --warn: #b7791f; --warn-soft: #fff6e0; --info: #3b6fb6; --info-soft: #e8f0fb;
+    --shadow: 0 4px 14px rgba(90,60,120,.08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #1b1922; --panel: #24212d; --text: #efeaf5; --muted: #a39cb3; --line: #3a3546; --edge: #5d5670;
+      --accent: #ff8fab; --accent-soft: #3a2631; --marker: #2d2838;
+      --win: #6fcf97; --win-soft: #1f3a2b; --lose: #ff8a7a; --lose-soft: #3d2422;
+      --warn: #f0c060; --warn-soft: #3a3020; --info: #8ab4f8; --info-soft: #1f2a3d;
+      --shadow: 0 4px 14px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #1b1922; --panel: #24212d; --text: #efeaf5; --muted: #a39cb3; --line: #3a3546; --edge: #5d5670;
+    --accent: #ff8fab; --accent-soft: #3a2631; --marker: #2d2838;
+    --win: #6fcf97; --win-soft: #1f3a2b; --lose: #ff8a7a; --lose-soft: #3d2422;
+    --warn: #f0c060; --warn-soft: #3a3020; --info: #8ab4f8; --info-soft: #1f2a3d;
+    --shadow: 0 4px 14px rgba(0,0,0,.35);
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--text); display: flex; flex-direction: column;
+    font: 14px/1.4 ui-rounded, "SF Pro Rounded", "Nunito", system-ui, sans-serif; }
+  header { border-bottom: 1px solid var(--line); padding: 10px 16px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  h1 { font-size: 1.1rem; margin: 0; }
+  select, button { font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line);
+    border-radius: 10px; padding: 5px 10px; }
+  button { cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  .tabs { display: flex; gap: 2px; }
+  .tabs button { border: 0; background: none; color: var(--muted); border-bottom: 3px solid transparent; border-radius: 0; }
+  .tabs button[aria-selected="true"] { color: var(--text); border-color: var(--accent); font-weight: 600; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 1em; background: var(--marker); color: var(--muted); font-size: .8rem; white-space: nowrap; }
+  .pill.win { background: var(--win-soft); color: var(--win); }
+  .pill.lose { background: var(--lose-soft); color: var(--lose); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .pill.info { background: var(--info-soft); color: var(--info); }
+  .grow { flex: 1; }
+  a { color: var(--accent); }
+  .muted { color: var(--muted); }
+  .layout { flex: 1; display: flex; min-height: 0; }
+  #stage { flex: 1; position: relative; overflow: hidden; cursor: grab; background:
+    radial-gradient(circle, var(--line) 1px, transparent 1px) 0 0 / 22px 22px; }
+  #stage.drag { cursor: grabbing; }
+  #canvas { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  #canvas svg { position: absolute; left: 0; top: 0; overflow: visible; pointer-events: none; }
+  .zoom { position: absolute; right: 12px; bottom: 12px; display: flex; gap: 4px; z-index: 3; }
+  .legend { position: absolute; left: 12px; bottom: 12px; z-index: 3; display: flex; gap: 6px; flex-wrap: wrap; max-width: 70%; }
+  aside { width: 420px; max-width: 45vw; border-left: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; background: var(--bg); }
+  aside .tabs { padding: 6px 10px 0; border-bottom: 1px solid var(--line); }
+  #side { overflow: auto; padding: 12px 14px; flex: 1; }
+  #side h3 { margin: 14px 0 6px; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  #side h3:first-child { margin-top: 0; }
+  #side p { margin: 4px 0; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; margin: 6px 0; box-shadow: var(--shadow); }
+  .rule { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .78rem; background: var(--marker);
+    border-radius: 6px; padding: 0 5px; margin: 1px 2px 1px 0; display: inline-block; }
+  .rule.neg { color: var(--lose); }
+  .text { font-style: italic; color: var(--muted); }
+
+  /* nodes */
+  .node { position: absolute; background: var(--panel); border: 1.5px solid var(--line); border-radius: 14px;
+    box-shadow: var(--shadow); cursor: pointer; transition: border-color .15s, opacity .15s, background .15s; }
+  .node:hover { border-color: var(--accent); }
+  .node.sel { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft), var(--shadow); }
+  .place { width: 270px; padding: 8px 10px; }
+  .place .ph { font-weight: 700; display: flex; gap: 6px; align-items: baseline; }
+  .place .pid { font-weight: normal; color: var(--muted); font-size: .75rem; font-family: ui-monospace, monospace; }
+  .place .things { margin: 4px 0 0; display: flex; flex-wrap: wrap; gap: 3px; }
+  .thing { font-size: .78rem; padding: 0 6px; border-radius: 8px; background: var(--marker); }
+  .thing.hidden { border: 1px dashed var(--edge); background: none; color: var(--muted); }
+  .thing.char { background: var(--info-soft); color: var(--info); }
+  .place ul { list-style: none; padding: 0; margin: 6px 0 0; border-top: 1px solid var(--line); padding-top: 4px; }
+  .place li, .chip { font-size: .8rem; padding: 1px 6px; border-radius: 6px; margin: 1px 0; display: flex; gap: 4px; align-items: baseline; }
+  .place li:hover { background: var(--accent-soft); }
+  .place li .v { color: var(--muted); font-family: ui-monospace, monospace; font-size: .72rem; width: 46px; flex: none; overflow-wrap: anywhere; }
+  .place.start { border-width: 2.5px; }
+  .place.unreached { opacity: .55; border-style: dashed; }
+  .place.here { border-color: var(--accent); background: var(--accent-soft); box-shadow: 0 0 0 4px var(--accent-soft), var(--shadow); }
+  .place.trail { border-color: var(--accent); }
+  .k-win { color: var(--win); } .k-lose { color: var(--lose); } .k-herring { color: var(--muted); font-style: italic; }
+  .k-dead { color: var(--warn); }
+  li.done, .pnode.done { background: var(--win-soft) !important; }
+  li.now, .pnode.now { outline: 2px solid var(--accent); }
+  .pnode { padding: 5px 9px; font-size: .8rem; max-width: 220px; border-radius: 10px; }
+  .pnode .pk { font-size: .68rem; color: var(--muted); display: block; }
+  .pnode.start { background: var(--marker); font-weight: 700; }
+  .pnode.take, .pnode.open { border-style: dashed; }
+  .pnode.open { background: var(--warn-soft); }
+  .pnode.reach { background: var(--info-soft); }
+  .pnode.end-win { background: var(--win-soft); border-color: var(--win); font-weight: 700; }
+  .pnode.end-lose { background: var(--lose-soft); border-color: var(--lose); font-weight: 700; }
+  .pnode.lose { border-color: var(--lose); }
+  .pnode.decor { opacity: .35; }
+  .pnode.dead { border-color: var(--warn); border-style: dotted; }
+  .elabel { position: absolute; font-size: .72rem; background: var(--bg); color: var(--muted); padding: 0 4px;
+    border-radius: 6px; white-space: nowrap; transform: translate(-50%, -50%); pointer-events: auto; cursor: help; }
+  .elabel.locked { color: var(--warn); border: 1px solid var(--warn); }
+  .elabel.trail { color: var(--accent); font-weight: 600; }
+  path.e { fill: none; stroke: var(--edge); stroke-width: 1.6; }
+  path.e.alt { stroke-dasharray: 5 4; }
+  path.e.locked { stroke: var(--warn); }
+  path.e.trail { stroke: var(--accent); stroke-width: 3; }
+  path.e.lose { stroke: var(--lose); }
+  path.e.win { stroke: var(--win); }
+  path.e.dim { opacity: .2; }
+
+  /* side lists */
+  .road { display: flex; flex-direction: column; gap: 2px; }
+  .step { display: grid; grid-template-columns: 26px 1fr; gap: 6px; padding: 5px 6px; border-radius: 8px; cursor: pointer; }
+  .step:hover { background: var(--marker); }
+  .step.now { background: var(--accent-soft); }
+  .step .n { color: var(--muted); font-size: .75rem; text-align: right; padding-top: 1px; }
+  .step .go { color: var(--muted); }
+  .step .mm { color: var(--lose); font-weight: 700; }
+  .ending { display: flex; gap: 8px; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 10px; cursor: pointer; border: 1px solid transparent; }
+  .ending:hover { border-color: var(--line); }
+  .ending.sel { border-color: var(--accent); background: var(--accent-soft); }
+  .stepper { display: flex; gap: 6px; align-items: center; position: sticky; top: -12px; background: var(--bg); padding: 6px 0; z-index: 1; }
+  .state { font-size: .8rem; }
+  .empty { color: var(--muted); padding: 20px 0; text-align: center; }
+  /* data view */
+  #data { position: absolute; inset: 0; display: grid; grid-template-columns: 250px 1fr; z-index: 4; background: var(--bg); cursor: auto; }
+  #data[hidden] { display: none; }
+  #data .index { border-right: 1px solid var(--line); overflow: auto; padding: 10px; }
+  #data .index input { width: 100%; font: inherit; color: var(--text); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 5px 9px; margin-bottom: 8px; }
+  #data .index h4 { margin: 10px 0 4px; font-size: .72rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); display: flex; justify-content: space-between; }
+  #data .index a { display: block; padding: 2px 6px; border-radius: 6px; color: var(--text); text-decoration: none; font-size: .85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #data .index a:hover { background: var(--marker); }
+  #data .index a.sel { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+  #data .index a .id { font-family: ui-monospace, monospace; font-size: .75rem; color: var(--muted); }
+  #data .record { overflow: auto; padding: 16px 20px 40px; }
+  #data h2 { margin: 0 0 4px; font-size: 1.15rem; }
+  #data h3 { margin: 18px 0 6px; font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  table.fields { border-collapse: collapse; width: 100%; }
+  table.fields > tbody > tr > th { text-align: left; vertical-align: top; width: 150px; padding: 6px 10px 6px 0; font-family: ui-monospace, monospace; font-size: .8rem; font-weight: 600; white-space: nowrap; }
+  table.fields > tbody > tr > th .doc { display: block; font-family: inherit; font-weight: normal; color: var(--muted); font-size: .72rem; white-space: normal; max-width: 150px; }
+  table.fields > tbody > tr > td { padding: 6px 0; vertical-align: top; border-bottom: 1px solid var(--line); }
+  table.fields > tbody > tr > th { border-bottom: 1px solid var(--line); }
+  table.fields tr.unknown th { color: var(--warn); }
+  .sub { border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; margin: 4px 0; background: var(--panel); }
+  .sub table.fields th { width: 90px; }
+  .ref { display: inline-block; padding: 0 7px; border-radius: 8px; background: var(--info-soft); color: var(--info); font-size: .82rem; cursor: pointer; margin: 1px 2px 1px 0; }
+  .ref:hover { outline: 1px solid var(--info); }
+  .ref.missing { background: var(--lose-soft); color: var(--lose); cursor: help; }
+  .lit { font-family: ui-monospace, monospace; font-size: .82rem; }
+  .bool-true { color: var(--win); } .bool-false { color: var(--muted); }
+  .optional { color: var(--muted); font-size: .8rem; }
+  .optional code { color: var(--text); }
+  pre.json { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-size: .78rem; overflow: auto; white-space: pre-wrap; }
+  .schema-svg text { font: 12px ui-rounded, system-ui, sans-serif; fill: var(--text); }
+  .schema-svg .box { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; cursor: pointer; }
+  .schema-svg .box:hover { stroke: var(--accent); }
+  .schema-svg .rel { stroke: var(--edge); stroke-width: 1.4; fill: none; }
+  .schema-svg .rl { font-size: 10px; fill: var(--muted); }
+  .count { color: var(--muted); font-weight: normal; }
+  @media (max-width: 760px) {
+    #data { grid-template-columns: 1fr; grid-template-rows: 30% 1fr; }
+    #data .index { border-right: 0; border-bottom: 1px solid var(--line); }
+    .layout { flex-direction: column; }
+    aside { width: auto; max-width: none; height: 45vh; border-left: 0; border-top: 1px solid var(--line); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Aventures</h1>
+  <select id="pick" aria-label="Aventure"></select>
+  <span id="badges" class="row"></span>
+  <span class="grow"></span>
+  <nav class="tabs" id="views">
+    <button data-view="map" aria-selected="true">Carte</button>
+    <button data-view="chain">Énigmes</button>
+    <button data-view="data">Données</button>
+  </nav>
+</header>
+<div class="layout">
+  <div id="stage">
+    <div id="data" hidden></div>
+    <div id="canvas"></div>
+    <div class="legend" id="legend"></div>
+    <div class="zoom">
+      <button id="decor" title="Montrer / cacher ce qui ne mène à aucune fin">décor</button>
+      <button id="fit">ajuster</button>
+      <button id="zin">+</button><button id="zout">−</button>
+    </div>
+  </div>
+  <aside>
+    <nav class="tabs" id="panels">
+      <button data-panel="about" aria-selected="true">Aventure</button>
+      <button data-panel="roads">Chemins</button>
+      <button data-panel="games">Parties</button>
+      <button data-panel="checks">Contrôles</button>
+      <button data-panel="detail">Détail</button>
+    </nav>
+    <div id="side"></div>
+  </aside>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+<script>
+let DATA = /*ADVENTURES_DATA*/null;
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;"}[c]));
+const ui = { adv: null, view: "map", panel: "about", sel: null, tour: null, step: -1, decor: true,
+  zoom: 1, x: 0, y: 0 };
+// `tour`: {kind: "road"|"game", key, steps: [{label, state, fired}]} — what the stepper walks through.
+
+// ---- data helpers -------------------------------------------------------------------------------
+const A = () => ui.adv;
+const G = () => ui.adv.graph;
+const name = id => A().names[id] || id;
+const action = id => G().actions.find(a => a.id === id);
+// "_coince": the engine's own end when a needed thing was destroyed (no win left).
+const ending = id => G().endings.find(e => e.id === id) || (id === "_coince" ? { id: "coincé", kind: "lose", text: "une chose indispensable a disparu" } : undefined);
+// An action is one consequence with its triggers (the ways of saying it): the page shows the data as is.
+const group = id => action(id);
+const anyOf = (a, set) => set.has(a.id);
+function groupKind(a) {
+  const end = (a.effects || []).find(e => e.startsWith("end:"));
+  if (end) return ending(end.slice(4))?.kind === "lose" ? "lose" : "win";
+  if (A().herrings.includes(a.id)) return "herring";
+  if (!A().explore.fired.includes(a.id)) return "dead";
+  return "";
+}
+const verbsOf = a => [...new Set((a.triggers || []).map(t => t.verb))];
+const shortOf = a => A().labels[a.id].slice(verbsOf(a).join(" / ").length).trim();
+const shortLabel = a => A().labels[a.id];
+// Items and characters as the engine reads them: the graph as written + the kind's properties, states
+// as a map with the starting one, doors on both sides (A().things).
+const withEngine = x => x && { ...x, ...(A().things?.[x.id] || {}) };
+const item = id => withEngine(G().items.find(i => i.id === id));
+const thingOf = id => item(id) || withEngine(G().characters.find(c => c.id === id)) || {};
+// A thing's property now: changed in the state, else as written (like World.prop).
+const prop = (st, id, k) => st?.props?.[id]?.[k] ?? thingOf(id)[k] ?? (k === "state" ? "" : false);
+const nameNow = (st, id) => st?.names?.[id] || name(id);
+const doors = () => new Set(G().places.flatMap(p => (p.exits || []).map(x => x.door).filter(Boolean)));
+const exitRules = x => [...(x.when || []), ...(x.door ? ["open:" + x.door] : [])];
+const KIND_TIP = { win: "mène à une victoire", lose: "mène à une défaite", herring: "fausse piste / blague",
+  dead: "jamais déclenchée par le solveur (doublon d'une autre, ou impossible)" };
+const ICON = { has: "🎒", flag: "🚩", at: "📍", visited: "👣", here: "👤", gain: "+🎒", lose: "−🎒", unflag: "−🚩",
+  reveal: "👁", hide: "🙈", destroy: "💨", move: "🚶", goto: "➜", end: "🏁", open: "🔓 ouvert", locked: "🔒", is: "≡", set: "≔",
+  close: "🚪 fermer", unlock: "🗝", lock: "🔒", follow: "🐾 suit" };
+function rule(r, effect) {
+  const neg = r.startsWith("!");
+  const [k, ...args] = r.replace(/^!/, "").split(":");
+  const icon = effect && k === "flag" ? "+🚩" : ICON[k] || k;
+  const what = args.map(x => k === "flag" || k === "unflag" ? x : k === "end" ? x : name(x)).join(" → ");
+  return `<span class="rule ${neg ? "neg" : ""}" title="${esc(r)}">${neg ? "pas " : ""}${icon} ${esc(what)}</span>`;
+}
+const rules = (list, effect) => (list || []).map(r => rule(r, effect)).join("") || '<span class="muted">—</span>';
+const stateOf = () => (ui.tour && ui.step >= 0 ? ui.tour.steps[ui.step]?.state : null);
+
+// ---- picker, badges ----------------------------------------------------------------------------
+function initPicker() {
+  const groups = {};
+  DATA.adventures.forEach((a, i) => {
+    const g = a.source === "banque" ? `Banque · ${a.graph.difficulty}` : a.source === "patron" ? "Patrons (catalogue des mécanismes)" : a.source === "étalon" ? "Étalon" : "Inventées";
+    (groups[g] ||= []).push(`<option value="${i}">${esc(a.title)}${a.games.length ? " · " + a.games.length + " partie(s)" : ""}</option>`);
+  });
+  $("#pick").innerHTML = Object.entries(groups).map(([g, o]) => `<optgroup label="${esc(g)}">${o.join("")}</optgroup>`).join("");
+  $("#pick").onchange = () => select(+$("#pick").value);
+  const fromHash = DATA.adventures.findIndex(a => encodeURIComponent(a.title) === location.hash.slice(1));
+  select(fromHash >= 0 ? fromHash : 0);
+  $("#pick").value = String(fromHash >= 0 ? fromHash : 0);
+}
+function select(i) {
+  ui.adv = DATA.adventures[i];
+  ui.sel = null; ui.tour = null; ui.step = -1; ui.dataSel = null;
+  history.replaceState(null, "", "#" + encodeURIComponent(ui.adv.title));
+  const a = A(), r = a.report, ex = a.explore;
+  const wins = G().endings.filter(e => e.kind === "win").length, loses = G().endings.length - wins;
+  const dead = G().actions.filter(x => groupKind(x) === "dead").length;
+  const triggers = G().actions.reduce((n, x) => n + (x.triggers || []).length, 0);
+  $("#badges").innerHTML = [
+    `<span class="pill">${esc(G().difficulty)}</span>`,
+    `<span class="pill ${a.model === 2 ? "info" : ""}" title="${a.model === 2 ? "modèle v2" : "modèle v1, montré converti en v2 (un déclencheur par action)"}">v${a.model}</span>`,
+    `<span class="pill" title="actions (conséquences) · déclencheurs (façons de le dire)">${G().places.length} lieux · ${G().actions.length} actions · ${triggers} déclencheurs</span>`,
+    `<span class="pill win">${wins} victoire${wins > 1 ? "s" : ""}</span>`,
+    loses ? `<span class="pill lose">${loses} défaite${loses > 1 ? "s" : ""}</span>` : "",
+    `<span class="pill">${ex.states} états${ex.complete ? "" : " (coupé)"}</span>`,
+    r.shortest ? `<span class="pill" title="pas du plus court chemin gagnant · énigmes (actions et ouvertures) sur ce chemin">plus court : ${r.shortest} pas · ${r.puzzles ?? "?"} énigmes</span>` : "",
+    a.errors.length ? `<span class="pill lose">${a.errors.length} erreur(s)</span>` : "",
+    (r.warnings || []).length ? `<span class="pill warn" title="${esc(r.warnings.join("\n"))}">${r.warnings.length} avertissement(s)</span>` : "",
+    dead ? `<span class="pill warn">${dead} jamais possible(s)</span>` : "",
+  ].join(" ");
+  draw(true);
+  side();
+}
+
+// ---- graph drawing (dagre for the layout, HTML nodes over an SVG of edges) ----------------------
+function layout(nodes, edges, opts) {
+  const g = new dagre.graphlib.Graph({ multigraph: true });
+  g.setGraph(opts);
+  g.setDefaultEdgeLabel(() => ({}));
+  const canvas = $("#canvas");
+  canvas.innerHTML = "";
+  for (const n of nodes) {
+    const el = document.createElement("div");
+    el.className = "node " + n.cls;
+    el.innerHTML = n.html;
+    el.dataset.id = n.id;
+    canvas.appendChild(el);
+    n.el = el;
+    g.setNode(n.id, { width: el.offsetWidth, height: el.offsetHeight });
+  }
+  edges.forEach((e, i) => g.setEdge(e.from, e.to, { width: e.label ? e.label.length * 6 + 14 : 0, height: e.label ? 16 : 0,
+    labelpos: "c", minlen: e.minlen || 1 }, "e" + i));
+  dagre.layout(g);
+  for (const n of nodes) {
+    const p = g.node(n.id);
+    n.el.style.left = p.x - p.width / 2 + "px";
+    n.el.style.top = p.y - p.height / 2 + "px";
+  }
+  const { width, height } = g.graph();
+  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+  svg.setAttribute("width", width); svg.setAttribute("height", height);
+  svg.innerHTML = `<defs>${["edge", "accent", "lose", "win", "warn"].map(c =>
+    `<marker id="m-${c}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+     <path d="M0,0L10,5L0,10z" fill="var(--${c})"/></marker>`).join("")}</defs>`;
+  edges.forEach((e, i) => {
+    const pts = g.edge(e.from, e.to, "e" + i).points;
+    let d = `M${pts[0].x},${pts[0].y}`;
+    for (let j = 1; j < pts.length - 1; j++) {
+      const m = { x: (pts[j].x + pts[j + 1].x) / 2, y: (pts[j].y + pts[j + 1].y) / 2 };
+      d += j === pts.length - 2 ? ` Q${pts[j].x},${pts[j].y} ${pts[j + 1].x},${pts[j + 1].y}` : ` Q${pts[j].x},${pts[j].y} ${m.x},${m.y}`;
+    }
+    if (pts.length === 2) d += ` L${pts[1].x},${pts[1].y}`;
+    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    path.setAttribute("d", d);
+    path.setAttribute("class", "e " + (e.cls || ""));
+    const color = (e.cls || "").match(/trail|lose|win|locked/)?.[0];
+    const marker = { trail: "accent", lose: "lose", win: "win", locked: "warn" }[color] || "edge";
+    if (e.arrow !== false) path.setAttribute("marker-end", `url(#m-${marker})`);
+    if (e.both) path.setAttribute("marker-start", `url(#m-${marker})`);
+    svg.appendChild(path);
+    if (e.label) {
+      const l = g.edge(e.from, e.to, "e" + i);
+      const el = document.createElement("div");
+      el.className = "elabel " + (e.lcls || "");
+      el.style.left = l.x + "px"; el.style.top = l.y + "px";
+      el.textContent = e.label;
+      if (e.tip) el.title = e.tip;
+      canvas.appendChild(el);
+    }
+  });
+  canvas.prepend(svg);
+  canvas.style.width = width + "px"; canvas.style.height = height + "px";
+  return { width, height };
+}
+
+function draw(fit) {
+  const data = ui.view === "data";
+  $("#data").hidden = !data;
+  for (const id of ["#canvas", "#legend", ".zoom"]) $(id).style.display = data ? "none" : "";
+  if (data) return drawData();
+  const size = ui.view === "map" ? drawMap() : drawChain();
+  legend();
+  if (fit) fitView(size);
+  else applyView();
+}
+
+function drawMap() {
+  const a = A(), g = G(), st = stateOf();
+  const done = new Set(st?.done || []);
+  const nowStep = ui.tour && ui.step >= 0 ? ui.tour.steps[ui.step] : null;
+  const nowActs = new Set(nowStep?.fired || []);
+  const trail = trailPlaces();
+  const placed = new Set();
+  const actsAt = {};
+  for (const x of g.actions) (actsAt[a.places_of[x.id]] ||= []).push(x);
+  const revealedAt = {};
+  for (const x of g.actions) for (const e of x.effects || []) if (e.startsWith("reveal:"))
+    (revealedAt[a.places_of[x.id]] ||= new Set()).add(e.slice(7));
+  const itemsAt = p => {
+    if (st) return Object.entries(st.items_at).filter(([, at]) => at === p).map(([i]) => i);
+    return g.items.filter(i => i.at === p).map(i => i.id);
+  };
+  const charsAt = p => st ? Object.entries(st.chars_at).filter(([, at]) => at === p).map(([c]) => c)
+    : g.characters.filter(c => c.at === p).map(c => c.id);
+  const actLi = x => {
+    const k = groupKind(x);
+    const cls = [k && "k-" + k, anyOf(x, done) && "done", anyOf(x, nowActs) && "now"].filter(Boolean).join(" ");
+    const n = (x.triggers || []).length;
+    const more = n > 1 ? ` <span class="pill" title="${n} déclencheurs">×${n}</span>` : "";
+    return `<li class="${cls}" data-act="${esc(x.id)}" title="${esc(KIND_TIP[k] || "")}"><span class="v">${verbsOf(x).map(esc).join("/<wbr>")}</span><span>${esc(shortOf(x))}${k === "win" ? " 🏆" : k === "lose" ? " 💥" : k === "dead" ? " ⚠" : ""}${more}</span></li>`;
+  };
+  const nodes = g.places.map(p => {
+    placed.add(p.id);
+    const chip = i => {
+      const it = item(i), dr = doors().has(i);
+      const icon = dr ? "🚪" : it.container ? "🗄" : it.takeable === false ? "🪨" : "📦";
+      const shut = it.openable ? (prop(st, i, "locked") ? " 🔒" : prop(st, i, "open") ? " (ouvert)" : " (fermé)") : "";
+      const state = it.states ? ` <span class="muted">[${esc(prop(st, i, "state"))}]</span>` : "";
+      const inside = (st ? Object.entries(st.items_at).filter(([, at]) => at === i).map(([x]) => x) : g.items.filter(x => x.at === i).map(x => x.id));
+      const hold = inside.length ? ` : ${inside.map(x => `📦 ${esc(nameNow(st, x))}`).join(", ")}` : "";
+      return `<span class="thing" title="${esc(it.description || "")}">${icon} ${esc(nameNow(st, i))}${shut}${state}${hold}</span>`;
+    };
+    const doorsHere = (A().doors_at?.[p.id] || (p.exits || []).map(x => x.door)).filter(d => d && !itemsAt(p.id).includes(d));
+    const items = [...itemsAt(p.id), ...new Set(doorsHere)].map(chip);
+    const hidden = st ? [] : [...(revealedAt[p.id] || [])].filter(i => !g.items.find(x => x.id === i)?.at)
+      .map(i => `<span class="thing hidden" title="apparaît grâce à une action">👁 ${esc(name(i))}</span>`);
+    const heldBy = c => (st ? Object.entries(st.items_at).filter(([, at]) => at === c).map(([x]) => x) : g.items.filter(x => x.at === c).map(x => x.id));
+    const chars = charsAt(p.id).map(c => `<span class="thing char">👤 ${esc(nameNow(st, c))}${thingOf(c).states ? ` [${esc(prop(st, c, "state"))}]` : ""}${heldBy(c).map(x => ` ✋ ${esc(nameNow(st, x))}`).join("")}</span>`);
+    const cls = ["place", p.id === g.start.place && "start", !a.explore.reached.includes(p.id) && "unreached",
+      st && st.place === p.id && "here", trail.has(p.id) && "trail", ui.sel?.type === "place" && ui.sel.id === p.id && "sel"]
+      .filter(Boolean).join(" ");
+    return { id: p.id, cls, html:
+      `<div class="ph">${p.id === g.start.place ? "🚩" : "📍"} ${esc(p.name)} <span class="pid">${esc(p.id)}</span></div>
+       <div class="things">${[...chars, ...items, ...hidden].join("")}</div>
+       ${(actsAt[p.id] || []).length ? `<ul>${actsAt[p.id].map(actLi).join("")}</ul>` : ""}` };
+  });
+  if ((actsAt[""] || []).length) nodes.push({ id: "__anywhere", cls: "place", html:
+    `<div class="ph">✨ Partout <span class="pid">là où sont l'objet ou la cible</span></div><ul>${actsAt[""].map(actLi).join("")}</ul>` });
+  // exits: one edge per pair of places, both directions merged
+  const pairs = new Map();
+  for (const p of g.places) for (const x of p.exits || []) {
+    if (!placed.has(x.to)) continue;
+    const key = [p.id, x.to].sort().join("|");
+    (pairs.get(key) || pairs.set(key, []).get(key)).push({ from: p.id, ...x });
+  }
+  const trailEdges = trailPairs();
+  const edges = [];
+  for (const [key, list] of pairs) {
+    const fwd = list[0], back = list.find(x => x.from === fwd.to);
+    const locked = list.filter(x => exitRules(x).length);
+    const open = !st || locked.every(x => holds(exitRules(x), st));
+    const door = list.find(x => x.door)?.door;
+    const label = [fwd.dir, back?.dir].filter(Boolean).join(" ⇄ ") + (door ? ` 🚪 ${name(door)}` : "") + (locked.length ? (open && st ? " 🔓" : " 🔒") : "");
+    const tip = locked.map(x => `${x.from} → ${x.to} : ${exitRules(x).join(", ")}${x.blocked ? " — « " + x.blocked + " »" : ""}`).join("\n");
+    const onTrail = trailEdges.has(key);
+    edges.push({ from: fwd.from, to: fwd.to, both: !!back, label, tip,
+      cls: onTrail ? "trail" : locked.length && !(st && open) ? "locked" : "", lcls: onTrail ? "trail" : locked.length ? "locked" : "" });
+  }
+  const size = layout(nodes, edges, { rankdir: "LR", nodesep: 40, ranksep: 90, marginx: 30, marginy: 30 });
+  $("#canvas").querySelectorAll(".node").forEach(el => el.onclick = ev => {
+    const li = ev.target.closest("li[data-act]");
+    if (li) choose({ type: "act", id: li.dataset.act });
+    else if (el.dataset.id !== "__anywhere") choose({ type: "place", id: el.dataset.id });
+  });
+  return size;
+}
+
+function holds(when, st) {
+  return (when || []).every(r => {
+    const neg = r.startsWith("!"); const [k, x] = r.replace(/^!/, "").split(":");
+    const v = k === "has" ? st.inventory.includes(x) : k === "flag" ? st.flags.includes(x) : k === "at" ? st.place === x
+      : k === "visited" ? st.visited.includes(x) : k === "here" ? st.chars_at[x] === st.place
+      : k === "open" || k === "locked" ? !!prop(st, x, k) : k === "is" ? prop(st, x, "state") === r.split(":")[2] : true;
+    return neg ? !v : v;
+  });
+}
+function trailPlaces() {
+  if (!ui.tour) return new Set();
+  const s = new Set();
+  ui.tour.steps.slice(0, ui.step + 1).forEach(x => x.state && s.add(x.state.place));
+  return s;
+}
+function trailPairs() {
+  if (!ui.tour) return new Set();
+  const s = new Set();
+  let prev = ui.tour.start?.place;
+  for (const x of ui.tour.steps.slice(0, ui.step + 1)) {
+    const p = x.state?.place;
+    if (prev && p && p !== prev) s.add([prev, p].sort().join("|"));
+    prev = p;
+  }
+  return s;
+}
+
+function drawChain() {
+  const a = A(), ch = a.chain, st = stateOf();
+  const done = new Set(st?.done || []);
+  const nowActs = new Set(ui.tour && ui.step >= 0 ? ui.tour.steps[ui.step].fired || [] : []);
+  // what leads to an ending (backwards from the endings)
+  const into = {};
+  ch.edges.forEach(e => (into[e.to] ||= []).push(e.from));
+  const useful = new Set(), todo = ch.nodes.filter(n => n.kind === "end").map(n => n.id);
+  while (todo.length) { const id = todo.pop(); if (useful.has(id)) continue; useful.add(id); (into[id] || []).forEach(f => todo.push(f)); }
+  const losing = new Set(a.explore.losing);
+  const has = n => n.kind === "take" ? st?.inventory.includes(n.ref) || st?.done && false
+    : n.kind === "reach" ? st?.visited.includes(n.ref) : n.kind === "open" || n.kind === "code" ? !!prop(st, n.ref, "open") : n.kind === "answer" ? !!prop(st, n.ref, "answered") : n.kind === "act" ? anyOf(group(n.ref), done) : n.kind === "end" ? st?.ending === n.ref : false;
+  // focus: what the selection needs (all its roads) and what it unlocks; the rest fades
+  const selId = !ui.sel ? null : ui.sel.type === "act" ? "act:" + ui.sel.id : ui.sel.type === "ending" ? "end:" + ui.sel.id
+    : ui.sel.type === "item" ? "take:" + ui.sel.id : ui.sel.type === "place" ? "reach:" + ui.sel.id : null;
+  let focus = null;
+  if (selId && ch.nodes.some(n => n.id === selId)) {
+    const out = {};
+    ch.edges.forEach(e => (out[e.from] ||= []).push(e.to));
+    focus = new Set();
+    for (const [dir, start] of [[into, selId], [out, selId]]) {
+      const stack = [start];
+      while (stack.length) { const id = stack.pop(); if (focus.has(id) && id !== start) continue; focus.add(id); (dir[id] || []).forEach(x => !focus.has(x) && stack.push(x)); }
+    }
+  }
+  const shown = ch.nodes.filter(n => ui.decor || useful.has(n.id));
+  const ids = new Set(shown.map(n => n.id));
+  const nodes = shown.map(n => {
+    let cls = "pnode " + n.kind, label = n.label, kind = "";
+    if (n.kind === "act") {
+      const x = group(n.ref), k = groupKind(x);
+      const where = a.places_of[x.id];
+      kind = (where ? name(where) : "partout") + (k === "herring" ? " · fausse piste" : k === "dead" ? " · jamais" : "")
+        + ((x.triggers || []).length > 1 ? ` · ${x.triggers.length} déclencheurs` : "");
+      if (k === "dead") cls += " dead";
+      if (anyOf(x, losing)) cls += " lose";
+      label = shortLabel(x);
+    }
+    if (n.kind === "end") { const e = ending(n.ref); cls = "pnode end-" + e.kind; label = (e.kind === "win" ? "🏆 " : "💥 ") + n.ref; kind = e.kind === "win" ? "victoire" : "défaite"; }
+    if (n.kind === "take") kind = "objet";
+    if (n.kind === "open") kind = doors().has(n.ref) ? "porte" : "contenant";
+    if (n.kind === "answer") { kind = "devinette"; label = "❓ " + n.label + " : « " + thingOf(n.ref).answer.accept[0] + " »"; }
+    if (n.kind === "code") { kind = "code"; label = "🔢 " + n.label + " : " + item(n.ref).code.press.map(name).join(" → "); }
+    if (n.kind === "reach") kind = "chemin ouvert";
+    if (focus ? !focus.has(n.id) : !useful.has(n.id) && n.kind !== "start") cls += " decor";
+    if (st && has(n)) cls += " done";
+    if (n.kind === "act" && anyOf(group(n.ref), nowActs)) cls += " now";
+    if (ui.sel && ((ui.sel.type === "act" && n.id === "act:" + ui.sel.id) || ui.sel.type === "node" && ui.sel.id === n.id)) cls += " sel";
+    return { id: n.id, cls, html: `${kind ? `<span class="pk">${esc(kind)}</span>` : ""}${esc(label)}` };
+  });
+  const endKind = id => id.startsWith("end:") ? ending(id.slice(4))?.kind : "";
+  const edges = ch.edges.filter(e => ids.has(e.from) && ids.has(e.to)).map(e => ({ ...e,
+    cls: [e.alt && "alt", endKind(e.to) === "lose" && "lose", endKind(e.to) === "win" && "win",
+      (focus ? !(focus.has(e.from) && focus.has(e.to)) : !useful.has(e.to)) && "dim"].filter(Boolean).join(" ") }));
+  const size = layout(nodes, edges, { rankdir: "LR", nodesep: 14, ranksep: 60, marginx: 30, marginy: 30 });
+  $("#canvas").querySelectorAll(".node").forEach(el => el.onclick = () => {
+    const n = ch.nodes.find(x => x.id === el.dataset.id);
+    if (n.kind === "act") choose({ type: "act", id: n.ref });
+    else if (n.kind === "reach") choose({ type: "place", id: n.ref });
+    else if (n.kind === "answer") choose({ type: entityOf(n.ref)?.type || "item", id: n.ref });
+    else if (n.kind === "take" || n.kind === "open" || n.kind === "code") choose({ type: "item", id: n.ref });
+    else if (n.kind === "end") choose({ type: "ending", id: n.ref });
+  });
+  return size;
+}
+
+function legend() {
+  const map = [["🚩", "départ"], ["📦", "objet"], ["🪨", "décor fixe"], ["👁", "caché (apparaît)"], ["👤", "personnage"],
+    ['<span class="k-win">🏆</span>', "gagne"], ['<span class="k-lose">💥</span>', "perd"], ['<span class="k-herring">abc</span>', "fausse piste"],
+    ['<span class="k-dead">⚠</span>', "jamais possible"], ['<span style="color:var(--warn)">🔒</span>', "chemin fermé"]];
+  const chain = [["→", "nécessaire à"], ["⇢", "une autre façon existe"], ["▭ pointillé", "ramasser"], ["jaune", "ouvrir (porte, contenant)"], ["bleu", "chemin à ouvrir"],
+    ["pâle", "ne mène à aucune fin"], ["clic", "surligne tout ce qui y mène"]];
+  $("#legend").innerHTML = (ui.view === "map" ? map : chain).map(([i, t]) => `<span class="pill">${i} ${t}</span>`).join("");
+}
+
+// ---- data view: the adventure's data structure, entity by entity ------------------------------
+// The model's fields, with what they mean (docs/adventure/model/README.md).
+const SCHEMA = {
+  adventure: { label: "Aventure", icon: "📘", fields: {
+    title: "le titre", difficulty: "facile, moyen ou difficile", tags: "mots-clés (pour choisir dans la banque)",
+    fact: "« Le savais-tu ? » dit à la victoire", intro: "le début de l'histoire", goal: "le but du héros",
+    start: "où on commence et ce qu'on a dans le sac", model: "version du modèle de données (2)",
+    puzzles: "le tableau des énigmes (Ron Gilbert), de la dernière à la première : ce qu'elle débloque, l'action qui la résout, ce qu'il faut, où est l'indice",
+    places: "les lieux", items: "les objets", characters: "les personnages", actions: "les énigmes", endings: "les fins" } },
+  place: { label: "Lieux", icon: "📍", key: "places", fields: {
+    id: "identifiant", name: "nom dit à l'enfant", aliases: "autres mots pour le nommer",
+    description: "ce qui ne change jamais", details: "phrases ajoutées selon l'état (storylets)",
+    decor: "petites choses du décor, sans usage (des idées pour le narrateur, qui peut en imaginer d'autres)",
+    exits: "les chemins vers d'autres lieux", variants: "v1 : descriptions entières remplacées (à convertir en details)" } },
+  item: { label: "Objets", icon: "📦", key: "items", fields: {
+    id: "identifiant", name: "nom", aliases: "autres mots", description: "quand on le regarde",
+    kind: "thing (s'emporte, par défaut), scenery (décor), container (contenant qui s'ouvre), door (porte d'une sortie) — les kinds d'Inform",
+    details: "phrases ajoutées selon l'état", at: "lieu, contenant ou personnage qui le tient au départ (vide = pas encore dans le monde ; une porte : là où est sa sortie)",
+    fixed: "pourquoi on ne peut pas le prendre", sturdy: "pourquoi on ne peut pas le casser ni le faire disparaître (sinon : destroy le peut)",
+    initial: "phrase dans la description du lieu tant qu'il n'a pas été déplacé (Inform : initial appearance)",
+    open: "ouvert au départ (contenant, porte)",
+    answer: "une devinette ou un mot de passe : question, accept = les réponses acceptées, right / wrong, hint, effects ; une porte ou un coffre s'ouvre",
+    code: "un code à faire (mini-énigme) : press = les boutons dans l'ordre, right / wrong / done = ce qui est dit, hint = l'indice",
+    locked: "fermé à clé au départ", key: "l'objet qui l'ouvre (on l'ouvre avec la clé dans le sac)", texts: "ce que dit l'ouverture : open, locked, unlock, closed",
+    states: "ses états, le premier est celui du départ ; chacun peut changer nom, description, apparition, paroles",
+    takeable: "ancien : se prend (remplacé par kind)", container: "ancien : contenant (remplacé par kind)",
+    openable: "ancien : s'ouvre (remplacé par kind)", state: "ancien : état de départ (maintenant le premier de states)" } },
+  character: { label: "Personnages", icon: "👤", key: "characters", fields: {
+    id: "identifiant", name: "nom", aliases: "autres mots", description: "quand on le regarde", details: "phrases selon l'état",
+    at: "lieu de départ", says: "ce qu'il dit quand on lui parle", initial: "phrase dans la description du lieu quand il est là",
+    states: "ses états, le premier est celui du départ (peuvent changer description, apparition, paroles)",
+    answer: "une devinette ou un mot de passe : question, accept = les réponses acceptées, right / wrong, hint, effects (ce que ça déclenche)",
+    state: "ancien : état de départ (maintenant le premier de states)" } },
+  action: { label: "Actions", icon: "⚡", key: "actions", fields: {
+    id: "identifiant", triggers: "les façons de le dire (une suffit) : verbe + objet + cible",
+    place: "seulement dans ce lieu", when: "conditions (toutes)", effects: "ce qui change", text: "ce qui est raconté",
+    not_yet: "dit quand les conditions ne sont pas encore réunies", hint: "l'indice de l'auteur pour un enfant bloqué (2e niveau)",
+    points: "points gagnés", repeatable: "peut se refaire",
+    warning: "l'avertissement avant de perdre", verb: "v1 : un seul verbe (devient un déclencheur)",
+    object: "v1 : l'objet", target: "v1 : la cible" } },
+  ending: { label: "Fins", icon: "🏁", key: "endings", fields: { id: "identifiant", kind: "win (victoire) ou lose (défaite)", text: "ce qui est raconté", fact: "le « Le savais-tu ? » de cette fin (sinon celui de l'aventure)" } },
+};
+const SUB = {
+  exits: { to: "lieu d'arrivée", dir: "direction", label: "ce qu'on voit du chemin", door: "la porte qui le ferme", when: "conditions pour passer", blocked: "dit quand c'est bloqué" },
+  details: { when: "conditions", text: "la phrase si elles tiennent", else: "la phrase sinon" },
+  variants: { when: "conditions", description: "toute la description" },
+  triggers: { verb: "verbe canonique", object: "l'objet ou le personnage", target: "sur quoi / à qui" },
+  start: { place: "lieu de départ", inventory: "dans le sac au départ" },
+  states: { id: "nom de l'état (is:X:état, set:X:état)", name: "son nom dans cet état", aliases: "autres mots",
+    description: "quand on le regarde", initial: "sa phrase dans le lieu", says: "ce qu'il dit" },
+  texts: { open: "en l'ouvrant", locked: "fermé à clé, sans la clé", unlock: "en l'ouvrant avec la clé", closed: "fermé (sortie)" },
+  code: { press: "les boutons, dans l'ordre", right: "dit à chaque bon bouton", wrong: "dit au mauvais (tout recommence)", done: "dit quand ça s'ouvre", hint: "indice du 2e niveau" },
+  answer: { question: "ce qui est demandé", accept: "les réponses acceptées (mots-clés)", right: "dit si c'est juste", wrong: "dit sinon (la question revient)", hint: "indice du 2e niveau", effects: "ce que la bonne réponse déclenche" },
+  puzzles: { goal: "ce qu'elle débloque", action: "l'action qui la résout", needs: "ce qu'il faut", clue_in: "où est l'indice" },
+};
+const REF_FIELDS = new Set(["to", "door", "at", "key", "object", "target", "place", "inventory", "action", "needs", "clue_in", "press"]);
+const RULE_FIELDS = new Set(["when", "effects"]);
+const TYPES = ["place", "item", "character", "action", "ending"];
+
+function entityOf(id) {
+  for (const t of TYPES) { const e = (G()[SCHEMA[t].key] || []).find(x => x.id === id); if (e) return { type: t, e }; }
+  return null;
+}
+const refChip = id => {
+  if (!id) return '<span class="muted">— (nulle part)</span>';
+  const f = entityOf(id);
+  return f ? `<span class="ref" data-ent="${esc(f.type)}::${esc(id)}" title="${esc(SCHEMA[f.type].label)} · ${esc(id)}">${SCHEMA[f.type].icon} ${esc(f.e.name || id)}</span>`
+    : `<span class="ref missing" title="identifiant inconnu">${esc(id)} ?</span>`;
+};
+function ruleChip(r, effect) {
+  const neg = r.startsWith("!");
+  const [k, ...args] = r.replace(/^!/, "").split(":");
+  const icon = effect && k === "flag" ? "+🚩" : ICON[k] || k;
+  const parts = args.map((x, i) => (k === "flag" || k === "unflag" || k === "end" || (i === 1 && (k === "is" || k === "set"))) ? `<span class="lit">${esc(x)}</span>` : refChip(x));
+  const endRef = k === "end" ? `<span class="ref" data-ent="ending::${esc(args[0])}">🏁 ${esc(args[0])}</span>` : "";
+  return `<span class="rule ${neg ? "neg" : ""}" title="${esc(r)}">${neg ? "pas " : ""}${endRef || `${icon} ${parts.join(" → ")}`}</span>`;
+}
+function renderValue(key, v, ctx) {
+  if (v === null || v === undefined || v === "") return '<span class="muted">—</span>';
+  if (RULE_FIELDS.has(key) && Array.isArray(v)) return v.map(r => ruleChip(r, key === "effects")).join(" ") || '<span class="muted">—</span>';
+  if (REF_FIELDS.has(key)) return Array.isArray(v) ? (v.map(refChip).join(" ") || '<span class="muted">—</span>') : refChip(v);
+  if (key === "verb") return `<span class="pill info" title="${esc((A().verbs[v] || []).join(", "))}">${esc(v)}</span> <span class="muted">${esc((A().verbs[v] || []).slice(0, 6).join(", "))}${(A().verbs[v] || []).length > 6 ? "…" : ""}</span>`;
+  if (typeof v === "boolean") return `<span class="bool-${v}">${v ? "oui" : "non"}</span>`;
+  if (typeof v === "number") return `<span class="lit">${v}</span>`;
+  if (typeof v === "string") return v.length > 40 || /\s/.test(v) && v.length > 20 ? `<span class="text">${esc(v)}</span>` : `<span class="lit">${esc(v)}</span>`;
+  if (Array.isArray(v)) {
+    if (v.every(x => typeof x === "string")) return v.map(x => `<span class="thing">${esc(x)}</span>`).join(" ") || '<span class="muted">—</span>';
+    return v.map((x, i) => `<div class="sub"><span class="muted">${esc(key)}[${i}]</span>${key === "states" && i === 0 ? ' <span class="pill">départ</span>' : ""}${fieldsTable(x, SUB[key] || {}, key)}</div>`).join("");
+  }
+  if (typeof v === "object") {
+    if (key === "states") return Object.entries(v).map(([k, x]) => `<div class="sub"><b>${esc(k)}</b>${ctx?.state === k ? ' <span class="pill">départ</span>' : ""}${Object.keys(x).length ? fieldsTable(x, SCHEMA.item.fields, "state") : '<div class="muted">rien ne change</div>'}</div>`).join("");
+    return fieldsTable(v, SUB[key] || {}, key);
+  }
+  return esc(String(v));
+}
+function fieldsTable(obj, docs, ctxKey) {
+  const rows = Object.entries(obj).map(([k, v]) => {
+    const known = k in docs;
+    return `<tr class="${known ? "" : "unknown"}"><th>${esc(k)}${docs[k] ? `<span class="doc">${esc(docs[k])}</span>` : known ? "" : '<span class="doc">champ inconnu du modèle</span>'}</th><td>${renderValue(k, v, obj)}</td></tr>`;
+  }).join("");
+  return `<table class="fields"><tbody>${rows}</tbody></table>`;
+}
+// Who points at an id: exits, places of things, keys, triggers, conditions and effects, the start.
+function refsTo(id) {
+  const g = G(), out = [];
+  const mentions = list => (list || []).some(r => r.replace(/^!/, "").split(":").slice(1).includes(id));
+  for (const p of g.places) {
+    (p.exits || []).forEach((x, i) => { if (x.to === id) out.push(["place", p.id, `exits[${i}].to`]); if (x.door === id) out.push(["place", p.id, `exits[${i}].door`]); if (mentions(x.when)) out.push(["place", p.id, `exits[${i}].when`]); });
+    (p.details || []).forEach((d, i) => mentions(d.when) && out.push(["place", p.id, `details[${i}].when`]));
+  }
+  for (const t of ["item", "character"]) for (const e of g[SCHEMA[t].key]) {
+    if (e.at === id) out.push([t, e.id, "at"]);
+    if (e.key === id) out.push([t, e.id, "key"]);
+    (e.code?.press || []).forEach((b, i) => b === id && out.push([t, e.id, `code.press[${i}]`]));
+    (e.details || []).forEach((d, i) => mentions(d.when) && out.push([t, e.id, `details[${i}].when`]));
+  }
+  for (const a of g.actions) {
+    (a.triggers || []).forEach((tr, i) => { if (tr.object === id) out.push(["action", a.id, `triggers[${i}].object`]); if (tr.target === id) out.push(["action", a.id, `triggers[${i}].target`]); });
+    if (a.place === id) out.push(["action", a.id, "place"]);
+    if (mentions(a.when)) out.push(["action", a.id, "when"]);
+    if (mentions(a.effects)) out.push(["action", a.id, "effects"]);
+  }
+  if (g.start?.place === id) out.push(["adventure", "", "start.place"]);
+  if ((g.start?.inventory || []).includes(id)) out.push(["adventure", "", "start.inventory"]);
+  (g.puzzles || []).forEach((z, i) => {
+    if (z.action === id) out.push(["adventure", "", `puzzles[${i}].action`]);
+    if ((z.needs || []).includes(id)) out.push(["adventure", "", `puzzles[${i}].needs`]);
+    if (z.clue_in === id) out.push(["adventure", "", `puzzles[${i}].clue_in`]);
+  });
+  return out;
+}
+function schemaDiagram() {
+  // the model's entities and how they point at each other (counts: in this adventure)
+  const g = G(), n = t => (g[SCHEMA[t].key] || []).length;
+  const count = f => { let c = 0; f(() => c++); return c; };
+  const B = { place: [300, 40], item: [560, 150], character: [40, 150], action: [300, 260], ending: [560, 330] };
+  const W = 150, H = 44;
+  const rel = (a, b, label, num, bend = 0) => {
+    const [x1, y1] = [B[a][0] + W / 2, B[a][1] + H / 2], [x2, y2] = [B[b][0] + W / 2, B[b][1] + H / 2];
+    if (a === b) return `<path class="rel" d="M${x1 + 40},${y1 - H / 2} c40,-40 80,-10 35,${H / 2 - 4}" marker-end="url(#sm)"/><text class="rl" x="${x1 + 85}" y="${y1 - 22}">${esc(label)} (${num})</text>`;
+    const mx = (x1 + x2) / 2 + bend, my = (y1 + y2) / 2 + bend / 3;
+    return `<path class="rel" d="M${x1},${y1} Q${mx},${my} ${x2},${y2}" marker-end="url(#sm)"/><text class="rl" x="${mx}" y="${my - 4}" text-anchor="middle">${esc(label)} (${num})</text>`;
+  };
+  const trig = k => count(inc => g.actions.forEach(a => (a.triggers || []).forEach(t => [t.object, t.target].forEach(x => x && entityOf(x)?.type === k && inc()))));
+  const rels = [
+    rel("place", "place", "exits.to", count(inc => g.places.forEach(p => (p.exits || []).forEach(inc)))),
+    rel("place", "item", "exits.door", count(inc => g.places.forEach(p => (p.exits || []).forEach(x => x.door && inc()))), 20),
+    rel("item", "place", "at", count(inc => g.items.forEach(i => i.at && entityOf(i.at)?.type === "place" && inc())), -40),
+    rel("character", "place", "at", count(inc => g.characters.forEach(c => c.at && inc()))),
+    rel("item", "item", "at (dedans) · key", count(inc => g.items.forEach(i => { if (entityOf(i.at)?.type === "item") inc(); if (i.key) inc(); }))),
+    rel("item", "character", "at (tenu par)", count(inc => g.items.forEach(i => entityOf(i.at)?.type === "character" && inc())), 30),
+    rel("action", "item", "triggers", trig("item")),
+    rel("action", "character", "triggers", trig("character")),
+    rel("action", "ending", "effects end:", count(inc => g.actions.forEach(a => (a.effects || []).forEach(e => e.startsWith("end:") && inc())))),
+    rel("action", "place", "place · goto", count(inc => g.actions.forEach(a => { if (a.place) inc(); (a.effects || []).forEach(e => e.startsWith("goto:") && inc()); })), 60),
+  ].join("");
+  const boxes = Object.entries(B).map(([t, [x, y]]) => `<g data-type="${t}"><rect class="box" x="${x}" y="${y}" width="${W}" height="${H}" rx="10"/>
+    <text x="${x + W / 2}" y="${y + 19}" text-anchor="middle">${SCHEMA[t].icon} ${esc(SCHEMA[t].label)}</text>
+    <text x="${x + W / 2}" y="${y + 35}" text-anchor="middle" class="rl">${n(t)} · ${esc(SCHEMA[t].key)}[]</text></g>`).join("");
+  return `<svg class="schema-svg" viewBox="0 0 880 400" style="width:100%;max-width:880px">
+    <defs><marker id="sm" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0L10,5L0,10z" fill="var(--edge)"/></marker></defs>
+    ${rels}${boxes}</svg>`;
+}
+function fieldUsage(t) {
+  const list = G()[SCHEMA[t].key] || [];
+  return Object.entries(SCHEMA[t].fields).map(([f, doc]) => {
+    const used = list.filter(e => e[f] !== undefined && e[f] !== "" && !(Array.isArray(e[f]) && !e[f].length)).length;
+    return `<tr><th>${esc(f)}<span class="doc">${esc(doc)}</span></th><td>${used ? `<span class="pill ${used === list.length ? "win" : ""}">${used} / ${list.length}</span>` : '<span class="muted">pas utilisé ici</span>'}</td></tr>`;
+  }).join("");
+}
+function overview() {
+  const a = A(), g = G();
+  const unknown = [];
+  for (const t of TYPES) for (const e of g[SCHEMA[t].key] || []) for (const k of Object.keys(e)) if (!(k in SCHEMA[t].fields)) unknown.push(`${t} ${e.id} : ${k}`);
+  const root = Object.fromEntries(Object.entries(g).filter(([k]) => !["places", "items", "characters", "actions", "endings"].includes(k)));
+  return `<h2>📘 ${esc(g.title)}</h2>
+    <p class="muted">Modèle de données v${a.model}${a.model === 1 ? " — montré converti en v2 : chaque action a un seul déclencheur ; les <code>variants</code> sont à réécrire en <code>details</code>" : ""}. Clique une entité, un lien bleu, ou une case du schéma.</p>
+    <h3>Schéma : les entités et leurs liens</h3>${schemaDiagram()}
+    ${unknown.length ? `<h3>Champs inconnus du modèle (${unknown.length})</h3><p>${unknown.map(u => `<span class="pill warn">${esc(u)}</span>`).join(" ")}</p>` : ""}
+    <h3>Racine</h3>${fieldsTable(root, SCHEMA.adventure.fields, "adventure")}
+    ${TYPES.map(t => `<h3>${SCHEMA[t].icon} ${esc(SCHEMA[t].label)} — champs du modèle et usage</h3><table class="fields"><tbody>${fieldUsage(t)}</tbody></table>`).join("")}`;
+}
+function record(type, id) {
+  const e = (G()[SCHEMA[type].key] || []).find(x => x.id === id);
+  if (!e) return overview();
+  const refs = refsTo(id);
+  const absent = Object.entries(SCHEMA[type].fields).filter(([k, doc]) => !(k in e) && !["verb", "object", "target", "variants"].includes(k) && !doc.startsWith("ancien"));
+  const link = ([t, eid, f]) => t === "adventure" ? `<div>📘 racine · <span class="lit">${esc(f)}</span></div>` : `<div>${refChip(eid)} <span class="lit">${esc(f)}</span></div>`;
+  return `<h2>${SCHEMA[type].icon} ${esc(e.name || e.id)} <span class="count lit">${esc(SCHEMA[type].key)} · ${esc(e.id)}</span></h2>
+    ${fieldsTable(e, SCHEMA[type].fields, type)}
+    <h3>Référencé par (${refs.length})</h3>${refs.map(link).join("") || '<p class="muted">personne</p>'}
+    ${absent.length ? `<h3>Champs possibles non utilisés</h3><p class="optional">${absent.map(([k, d]) => `<code>${esc(k)}</code> ${esc(d)}`).join(" · ")}</p>` : ""}
+    <h3>JSON</h3><pre class="json">${esc(JSON.stringify(e, null, 1))}</pre>`;
+}
+function drawData() {
+  const g = G(), q = (ui.dataQuery || "").toLowerCase();
+  if (!ui.dataSel && ui.sel) {  // coming from the map or the puzzles: open what was selected
+    const t = { act: "action", place: "place", item: "item", ending: "ending" }[ui.sel.type];
+    if (t) ui.dataSel = { type: t, id: ui.sel.id };
+  }
+  const sel = ui.dataSel;
+  const match = e => !q || JSON.stringify(e).toLowerCase().includes(q);
+  const index = TYPES.map(t => {
+    const list = (g[SCHEMA[t].key] || []).filter(match);
+    return `<h4><span>${SCHEMA[t].icon} ${esc(SCHEMA[t].label)}</span><span>${list.length}</span></h4>` + list.map(e =>
+      `<a href="#" class="${sel?.type === t && sel.id === e.id ? "sel" : ""}" data-ent="${t}::${esc(e.id)}">${esc(e.name || (t === "action" ? A().labels[e.id] : e.id))} <span class="id">${esc(e.id)}</span></a>`).join("");
+  }).join("");
+  const el = $("#data");
+  el.innerHTML = `<div class="index"><input id="dq" placeholder="chercher (id, mot, texte…)" value="${esc(ui.dataQuery || "")}">
+      <a href="#" data-ent="" class="${sel ? "" : "sel"}">📘 Vue d'ensemble</a>${index}</div>
+    <div class="record">${sel ? record(sel.type, sel.id) : overview()}</div>`;
+  const dq = el.querySelector("#dq");
+  dq.oninput = () => { ui.dataQuery = dq.value; const pos = dq.selectionStart; drawData(); const n = $("#dq"); n.focus(); n.setSelectionRange(pos, pos); };
+  el.querySelectorAll("[data-ent]").forEach(x => x.onclick = ev => {
+    ev.preventDefault();
+    const [t, id] = x.dataset.ent.split("::");
+    ui.dataSel = t ? { type: t, id } : null;
+    ui.sel = t && t !== "character" ? { type: t === "action" ? "act" : t, id } : null;  // the side panel follows
+    drawData();
+    if (ui.sel) setPanel("detail");
+  });
+  el.querySelectorAll(".schema-svg g[data-type]").forEach(x => x.onclick = () => {
+    const t = x.dataset.type, first = (g[SCHEMA[t].key] || [])[0];
+    if (first) { ui.dataSel = { type: t, id: first.id }; drawData(); }
+  });
+  return { width: 0, height: 0 };
+}
+
+// ---- pan / zoom --------------------------------------------------------------------------------
+function applyView() { $("#canvas").style.transform = `translate(${ui.x}px,${ui.y}px) scale(${ui.zoom})`; }
+function fitView(size) {
+  const s = $("#stage").getBoundingClientRect();
+  ui.zoom = Math.min(1.2, (s.width - 20) / size.width, (s.height - 50) / size.height);
+  ui.x = (s.width - size.width * ui.zoom) / 2; ui.y = Math.max(10, (s.height - 40 - size.height * ui.zoom) / 2);
+  applyView();
+}
+function zoomAt(f, cx, cy) {
+  const z = Math.max(.15, Math.min(3, ui.zoom * f));
+  ui.x = cx - (cx - ui.x) * z / ui.zoom; ui.y = cy - (cy - ui.y) * z / ui.zoom; ui.zoom = z; applyView();
+}
+(() => {
+  const stage = $("#stage");
+  stage.addEventListener("wheel", e => {
+    if (ui.view === "data") return;  // the data view scrolls normally
+    e.preventDefault();
+    const r = stage.getBoundingClientRect();
+    if (e.ctrlKey || e.metaKey || Math.abs(e.deltaY) > 40 && !e.deltaX) zoomAt(Math.exp(-e.deltaY / 300), e.clientX - r.left, e.clientY - r.top);
+    else { ui.x -= e.deltaX; ui.y -= e.deltaY; applyView(); }
+  }, { passive: false });
+  let drag = null;
+  let moved = false;
+  stage.addEventListener("click", e => { if (ui.view !== "data" && !moved && ui.sel && !e.target.closest(".node,.zoom,.legend,.elabel")) { ui.sel = null; draw(false); } });
+  stage.addEventListener("pointerdown", e => { moved = false; if (ui.view === "data" || e.target.closest(".node,.zoom,.legend")) return; drag = { x: e.clientX - ui.x, y: e.clientY - ui.y }; stage.classList.add("drag"); stage.setPointerCapture(e.pointerId); });
+  stage.addEventListener("pointermove", e => { if (drag) { moved = true; ui.x = e.clientX - drag.x; ui.y = e.clientY - drag.y; applyView(); } });
+  stage.addEventListener("pointerup", () => { drag = null; stage.classList.remove("drag"); });
+  $("#fit").onclick = () => draw(true);
+  $("#zin").onclick = () => { const r = stage.getBoundingClientRect(); zoomAt(1.25, r.width / 2, r.height / 2); };
+  $("#zout").onclick = () => { const r = stage.getBoundingClientRect(); zoomAt(.8, r.width / 2, r.height / 2); };
+  $("#decor").onclick = () => { ui.decor = !ui.decor; $("#decor").style.opacity = ui.decor ? 1 : .5; draw(true); };
+})();
+
+// ---- side panels --------------------------------------------------------------------------------
+function tabs(id, key, cb) {
+  $(id).querySelectorAll("button").forEach(b => b.onclick = () => {
+    ui[key] = b.dataset[key];
+    $(id).querySelectorAll("button").forEach(x => x.setAttribute("aria-selected", x === b));
+    cb();
+  });
+}
+function setPanel(p) { ui.panel = p; $("#panels").querySelectorAll("button").forEach(x => x.setAttribute("aria-selected", x.dataset.panel === p)); side(); }
+function choose(sel) {
+  const t = { act: "action", place: "place", item: "item", ending: "ending" }[sel.type];
+  ui.sel = sel; ui.dataSel = t ? { type: t, id: sel.id } : ui.dataSel;
+  draw(false); setPanel("detail");
+}
+
+function side() {
+  const el = $("#side");
+  el.innerHTML = ({ about: aboutPanel, roads: roadsPanel, games: gamesPanel, checks: checksPanel, detail: detailPanel })[ui.panel]();
+  el.querySelectorAll("[data-go]").forEach(b => b.onclick = () => { const [t, id] = b.dataset.go.split("::"); choose({ type: t, id }); });
+  el.querySelectorAll("[data-road]").forEach(b => b.onclick = () => startTour("road", b.dataset.road));
+  el.querySelectorAll("[data-game]").forEach(b => b.onclick = () => startTour("game", +b.dataset.game));
+  el.querySelectorAll("[data-step]").forEach(b => b.onclick = () => goStep(+b.dataset.step));
+  el.querySelector("#prev")?.addEventListener("click", () => goStep(ui.step - 1));
+  el.querySelector("#next")?.addEventListener("click", () => goStep(ui.step + 1));
+  el.querySelector("#stop")?.addEventListener("click", () => { ui.tour = null; ui.step = -1; draw(false); side(); });
+  el.querySelector(".step.now")?.scrollIntoView({ block: "nearest" });
+}
+
+function aboutPanel() {
+  const g = G(), a = A();
+  const recs = a.records.map(r => `<div class="card"><b>${esc(r.player || "?")}</b> <span class="muted">${esc((r.created || "").slice(0, 16))}${r.idea ? " · idée : " + esc(r.idea) : ""}</span>
+    ${(r.runs || []).map(x => `<div>${x.outcome === "win" ? "🏆" : x.outcome === "lose" ? "💥" : "⏸"} ${esc((x.started || "").slice(0, 16).replace("T", " "))} · ${esc(x.ending || x.outcome || "en cours")} · ${x.turns ?? "?"} tours${x.from ? " · depuis " + esc(x.from) : ""}</div>`).join("")}
+    ${r.state ? `<div class="muted">État gardé : ${esc(name(r.state.place))}${r.state.ending ? " · fini (" + esc(r.state.ending) + ")" : ""} · sac : ${esc(r.state.inventory.map(name).join(", ") || "vide")}</div>` : ""}</div>`).join("");
+  return `<h3>${esc(a.source)}</h3>
+    <p><b>${esc(g.title)}</b></p><p class="text">${esc(g.intro)}</p><p>🎯 ${esc(g.goal)}</p>
+    ${g.fact ? `<p class="muted">💡 ${esc(g.fact)}</p>` : ""}
+    <h3>Fins</h3>${g.endings.map(e => `<div class="card"><span class="pill ${e.kind}">${e.kind === "win" ? "victoire" : "défaite"}</span> <a href="#" data-go="ending::${esc(e.id)}">${esc(e.id)}</a><p class="text">${esc(e.text)}</p></div>`).join("")}
+    <h3>Départ</h3><p>📍 ${esc(name(g.start.place))} · sac : ${esc((g.start.inventory || []).map(name).join(", ") || "vide")}</p>
+    ${recs ? `<h3>Gardée pour</h3>${recs}` : ""}`;
+}
+
+function roadsPanel() {
+  const a = A();
+  const list = G().endings.map(e => {
+    const r = a.roads[e.id];
+    return `<div class="ending ${ui.tour?.kind === "road" && ui.tour.key === e.id ? "sel" : ""}" data-road="${esc(e.id)}">
+      <span><span class="pill ${e.kind}">${e.kind === "win" ? "🏆" : "💥"} ${esc(e.id)}</span></span>
+      <span class="muted">${r ? r.length + " pas" : "inatteignable"}</span></div>`;
+  }).join("");
+  return `<h3>Le plus court chemin vers chaque fin</h3>
+    <p class="muted">Clique une fin pour suivre son chemin pas à pas sur la carte ou les énigmes. Toutes les autres façons
+    (les variantes, les ordres possibles) se lisent dans la vue <b>Énigmes</b> : une flèche pointillée = une autre façon existe.</p>
+    ${list}${tourView()}`;
+}
+
+function gamesPanel() {
+  const a = A();
+  if (!a.games.length) return `<div class="empty">Aucune partie trouvée dans les journaux de session ni dans les parties simulées (<code>uv run pet-playtest</code>).</div>`;
+  const list = a.games.map((g, i) => {
+    const last = g.turns.at(-1)?.state;
+    const end = last?.ending ? ending(last.ending) : null;
+    const mm = g.turns.filter(t => t.mismatch).length;
+    const issues = g.turns.reduce((n, t) => n + (t.issues || []).length, 0);
+    const unknown = g.turns.reduce((n, t) => n + t.outcomes.filter(o => ["free", "absent", "impossible"].includes(o)).length, 0);
+    const who = g.simulated ? `<span class="pill info" title="${esc(g.simulated.style)}">🤖 ${esc(g.simulated.child)}</span>` : `<span class="pill">${esc(g.mode)}</span>`;
+    return `<div class="ending ${ui.tour?.kind === "game" && ui.tour.key === i ? "sel" : ""}" data-game="${i}">
+      <span>${esc(g.t.slice(0, 16).replace("T", " "))} ${who}</span>
+      <span>${g.turns.length} tours ${end ? `<span class="pill ${end.kind}">${esc(end.id)}</span>` : ""} ${mm ? `<span class="pill lose">${mm} écart(s)</span>` : ""}
+      ${issues ? `<span class="pill lose" title="écarts du narrateur relevés par le juge">${issues} faute(s) du narrateur</span>` : ""}
+      ${unknown ? `<span class="pill warn" title="free, absent, impossible : le monde n'a pas compris">${unknown} incompris</span>` : ""}</span></div>`;
+  }).join("");
+  return `<h3>Parties jouées (rejouées dans le moteur)</h3>
+    <p class="muted">Chaque appel <code>adventure_act</code> du journal est rejoué dans le moteur actuel. Un <span class="mm" style="color:var(--lose)">écart</span>
+    = le moteur répond autrement qu'au moment de la partie.</p>${list}${tourView()}`;
+}
+
+function startTour(kind, key) {
+  const a = A();
+  if (kind === "road") {
+    const r = a.roads[key];
+    if (!r) return;
+    ui.tour = { kind, key, start: { place: G().start.place }, steps: r.map(s => ({ ...s, fired: s.kind === "act" ? [s.id] : [] })) };
+  } else {
+    const g = a.games[key];
+    ui.tour = { kind, key, start: g.start, steps: g.turns.map(t => ({ ...t, label: t.said || "(rien)", state: t.state })) };
+  }
+  ui.step = 0;
+  draw(false); side();
+}
+function goStep(i) {
+  if (!ui.tour) return;
+  ui.step = Math.max(0, Math.min(ui.tour.steps.length - 1, i));
+  draw(false); side();
+}
+function tourView() {
+  const t = ui.tour;
+  if (!t) return "";
+  const st = stateOf();
+  const steps = t.steps.map((s, i) => {
+    let body;
+    if (t.kind === "road") {
+      body = s.kind === "go" ? `<span class="go">➜ ${esc(name(s.id))}</span>`
+        : s.kind === "take" ? `🎒 prendre <b>${esc(name(s.id))}</b>`
+        : s.kind === "open" ? `🗄 ouvrir <b>${esc(name(s.id))}</b>`
+        : s.kind === "press" ? `🔢 appuyer sur <b>${esc(name(s.id))}</b>`
+        : s.kind === "answer" ? `❓ répondre à <b>${esc(name(s.id))}</b> : « ${esc(thingOf(s.id).answer.accept[0])} »`
+        : `<b>${esc(s.label)}</b>${i === ui.step && s.text ? `<div class="text">${esc(s.text)}</div>` : ""}`;
+    } else {
+      const intents = s.intents.map((x, j) => `<span class="rule">${esc([x.verb, x.object, x.target && "→ " + x.target, x.to].filter(Boolean).join(" "))}</span>
+        <span class="pill ${s.outcomes[j] === "done" || s.outcomes[j] === "end" ? "win" : s.outcomes[j] === "free" ? "info" : s.outcomes[j] ? "warn" : ""}">${esc(s.outcomes[j] || "—")}</span>`).join(" ");
+      body = `« ${esc(s.said)} »<div>${intents}</div>${s.fired.length ? `<div>✓ ${s.fired.map(f => esc(A().labels[f] || f)).join(", ")}</div>` : ""}
+        ${s.mismatch ? `<div class="mm">journal : ${esc(s.logged.join(", "))}</div>` : ""}
+        ${s.told && i === ui.step ? `<div class="text">🐱 ${esc(s.told.replace(/\[[^\]]{1,30}\]\s*/g, ""))}</div>` : ""}
+        ${(s.issues || []).map(x => `<div class="mm">⚠ ${esc(x.kind)} : ${esc(x.text)}</div>`).join("")}`;
+    }
+    return `<div class="step ${i === ui.step ? "now" : ""}" data-step="${i}"><span class="n">${i + 1}</span><span>${body}</span></div>`;
+  }).join("");
+  const stateBox = st ? `<div class="card state">📍 <b>${esc(name(st.place))}</b>${st.ending ? ` · <span class="pill ${ending(st.ending)?.kind}">${esc(st.ending)}</span>` : ""}
+    <div>🎒 ${esc(st.inventory.map(i => nameNow(st, i)).join(", ") || "vide")}</div>
+    <div>${Object.entries(st.props || {}).map(([i, v]) => `<span class="rule">${esc(name(i))} : ${[thingOf(i).openable && (v.locked ? "🔒" : v.open ? "ouvert" : "fermé"), v.state].filter(Boolean).map(esc).join(" · ")}</span>`).join("")}</div><div>${st.flags.map(f => `<span class="rule">🚩 ${esc(f)}</span>`).join("") || ""}</div></div>` : "";
+  return `<div class="stepper"><button id="prev">◀</button><button id="next">▶</button>
+    <span class="muted">pas ${ui.step + 1} / ${t.steps.length}</span><span class="grow"></span><button id="stop">fermer</button></div>
+    ${stateBox}<div class="road">${steps}</div>`;
+}
+
+function checksPanel() {
+  const a = A(), g = G(), ex = a.explore;
+  const dead = g.actions.filter(x => groupKind(x) === "dead");
+  const unreached = g.places.filter(p => !ex.reached.includes(p.id));
+  const used = new Set(g.actions.flatMap(x => [...(x.triggers || []).flatMap(t => [t.object, t.target]), ...(x.when || []).map(r => r.split(":")[1]), ...(x.effects || []).map(e => e.split(":")[1])]));
+  g.places.forEach(p => (p.exits || []).forEach(x => (x.when || []).forEach(r => used.add(r.split(":")[1]))));
+  g.items.forEach(i => i.key && used.add(i.key));
+  const idle = g.items.filter(i => !used.has(i.id) && item(i.id).takeable !== false);
+  const winsOk = g.endings.filter(e => e.kind === "win").map(e => [e, a.report.wins?.[e.id]]);
+  return `<h3>Validation (check)</h3>
+    ${a.errors.length ? a.errors.map(e => `<div class="card" style="border-color:var(--lose)">${esc(e)}</div>`).join("") : `<p><span class="pill win">aucune erreur</span></p>`}
+    ${(a.report.warnings || []).map(e => `<div class="card" style="border-color:var(--warn)">⚠ ${esc(e)}</div>`).join("")}
+    <h3>Solveur</h3>
+    <p>${ex.states} états${ex.complete ? " (exploration complète)" : " — <b>exploration coupée</b>"} · plus court chemin gagnant : ${a.report.shortest ?? "—"} pas</p>
+    <p>${winsOk.map(([e, n]) => `<span class="pill win">${esc(e.id)} : ${n ?? "∅"}</span>`).join(" ")} ${(a.report.loses || []).map(l => `<span class="pill lose">${esc(l)}</span>`).join(" ")}</p>
+    <p>${ex.stuck ? `<span class="pill lose">${ex.stuck} état(s) sans issue</span>` : `<span class="pill win">jamais coincé</span>`}</p>
+    <h3>Jamais déclenchées (${dead.length})</h3>
+    <p class="muted">Le solveur ne les fait jamais : conditions impossibles, ou même effet qu'une autre action déjà faite (en v1, souvent un doublon à fusionner en déclencheurs). À vérifier.</p>
+    ${dead.map(x => `<div class="chip"><a href="#" data-go="act::${esc(x.id)}">${esc(x.id)}</a> <span class="muted">${esc(a.labels[x.id])}</span></div>`).join("") || '<p class="muted">—</p>'}
+    <h3>Fausses pistes (${a.herrings.length})</h3>
+    ${a.herrings.map(id => `<div class="chip"><a href="#" data-go="act::${esc(id)}">${esc(id)}</a> <span class="muted">${esc(a.labels[id])}</span></div>`).join("") || '<p class="muted">—</p>'}
+    <h3>Lieux jamais atteints</h3>${unreached.map(p => `<div class="chip">${esc(p.name)}</div>`).join("") || '<p class="muted">—</p>'}
+    <h3>Objets à prendre qui ne servent à rien</h3>${idle.map(i => `<div class="chip"><a href="#" data-go="item::${esc(i.id)}">${esc(i.name)}</a></div>`).join("") || '<p class="muted">—</p>'}`;
+}
+
+function detailPanel() {
+  const s = ui.sel, g = G(), a = A();
+  if (!s) return `<div class="empty">Clique un lieu, une action ou une énigme.</div>`;
+  const back = list => list.map(x => `<a href="#" data-go="act::${esc(x.id)}">${esc(a.labels[x.id])}</a>`).join(", ") || "—";
+  if (s.type === "act") {
+    const x = group(s.id), k = groupKind(x);
+    const deps = a.chain.edges.filter(e => e.to === "act:" + x.id && e.from !== "start");
+    const enables = a.chain.edges.filter(e => e.from === "act:" + x.id);
+    const nodeLink = id => { const n = a.chain.nodes.find(z => z.id === id); return n.kind === "act" ? `<a href="#" data-go="act::${esc(n.ref)}">${esc(n.label)}</a>` : esc(n.label); };
+    const fired = new Set(a.explore.fired);
+    const words = it => { const t = g.items.find(i => i.id === it) || g.characters.find(c => c.id === it) || g.places.find(p => p.id === it);
+      return t ? `<b>${esc(t.name)}</b>${(t.aliases || []).length ? ` <span class="muted">(${esc(t.aliases.join(", "))})</span>` : ""}` : esc(it); };
+    const triggers = (x.triggers || []).map((t, i) => {
+      const syn = (a.verbs[t.verb] || []).join(", ");
+      return `<div class="card"><div><span class="pill info">${esc(t.verb)}</span> ${t.object ? words(t.object) : ""}${t.target ? " → " + words(t.target) : ""}</div>
+        ${syn ? `<div class="muted">verbe aussi compris : ${esc(syn)}</div>` : ""}</div>`;
+    }).join("");
+    return `<h3>Action</h3><p><b>${esc(a.labels[x.id])}</b> <span class="pid muted">${esc(x.id)}</span> ${k ? `<span class="pill ${k === "dead" ? "warn" : k}">${esc(KIND_TIP[k])}</span>` : ""}</p>
+      <p>📍 ${a.places_of[x.id] ? esc(name(a.places_of[x.id])) : "partout (là où est l'objet)"}${x.place ? " (imposé)" : ""} · ${x.points ?? 0} points${x.repeatable ? " · répétable" : ""}</p>
+      <h3>Conditions</h3><p>${rules(x.when)}</p>
+      <h3>Conséquence</h3><p>${rules(x.effects, true)}</p>
+      <p class="text">${esc(x.text)}</p>
+      ${x.not_yet ? `<h3>Pas encore</h3><p class="text">${esc(x.not_yet)}</p>` : ""}
+      <h3>Déclencheurs (${(x.triggers || []).length})</h3>
+      <p class="muted">Les façons de le dire qui font cette action. Le moteur comprend aussi les synonymes du verbe et les autres noms des choses${k === "lose" ? ", sauf pour une action qui fait perdre : seul le verbe exact compte" : ""}.</p>
+      ${triggers}
+      <h3>A besoin de</h3><p>${deps.map(e => nodeLink(e.from) + (e.alt ? " <span class='muted'>(ou)</span>" : "")).join("<br>") || "—"}</p>
+      <h3>Débloque</h3><p>${enables.map(e => nodeLink(e.to)).join("<br>") || "—"}</p>`;
+  }
+  if (s.type === "place") {
+    const p = g.places.find(x => x.id === s.id);
+    return `<h3>Lieu</h3><p><b>${esc(p.name)}</b> <span class="muted">${esc(p.id)} · alias : ${esc((p.aliases || []).join(", "))}</span></p>
+      <p class="text">${esc(p.description)}</p>
+      ${(p.details || []).map(d => `<div class="card">${rules(d.when)}<p class="text">${esc(d.text)}</p>${d.else ? `<p class="muted">sinon : <span class="text">${esc(d.else)}</span></p>` : ""}</div>`).join("")}
+      ${(p.variants || []).map(v => `<div class="card"><span class="pill warn" title="modèle v1 : toute la description remplacée">variante v1</span> ${rules(v.when)}<p class="text">${esc(v.description)}</p></div>`).join("")}
+      <h3>Sorties</h3>${(p.exits || []).map(x => `<div class="card">➜ <b>${esc(name(x.to))}</b> <span class="muted">${esc(x.dir || "")} · « ${esc(x.label || "")} »</span>
+        ${x.door ? `<div>🚪 <a href="#" data-go="item::${esc(x.door)}">${esc(name(x.door))}</a></div>` : ""}
+        ${(x.when || []).length ? `<div>🔒 ${rules(x.when)}</div>${x.blocked ? `<div class="text">${esc(x.blocked)}</div>` : ""}` : ""}</div>`).join("")}
+      <h3>Personnages</h3>${g.characters.filter(c => c.at === p.id).map(c => `<div class="card"><b>${esc(c.name)}</b><p class="text">${esc(c.description)}</p>${c.initial ? `<p>🖼 <span class="text">${esc(c.initial)}</span></p>` : ""}<p>💬 ${esc(c.says || "")}</p>
+        ${c.states ? Object.entries(c.states).map(([k, v]) => `<div><span class="rule">${esc(k)}${k === c.state ? " (départ)" : ""}</span> ${v.initial ? `<span class="text">${esc(v.initial)}</span>` : ""} ${v.says ? `💬 <span class="text">${esc(v.says)}</span>` : ""}</div>`).join("") : ""}</div>`).join("") || "—"}
+      <h3>Objets</h3>${g.items.filter(i => i.at === p.id).map(i => `<div class="chip"><a href="#" data-go="item::${esc(i.id)}">${esc(i.name)}</a>${i.takeable === false ? " 🪨" : ""}</div>`).join("") || "—"}`;
+  }
+  if (s.type === "item") {
+    const i = g.items.find(x => x.id === s.id);
+    const uses = g.actions.filter(x => (x.triggers || []).some(t => t.object === i.id || t.target === i.id) || (x.when || []).some(r => r.replace(/^!/, "").split(":")[1] === i.id));
+    const makes = g.actions.filter(x => (x.effects || []).some(e => e.split(":")[1] === i.id));
+    return `<h3>Objet</h3><p><b>${esc(i.name)}</b> <span class="muted">${esc(i.id)} · alias : ${esc((i.aliases || []).join(", "))}</span></p>
+      <p>📍 ${i.at ? esc(name(i.at)) + (item(i.at) ? " (dedans)" : "") : "caché au départ"} · ${i.takeable === false ? "ne se prend pas" : "se prend"}${doors().has(i.id) ? " · porte" : ""}${i.container ? " · contenant" : ""}</p>
+      ${i.openable ? `<p>🗄 ouvrable · ${i.open ? "ouvert" : "fermé"}${i.locked ? ` · 🔒 fermé à clé, clé : <a href="#" data-go="item::${esc(i.key)}">${esc(name(i.key))}</a>` : ""}</p>` : ""}
+      ${Object.entries(i.texts || {}).map(([k, t]) => `<p class="text"><span class="rule">${esc(k)}</span> ${esc(t)}</p>`).join("")}
+      <p class="text">${esc(i.description)}</p>${(i.details || []).map(d => `<div>${rules(d.when)} <span class="text">${esc(d.text)}</span>${d.else ? ` <span class="muted">sinon</span> <span class="text">${esc(d.else)}</span>` : ""}</div>`).join("")}
+      ${i.initial ? `<p>🖼 apparition initiale : <span class="text">${esc(i.initial)}</span></p>` : ""}
+      ${i.fixed ? `<p class="text">🪨 ${esc(i.fixed)}</p>` : ""}
+      ${i.states ? `<h3>États (départ : ${esc(i.state)})</h3>${Object.entries(i.states).map(([k, v]) => `<div class="card"><b>${esc(k)}</b>${v.name ? ` → ${esc(v.name)}` : ""}${v.description ? `<p class="text">${esc(v.description)}</p>` : ""}</div>`).join("")}` : ""}
+      ${g.items.some(x => x.at === i.id) ? `<h3>Contient</h3>${g.items.filter(x => x.at === i.id).map(x => `<a href="#" data-go="item::${esc(x.id)}">${esc(x.name)}</a>`).join(", ")}` : ""}
+      <h3>Apparaît / change avec</h3><p>${back(makes)}</p><h3>Sert à</h3><p>${back(uses)}</p>`;
+  }
+  if (s.type === "ending") {
+    const e = ending(s.id);
+    const by = g.actions.filter(x => (x.effects || []).includes("end:" + e.id));
+    return `<h3>Fin</h3><p><span class="pill ${e.kind}">${e.kind === "win" ? "victoire" : "défaite"}</span> <b>${esc(e.id)}</b></p>
+      <p class="text">${esc(e.text)}</p><h3>Déclenchée par</h3><p>${back(by)}</p>
+      <p><button data-road="${esc(e.id)}">suivre le plus court chemin</button></p>`;
+  }
+  return "";
+}
+
+tabs("#views", "view", () => draw(true));
+tabs("#panels", "panel", side);
+addEventListener("keydown", e => {
+  if (!ui.tour || e.target.closest("select")) return;
+  if (e.key === "ArrowRight") goStep(ui.step + 1);
+  if (e.key === "ArrowLeft") goStep(ui.step - 1);
+});
+addEventListener("resize", () => draw(true));
+function fail(msg) { document.body.innerHTML = `<p style="padding:20px">${esc(msg)}</p>`; }
+if (!window.dagre) fail("La bibliothèque de mise en page (dagre, CDN) n'a pas pu se charger : il faut une connexion.");
+else if (DATA) initPicker();
+else {  // served by pet-web (/adventures): the data comes from the guarded debug route
+  document.querySelector("h1").textContent = "Aventures · calcul…";
+  fetch("/debug/adventures", { headers: { "X-Pet": "1" } })
+    .then(r => r.ok ? r.json() : Promise.reject(new Error(r.status + " " + r.statusText)))
+    .then(d => { DATA = d; document.querySelector("h1").textContent = "Aventures"; initPicker(); })
+    .catch(e => fail("Impossible de charger les aventures : " + e.message));
+}
+</script>
+</body>
+</html>

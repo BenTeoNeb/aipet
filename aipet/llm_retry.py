@@ -1,4 +1,12 @@
-"""Retry a streamed chat completion that sends no first chunk in time (OpenAI-compatible APIs).
+"""Retries inside the LLM service.
+
+`EmptyReplyRetry` (every provider): after a tool result, the model sometimes says nothing at all (the
+end of a story was never told). The service knows for sure whether a reply had words or a tool call,
+so it asks once more, within the same response: downstream never sees an empty reply. (A processor
+after the LLM used to guess this from frames, and a reply that was only a tool call, announced after
+the end of the response, looked empty: the ending of an adventure was told twice, 21/11/2026.)
+
+`FirstChunkRetry`: retry a streamed chat completion that sends no first chunk in time (OpenAI-compatible APIs).
 
 Pipecat's `retry_on_timeout` only bounds the request until the HTTP headers come back. OpenRouter
 sends them right away (then keep-alive comments while the model thinks), so a model that takes
@@ -9,6 +17,7 @@ like Pipecat's own retry)."""
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from typing import Any
 
 from loguru import logger
@@ -65,9 +74,65 @@ class FirstChunkRetry:
         return _Peeked(first, iterator, stream)
 
 
-class RetryingOpenRouterLLMService(FirstChunkRetry, OpenRouterLLMService):
+def _after_tool(context) -> bool:
+    """This model call follows a tool result (instructions added since do not count)."""
+    for m in reversed(context.get_messages()):
+        role = m.get("role") if isinstance(m, dict) else None
+        if role in ("system", "developer"):
+            continue
+        return role == "tool"
+    return False
+
+
+class EmptyReplyRetry:
+    """Mixin for Pipecat's LLM services: an empty reply after a tool is asked once more."""
+
+    # Model-facing text (French content).
+    NOTE = (
+        "⟦système : après l'outil, tu n'as rien dit. Continue maintenant : raconte la suite (ou la fin de "
+        "l'histoire) et pose ta question à l'enfant. Si tu avais déjà tout dit et que tu attends sa réponse, "
+        "réponds seulement [silence].⟧"
+    )
+    # Set by the pipeline: the pet said goodbye or sleeps (its silence is wanted); the session log.
+    empty_reply_skip: Callable[[], bool] = staticmethod(lambda: False)
+    empty_reply_slog: Any = None
+    _replied = False
+
+    async def _push_llm_text(self, text: str):
+        if text.strip():
+            self._replied = True
+        await super()._push_llm_text(text)  # type: ignore[misc]
+
+    async def run_function_calls(self, function_calls):
+        if function_calls:
+            self._replied = True
+        await super().run_function_calls(function_calls)
+
+    async def _process_context(self, context):
+        self._replied = False
+        await super()._process_context(context)
+        if self._replied or not _after_tool(context) or self.empty_reply_skip():
+            return
+        logger.info("🔁 Empty reply after a tool: asking the model again")
+        if self.empty_reply_slog:
+            self.empty_reply_slog.event("empty_reply_retry")
+        context.add_message({"role": "user", "content": self.NOTE})
+        await super()._process_context(context)  # once: never a loop
+
+
+_RETRYING: dict[type, type] = {}
+
+
+def with_empty_reply_retry(cls: type) -> type:
+    """`cls` (a Pipecat LLM service) that asks an empty reply after a tool again."""
+    if cls not in _RETRYING:
+        _RETRYING[cls] = type(cls.__name__, (EmptyReplyRetry, cls), {})
+    return _RETRYING[cls]
+
+
+class RetryingOpenRouterLLMService(EmptyReplyRetry, FirstChunkRetry, OpenRouterLLMService):
     pass
 
 
-class RetryingOpenAILLMService(FirstChunkRetry, OpenAILLMService):
+class RetryingOpenAILLMService(EmptyReplyRetry, FirstChunkRetry, OpenAILLMService):
     pass

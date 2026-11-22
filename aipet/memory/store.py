@@ -34,6 +34,7 @@ from loguru import logger
 from aipet.fileio import atomic_write_json, atomic_write_text, load_json, lock_for
 from aipet.memory import short_cards
 from aipet.memory.cards import (  # noqa: F401 (re-exported: the memory's public format)
+    DIR_ADVENTURES,
     DIR_CONVERSATIONS,
     DIR_FAMILY,
     DIR_GAMES,
@@ -338,6 +339,15 @@ class Memory:
                     text, n = scrub_sentences(p.read_text(encoding="utf-8"), everywhere)
                     if n:
                         changed(p, text, n)
+                # Adventures: their worlds are made of ids and rules, scrubbing words would break them;
+                # an adventure that mentions what is forgotten is deleted whole.
+                for p in sorted((self.root / DIR_ADVENTURES).glob("*.json")):
+                    with lock_for(p):
+                        data = load_json(p, None)
+                        if data is not None and scrub_value(data, everywhere) != data:
+                            p.unlink()
+                            res["removed_items"] += 1
+                            res["files"].append(self._rel(p))
                 # Game records and the story universe (guessed answers, quiz questions, characters).
                 for p in [
                     *sorted((self.root / DIR_GAMES).glob("*.json")),

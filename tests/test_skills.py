@@ -217,9 +217,16 @@ def test_skill_header_declares_tools(tmp_path):
 
 
 def test_builtin_skills_declare_existing_tools():
-    from aipet.games import guess, learn, quiz, story, yes_no
+    from aipet.games import adventure, guess, learn, quiz, story, yes_no
 
-    every_tool = quiz.QUIZ_TOOLS | yes_no.YES_NO_TOOLS | guess.GUESS_TOOLS | story.STORY_TOOLS | learn.LEARN_TOOLS
+    every_tool = (
+        quiz.QUIZ_TOOLS
+        | yes_no.YES_NO_TOOLS
+        | guess.GUESS_TOOLS
+        | story.STORY_TOOLS
+        | learn.LEARN_TOOLS
+        | adventure.ADVENTURE_TOOLS
+    )
     builtin = Skills.from_config({"skills": {"family_dir": "/nowhere"}}).all()
     assert all(set(s.tools) <= every_tool for s in builtin.values())
     assert set(builtin["quiz"].tools) == quiz.QUIZ_TOOLS and set(builtin["story"].tools) == story.STORY_TOOLS

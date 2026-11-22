@@ -1,0 +1,426 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:storyworld:adventure:format-2",
+  "title": "Storyworld adventure, format 2",
+  "description": "An interactive-fiction adventure: a world graph (places, items, characters), the actions that change it, and its endings. Structure only: cross-references, reachability and the absence of dead ends are verified by the checker (see SPEC.md). Version 1 graphs are not covered; they are migrated by the library first.",
+  "type": "object",
+  "properties": {
+    "format": {
+      "description": "Format version. Always 2 for this schema.",
+      "const": 2
+    },
+    "model": {
+      "description": "Deprecated alias of `format` (files written before the field was renamed).",
+      "const": 2,
+      "deprecated": true
+    },
+    "title": {
+      "description": "The adventure's title, shown and spoken to the player.",
+      "type": "string",
+      "minLength": 1
+    },
+    "difficulty": {
+      "description": "Difficulty label. Its meaning (size limits, hint pacing, checkpoints) is an application policy, not part of the format.",
+      "enum": ["facile", "moyen", "difficile"]
+    },
+    "tags": {
+      "description": "Theme keywords (used to pick an adventure matching a player's idea).",
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "fact": {
+      "description": "A true « did you know? » anecdote told after the adventure ends (an ending's own `fact` takes precedence).",
+      "type": "string"
+    },
+    "intro": {
+      "description": "Opening text told before the first turn.",
+      "type": "string"
+    },
+    "goal": {
+      "description": "The mission, in one sentence.",
+      "type": "string"
+    },
+    "start": {"$ref": "#/$defs/start"},
+    "places": {
+      "description": "The places of the world (Inform's rooms).",
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/place"}
+    },
+    "items": {
+      "description": "Things, scenery, containers and doors. Default: none.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/item"}
+    },
+    "characters": {
+      "description": "The people and animals of the world. Default: none.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/character"}
+    },
+    "actions": {
+      "description": "Scripted actions (the puzzles): one consequence each, with the ways of saying it. Default: none.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/action"}
+    },
+    "endings": {
+      "description": "The ways the adventure can end (at least one win).",
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/ending"}
+    },
+    "puzzles": {
+      "description": "The puzzle dependency chart (Ron Gilbert's), written backwards from the end. Documentation for authors and the hint system; checked, but not needed to play.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/puzzle"}
+    }
+  },
+  "required": ["title", "start", "places", "endings"],
+  "anyOf": [
+    {"required": ["format"]},
+    {"required": ["model"]}
+  ],
+  "patternProperties": {"^x-": true},
+  "additionalProperties": false,
+
+  "$defs": {
+    "id": {
+      "description": "An identifier: unique across places, items and characters (actions and endings have their own namespaces). No colon or whitespace, not starting with `!`; lowercase ASCII with underscores is recommended.",
+      "type": "string",
+      "pattern": "^[^!:\\s][^:\\s]*$"
+    },
+    "location": {
+      "description": "A place id, a container id, a character id, or \"\" (not in the world yet).",
+      "type": "string",
+      "pattern": "^([^!:\\s][^:\\s]*)?$"
+    },
+    "text": {
+      "description": "Text told to the player (any language).",
+      "type": "string"
+    },
+    "aliases": {
+      "description": "Other names the player may use (articles and plural marks are ignored when matching).",
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "condition": {
+      "description": "A condition: has:ITEM, flag:NAME, at:PLACE, visited:PLACE, here:CHARACTER, open:ITEM, locked:ITEM, is:THING:STATE, optionally negated with a leading `!`.",
+      "type": "string",
+      "pattern": "^!?(?:(?:has|flag|at|visited|here|open|locked):[^!:\\s][^:\\s]*|is:[^!:\\s][^:\\s]*:[^!:\\s][^:\\s]*)$"
+    },
+    "conditions": {
+      "description": "Conditions that must all hold (an empty list always holds).",
+      "type": "array",
+      "items": {"$ref": "#/$defs/condition"}
+    },
+    "effect": {
+      "description": "An effect: gain:ITEM, lose:ITEM, flag:NAME, reveal:ITEM, move:CHARACTER:PLACE, follow:CHARACTER, goto:PLACE, end:ENDING, open:ITEM, unlock:ITEM, set:THING:STATE.",
+      "type": "string",
+      "pattern": "^(?:(?:gain|lose|flag|reveal|follow|goto|end|open|unlock):[^!:\\s][^:\\s]*|(?:move|set):[^!:\\s][^:\\s]*:[^!:\\s][^:\\s]*)$"
+    },
+    "effects": {
+      "description": "Effects applied in order.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/effect"}
+    },
+    "line": {
+      "description": "One line of a situated text: said when its conditions hold.",
+      "type": "object",
+      "properties": {
+        "when": {"$ref": "#/$defs/conditions", "description": "When this line applies. Omitted on the last line (the default)."},
+        "text": {"$ref": "#/$defs/text", "description": "The line."}
+      },
+      "required": ["text"],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "situated": {
+      "description": "A text, or a list of lines of which the first whose conditions hold is used (storylets); the last line should have no `when`.",
+      "oneOf": [
+        {"type": "string"},
+        {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/line"}}
+      ]
+    },
+    "detail": {
+      "description": "A sentence added to a description while its conditions hold (else its `else`).",
+      "type": "object",
+      "properties": {
+        "when": {"$ref": "#/$defs/conditions", "description": "When `text` is told. Default: always."},
+        "text": {"$ref": "#/$defs/text", "description": "Told while the conditions hold."},
+        "else": {"$ref": "#/$defs/text", "description": "Told while they don't. Default: nothing."}
+      },
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "details": {
+      "description": "Composed description: the base `description`, then each detail that holds (or its `else`), in order.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/detail"}
+    },
+    "state": {
+      "description": "A value state (Inform's « can be empty or full »). Its fields override the owner's while it is current.",
+      "type": "object",
+      "properties": {
+        "id": {"$ref": "#/$defs/id", "description": "The state's name, unique within its owner (used in is:X:S and set:X:S)."},
+        "name": {"$ref": "#/$defs/text", "description": "The owner's name while in this state."},
+        "aliases": {"$ref": "#/$defs/aliases", "description": "More names while in this state (all states' names are always understood)."},
+        "description": {"$ref": "#/$defs/text", "description": "The owner's description while in this state."},
+        "initial": {"$ref": "#/$defs/situated", "description": "The owner's initial appearance while in this state."},
+        "says": {"$ref": "#/$defs/situated", "description": "What the owner (a character) says while in this state."}
+      },
+      "required": ["id"],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "states": {
+      "description": "Value states, the first is the starting state.",
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/state"}
+    },
+    "legacyStates": {
+      "description": "Deprecated: states as a map keyed by state name, with `state` naming the starting one.",
+      "deprecated": true,
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "name": {"$ref": "#/$defs/text", "description": "The owner's name in this state."},
+          "aliases": {"$ref": "#/$defs/aliases", "description": "More names in this state."},
+          "description": {"$ref": "#/$defs/text", "description": "The owner's description in this state."},
+          "initial": {"$ref": "#/$defs/situated", "description": "Initial appearance in this state."},
+          "says": {"$ref": "#/$defs/situated", "description": "What the owner says in this state."}
+        },
+        "patternProperties": {"^x-": true},
+        "additionalProperties": false
+      }
+    },
+    "answer": {
+      "description": "A riddle or a password. A character asks it; an item that asks it is locked until answered and opens then.",
+      "type": "object",
+      "properties": {
+        "question": {"$ref": "#/$defs/text", "description": "The question, told when the player talks to the asker or tries to open it."},
+        "accept": {"description": "Accepted answers: the player's words match when they contain every significant word of one of them.", "type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "right": {"$ref": "#/$defs/text", "description": "Told on a right answer."},
+        "wrong": {"$ref": "#/$defs/text", "description": "Told on a wrong answer (the question is repeated)."},
+        "hint": {"$ref": "#/$defs/text", "description": "Second-level hint for this riddle."},
+        "effects": {"$ref": "#/$defs/effects", "description": "Applied on a right answer (an openable asker also opens)."}
+      },
+      "required": ["question", "accept"],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "code": {
+      "description": "A code lock: scenery buttons pressed in the right order open the container or door.",
+      "type": "object",
+      "properties": {
+        "press": {"description": "Button item ids (scenery), in the order that opens it. At least two.", "type": "array", "minItems": 2, "items": {"$ref": "#/$defs/id"}},
+        "right": {"$ref": "#/$defs/text", "description": "Told when a right button (not the last) is pressed."},
+        "wrong": {"$ref": "#/$defs/text", "description": "Told when a wrong button is pressed (the code starts again)."},
+        "done": {"$ref": "#/$defs/text", "description": "Told when the last button opens it. Default: texts.open."},
+        "hint": {"$ref": "#/$defs/text", "description": "Second-level hint (where the order is shown)."}
+      },
+      "required": ["press"],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "openingTexts": {
+      "description": "What opening a container or door says.",
+      "type": "object",
+      "properties": {
+        "open": {"$ref": "#/$defs/text", "description": "Told when it opens (not locked)."},
+        "locked": {"$ref": "#/$defs/text", "description": "Told when it is locked and cannot be opened yet."},
+        "unlock": {"$ref": "#/$defs/text", "description": "Told when the key in the bag unlocks and opens it."},
+        "closed": {"$ref": "#/$defs/text", "description": "Told for an exit closed by this (unlocked) door."}
+      },
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "exit": {
+      "description": "A way out of a place.",
+      "type": "object",
+      "properties": {
+        "to": {"$ref": "#/$defs/id", "description": "The place it leads to."},
+        "label": {"$ref": "#/$defs/text", "description": "How the way is named (« vers la plage »). Default: the destination's name."},
+        "dir": {"description": "A direction word (« nord », « haut »), also understood as the way's name.", "type": "string"},
+        "door": {"$ref": "#/$defs/id", "description": "A door item closing this way. Written on one side: the way back gets the same door."},
+        "when": {"$ref": "#/$defs/conditions", "description": "Conditions to go through. Default: none."},
+        "blocked": {"$ref": "#/$defs/text", "description": "Told while `when` does not hold."}
+      },
+      "required": ["to"],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "variant": {
+      "description": "Deprecated (version 1): a whole description replacing the base one while its conditions hold.",
+      "deprecated": true,
+      "type": "object",
+      "properties": {
+        "when": {"$ref": "#/$defs/conditions", "description": "When this description applies."},
+        "description": {"$ref": "#/$defs/text", "description": "The whole description."}
+      },
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "place": {
+      "description": "A place (Inform's room).",
+      "type": "object",
+      "properties": {
+        "id": {"$ref": "#/$defs/id", "description": "Unique id."},
+        "name": {"$ref": "#/$defs/text", "description": "The place's name, with its article."},
+        "aliases": {"$ref": "#/$defs/aliases", "description": "Other names."},
+        "description": {"$ref": "#/$defs/text", "description": "What never changes here."},
+        "details": {"$ref": "#/$defs/details", "description": "Sentences that depend on the situation."},
+        "decor": {"description": "Plain things seen here that serve no purpose (the narrator may play along with them).", "type": "array", "items": {"type": "string"}},
+        "exits": {"description": "The ways out.", "type": "array", "items": {"$ref": "#/$defs/exit"}},
+        "variants": {"description": "Deprecated: version 1 whole descriptions; use `details`.", "deprecated": true, "type": "array", "items": {"$ref": "#/$defs/variant"}}
+      },
+      "required": ["id", "name"],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "item": {
+      "description": "A thing of the world, of one of four kinds (Inform's kinds).",
+      "type": "object",
+      "properties": {
+        "id": {"$ref": "#/$defs/id", "description": "Unique id."},
+        "kind": {"description": "thing (can be taken; the default), scenery (stays put), container (holds things, opens), door (closes the exits that name it).", "enum": ["thing", "scenery", "container", "door"], "default": "thing"},
+        "name": {"$ref": "#/$defs/text", "description": "The item's name, with its article."},
+        "aliases": {"$ref": "#/$defs/aliases", "description": "Other names."},
+        "description": {"$ref": "#/$defs/text", "description": "What examining it tells."},
+        "details": {"$ref": "#/$defs/details", "description": "Sentences added to its description depending on the situation."},
+        "at": {"$ref": "#/$defs/location", "description": "Where it starts: a place, a container (inside), a character (held), or \"\" / absent (not in the world until revealed or gained). A door needs none."},
+        "fixed": {"$ref": "#/$defs/text", "description": "Why it cannot be taken (told when the player tries)."},
+        "sturdy": {"description": "Cannot be destroyed; a string is the reason told.", "type": ["boolean", "string"]},
+        "fragile": {"description": "Scenery that can be destroyed (a drawing in the sand). Default: false.", "type": "boolean", "default": false},
+        "initial": {"$ref": "#/$defs/situated", "description": "Initial appearance: a sentence in the place's description while it was never moved."},
+        "open": {"description": "Starts open (containers and doors). Default: false.", "type": "boolean", "default": false},
+        "locked": {"description": "Starts locked (containers and doors). Implied by `code` and `answer`. Default: false.", "type": "boolean", "default": false},
+        "key": {"$ref": "#/$defs/id", "description": "The item that unlocks it."},
+        "texts": {"$ref": "#/$defs/openingTexts", "description": "What opening it says."},
+        "states": {
+          "description": "Value states, the first is the start (a deprecated map form is still accepted).",
+          "anyOf": [{"$ref": "#/$defs/states"}, {"$ref": "#/$defs/legacyStates"}]
+        },
+        "state": {"description": "Deprecated: the starting state, with the map form of `states`.", "deprecated": true, "type": "string"},
+        "code": {"$ref": "#/$defs/code", "description": "A code lock that opens it."},
+        "answer": {"$ref": "#/$defs/answer", "description": "A riddle or password it asks (a speaking door or chest)."},
+        "takeable": {"description": "Deprecated (version 1): use kind thing / scenery.", "deprecated": true, "type": "boolean"},
+        "container": {"description": "Deprecated (version 1): use kind container.", "deprecated": true, "type": "boolean"},
+        "openable": {"description": "Deprecated (version 1): use kind door (or container).", "deprecated": true, "type": "boolean"}
+      },
+      "required": ["id", "name"],
+      "allOf": [
+        {
+          "description": "A lock, a key or a code belongs to a container or a door.",
+          "if": {
+            "anyOf": [
+              {"required": ["key"]},
+              {"required": ["code"]},
+              {"required": ["locked"], "properties": {"locked": {"const": true}}}
+            ],
+            "not": {"anyOf": [{"required": ["container"]}, {"required": ["openable"]}]}
+          },
+          "then": {"required": ["kind"], "properties": {"kind": {"enum": ["container", "door"]}}}
+        }
+      ],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "character": {
+      "description": "A person or animal. Never taken, never destroyed.",
+      "type": "object",
+      "properties": {
+        "id": {"$ref": "#/$defs/id", "description": "Unique id."},
+        "name": {"$ref": "#/$defs/text", "description": "The character's name."},
+        "aliases": {"$ref": "#/$defs/aliases", "description": "Other names."},
+        "description": {"$ref": "#/$defs/text", "description": "What examining them tells."},
+        "details": {"$ref": "#/$defs/details", "description": "Sentences added to their description depending on the situation."},
+        "at": {"$ref": "#/$defs/location", "description": "The place where they start, or \"\" / absent (not in the world until moved there)."},
+        "says": {"$ref": "#/$defs/situated", "description": "What they say when talked to."},
+        "initial": {"$ref": "#/$defs/situated", "description": "A sentence in the place's description while they are there (not while they follow the hero)."},
+        "states": {
+          "description": "Value states, the first is the start (a deprecated map form is still accepted).",
+          "anyOf": [{"$ref": "#/$defs/states"}, {"$ref": "#/$defs/legacyStates"}]
+        },
+        "state": {"description": "Deprecated: the starting state, with the map form of `states`.", "deprecated": true, "type": "string"},
+        "answer": {"$ref": "#/$defs/answer", "description": "A riddle or password they ask."}
+      },
+      "required": ["id", "name"],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "verb": {
+      "description": "A canonical verb a trigger may use. go, take, drop, look, inventory, help, where and other are built in and cannot be scripted.",
+      "enum": ["examine", "search", "give", "use", "combine", "open", "close", "talk", "answer", "ask", "eat", "drink", "climb", "swim", "jump", "push", "pull", "light", "wear", "read", "hit", "destroy", "smell", "touch", "listen", "wait", "sit", "sing", "dance", "throw", "fill"]
+    },
+    "trigger": {
+      "description": "One way of saying an action: a verb and up to two things.",
+      "type": "object",
+      "properties": {
+        "verb": {"$ref": "#/$defs/verb", "description": "The canonical verb."},
+        "object": {"$ref": "#/$defs/id", "description": "The thing acted on (an item, character or place id)."},
+        "target": {"$ref": "#/$defs/id", "description": "The second thing (give X to TARGET, use X on TARGET)."}
+      },
+      "required": ["verb"],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "action": {
+      "description": "A scripted action: one consequence, any of its triggers does it once its conditions hold.",
+      "type": "object",
+      "properties": {
+        "id": {"$ref": "#/$defs/id", "description": "Unique among actions."},
+        "triggers": {"description": "The ways of saying it that verb synonyms and aliases don't already cover.", "type": "array", "minItems": 1, "items": {"$ref": "#/$defs/trigger"}},
+        "place": {"$ref": "#/$defs/id", "description": "Only in this place. Default: wherever its things are in reach."},
+        "when": {"$ref": "#/$defs/conditions", "description": "Conditions (all must hold). Default: none."},
+        "effects": {"$ref": "#/$defs/effects", "description": "What it changes. Empty: a clue or a joke, told as story (never a step)."},
+        "text": {"$ref": "#/$defs/text", "description": "Told when it is done."},
+        "not_yet": {"$ref": "#/$defs/text", "description": "Told when it is tried before its conditions hold."},
+        "hint": {"$ref": "#/$defs/text", "description": "Second-level hint for this step (Invisiclues style)."},
+        "points": {"description": "Score when done. Default: 5.", "type": "integer", "default": 5},
+        "repeatable": {"description": "Can be done again (non-idempotent effects). Default: false.", "type": "boolean", "default": false},
+        "warning": {"$ref": "#/$defs/text", "description": "For a losing action: the warning told the first time (default: a generic one)."}
+      },
+      "required": ["id", "triggers"],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "ending": {
+      "description": "An ending. Ids starting with `_` are reserved for built-in endings.",
+      "type": "object",
+      "properties": {
+        "id": {"description": "Unique among endings (used in end:ID).", "type": "string", "pattern": "^[^!:_\\s][^:\\s]*$"},
+        "kind": {"description": "win or lose.", "enum": ["win", "lose"]},
+        "text": {"$ref": "#/$defs/text", "description": "The ending told."},
+        "fact": {"$ref": "#/$defs/text", "description": "A « did you know? » for this ending (default: the adventure's `fact`)."}
+      },
+      "required": ["id", "kind"],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "puzzle": {
+      "description": "A node of the puzzle dependency chart.",
+      "type": "object",
+      "properties": {
+        "goal": {"$ref": "#/$defs/text", "description": "What solving it achieves, in words."},
+        "action": {"$ref": "#/$defs/id", "description": "What solves it: an action id, an item with a code, or the id of a riddle's asker."},
+        "needs": {"description": "Ids of the items, characters or places it needs.", "type": "array", "items": {"$ref": "#/$defs/id"}},
+        "clue_in": {"$ref": "#/$defs/id", "description": "The item, character or place whose texts give the clue (the first hint points there)."}
+      },
+      "required": ["action", "clue_in"],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
+    "start": {
+      "description": "Where the hero starts.",
+      "type": "object",
+      "properties": {
+        "place": {"$ref": "#/$defs/id", "description": "The starting place."},
+        "inventory": {"description": "Item ids in the bag at the start. Default: none.", "type": "array", "items": {"$ref": "#/$defs/id"}}
+      },
+      "required": ["place"],
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    }
+  }
+}
