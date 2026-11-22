@@ -6,7 +6,6 @@ from pathlib import Path
 
 import pytest
 
-from aipet.games.adventure import library
 from aipet.games.adventure_engine import World, check, hint_text, solve, upgrade
 
 REFERENCE = Path(__file__).parent.parent / "docs" / "adventure" / "model" / "le-phare-de-piko.json"
@@ -232,13 +231,26 @@ def test_hints_follow_the_new_steps(w):
 
 
 def test_a_version_1_graph_is_upgraded_without_loss():
-    v1 = next(g for g in library() if g["title"] == "Le phare de Piko")
+    v1 = {  # the bank's first format: one verb per action, booleans, states as a map
+        "title": "v1", "difficulty": "facile", "start": {"place": "a", "inventory": []},
+        "places": [{"id": "a", "name": "a", "description": "A.", "exits": [{"to": "b", "label": "b", "dir": "est"}]},
+                   {"id": "b", "name": "b", "description": "B.", "exits": [{"to": "a", "label": "a", "dir": "ouest"}]},
+                   {"id": "c", "name": "c", "description": "C.", "exits": []}],
+        "items": [{"id": "algue", "name": "une algue", "at": "a", "takeable": True},
+                  {"id": "pot", "name": "un pot", "at": "b", "takeable": False, "state": "vide",
+                   "states": {"plein": {}, "vide": {}}}],
+        "characters": [{"id": "pinces", "name": "Pinces", "at": "b", "says": "Grr"}],
+        "actions": [{"id": "nourrir", "verb": "give", "object": "algue", "target": "pinces", "when": ["has:algue"],
+                     "effects": ["end:gagne"], "text": "Miam"}],
+        "endings": [{"id": "gagne", "kind": "win", "text": "Bravo"}],
+    }  # fmt: skip
     v2 = upgrade(v1)
-    assert v1["actions"][0]["verb"] == "give"  # the original is left alone
+    assert v1["actions"][0]["verb"] == "give" and "format" not in v1  # the original is left alone
     first = v2["actions"][0]
     assert first["triggers"] == [{"verb": "give", "object": "algue", "target": "pinces"}] and "verb" not in first
+    assert v2["format"] == 2 and v2["items"][1]["kind"] == "scenery" and v2["items"][1]["states"][0]["id"] == "vide"
     assert upgrade(v2) is v2
-    assert check(v1)[0] == []
+    assert solve(World(v1))["wins"] == solve(World(v2))["wins"] == {"gagne": 3}
 
 
 def test_montrer_is_not_monter():
@@ -497,3 +509,10 @@ def test_giving_what_lies_here_takes_it_first(w):
     fed = w.act(st, {"verb": "give", "object": "algue", "target": "pinces"})
     assert fed["outcome"] == "done" and fed["changes"][0] == "gagné : une algue verte"
     assert w.prop(st, "pinces", "state") == "content"
+
+
+def test_using_the_key_alone_at_the_door_opens_it(w):
+    st = w.start()
+    st.place, st.inventory, st.items_at["cle"] = "pied_phare", ["cle"], "inv"
+    opened = w.act(st, {"verb": "use", "object": "cle"})
+    assert opened["outcome"] == "done" and w.prop(st, "porte", "open")

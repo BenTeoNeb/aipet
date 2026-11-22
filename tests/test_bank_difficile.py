@@ -118,7 +118,7 @@ def test_le_petit_rover_de_la_lune(tmp_path, monkeypatch):
         ("Je saute de joie", [A("jump")], ["free"]),
         ("Je descends dans le cratère", [G("en bas")], ["done"]),
         ("Je prends la pierre qui brille", [A("take", "la pierre")], ["not_yet"]),  # deep in the crack
-        ("J'attrape la pierre avec la pince", [A("use", "la pince", "la fente")], ["clue"]),  # too short
+        ("J'attrape la pierre avec la pince", [A("use", "la pince", "la fente")], ["not_yet"]),  # too short
         ("Je mets la pince au bout du manche", [A("combine", "la pince", "le manche")], ["done"]),
         ("J'attrape la pierre avec la longue pince", [A("use", "la longue pince", "la fente")], ["done"]),
         ("Aide-moi", [A("help")], ["hint"]),

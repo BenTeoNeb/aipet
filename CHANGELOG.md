@@ -5,6 +5,20 @@ versions follow [Semantic Versioning](https://semver.org/) once the first releas
 
 ## [Unreleased]
 
+### Added
+- Adventures where the child is the hero (`adventure_start`, `adventure_act`, `adventure_end`): a bank
+  of 15 hand-written adventures in three difficulties, new ones invented on the child's idea, resume,
+  replay and « sauvegardes » after a loss. Code locks, riddles, companions, things held by
+  characters, containers and doors with keys, destroying what is plausible, memories of what the
+  child did, « où est… ? », hints that point at the clue.
+- `storyworld`: the adventure engine as a library (world model, turn, solver, checker), with a
+  written format (`SPEC.md`), a JSON Schema, structured diagnostics and French as its first language.
+- `/adventures` and `pet-adventures`: an explorer page (map, puzzle chain, the data model, games
+  played and replayed through the engine). `pet-playtest`: a simulated child plays an adventure
+  against the real narrator, with a judge for the narrator's slips.
+- Activity suggestions: the pet proposes something new or not done for a while, and something the
+  child likes. Story characters' names are given to speech recognition.
+
 ### Fixed
 - `pet-headless` crashed at startup (it read a config key that does not exist).
 - A forget request could be undone by a condensation running at the same time, and missed the

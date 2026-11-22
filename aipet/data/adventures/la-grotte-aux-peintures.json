@@ -1,120 +1,742 @@
 {
-  "title": "La grotte aux peintures d'Oukou",
-  "difficulty": "facile",
-  "tags": ["prehistoire", "grotte", "caverne", "peinture", "mammouth", "loup", "clan", "dessin"],
-  "fact": "Il y a plus de 30 000 ans, dans la grotte Chauvet, en France, les hommes de la préhistoire peignaient des mammouths, des lions et des chevaux avec du charbon de bois et de l'ocre rouge ; ils dessinaient aussi leurs mains en soufflant de la couleur tout autour.",
-  "intro": "Il y a très, très longtemps, au temps des mammouths… Tu vis avec le clan des Castors. Ce soir, c'est le grand festin, mais la grande peinture de la grotte n'est pas finie ! Ton petit cousin Oukou compte sur toi.",
-  "goal": "Finir la grande peinture de la grotte avant le festin du soir.",
-  "start": {"place": "campement", "inventory": []},
-  "places": [
-    {"id": "campement", "name": "le campement du clan", "aliases": ["campement", "camp", "tentes", "village"],
-     "description": "Le campement du clan, avec ses tentes en peaux de bêtes. Un grand feu crépite, crac crac ! Oukou sautille d'impatience. Contre une tente, une torche attend qu'on l'allume.",
-     "variants": [{"when": ["has:torche"], "description": "Le campement du clan, avec ses tentes en peaux de bêtes. Le grand feu crépite, crac crac ! Oukou sautille d'impatience."}],
-     "exits": [
-       {"to": "entree", "label": "vers la grotte", "dir": "nord"},
-       {"to": "riviere", "label": "vers la rivière", "dir": "est"},
-       {"to": "bois", "label": "vers le bois", "dir": "ouest"}]},
-    {"id": "riviere", "name": "la rivière", "aliases": ["riviere", "berge", "eau", "bord de l'eau"],
-     "description": "Une rivière qui fait glou glou entre les cailloux. Sur la berge, il y a de la terre rouge, l'ocre… mais un bébé mammouth tout poilu est assis dessus ! Il regarde les framboises d'un buisson piquant en se léchant la trompe.",
-     "variants": [
-       {"when": ["has:framboises"], "description": "Une rivière qui fait glou glou entre les cailloux. Sur la berge, il y a de la terre rouge, l'ocre… mais Patapouf le bébé mammouth est toujours assis dessus ! Il regarde tes framboises avec des yeux tout ronds."},
-       {"when": ["flag:patapouf_content"], "description": "Une rivière qui fait glou glou entre les cailloux. Patapouf le bébé mammouth s'est poussé : sur la berge, on voit enfin la terre rouge, l'ocre !"},
-       {"when": ["has:ocre"], "description": "Une rivière qui fait glou glou entre les cailloux. Patapouf le bébé mammouth s'arrose avec sa trompe, pfiouuu, il est tout content."}],
-     "exits": [{"to": "campement", "label": "vers le campement", "dir": "ouest"}]},
-    {"id": "bois", "name": "le petit bois", "aliases": ["bois", "foret", "arbres"],
-     "description": "Un petit bois de bouleaux, avec des pommes de pin partout par terre. Pistache, un louveteau tout gris, mâchouille un os creux en remuant la queue.",
-     "variants": [{"when": ["flag:os_lache"], "description": "Un petit bois de bouleaux, avec des pommes de pin partout par terre. Pistache le louveteau court après sa pomme de pin en jappant."}],
-     "exits": [{"to": "campement", "label": "vers le campement", "dir": "est"}]},
-    {"id": "entree", "name": "l'entrée de la grotte", "aliases": ["entree", "entree de la grotte", "grotte", "caverne"],
-     "description": "L'entrée de la grotte, comme une grande bouche de pierre. À côté, un vieux foyer éteint, plein de morceaux de charbon. Le grand tambour du festin est rangé ici : pas question de taper dessus, ça réveillerait les chauves-souris qui dorment dans la grotte ! Dedans, il fait tout noir… et on entend de petits couinements. Chut !",
-     "variants": [{"when": ["has:charbon"], "description": "L'entrée de la grotte, comme une grande bouche de pierre. À côté, un vieux foyer éteint, plein de cendres. Le grand tambour du festin est rangé ici : pas question de taper dessus, ça réveillerait les chauves-souris qui dorment dans la grotte ! Dedans, on entend de petits couinements. Chut !"}],
-     "exits": [
-       {"to": "fond", "label": "dans la grotte", "dir": "dedans", "when": ["flag:torche_allumee"],
-        "blocked": "Il fait tout noir là-dedans, on ne voit même pas le bout de son nez ! Il te faudrait de la lumière."},
-       {"to": "campement", "label": "vers le campement", "dir": "sud"}]},
-    {"id": "fond", "name": "la salle des peintures", "aliases": ["salle des peintures", "salle", "fond", "fond de la grotte"],
-     "description": "La salle des peintures ! À la lumière de ta torche, la grande paroi apparaît : trois mammouths dessinés au doigt, mais tout pâles. Il leur manque le contour noir et la couleur rouge. À côté, de vieilles mains rouges, soufflées par les grands du clan. Au plafond, les chauves-souris dorment, la tête en bas.",
-     "variants": [
-       {"when": ["flag:noir"], "description": "La salle des peintures ! Sur la grande paroi, les trois mammouths ont un beau contour noir. Il ne manque plus que la couleur rouge. À côté, de vieilles mains rouges, soufflées par les grands du clan. Au plafond, les chauves-souris dorment."},
-       {"when": ["flag:rouge"], "description": "La salle des peintures ! Sur la grande paroi, les trois mammouths sont tout rouges. Il ne manque plus que le contour noir. Au plafond, les chauves-souris dorment."}],
-     "exits": [{"to": "entree", "label": "vers la sortie", "dir": "dehors"}]}
-  ],
-  "items": [
-    {"id": "feu", "name": "le grand feu", "aliases": ["feu", "feu de camp", "flammes"], "at": "campement", "takeable": false,
-     "fixed": "Aïe, ça brûle ! Le feu reste au milieu du campement.", "description": "Un grand feu qui crépite. Parfait pour allumer une torche !"},
-    {"id": "torche", "name": "une torche", "aliases": ["torche", "flambeau", "lumiere"], "at": "campement", "takeable": true,
-     "description": "Un bâton avec de la résine au bout. Une fois allumée, elle éclaire tout !"},
-    {"id": "framboises", "name": "des framboises", "aliases": ["framboises", "framboise", "baies", "fruits"], "at": "riviere", "takeable": true,
-     "description": "De belles framboises bien sucrées. Patapouf les regarde avec des yeux tout ronds."},
-    {"id": "buisson", "name": "le buisson de framboises", "aliases": ["buisson", "framboisier", "ronces"], "at": "riviere", "takeable": false,
-     "fixed": "Aïe, il pique ! Mais tu peux cueillir ses framboises.", "description": "Un buisson piquant, couvert de framboises bien rouges."},
-    {"id": "ocre", "name": "de l'ocre rouge", "aliases": ["ocre", "terre rouge", "couleur rouge", "rouge", "terre"], "at": "", "takeable": true,
-     "description": "De la terre toute rouge, douce comme de la poudre. Avec ça, on peint en rouge !"},
-    {"id": "pomme_de_pin", "name": "une pomme de pin", "aliases": ["pomme de pin", "pomme", "pommes de pin"], "at": "bois", "takeable": true,
-     "description": "Une pomme de pin bien ronde. Parfaite pour jouer à la balle !"},
-    {"id": "os", "name": "un os creux", "aliases": ["os", "os creux", "tube", "flute"], "at": "", "takeable": true,
-     "description": "Un petit os tout creux, comme une paille. Les grands du clan soufflent dedans pour dessiner leurs mains sur la paroi !"},
-    {"id": "charbon", "name": "des morceaux de charbon", "aliases": ["charbon", "charbon de bois", "morceaux de charbon", "noir", "couleur noire"], "at": "entree", "takeable": true,
-     "description": "Des morceaux de charbon tout noirs. Ça laisse de grands traits noirs partout… même sur tes doigts !"},
-    {"id": "foyer", "name": "le vieux foyer", "aliases": ["foyer", "cendres", "vieux feu"], "at": "entree", "takeable": false,
-     "fixed": "Ce sont juste des pierres et des cendres.", "description": "Un vieux feu éteint depuis longtemps."},
-    {"id": "tambour", "name": "le grand tambour", "aliases": ["tambour", "tam-tam", "tamtam"], "at": "entree", "takeable": false,
-     "fixed": "Il est bien trop gros, et il est pour le festin de ce soir !",
-     "description": "Un énorme tambour en peau. Oukou a bien dit : pas de bruit près de la grotte, les chauves-souris dorment !"},
-    {"id": "paroi", "name": "la grande paroi", "aliases": ["paroi", "peinture", "mur", "dessin", "fresque", "mammouths", "roche"], "at": "fond", "takeable": false,
-     "fixed": "Un mur de grotte, ça ne rentre pas dans un sac !", "description": "Une grande paroi de pierre avec trois mammouths dessinés au doigt."},
-    {"id": "chauves_souris", "name": "les chauves-souris", "aliases": ["chauves-souris", "chauve-souris", "chauves souris"], "at": "fond", "takeable": false,
-     "fixed": "Chut, elles dorment ! Laisse-les tranquilles.", "description": "Des dizaines de petites chauves-souris endormies, la tête en bas, enroulées dans leurs ailes."}
-  ],
-  "characters": [
-    {"id": "oukou", "name": "Oukou", "aliases": ["oukou", "cousin", "petit cousin"], "at": "campement",
-     "description": "Un petit garçon avec une tunique en peau et des cheveux tout ébouriffés.",
-     "says": "Vite, la peinture doit être finie pour le festin ! Il faut du charbon noir, près de l'entrée de la grotte, et de l'ocre rouge, au bord de la rivière. Prends la torche et allume-la au feu, dans la grotte il fait tout noir ! Et surtout, ne tape pas sur le grand tambour : ça réveillerait les chauves-souris !"},
-    {"id": "patapouf", "name": "Patapouf le bébé mammouth", "aliases": ["patapouf", "mammouth", "bebe mammouth", "petit mammouth", "elephant"], "at": "riviere",
-     "description": "Un bébé mammouth tout poilu, avec une petite trompe et de toutes petites oreilles poilues.",
-     "says": "Pouet ! Les framboises, c'est ce que je préfère au monde… mais le buisson pique ma trompe !"},
-    {"id": "pistache", "name": "Pistache le louveteau", "aliases": ["pistache", "louveteau", "loup", "petit loup", "chien"], "at": "bois",
-     "description": "Un louveteau tout gris aux grandes oreilles. Il adore courir après tout ce qu'on lance.",
-     "says": "Wouf ! Wouf ! (Pistache regarde les pommes de pin en remuant la queue : il voudrait jouer à la balle !)"}
-  ],
-  "actions": [
-    {"id": "allumer_torche", "verb": "light", "object": "torche", "when": ["has:torche", "at:campement"], "effects": ["flag:torche_allumee"], "points": 10,
-     "not_yet": "Pour allumer la torche, il faut du feu… Le grand feu du campement, peut-être ?",
-     "text": "Tu approches la torche du feu… fchhh ! Elle s'allume et fait danser des ombres partout. Oukou applaudit."},
-    {"id": "torche_au_feu", "verb": "use", "object": "torche", "target": "feu", "place": "campement", "when": ["has:torche"], "effects": ["flag:torche_allumee"], "points": 10,
-     "text": "Tu approches la torche du feu… fchhh ! Elle s'allume et fait danser des ombres partout. Oukou applaudit."},
-    {"id": "donner_framboises", "verb": "give", "object": "framboises", "target": "patapouf", "when": ["has:framboises"],
-     "effects": ["lose:framboises", "flag:patapouf_content", "reveal:ocre"], "points": 10,
-     "text": "Patapouf attrape les framboises avec sa trompe, slurp ! Il se lève tout content et barrit : « Pouet ! » Là où il était assis, il y a de la belle terre rouge : de l'ocre !"},
-    {"id": "pousser_patapouf", "verb": "push", "object": "patapouf", "when": ["flag:patapouf_ne_bouge_pas"], "effects": [], "points": 0,
-     "not_yet": "Tu pousses, tu pousses… Patapouf ne bouge pas d'un poil. Un mammouth, même bébé, c'est très lourd ! Il a l'air d'avoir faim…",
-     "text": ""},
-    {"id": "lancer_pomme", "verb": "throw", "object": "pomme_de_pin", "target": "pistache", "when": ["has:pomme_de_pin"],
-     "effects": ["reveal:os", "flag:os_lache"], "points": 10,
-     "text": "Tu lances la pomme de pin, hop ! Pistache lâche son os et file la chercher en jappant. L'os creux est resté par terre."},
-    {"id": "noir_d_abord", "verb": "use", "object": "charbon", "target": "paroi", "when": ["has:charbon", "!flag:rouge"], "effects": ["flag:noir"], "points": 10,
-     "not_yet": "Le contour noir est déjà fait ! Il ne manque plus que le rouge.",
-     "text": "Tu dessines le contour des mammouths avec le charbon, scritch scritch : les trompes, les défenses, les longs poils ! Ils ont l'air presque vivants."},
-    {"id": "noir_en_dernier", "verb": "use", "object": "charbon", "target": "paroi", "when": ["has:charbon", "flag:rouge"], "effects": ["end:festin"], "points": 20,
-     "not_yet": "Le contour noir est déjà fait ! Il ne manque plus que le rouge.",
-     "text": "Tu dessines le contour des mammouths avec le charbon, scritch scritch : la peinture est finie !"},
-    {"id": "rouge_d_abord", "verb": "use", "object": "ocre", "target": "paroi", "when": ["has:ocre", "!flag:noir"], "effects": ["flag:rouge"], "points": 10,
-     "not_yet": "Les mammouths sont déjà tout rouges ! Il ne manque plus que le contour noir.",
-     "text": "Tu frottes l'ocre sur les mammouths : les voilà tout rouges, comme s'ils avaient couru au soleil !"},
-    {"id": "rouge_en_dernier", "verb": "use", "object": "ocre", "target": "paroi", "when": ["has:ocre", "flag:noir"], "effects": ["end:festin"], "points": 20,
-     "not_yet": "Les mammouths sont déjà tout rouges ! Il ne manque plus que le contour noir.",
-     "text": "Tu frottes l'ocre sur les mammouths : la peinture est finie !"},
-    {"id": "souffler_main", "verb": "use", "object": "os", "target": "paroi", "when": ["has:os", "has:ocre", "flag:noir"], "effects": ["end:mains"], "points": 20,
-     "not_yet": "Pour souffler une main, il faut de l'ocre rouge à mettre dans l'os creux… et que le contour noir des mammouths soit fini !",
-     "text": "Tu mets de l'ocre dans l'os creux, tu poses ta main sur la paroi et tu souffles, pfffiou !"},
-    {"id": "taper_tambour", "verb": "hit", "object": "tambour", "effects": ["end:chauves_souris"], "points": 0,
-     "text": "BOUM ! BOUM ! BOUM ! Le grand tambour résonne jusqu'au fond de la grotte…"},
-    {"id": "jouer_tambour", "verb": "use", "object": "tambour", "effects": ["end:chauves_souris"], "points": 0,
-     "text": "BOUM ! BOUM ! BOUM ! Le grand tambour résonne jusqu'au fond de la grotte…"}
-  ],
-  "endings": [
-    {"id": "festin", "kind": "win", "text": "Les trois mammouths, noirs et rouges, ont l'air de galoper sur la paroi ! Oukou appelle tout le clan. Les grands lèvent leurs torches et disent « Ooooh ! ». Puis tout le monde va au festin, et c'est toi qui as la plus grosse part de galette aux noisettes."},
-    {"id": "mains", "kind": "win", "text": "Quand tu retires ta main, elle est dessinée en rouge à côté des mammouths : c'est ta signature ! Oukou veut faire pareil, souffle trop fort… et se retrouve avec le nez tout rouge. Le clan arrive pour le festin et rit de bon cœur : la plus belle peinture du monde, signée par toi !"},
-    {"id": "chauves_souris", "kind": "lose", "text": "Les chauves-souris se réveillent d'un coup et sortent de la grotte en tourbillon, flap flap flap ! Elles volent partout autour du campement, et tout le clan passe la soirée à leur courir après en riant. La peinture n'est pas finie pour le festin… ce sera pour une autre fois !"}
-  ]
+ "format": 2,
+ "title": "La grotte aux peintures d'Oukou",
+ "difficulty": "facile",
+ "tags": [
+  "prehistoire",
+  "grotte",
+  "caverne",
+  "peinture",
+  "mammouth",
+  "loup",
+  "clan",
+  "dessin"
+ ],
+ "fact": "Il y a plus de 30 000 ans, dans la grotte Chauvet, en France, les hommes de la préhistoire peignaient des mammouths, des lions et des chevaux avec du charbon de bois et de l'ocre rouge ; ils dessinaient aussi leurs mains en soufflant de la couleur tout autour.",
+ "intro": "Il y a très, très longtemps, au temps des mammouths… Tu vis avec le clan des Castors. Ce soir, c'est le grand festin, mais la grande peinture de la grotte n'est pas finie ! Ton petit cousin Oukou compte sur toi.",
+ "goal": "Finir la grande peinture de la grotte avant le festin du soir.",
+ "start": {
+  "place": "campement",
+  "inventory": []
+ },
+ "places": [
+  {
+   "id": "campement",
+   "name": "le campement du clan",
+   "aliases": [
+    "campement",
+    "camp",
+    "tentes",
+    "village"
+   ],
+   "description": "Le campement du clan, avec ses tentes en peaux de bêtes.",
+   "decor": [
+    "tentes",
+    "peaux de bêtes",
+    "lances",
+    "paniers tressés"
+   ],
+   "exits": [
+    {
+     "to": "entree",
+     "label": "vers la grotte",
+     "dir": "nord"
+    },
+    {
+     "to": "riviere",
+     "label": "vers la rivière",
+     "dir": "est"
+    },
+    {
+     "to": "bois",
+     "label": "vers le bois",
+     "dir": "ouest"
+    }
+   ]
+  },
+  {
+   "id": "riviere",
+   "name": "la rivière",
+   "aliases": [
+    "riviere",
+    "berge",
+    "eau",
+    "bord de l'eau"
+   ],
+   "description": "Une rivière qui fait glou glou entre les cailloux.",
+   "details": [
+    {
+     "when": [
+      "is:patapouf:content",
+      "!has:ocre"
+     ],
+     "text": "Là où Patapouf était assis, on voit enfin la terre rouge, l'ocre !"
+    }
+   ],
+   "decor": [
+    "cailloux",
+    "galets",
+    "petits poissons",
+    "libellules"
+   ],
+   "exits": [
+    {
+     "to": "campement",
+     "label": "vers le campement",
+     "dir": "ouest"
+    }
+   ]
+  },
+  {
+   "id": "bois",
+   "name": "le petit bois",
+   "aliases": [
+    "bois",
+    "foret",
+    "arbres"
+   ],
+   "description": "Un petit bois de bouleaux, avec des pommes de pin partout par terre.",
+   "decor": [
+    "bouleaux",
+    "feuilles mortes",
+    "champignons",
+    "écureuil"
+   ],
+   "exits": [
+    {
+     "to": "campement",
+     "label": "vers le campement",
+     "dir": "est"
+    }
+   ]
+  },
+  {
+   "id": "entree",
+   "name": "l'entrée de la grotte",
+   "aliases": [
+    "entree",
+    "entree de la grotte",
+    "grotte",
+    "caverne"
+   ],
+   "description": "L'entrée de la grotte, comme une grande bouche de pierre. Dedans, on entend de petits couinements. Chut !",
+   "details": [
+    {
+     "when": [
+      "!is:torche:allumee"
+     ],
+     "text": "Il fait tout noir, là-dedans…"
+    }
+   ],
+   "decor": [
+    "rochers",
+    "mousse",
+    "toiles d'araignée",
+    "traces de pas"
+   ],
+   "exits": [
+    {
+     "to": "fond",
+     "label": "dans la grotte",
+     "dir": "dedans",
+     "when": [
+      "has:torche",
+      "is:torche:allumee"
+     ],
+     "blocked": "Il fait tout noir là-dedans, on ne voit même pas le bout de son nez ! Il te faudrait de la lumière."
+    },
+    {
+     "to": "campement",
+     "label": "vers le campement",
+     "dir": "sud"
+    }
+   ]
+  },
+  {
+   "id": "fond",
+   "name": "la salle des peintures",
+   "aliases": [
+    "salle des peintures",
+    "salle",
+    "fond",
+    "fond de la grotte"
+   ],
+   "description": "La salle des peintures ! À la lumière de ta torche, la grande paroi apparaît. À côté des mammouths, de vieilles mains rouges, soufflées par les grands du clan.",
+   "decor": [
+    "vieilles mains rouges",
+    "stalactites",
+    "flaques",
+    "échos"
+   ],
+   "exits": [
+    {
+     "to": "entree",
+     "label": "vers la sortie",
+     "dir": "dehors"
+    }
+   ]
+  }
+ ],
+ "items": [
+  {
+   "id": "feu",
+   "kind": "scenery",
+   "name": "le grand feu",
+   "aliases": [
+    "feu",
+    "feu de camp",
+    "flammes"
+   ],
+   "at": "campement",
+   "fixed": "Aïe, ça brûle ! Le feu reste au milieu du campement.",
+   "initial": "Un grand feu crépite, crac crac !",
+   "description": "Un grand feu qui crépite. Parfait pour allumer une torche !"
+  },
+  {
+   "id": "torche",
+   "kind": "thing",
+   "name": "une torche",
+   "aliases": [
+    "torche",
+    "flambeau",
+    "lumiere"
+   ],
+   "at": "campement",
+   "initial": "Contre une tente, une torche attend qu'on l'allume.",
+   "description": "Un bâton avec de la résine au bout. Une fois allumée, elle éclaire tout !",
+   "states": [
+    {
+     "id": "eteinte"
+    },
+    {
+     "id": "allumee",
+     "name": "une torche allumée",
+     "aliases": [
+      "torche allumee"
+     ],
+     "description": "La torche brûle bien et fait danser des ombres partout."
+    }
+   ]
+  },
+  {
+   "id": "framboises",
+   "kind": "thing",
+   "name": "des framboises",
+   "aliases": [
+    "framboises",
+    "framboise",
+    "baies",
+    "fruits"
+   ],
+   "at": "riviere",
+   "description": "De belles framboises bien sucrées. Patapouf les regarde avec des yeux tout ronds."
+  },
+  {
+   "id": "buisson",
+   "kind": "scenery",
+   "name": "le buisson de framboises",
+   "aliases": [
+    "buisson",
+    "framboisier",
+    "ronces"
+   ],
+   "at": "riviere",
+   "fixed": "Aïe, il pique ! Mais tu peux cueillir ses framboises.",
+   "initial": "Au bord de l'eau pousse un buisson piquant, couvert de framboises bien rouges.",
+   "description": "Un buisson piquant, couvert de framboises bien rouges."
+  },
+  {
+   "id": "ocre",
+   "kind": "thing",
+   "name": "de l'ocre rouge",
+   "aliases": [
+    "ocre",
+    "terre rouge",
+    "couleur rouge",
+    "rouge",
+    "terre"
+   ],
+   "at": "",
+   "description": "De la terre toute rouge, douce comme de la poudre. Avec ça, on peint en rouge !"
+  },
+  {
+   "id": "pomme_de_pin",
+   "kind": "thing",
+   "name": "une pomme de pin",
+   "aliases": [
+    "pomme de pin",
+    "pomme",
+    "pommes de pin"
+   ],
+   "at": "bois",
+   "description": "Une pomme de pin bien ronde. Parfaite pour jouer à la balle !"
+  },
+  {
+   "id": "os",
+   "kind": "thing",
+   "name": "un os creux",
+   "aliases": [
+    "os",
+    "os creux",
+    "tube",
+    "flute"
+   ],
+   "at": "pistache",
+   "description": "Un petit os tout creux, comme une paille. Les grands du clan soufflent dedans pour dessiner leurs mains sur la paroi !"
+  },
+  {
+   "id": "charbon",
+   "kind": "thing",
+   "name": "des morceaux de charbon",
+   "aliases": [
+    "charbon",
+    "charbon de bois",
+    "morceaux de charbon",
+    "noir",
+    "couleur noire"
+   ],
+   "at": "entree",
+   "initial": "Dans le vieux foyer, il reste plein de morceaux de charbon.",
+   "description": "Des morceaux de charbon tout noirs. Ça laisse de grands traits noirs partout… même sur tes doigts !"
+  },
+  {
+   "id": "foyer",
+   "kind": "scenery",
+   "name": "le vieux foyer",
+   "aliases": [
+    "foyer",
+    "cendres",
+    "vieux feu"
+   ],
+   "at": "entree",
+   "fixed": "Ce sont juste des pierres et des cendres.",
+   "initial": "À côté de l'entrée, un vieux foyer éteint.",
+   "description": "Un vieux feu éteint depuis longtemps."
+  },
+  {
+   "id": "tambour",
+   "kind": "scenery",
+   "name": "le grand tambour",
+   "aliases": [
+    "tambour",
+    "tam-tam",
+    "tamtam"
+   ],
+   "at": "entree",
+   "fixed": "Il est bien trop gros, et il est pour le festin de ce soir !",
+   "sturdy": "C'est le tambour du festin, en bonne peau bien tendue : on n'y touche pas !",
+   "initial": "Le grand tambour du festin est rangé ici : pas question de taper dessus, ça réveillerait les chauves-souris qui dorment dans la grotte !",
+   "description": "Un énorme tambour en peau. Oukou a bien dit : pas de bruit près de la grotte, les chauves-souris dorment !"
+  },
+  {
+   "id": "paroi",
+   "kind": "scenery",
+   "name": "la grande paroi",
+   "aliases": [
+    "paroi",
+    "peinture",
+    "mur",
+    "dessin",
+    "fresque",
+    "mammouths",
+    "roche"
+   ],
+   "at": "fond",
+   "fixed": "Un mur de grotte, ça ne rentre pas dans un sac !",
+   "sturdy": "C'est la roche de la grotte : bien trop dure ! Et la peinture du clan doit être finie pour ce soir.",
+   "description": "Une grande paroi de pierre avec trois mammouths dessinés au doigt.",
+   "states": [
+    {
+     "id": "pale",
+     "initial": "Sur la paroi, trois mammouths dessinés au doigt, mais tout pâles : il leur manque le contour noir et la couleur rouge.",
+     "description": "Une grande paroi de pierre avec trois mammouths dessinés au doigt, tout pâles. Il leur manque le contour noir et la couleur rouge."
+    },
+    {
+     "id": "noir",
+     "initial": "Sur la paroi, les trois mammouths ont un beau contour noir. Il ne manque plus que la couleur rouge.",
+     "description": "Trois mammouths avec un beau contour noir. Il ne manque plus que la couleur rouge."
+    },
+    {
+     "id": "rouge",
+     "initial": "Sur la paroi, les trois mammouths sont tout rouges. Il ne manque plus que le contour noir.",
+     "description": "Trois mammouths tout rouges. Il ne manque plus que le contour noir."
+    }
+   ]
+  },
+  {
+   "id": "chauves_souris",
+   "kind": "scenery",
+   "name": "les chauves-souris",
+   "aliases": [
+    "chauves-souris",
+    "chauve-souris",
+    "chauves souris"
+   ],
+   "at": "fond",
+   "fixed": "Chut, elles dorment ! Laisse-les tranquilles.",
+   "initial": "Au plafond, les chauves-souris dorment, la tête en bas.",
+   "description": "Des dizaines de petites chauves-souris endormies, la tête en bas, enroulées dans leurs ailes."
+  }
+ ],
+ "characters": [
+  {
+   "id": "oukou",
+   "name": "Oukou",
+   "aliases": [
+    "oukou",
+    "cousin",
+    "petit cousin"
+   ],
+   "at": "campement",
+   "description": "Un petit garçon avec une tunique en peau et des cheveux tout ébouriffés.",
+   "initial": "Oukou sautille d'impatience.",
+   "says": [
+    {
+     "when": [
+      "is:torche:allumee"
+     ],
+     "text": "Ta torche brille ! Maintenant, il faut du charbon noir, près de l'entrée de la grotte, et de l'ocre rouge, au bord de la rivière. Et surtout, ne tape pas sur le grand tambour : ça réveillerait les chauves-souris !"
+    },
+    {
+     "text": "Vite, la peinture doit être finie pour le festin ! Il faut du charbon noir, près de l'entrée de la grotte, et de l'ocre rouge, au bord de la rivière. Prends la torche et allume-la au feu, dans la grotte il fait tout noir ! Et surtout, ne tape pas sur le grand tambour : ça réveillerait les chauves-souris !"
+    }
+   ]
+  },
+  {
+   "id": "patapouf",
+   "name": "Patapouf le bébé mammouth",
+   "aliases": [
+    "patapouf",
+    "mammouth",
+    "bebe mammouth",
+    "petit mammouth",
+    "elephant"
+   ],
+   "at": "riviere",
+   "description": "Un bébé mammouth tout poilu, avec une petite trompe et de toutes petites oreilles poilues.",
+   "states": [
+    {
+     "id": "assis",
+     "initial": "Sur la berge, il y a de la terre rouge, l'ocre… mais un bébé mammouth tout poilu est assis dessus ! Il regarde les framboises en se léchant la trompe.",
+     "says": "Pouet ! Les framboises, c'est ce que je préfère au monde… mais le buisson pique ma trompe !"
+    },
+    {
+     "id": "content",
+     "initial": "Patapouf le bébé mammouth s'arrose avec sa trompe, pfiouuu, il est tout content.",
+     "says": "Pouet ! Pouet ! Merci pour les framboises !"
+    }
+   ]
+  },
+  {
+   "id": "pistache",
+   "name": "Pistache le louveteau",
+   "aliases": [
+    "pistache",
+    "louveteau",
+    "loup",
+    "petit loup",
+    "chien"
+   ],
+   "at": "bois",
+   "description": "Un louveteau tout gris aux grandes oreilles. Il adore courir après tout ce qu'on lance.",
+   "states": [
+    {
+     "id": "machouille",
+     "initial": "Pistache, un louveteau tout gris, mâchouille un os creux en remuant la queue.",
+     "says": "Wouf ! Wouf ! (Pistache regarde les pommes de pin en remuant la queue : il voudrait jouer à la balle !)"
+    },
+    {
+     "id": "joue",
+     "initial": "Pistache le louveteau court après sa pomme de pin en jappant.",
+     "says": "Wouf ! Wouf ! (Pistache te rapporte sa pomme de pin, tout fier.)"
+    }
+   ]
+  }
+ ],
+ "actions": [
+  {
+   "id": "allumer_torche",
+   "triggers": [
+    {
+     "verb": "light",
+     "object": "torche"
+    },
+    {
+     "verb": "use",
+     "object": "torche",
+     "target": "feu"
+    }
+   ],
+   "when": [
+    "has:torche",
+    "at:campement"
+   ],
+   "effects": [
+    "set:torche:allumee"
+   ],
+   "points": 10,
+   "not_yet": "Pour allumer la torche, il faut du feu… Le grand feu du campement, peut-être ?",
+   "text": "Tu approches la torche du feu… fchhh ! Elle s'allume et fait danser des ombres partout. Oukou applaudit.",
+   "hint": "Dans la grotte, il fait tout noir… Et ta torche est éteinte. Où y a-t-il du feu ?"
+  },
+  {
+   "id": "donner_framboises",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "framboises",
+     "target": "patapouf"
+    }
+   ],
+   "when": [
+    "has:framboises"
+   ],
+   "effects": [
+    "lose:framboises",
+    "set:patapouf:content",
+    "reveal:ocre"
+   ],
+   "points": 10,
+   "text": "Patapouf attrape les framboises avec sa trompe, slurp ! Il se lève tout content et barrit : « Pouet ! » Là où il était assis, il y a de la belle terre rouge : de l'ocre !",
+   "hint": "Patapouf est assis sur l'ocre… Qu'est-ce qu'il aime le plus au monde ?"
+  },
+  {
+   "id": "pousser_patapouf",
+   "triggers": [
+    {
+     "verb": "push",
+     "object": "patapouf"
+    }
+   ],
+   "when": [
+    "is:patapouf:assis"
+   ],
+   "effects": [],
+   "points": 0,
+   "not_yet": "Patapouf s'est déjà poussé tout seul : pas la peine de le pousser !",
+   "text": "Tu pousses, tu pousses… Patapouf ne bouge pas d'un poil. Un mammouth, même bébé, c'est très lourd ! Il a l'air d'avoir faim…"
+  },
+  {
+   "id": "lancer_pomme",
+   "triggers": [
+    {
+     "verb": "throw",
+     "object": "pomme_de_pin",
+     "target": "pistache"
+    }
+   ],
+   "when": [
+    "has:pomme_de_pin"
+   ],
+   "effects": [
+    "reveal:os",
+    "set:pistache:joue"
+   ],
+   "points": 10,
+   "text": "Tu lances la pomme de pin, hop ! Pistache lâche son os et file la chercher en jappant. L'os creux est resté par terre.",
+   "hint": "Pistache adore courir après ce qu'on lance… Il y a de quoi jouer à la balle, par terre."
+  },
+  {
+   "id": "noir_d_abord",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "charbon",
+     "target": "paroi"
+    }
+   ],
+   "when": [
+    "has:charbon",
+    "is:paroi:pale"
+   ],
+   "effects": [
+    "set:paroi:noir"
+   ],
+   "points": 10,
+   "not_yet": "Le contour noir est déjà fait ! Il ne manque plus que le rouge.",
+   "text": "Tu dessines le contour des mammouths avec le charbon, scritch scritch : les trompes, les défenses, les longs poils ! Ils ont l'air presque vivants.",
+   "hint": "Les mammouths n'ont pas de contour… Avec quoi dessine-t-on en noir ?"
+  },
+  {
+   "id": "noir_en_dernier",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "charbon",
+     "target": "paroi"
+    }
+   ],
+   "when": [
+    "has:charbon",
+    "is:paroi:rouge"
+   ],
+   "effects": [
+    "end:festin"
+   ],
+   "points": 20,
+   "not_yet": "Le contour noir est déjà fait ! Il ne manque plus que le rouge.",
+   "text": "Tu dessines le contour des mammouths avec le charbon, scritch scritch : la peinture est finie !",
+   "hint": "Les mammouths sont tout rouges : il ne leur manque plus que leur contour noir."
+  },
+  {
+   "id": "rouge_d_abord",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "ocre",
+     "target": "paroi"
+    }
+   ],
+   "when": [
+    "has:ocre",
+    "is:paroi:pale"
+   ],
+   "effects": [
+    "set:paroi:rouge"
+   ],
+   "points": 10,
+   "not_yet": "Les mammouths sont déjà tout rouges ! Il ne manque plus que le contour noir.",
+   "text": "Tu frottes l'ocre sur les mammouths : les voilà tout rouges, comme s'ils avaient couru au soleil !",
+   "hint": "Les mammouths sont tout pâles… Avec quoi peint-on en rouge ?"
+  },
+  {
+   "id": "rouge_en_dernier",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "ocre",
+     "target": "paroi"
+    }
+   ],
+   "when": [
+    "has:ocre",
+    "is:paroi:noir"
+   ],
+   "effects": [
+    "end:festin"
+   ],
+   "points": 20,
+   "not_yet": "Les mammouths sont déjà tout rouges ! Il ne manque plus que le contour noir.",
+   "text": "Tu frottes l'ocre sur les mammouths : la peinture est finie !",
+   "hint": "Le contour noir est fait : il ne manque plus que la couleur rouge."
+  },
+  {
+   "id": "souffler_main",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "os",
+     "target": "paroi"
+    }
+   ],
+   "when": [
+    "has:os",
+    "has:ocre",
+    "is:paroi:noir"
+   ],
+   "effects": [
+    "end:mains"
+   ],
+   "points": 20,
+   "not_yet": "Pour souffler une main, il faut de l'ocre rouge à mettre dans l'os creux… et que le contour noir des mammouths soit fini !",
+   "text": "Tu mets de l'ocre dans l'os creux, tu poses ta main sur la paroi et tu souffles, pfffiou !",
+   "hint": "Les grands du clan soufflent de la couleur dans un os creux, autour de leur main…"
+  },
+  {
+   "id": "taper_tambour",
+   "triggers": [
+    {
+     "verb": "hit",
+     "object": "tambour"
+    },
+    {
+     "verb": "use",
+     "object": "tambour"
+    }
+   ],
+   "effects": [
+    "end:chauves_souris"
+   ],
+   "points": 0,
+   "warning": "Oukou t'attrape le bras : « Chut ! Si tu tapes sur le tambour, les chauves-souris vont se réveiller ! » Tu es sûr ?",
+   "text": "BOUM ! BOUM ! BOUM ! Le grand tambour résonne jusqu'au fond de la grotte…"
+  }
+ ],
+ "endings": [
+  {
+   "id": "festin",
+   "kind": "win",
+   "text": "Les trois mammouths, noirs et rouges, ont l'air de galoper sur la paroi ! Oukou appelle tout le clan. Les grands lèvent leurs torches et disent « Ooooh ! ». Puis tout le monde va au festin, et c'est toi qui as la plus grosse part de galette aux noisettes.",
+   "fact": "Il y a plus de 30 000 ans, dans la grotte Chauvet, en France, les hommes de la préhistoire peignaient des mammouths, des lions et des chevaux avec du charbon de bois et de l'ocre rouge !"
+  },
+  {
+   "id": "mains",
+   "kind": "win",
+   "text": "Quand tu retires ta main, elle est dessinée en rouge à côté des mammouths : c'est ta signature ! Oukou veut faire pareil, souffle trop fort… et se retrouve avec le nez tout rouge. Le clan arrive pour le festin et rit de bon cœur : la plus belle peinture du monde, signée par toi !",
+   "fact": "Les mains dessinées en soufflant de la couleur tout autour s'appellent des « mains négatives » : on en a trouvé dans des grottes du monde entier, et certaines ont plus de 40 000 ans !"
+  },
+  {
+   "id": "chauves_souris",
+   "kind": "lose",
+   "text": "Les chauves-souris se réveillent d'un coup et sortent de la grotte en tourbillon, flap flap flap ! Elles volent partout autour du campement, et tout le clan passe la soirée à leur courir après en riant. La peinture n'est pas finie pour le festin… ce sera pour une autre fois !"
+  }
+ ],
+ "puzzles": [
+  {
+   "goal": "Finir la peinture : le contour noir et la couleur rouge",
+   "action": "rouge_en_dernier",
+   "needs": [
+    "ocre",
+    "charbon",
+    "paroi"
+   ],
+   "clue_in": "oukou"
+  },
+  {
+   "goal": "Ou signer la peinture d'une main soufflée avec l'os creux",
+   "action": "souffler_main",
+   "needs": [
+    "os",
+    "ocre",
+    "paroi"
+   ],
+   "clue_in": "os"
+  },
+  {
+   "goal": "Que Pistache lâche son os creux",
+   "action": "lancer_pomme",
+   "needs": [
+    "pomme_de_pin",
+    "pistache"
+   ],
+   "clue_in": "pistache"
+  },
+  {
+   "goal": "Dessiner le contour noir des mammouths",
+   "action": "noir_d_abord",
+   "needs": [
+    "charbon",
+    "paroi"
+   ],
+   "clue_in": "oukou"
+  },
+  {
+   "goal": "Que Patapouf se pousse de l'ocre",
+   "action": "donner_framboises",
+   "needs": [
+    "framboises",
+    "patapouf"
+   ],
+   "clue_in": "patapouf"
+  },
+  {
+   "goal": "Allumer la torche au grand feu",
+   "action": "allumer_torche",
+   "needs": [
+    "torche",
+    "feu"
+   ],
+   "clue_in": "oukou"
+  }
+ ]
 }

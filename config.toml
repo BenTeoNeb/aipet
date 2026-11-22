@@ -162,7 +162,7 @@ hang_up_after_secs = 8       # silence after his last words before hanging up (a
 
 [games]
 guess_max_questions = 20     # « devine à quoi je pense »: Flocon gives up and asks after this many questions
-adventure_drafts = true      # also offer the data model's reference adventures (docs/adventure/model), « (nouvelle version) »
+adventure_drafts = false     # also offer the data model's reference adventures (docs/adventure/model), « (nouvelle version) »
 
 [family]
 # The children are not listed here: each pet learns their first names, ages and classes from them

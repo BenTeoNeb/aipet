@@ -1,836 +1,1029 @@
 {
-  "title": "Raya et la perle de lumière",
-  "difficulty": "difficile",
-  "intro": "Tu descends au fond de la mer dans Bulle, ton petit sous-marin transparent. Raya la raie t'attend, très inquiète : la perle de lumière qui éclaire le palais de Madame Bénitier s'est éteinte, et tout le récif est plongé dans le noir.",
-  "goal": "Ramener la lumière dans le palais de Madame Bénitier.",
-  "tags": [
-    "mer",
-    "ocean",
-    "sous-marin",
-    "raie",
+ "title": "Raya et la perle de lumière",
+ "difficulty": "difficile",
+ "intro": "Tu descends au fond de la mer dans Bulle, ton petit sous-marin transparent. Raya la raie t'attend, très inquiète : la perle de lumière qui éclaire le palais de Madame Bénitier s'est éteinte, et tout le récif est plongé dans le noir.",
+ "goal": "Ramener la lumière dans le palais de Madame Bénitier.",
+ "tags": [
+  "mer",
+  "ocean",
+  "sous-marin",
+  "raie",
+  "corail",
+  "perle",
+  "poisson",
+  "poulpe"
+ ],
+ "fact": "Tout au fond de la mer, où il fait noir, beaucoup de poissons fabriquent leur propre lumière, comme le poisson-lanterne : ça s'appelle la bioluminescence !",
+ "start": {
+  "place": "recif",
+  "inventory": []
+ },
+ "places": [
+  {
+   "id": "recif",
+   "name": "le récif",
+   "aliases": [
+    "recif",
     "corail",
-    "perle",
-    "poisson",
-    "poulpe"
-  ],
-  "fact": "Tout au fond de la mer, où il fait noir, beaucoup de poissons fabriquent leur propre lumière, comme le poisson-lanterne : ça s'appelle la bioluminescence !",
-  "start": {
-    "place": "recif",
-    "inventory": []
+    "depart"
+   ],
+   "description": "Le récif de corail, tout gris dans la pénombre. Des chemins partent vers une forêt d'algues, une vieille épave, un jardin de corail et une plaine de sable.",
+   "exits": [
+    {
+     "to": "algues",
+     "label": "vers la forêt d'algues",
+     "dir": "nord"
+    },
+    {
+     "to": "epave",
+     "label": "vers l'épave",
+     "dir": "est"
+    },
+    {
+     "to": "jardin",
+     "label": "vers le jardin de corail",
+     "dir": "ouest"
+    },
+    {
+     "to": "plaine",
+     "label": "vers la plaine de sable",
+     "dir": "sud"
+    }
+   ],
+   "decor": [
+    "Bulle",
+    "coraux gris",
+    "bulles",
+    "étoiles de mer",
+    "oursins"
+   ]
   },
-  "places": [
+  {
+   "id": "algues",
+   "name": "la forêt d'algues",
+   "aliases": [
+    "foret d'algues",
+    "algues",
+    "foret"
+   ],
+   "description": "De grandes algues qui dansent doucement. Certaines brillent d'une petite lumière verte : ces algues-là ne se mangent pas, elles donnent un drôle de hoquet ! Plus loin, l'entrée d'une grotte.",
+   "exits": [
     {
-      "id": "recif",
-      "name": "le récif",
-      "aliases": [
-        "recif",
-        "corail",
-        "depart"
-      ],
-      "description": "Le récif de corail, tout gris dans la pénombre. Raya la raie ondule à côté de Bulle. Des chemins partent vers une forêt d'algues, une vieille épave, un jardin de corail et une plaine de sable.",
-      "exits": [
-        {
-          "to": "algues",
-          "label": "vers la forêt d'algues",
-          "dir": "nord"
-        },
-        {
-          "to": "epave",
-          "label": "vers l'épave",
-          "dir": "est"
-        },
-        {
-          "to": "jardin",
-          "label": "vers le jardin de corail",
-          "dir": "ouest"
-        },
-        {
-          "to": "plaine",
-          "label": "vers la plaine de sable",
-          "dir": "sud"
-        }
-      ]
+     "to": "recif",
+     "label": "vers le récif",
+     "dir": "sud"
     },
     {
-      "id": "algues",
-      "name": "la forêt d'algues",
-      "aliases": [
-        "foret d'algues",
-        "algues",
-        "foret"
-      ],
-      "description": "De grandes algues qui dansent doucement. Certaines brillent d'une petite lumière verte : ces algues-là ne se mangent pas, elles donnent un drôle de hoquet ! Plus loin, l'entrée d'une grotte.",
-      "exits": [
-        {
-          "to": "recif",
-          "label": "vers le récif",
-          "dir": "sud"
-        },
-        {
-          "to": "grotte",
-          "label": "vers la grotte",
-          "dir": "est"
-        }
-      ]
-    },
-    {
-      "id": "grotte",
-      "name": "la grotte d'Octave",
-      "aliases": [
-        "grotte",
-        "caverne",
-        "trou"
-      ],
-      "description": "Une grotte pleine de coins et de recoins. On entend un petit rire : « Hi hi, tu ne me trouveras jamais ! »",
-      "variants": [
-        {
-          "when": [
-            "flag:octave_trouve"
-          ],
-          "description": "Une grotte pleine de coins et de recoins. Octave le poulpe agite ses huit bras pour te dire bonjour."
-        }
-      ],
-      "exits": [
-        {
-          "to": "algues",
-          "label": "vers la forêt d'algues",
-          "dir": "ouest"
-        }
-      ]
-    },
-    {
-      "id": "epave",
-      "name": "l'épave",
-      "aliases": [
-        "epave",
-        "bateau",
-        "bateau coule"
-      ],
-      "description": "Un vieux bateau couché sur le sable. Un filet de pêche est accroché au mât, une boîte de biscuits rouillée traîne sur le pont, et un bocal en verre est coincé dans le sable.",
-      "exits": [
-        {
-          "to": "recif",
-          "label": "vers le récif",
-          "dir": "ouest"
-        }
-      ],
-      "variants": [
-        {
-          "when": [
-            "!flag:boite_ouverte",
-            "has:bocal"
-          ],
-          "description": "Un vieux bateau couché sur le sable. Un filet de pêche est accroché au mât, une boîte de biscuits rouillée traîne sur le pont."
-        },
-        {
-          "when": [
-            "!flag:boite_ouverte",
-            "has:lampe"
-          ],
-          "description": "Un vieux bateau couché sur le sable. Un filet de pêche est accroché au mât, une boîte de biscuits rouillée traîne sur le pont."
-        },
-        {
-          "when": [
-            "flag:boite_ouverte",
-            "!has:bocal",
-            "!has:lampe"
-          ],
-          "description": "Un vieux bateau couché sur le sable. Un filet de pêche est accroché au mât, une boîte de biscuits rouillée traîne sur le pont, le couvercle ouvert, et un bocal en verre est coincé dans le sable."
-        },
-        {
-          "when": [
-            "flag:boite_ouverte",
-            "has:bocal"
-          ],
-          "description": "Un vieux bateau couché sur le sable. Un filet de pêche est accroché au mât, une boîte de biscuits rouillée traîne sur le pont, le couvercle ouvert."
-        },
-        {
-          "when": [
-            "flag:boite_ouverte",
-            "has:lampe"
-          ],
-          "description": "Un vieux bateau couché sur le sable. Un filet de pêche est accroché au mât, une boîte de biscuits rouillée traîne sur le pont, le couvercle ouvert."
-        }
-      ]
-    },
-    {
-      "id": "jardin",
-      "name": "le jardin de corail",
-      "aliases": [
-        "jardin",
-        "jardin de corail"
-      ],
-      "description": "Un jardin de coraux de toutes les formes. Au milieu, le Corail-Soleil brille encore, tout chaud, comme un petit soleil sous la mer.",
-      "exits": [
-        {
-          "to": "recif",
-          "label": "vers le récif",
-          "dir": "est"
-        }
-      ]
-    },
-    {
-      "id": "plaine",
-      "name": "la plaine de sable",
-      "aliases": [
-        "plaine",
-        "sable",
-        "plaine de sable"
-      ],
-      "description": "Une grande plaine de sable fin, où quelque chose brille ici et là. Au bout, un grand trou tout noir descend dans la fosse. Zigzag l'anguille monte la garde devant, en faisant des étincelles : mieux vaut ne pas l'embêter, quand elle se fâche, BZZT !",
-      "variants": [
-        {
-          "when": [
-            "!flag:coquillages_trouves",
-            "flag:passage"
-          ],
-          "description": "Une grande plaine de sable fin, où quelque chose brille ici et là. Zigzag l'anguille porte fièrement son collier et te laisse passer vers la fosse. Elle reste une anguille électrique : on ne l'embête pas !"
-        },
-        {
-          "when": [
-            "flag:coquillages_trouves",
-            "!flag:passage"
-          ],
-          "description": "Une grande plaine de sable fin, toute creusée. Au bout, un grand trou tout noir descend dans la fosse. Zigzag l'anguille monte la garde devant, en faisant des étincelles : mieux vaut ne pas l'embêter, quand elle se fâche, BZZT !"
-        },
-        {
-          "when": [
-            "flag:coquillages_trouves",
-            "flag:passage"
-          ],
-          "description": "Une grande plaine de sable fin, toute creusée. Zigzag l'anguille porte fièrement son collier et te laisse passer vers la fosse. Elle reste une anguille électrique : on ne l'embête pas !"
-        }
-      ],
-      "exits": [
-        {
-          "to": "recif",
-          "label": "vers le récif",
-          "dir": "nord"
-        },
-        {
-          "to": "fosse",
-          "label": "descendre dans la fosse",
-          "dir": "bas",
-          "when": [
-            "flag:passage"
-          ],
-          "blocked": "Zigzag l'anguille te barre le passage en crépitant : « Bzzt ! Personne ne descend ! »"
-        }
-      ]
-    },
-    {
-      "id": "fosse",
-      "name": "la fosse",
-      "aliases": [
-        "fosse",
-        "trou noir",
-        "abysses"
-      ],
-      "description": "Il fait tout noir dans la fosse. Tu ne vois même pas le bout de ton nez. Quelque part, de petites lumières clignotent : ce sont les poissons-lanternes.",
-      "variants": [
-        {
-          "when": [
-            "flag:fosse_eclairee"
-          ],
-          "description": "La lampe éclaire la fosse : des rochers tout bleus, des poissons-lanternes qui clignotent, et au fond, un passage vers une lueur dorée."
-        }
-      ],
-      "exits": [
-        {
-          "to": "plaine",
-          "label": "remonter vers la plaine",
-          "dir": "haut"
-        },
-        {
-          "to": "palais",
-          "label": "vers la lueur dorée",
-          "dir": "nord",
-          "when": [
-            "flag:fosse_eclairee"
-          ],
-          "blocked": "Il fait bien trop noir pour trouver le chemin…"
-        }
-      ]
-    },
-    {
-      "id": "palais",
-      "name": "le palais de Madame Bénitier",
-      "aliases": [
-        "palais",
-        "chateau"
-      ],
-      "description": "Un palais de nacre, tout sombre. Au milieu, Madame Bénitier, un énorme coquillage, dort la coquille fermée. Une couronne vide attend sa perle.",
-      "variants": [
-        {
-          "when": [
-            "flag:benitier_ouvert"
-          ],
-          "description": "Un palais de nacre. Madame Bénitier a ouvert sa grande coquille et attend, toute triste : sa perle de lumière n'est plus là."
-        }
-      ],
-      "exits": [
-        {
-          "to": "fosse",
-          "label": "vers la fosse",
-          "dir": "sud"
-        }
-      ]
+     "to": "grotte",
+     "label": "vers la grotte",
+     "dir": "est"
     }
-  ],
-  "items": [
+   ],
+   "decor": [
+    "bulles",
+    "petits crabes",
+    "rochers moussus"
+   ]
+  },
+  {
+   "id": "grotte",
+   "name": "la grotte d'Octave",
+   "aliases": [
+    "grotte",
+    "caverne",
+    "trou"
+   ],
+   "description": "Une grotte pleine de coins et de recoins.",
+   "exits": [
     {
-      "id": "algue_lumineuse",
-      "name": "une algue lumineuse",
-      "aliases": [
-        "algue lumineuse",
-        "algue verte",
-        "algue qui brille"
-      ],
-      "at": "algues",
-      "takeable": true,
-      "description": "Une algue qui brille d'une douce lumière verte. Elle se fane vite si on la laisse dans l'eau de mer : il faudrait la protéger. Et surtout, on ne la mange pas !"
-    },
-    {
-      "id": "filet",
-      "name": "le filet de pêche",
-      "aliases": [
-        "filet"
-      ],
-      "at": "epave",
-      "takeable": false,
-      "fixed": "Il est tout emmêlé autour du mât… mais on pourrait en détacher un bout.",
-      "description": "Un vieux filet emmêlé, avec des bouts de ficelle qui pendent."
-    },
-    {
-      "id": "ficelle",
-      "name": "une ficelle",
-      "aliases": [
-        "ficelle",
-        "fil",
-        "corde"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Une longue ficelle solide, tirée du vieux filet."
-    },
-    {
-      "id": "boite",
-      "name": "la boîte de biscuits",
-      "aliases": [
-        "boite",
-        "boite de biscuits",
-        "boite rouillee"
-      ],
-      "at": "epave",
-      "takeable": false,
-      "fixed": "Elle est soudée au pont par la rouille.",
-      "description": "Une vieille boîte de biscuits en fer, toute rouillée, avec un couvercle."
-    },
-    {
-      "id": "miettes",
-      "name": "des miettes de biscuit",
-      "aliases": [
-        "miettes",
-        "biscuit",
-        "biscuits"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Des miettes de biscuit, un peu mouillées. Les petits poissons adorent ça !"
-    },
-    {
-      "id": "bocal",
-      "name": "un bocal en verre",
-      "aliases": [
-        "bocal",
-        "pot",
-        "pot en verre"
-      ],
-      "at": "epave",
-      "takeable": true,
-      "description": "Un bocal en verre avec un couvercle. On pourrait mettre quelque chose dedans pour le protéger."
-    },
-    {
-      "id": "sable",
-      "name": "le sable de la plaine",
-      "aliases": [
-        "sable",
-        "sol"
-      ],
-      "at": "plaine",
-      "takeable": false,
-      "fixed": "Le sable file entre tes doigts… mais il cache peut-être des trésors.",
-      "description": "Du sable fin et doux, qui file entre les doigts."
-    },
-    {
-      "id": "coquillages",
-      "name": "des coquillages",
-      "aliases": [
-        "coquillages",
-        "coquillage",
-        "coquilles"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Des petits coquillages roses et blancs, avec un petit trou au milieu."
-    },
-    {
-      "id": "collier",
-      "name": "un collier de coquillages",
-      "aliases": [
-        "collier",
-        "bijou"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Un joli collier de coquillages roses et blancs."
-    },
-    {
-      "id": "lampe",
-      "name": "une lampe d'algues",
-      "aliases": [
-        "lampe",
-        "lampe d'algues",
-        "bocal lumineux",
-        "lumiere"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Le bocal fermé, avec l'algue lumineuse dedans : une vraie lampe sous la mer !"
-    },
-    {
-      "id": "perle",
-      "name": "une perle éteinte",
-      "aliases": [
-        "perle",
-        "perle eteinte",
-        "perle grise"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Une grosse perle toute grise et froide. Elle a dû perdre sa lumière… il faudrait la réchauffer quelque part."
-    },
-    {
-      "id": "perle_lumineuse",
-      "name": "la perle de lumière",
-      "aliases": [
-        "perle",
-        "perle de lumiere",
-        "perle qui brille"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "La perle brille comme un petit soleil !"
-    },
-    {
-      "id": "corail_soleil",
-      "name": "le Corail-Soleil",
-      "aliases": [
-        "corail-soleil",
-        "corail soleil",
-        "corail qui brille"
-      ],
-      "at": "jardin",
-      "takeable": false,
-      "fixed": "Il a des racines jusqu'au fond de la mer, il reste là !",
-      "description": "Un corail orange et chaud qui brille comme un petit soleil. Tout ce qu'on pose dessus se met à briller."
-    },
-    {
-      "id": "conque",
-      "name": "une conque",
-      "aliases": [
-        "conque",
-        "coquillage-trompette",
-        "trompette"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Un grand coquillage en spirale : quand on souffle dedans, il chante la musique de la mer."
-    },
-    {
-      "id": "gouvernail",
-      "name": "le gouvernail",
-      "aliases": [
-        "gouvernail",
-        "barre",
-        "roue"
-      ],
-      "at": "epave",
-      "takeable": false,
-      "fixed": "Il est énorme et tout rouillé, impossible de l'emporter.",
-      "description": "Le vieux gouvernail du bateau. Il grince quand on le tourne, mais il ne sert plus à rien."
-    },
-    {
-      "id": "collier_zigzag",
-      "name": "le collier de Zigzag",
-      "aliases": [
-        "collier",
-        "bijou"
-      ],
-      "at": "",
-      "takeable": false,
-      "fixed": "C'est le collier de Zigzag, maintenant : on ne reprend pas un cadeau !",
-      "description": "Le joli collier de coquillages, au cou de Zigzag. Il lui va très bien !"
+     "to": "algues",
+     "label": "vers la forêt d'algues",
+     "dir": "ouest"
     }
-  ],
-  "characters": [
+   ],
+   "details": [
     {
-      "id": "raya",
-      "name": "Raya la raie",
-      "aliases": [
-        "raya",
-        "raie"
-      ],
-      "at": "recif",
-      "description": "Une raie manta violette, avec de grandes nageoires qui ondulent.",
-      "says": "La perle est tombée au fond de la fosse, mais Zigzag l'anguille garde l'entrée : elle a perdu son beau collier et elle est de très mauvaise humeur. Et en bas, il fait tout noir ! Madame Bénitier, elle, ne se réveille qu'avec la musique de la mer… Octave le poulpe sait d'où elle vient. Et surtout, n'embête jamais Zigzag : quand elle se fâche, BZZT !"
-    },
-    {
-      "id": "zigzag",
-      "name": "Zigzag l'anguille",
-      "aliases": [
-        "zigzag",
-        "anguille"
-      ],
-      "at": "plaine",
-      "description": "Une anguille électrique toute jaune, qui fait des petites étincelles quand elle se fâche.",
-      "says": "Bzzt ! Mon beau collier de coquillages… Sans collier, personne ne descend dans la fosse ! Et ne m'embête pas, sinon BZZT !"
-    },
-    {
-      "id": "octave",
-      "name": "Octave le poulpe",
-      "aliases": [
-        "octave",
-        "poulpe",
-        "pieuvre"
-      ],
-      "at": "",
-      "description": "Un petit poulpe farceur qui change de couleur pour se cacher.",
-      "says": "Tu m'as trouvé ! Tu es vraiment fort à cache-cache. Garde bien ma conque !"
-    },
-    {
-      "id": "poissons",
-      "name": "les poissons-lanternes",
-      "aliases": [
-        "poissons",
-        "poissons-lanternes",
-        "poissons lanternes",
-        "petites lumieres"
-      ],
-      "at": "fosse",
-      "description": "Une famille de petits poissons qui ont une lumière au bout du nez.",
-      "says": "Blip, blip ! Ici au fond, on a toujours un petit creux… Et partout où on va, il fait tout de suite moins noir !"
-    },
-    {
-      "id": "benitier",
-      "name": "Madame Bénitier",
-      "aliases": [
-        "benitier",
-        "madame benitier",
-        "coquillage geant"
-      ],
-      "at": "palais",
-      "description": "Un coquillage géant, très très vieux et très gentil, qui garde la lumière du récif.",
-      "says": "Zzz… Seule la musique de la mer peut me réveiller… zzz…"
+     "when": [
+      "!here:octave"
+     ],
+     "text": "On entend un petit rire : « Hi hi, tu ne me trouveras jamais ! »"
     }
-  ],
-  "actions": [
+   ],
+   "decor": [
+    "recoins",
+    "rochers",
+    "algues sombres",
+    "petits cailloux"
+   ]
+  },
+  {
+   "id": "epave",
+   "name": "l'épave",
+   "aliases": [
+    "epave",
+    "bateau",
+    "bateau coule"
+   ],
+   "description": "Un vieux bateau couché sur le sable. Un filet de pêche est accroché au mât.",
+   "exits": [
     {
-      "id": "detacher_ficelle",
-      "verb": "search",
-      "object": "filet",
-      "effects": [
-        "reveal:ficelle"
-      ],
-      "points": 5,
-      "text": "Tu tires sur un bout du filet… et une longue ficelle se détache !"
+     "to": "recif",
+     "label": "vers le récif",
+     "dir": "ouest"
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "open:boite"
+     ],
+     "text": "Une boîte de biscuits rouillée traîne sur le pont, le couvercle ouvert.",
+     "else": "Une boîte de biscuits rouillée traîne sur le pont."
+    }
+   ],
+   "decor": [
+    "mât",
+    "hublots",
+    "ancre rouillée",
+    "planches",
+    "coquillages collés"
+   ]
+  },
+  {
+   "id": "jardin",
+   "name": "le jardin de corail",
+   "aliases": [
+    "jardin",
+    "jardin de corail"
+   ],
+   "description": "Un jardin de coraux de toutes les formes. Au milieu, le Corail-Soleil brille encore, tout chaud, comme un petit soleil sous la mer.",
+   "exits": [
+    {
+     "to": "recif",
+     "label": "vers le récif",
+     "dir": "est"
+    }
+   ],
+   "decor": [
+    "coraux",
+    "anémones",
+    "poissons-clowns",
+    "éponges"
+   ]
+  },
+  {
+   "id": "plaine",
+   "name": "la plaine de sable",
+   "aliases": [
+    "plaine",
+    "sable",
+    "plaine de sable"
+   ],
+   "description": "Une grande plaine de sable fin. Au bout, un grand trou tout noir descend dans la fosse.",
+   "exits": [
+    {
+     "to": "recif",
+     "label": "vers le récif",
+     "dir": "nord"
     },
     {
-      "id": "tirer_ficelle",
-      "verb": "pull",
-      "object": "filet",
-      "effects": [
-        "reveal:ficelle"
-      ],
-      "points": 5,
-      "text": "Tu tires sur un bout du filet… et une longue ficelle se détache !"
+     "to": "fosse",
+     "label": "descendre dans la fosse",
+     "dir": "bas",
+     "when": [
+      "flag:passage"
+     ],
+     "blocked": "Zigzag l'anguille te barre le passage en crépitant : « Bzzt ! Personne ne descend ! »"
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "flag:coquillages_trouves"
+     ],
+     "text": "Le sable est tout creusé.",
+     "else": "Quelque chose brille ici et là dans le sable."
+    }
+   ],
+   "decor": [
+    "sable fin",
+    "étoiles de mer",
+    "petits poissons plats",
+    "rides de sable"
+   ]
+  },
+  {
+   "id": "fosse",
+   "name": "la fosse",
+   "aliases": [
+    "fosse",
+    "trou noir",
+    "abysses"
+   ],
+   "description": "",
+   "exits": [
+    {
+     "to": "plaine",
+     "label": "remonter vers la plaine",
+     "dir": "haut"
     },
     {
-      "id": "ouvrir_boite",
-      "verb": "open",
-      "object": "boite",
-      "effects": [
-        "reveal:miettes",
-        "flag:boite_ouverte"
-      ],
-      "points": 5,
-      "text": "Crrr… le couvercle rouillé s'ouvre. Dedans, des miettes de biscuit !"
+     "to": "palais",
+     "label": "vers la lueur dorée",
+     "dir": "nord",
+     "when": [
+      "flag:fosse_eclairee"
+     ],
+     "blocked": "Il fait bien trop noir pour trouver le chemin…"
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "flag:fosse_eclairee"
+     ],
+     "text": "La lampe éclaire la fosse : des rochers tout bleus, des poissons-lanternes qui clignotent, et au fond, un passage vers une lueur dorée.",
+     "else": "Il fait tout noir dans la fosse. Tu ne vois même pas le bout de ton nez. Quelque part, de petites lumières clignotent : ce sont les poissons-lanternes."
+    }
+   ],
+   "decor": [
+    "rochers bleus",
+    "eau noire",
+    "bulles",
+    "sable sombre"
+   ]
+  },
+  {
+   "id": "palais",
+   "name": "le palais de Madame Bénitier",
+   "aliases": [
+    "palais",
+    "chateau"
+   ],
+   "description": "Un palais de nacre, tout sombre. Une couronne vide attend sa perle.",
+   "exits": [
+    {
+     "to": "fosse",
+     "label": "vers la fosse",
+     "dir": "sud"
+    }
+   ],
+   "decor": [
+    "colonnes de nacre",
+    "couronne vide",
+    "rideaux d'algues",
+    "trône de corail"
+   ]
+  }
+ ],
+ "items": [
+  {
+   "id": "algue_lumineuse",
+   "name": "une algue lumineuse",
+   "aliases": [
+    "algue lumineuse",
+    "algue verte",
+    "algue qui brille"
+   ],
+   "at": "algues",
+   "description": "Une algue qui brille d'une douce lumière verte. Elle se fane vite si on la laisse dans l'eau de mer : il faudrait la protéger. Et surtout, on ne la mange pas !",
+   "kind": "thing"
+  },
+  {
+   "id": "filet",
+   "name": "le filet de pêche",
+   "aliases": [
+    "filet"
+   ],
+   "at": "epave",
+   "fixed": "Il est tout emmêlé autour du mât… mais on pourrait en détacher un bout.",
+   "description": "Un vieux filet emmêlé, avec des bouts de ficelle qui pendent.",
+   "kind": "scenery",
+   "sturdy": "Un vieux filet de pêche, c'est bien trop solide à déchirer !"
+  },
+  {
+   "id": "ficelle",
+   "name": "une ficelle",
+   "aliases": [
+    "ficelle",
+    "fil",
+    "corde"
+   ],
+   "at": "",
+   "description": "Une longue ficelle solide, tirée du vieux filet.",
+   "kind": "thing"
+  },
+  {
+   "id": "boite",
+   "name": "la boîte de biscuits",
+   "aliases": [
+    "boite",
+    "boite de biscuits",
+    "boite rouillee"
+   ],
+   "at": "epave",
+   "fixed": "Elle est soudée au pont par la rouille.",
+   "description": "Une vieille boîte de biscuits en fer, toute rouillée, avec un couvercle.",
+   "kind": "container",
+   "texts": {
+    "open": "Crrr… le couvercle rouillé s'ouvre. Dedans, des miettes de biscuit !"
+   }
+  },
+  {
+   "id": "miettes",
+   "name": "des miettes de biscuit",
+   "aliases": [
+    "miettes",
+    "biscuit",
+    "biscuits"
+   ],
+   "at": "boite",
+   "description": "Des miettes de biscuit, un peu mouillées. Les petits poissons adorent ça !",
+   "kind": "thing"
+  },
+  {
+   "id": "bocal",
+   "name": "un bocal en verre",
+   "aliases": [
+    "bocal",
+    "pot",
+    "pot en verre"
+   ],
+   "at": "epave",
+   "description": "Un bocal en verre avec un couvercle. On pourrait mettre quelque chose dedans pour le protéger.",
+   "kind": "thing",
+   "initial": "Un bocal en verre est coincé dans le sable.",
+   "states": [
+    {
+     "id": "vide"
     },
     {
-      "id": "fouiller_boite",
-      "verb": "search",
-      "object": "boite",
-      "effects": [
-        "reveal:miettes",
-        "flag:boite_ouverte"
-      ],
-      "points": 5,
-      "text": "Crrr… le couvercle rouillé s'ouvre. Dedans, des miettes de biscuit !"
+     "id": "lampe",
+     "name": "une lampe d'algues",
+     "aliases": [
+      "lampe",
+      "lampe d'algues",
+      "bocal lumineux",
+      "lumiere"
+     ],
+     "description": "Le bocal fermé, avec l'algue lumineuse dedans : une vraie lampe sous la mer !"
+    }
+   ]
+  },
+  {
+   "id": "sable",
+   "name": "le sable de la plaine",
+   "aliases": [
+    "sable",
+    "sol"
+   ],
+   "at": "plaine",
+   "fixed": "Le sable file entre tes doigts… mais il cache peut-être des trésors.",
+   "description": "Du sable fin et doux, qui file entre les doigts.",
+   "kind": "scenery",
+   "sturdy": "Du sable, il y en a partout : on ne peut pas le casser !"
+  },
+  {
+   "id": "coquillages",
+   "name": "des coquillages",
+   "aliases": [
+    "coquillages",
+    "coquillage",
+    "coquilles"
+   ],
+   "at": "",
+   "description": "Des petits coquillages roses et blancs, avec un petit trou au milieu.",
+   "kind": "thing"
+  },
+  {
+   "id": "collier",
+   "name": "un collier de coquillages",
+   "aliases": [
+    "collier",
+    "bijou"
+   ],
+   "at": "",
+   "description": "Un joli collier de coquillages roses et blancs.",
+   "kind": "thing"
+  },
+  {
+   "id": "perle",
+   "name": "une perle éteinte",
+   "aliases": [
+    "perle",
+    "perle eteinte",
+    "perle grise"
+   ],
+   "at": "",
+   "description": "Une grosse perle toute grise et froide. Elle a dû perdre sa lumière… il faudrait la réchauffer quelque part.",
+   "kind": "thing",
+   "states": [
+    {
+     "id": "eteinte"
     },
     {
-      "id": "fouiller_sable",
-      "verb": "search",
-      "object": "sable",
-      "effects": [
-        "reveal:coquillages",
-        "flag:coquillages_trouves"
-      ],
-      "points": 5,
-      "text": "Tu creuses dans le sable avec tes mains… et tu trouves plein de petits coquillages avec un trou au milieu !"
+     "id": "lumineuse",
+     "name": "la perle de lumière",
+     "aliases": [
+      "perle de lumiere",
+      "perle qui brille"
+     ],
+     "description": "La perle brille comme un petit soleil !"
+    }
+   ]
+  },
+  {
+   "id": "corail_soleil",
+   "name": "le Corail-Soleil",
+   "aliases": [
+    "corail-soleil",
+    "corail soleil",
+    "corail qui brille"
+   ],
+   "at": "jardin",
+   "fixed": "Il a des racines jusqu'au fond de la mer, il reste là !",
+   "description": "Un corail orange et chaud qui brille comme un petit soleil. Tout ce qu'on pose dessus se met à briller.",
+   "kind": "scenery",
+   "sturdy": "Le Corail-Soleil est le cœur chaud du jardin : on ne l'abîme pas !"
+  },
+  {
+   "id": "conque",
+   "name": "une conque",
+   "aliases": [
+    "conque",
+    "coquillage-trompette",
+    "trompette"
+   ],
+   "at": "octave",
+   "description": "Un grand coquillage en spirale : quand on souffle dedans, il chante la musique de la mer.",
+   "kind": "thing"
+  },
+  {
+   "id": "gouvernail",
+   "name": "le gouvernail",
+   "aliases": [
+    "gouvernail",
+    "barre",
+    "roue"
+   ],
+   "at": "epave",
+   "fixed": "Il est énorme et tout rouillé, impossible de l'emporter.",
+   "description": "Le vieux gouvernail du bateau. Il grince quand on le tourne, mais il ne sert plus à rien.",
+   "kind": "scenery",
+   "sturdy": "Il est en gros bois et en fer : impossible de le casser."
+  },
+  {
+   "id": "collier_zigzag",
+   "name": "le collier de Zigzag",
+   "aliases": [
+    "collier",
+    "bijou"
+   ],
+   "at": "",
+   "fixed": "C'est le collier de Zigzag, maintenant : on ne reprend pas un cadeau !",
+   "description": "Le joli collier de coquillages, au cou de Zigzag. Il lui va très bien !",
+   "kind": "scenery",
+   "sturdy": "C'est le cadeau de Zigzag : on ne l'abîme pas !"
+  }
+ ],
+ "characters": [
+  {
+   "id": "raya",
+   "name": "Raya la raie",
+   "aliases": [
+    "raya",
+    "raie"
+   ],
+   "at": "recif",
+   "description": "Une raie manta violette, avec de grandes nageoires qui ondulent.",
+   "says": [
+    {
+     "when": [
+      "is:perle:lumineuse"
+     ],
+     "text": "La perle brille de nouveau ! Vite, rapporte-la à Madame Bénitier, dans son palais !"
     },
     {
-      "id": "faire_collier",
-      "verb": "combine",
-      "object": "ficelle",
-      "target": "coquillages",
-      "when": [
-        "has:ficelle",
-        "has:coquillages"
-      ],
-      "effects": [
-        "lose:ficelle",
-        "lose:coquillages",
-        "gain:collier"
-      ],
-      "points": 10,
-      "text": "Tu enfiles les coquillages un par un sur la ficelle… et tu fais un nœud : voilà un joli collier !"
+     "when": [
+      "flag:passage"
+     ],
+     "text": "Zigzag te laisse passer, bravo ! Mais en bas, il fait tout noir : il te faudra une lumière qui ne s'éteint pas dans l'eau. Et Madame Bénitier ne se réveille qu'avec la musique de la mer… Octave le poulpe sait d'où elle vient."
     },
     {
-      "id": "offrir_collier",
-      "verb": "give",
-      "object": "collier",
-      "target": "zigzag",
-      "when": [
-        "has:collier"
-      ],
-      "effects": [
-        "lose:collier",
-        "flag:passage",
-        "reveal:collier_zigzag"
-      ],
-      "points": 10,
-      "text": "Zigzag met le collier et fait des étincelles de joie : bzzt bzzt ! « Qu'il est beau ! Vas-y, tu peux descendre. »"
+     "text": "La perle est tombée au fond de la fosse, mais Zigzag l'anguille garde l'entrée : elle a perdu son beau collier et elle est de très mauvaise humeur. Et en bas, il fait tout noir ! Madame Bénitier, elle, ne se réveille qu'avec la musique de la mer… Octave le poulpe sait d'où elle vient. Et surtout, n'embête jamais Zigzag : quand elle se fâche, BZZT !"
+    }
+   ],
+   "initial": "Raya la raie ondule à côté de Bulle."
+  },
+  {
+   "id": "zigzag",
+   "name": "Zigzag l'anguille",
+   "aliases": [
+    "zigzag",
+    "anguille"
+   ],
+   "at": "plaine",
+   "description": "Une anguille électrique toute jaune, qui fait des petites étincelles quand elle se fâche.",
+   "says": "Bzzt ! Mon beau collier de coquillages… Sans collier, personne ne descend dans la fosse ! Et ne m'embête pas, sinon BZZT !",
+   "states": [
+    {
+     "id": "fachee",
+     "initial": "Zigzag l'anguille monte la garde devant le trou, en faisant des étincelles : mieux vaut ne pas l'embêter, quand elle se fâche, BZZT !"
     },
     {
-      "id": "faire_lampe",
-      "verb": "combine",
-      "object": "algue_lumineuse",
-      "target": "bocal",
-      "when": [
-        "has:algue_lumineuse",
-        "has:bocal"
-      ],
-      "effects": [
-        "lose:algue_lumineuse",
-        "lose:bocal",
-        "gain:lampe"
-      ],
-      "points": 10,
-      "text": "Tu glisses l'algue lumineuse dans le bocal et tu fermes le couvercle : la lumière verte brille bien fort. Une lampe d'algues !"
+     "id": "contente",
+     "initial": "Zigzag l'anguille porte fièrement son collier et te laisse passer vers la fosse. Elle reste une anguille électrique : on ne l'embête pas !",
+     "says": "Bzzt bzzt ! Qu'il est beau, mon collier ! Vas-y, tu peux descendre dans la fosse. Mais ne m'embête pas quand même !"
+    }
+   ]
+  },
+  {
+   "id": "octave",
+   "name": "Octave le poulpe",
+   "aliases": [
+    "octave",
+    "poulpe",
+    "pieuvre"
+   ],
+   "at": "",
+   "description": "Un petit poulpe farceur qui change de couleur pour se cacher.",
+   "says": "Tu m'as trouvé ! Tu es vraiment fort à cache-cache. Garde bien ma conque !",
+   "initial": "Octave le poulpe agite ses huit bras pour te dire bonjour."
+  },
+  {
+   "id": "poissons",
+   "name": "les poissons-lanternes",
+   "aliases": [
+    "poissons",
+    "poissons-lanternes",
+    "poissons lanternes",
+    "petites lumieres"
+   ],
+   "at": "fosse",
+   "description": "Une famille de petits poissons qui ont une lumière au bout du nez.",
+   "says": "Blip, blip ! Ici au fond, on a toujours un petit creux… Et partout où on va, il fait tout de suite moins noir !",
+   "initial": "Dans le noir, de petites lumières clignotent : les poissons-lanternes.",
+   "states": [
+    {
+     "id": "affames"
     },
     {
-      "id": "eclairer_fosse",
-      "verb": "use",
-      "object": "lampe",
-      "place": "fosse",
-      "when": [
-        "has:lampe"
-      ],
-      "effects": [
-        "flag:fosse_eclairee",
-        "reveal:perle"
-      ],
-      "points": 10,
-      "text": "Tu lèves la lampe d'algues : la fosse s'illumine ! Sur un rocher, tu vois une grosse perle toute grise, et au fond, un passage vers une lueur dorée."
+     "id": "amis",
+     "initial": "Les poissons-lanternes clignotent tout autour de toi, ravis.",
+     "says": "Blip, blip ! Merci pour les miettes ! On est tes amis, maintenant : partout où on va, il fait tout de suite moins noir !"
+    }
+   ]
+  },
+  {
+   "id": "benitier",
+   "name": "Madame Bénitier",
+   "aliases": [
+    "benitier",
+    "madame benitier",
+    "coquillage geant"
+   ],
+   "at": "palais",
+   "description": "Un coquillage géant, très très vieux et très gentil, qui garde la lumière du récif.",
+   "says": "Zzz… Seule la musique de la mer peut me réveiller… zzz…",
+   "states": [
+    {
+     "id": "endormie",
+     "initial": "Au milieu, Madame Bénitier, un énorme coquillage, dort la coquille fermée."
     },
     {
-      "id": "eclairer_fosse_2",
-      "verb": "light",
-      "object": "fosse",
-      "when": [
-        "has:lampe"
-      ],
-      "effects": [
-        "flag:fosse_eclairee",
-        "reveal:perle"
-      ],
-      "points": 10,
-      "not_yet": "Il te faudrait une lumière… une qui ne s'éteint pas dans l'eau.",
-      "text": "Tu lèves la lampe d'algues : la fosse s'illumine ! Sur un rocher, tu vois une grosse perle toute grise, et au fond, un passage vers une lueur dorée."
-    },
-    {
-      "id": "fouiller_fosse",
-      "verb": "search",
-      "object": "fosse",
-      "when": [
-        "has:lampe"
-      ],
-      "effects": [
-        "flag:fosse_eclairee",
-        "reveal:perle"
-      ],
-      "points": 10,
-      "not_yet": "Tu tâtonnes dans le noir… tu ne vois rien du tout ! Il te faudrait une lumière.",
-      "text": "Avec la lampe, tu regardes partout : sur un rocher, une grosse perle toute grise, et au fond, un passage vers une lueur dorée."
-    },
-    {
-      "id": "nourrir_poissons",
-      "verb": "give",
-      "object": "miettes",
-      "target": "poissons",
-      "when": [
-        "has:miettes"
-      ],
-      "effects": [
-        "lose:miettes",
-        "flag:poissons_amis"
-      ],
-      "points": 10,
-      "text": "Les poissons-lanternes se jettent sur les miettes : blip blip blip ! « Merci ! Maintenant, on te suit partout ! »"
-    },
-    {
-      "id": "trouver_octave",
-      "verb": "search",
-      "object": "grotte",
-      "effects": [
-        "move:octave:grotte",
-        "flag:octave_trouve",
-        "gain:conque"
-      ],
-      "points": 10,
-      "text": "Tu regardes derrière un rocher… le rocher a des yeux ! « Hi hi, tu m'as trouvé ! » C'est Octave le poulpe. « Tu as gagné, prends ma conque : elle joue la musique de la mer. »"
-    },
-    {
-      "id": "rallumer_perle",
-      "verb": "use",
-      "object": "perle",
-      "target": "corail_soleil",
-      "when": [
-        "has:perle"
-      ],
-      "effects": [
-        "lose:perle",
-        "gain:perle_lumineuse"
-      ],
-      "points": 10,
-      "text": "Tu poses la perle grise sur le Corail-Soleil… elle se réchauffe, rosit, et se met à briller comme une étoile !"
-    },
-    {
-      "id": "jouer_conque",
-      "verb": "use",
-      "object": "conque",
-      "place": "palais",
-      "when": [
-        "has:conque"
-      ],
-      "effects": [
-        "flag:benitier_ouvert"
-      ],
-      "points": 10,
-      "not_yet": "Tu souffles dans la conque : ouuuh ! La mer chante… mais il n'y a personne à réveiller ici.",
-      "text": "Tu souffles dans la conque : ouuuuuh… La musique de la mer remplit le palais, et Madame Bénitier ouvre lentement sa grande coquille."
-    },
-    {
-      "id": "perle_grise",
-      "verb": "give",
-      "object": "perle",
-      "target": "benitier",
-      "when": [
+     "id": "eveillee",
+     "initial": "Madame Bénitier a ouvert sa grande coquille et attend, toute triste : sa perle de lumière n'est plus là.",
+     "says": [
+      {
+       "when": [
         "has:perle",
-        "flag:benitier_ouvert"
-      ],
-      "effects": [],
-      "points": 0,
-      "repeatable": true,
-      "not_yet": "Madame Bénitier dort, la coquille fermée. Il faudrait d'abord la réveiller…",
-      "text": "Madame Bénitier regarde la perle grise et soupire : « Ma pauvre perle a perdu sa lumière… Il faudrait la réchauffer près du Corail-Soleil. »"
-    },
-    {
-      "id": "rendre_perle",
-      "verb": "give",
-      "object": "perle_lumineuse",
-      "target": "benitier",
-      "when": [
-        "has:perle_lumineuse",
-        "flag:benitier_ouvert"
-      ],
-      "effects": [
-        "lose:perle_lumineuse",
-        "end:perle"
-      ],
-      "points": 20,
-      "not_yet": "Madame Bénitier dort, la coquille fermée. Il faudrait d'abord la réveiller…",
-      "text": "Tu poses la perle de lumière dans la couronne… FLASH ! Une lumière dorée jaillit et file dans toute la mer."
-    },
-    {
-      "id": "inviter_poissons",
-      "verb": "talk",
-      "object": "benitier",
-      "when": [
-        "flag:benitier_ouvert",
-        "flag:poissons_amis"
-      ],
-      "effects": [
-        "end:poissons"
-      ],
-      "points": 20,
-      "not_yet": "Madame Bénitier murmure : « Il fait si noir dans mon palais… »",
-      "text": "Tu dis à Madame Bénitier : « J'ai des amis qui brillent ! » Les poissons-lanternes entrent en dansant dans le palais."
-    },
-    {
-      "id": "embeter_zigzag",
-      "verb": "hit",
-      "object": "zigzag",
-      "effects": [
-        "end:zap"
-      ],
-      "points": 0,
-      "text": "Zigzag se fâche tout rouge : BZZZT ! Une grosse étincelle secoue Bulle, et ton sous-marin remonte tout seul à la surface, comme un bouchon."
-    },
-    {
-      "id": "manger_algue",
-      "verb": "eat",
-      "object": "algue_lumineuse",
-      "when": [
-        "has:algue_lumineuse"
-      ],
-      "effects": [
-        "end:hoquet"
-      ],
-      "points": 0,
-      "text": "Tu croques l'algue lumineuse… hic ! Tu as le hoquet, et à chaque hic, tu t'allumes en vert ! Hic ! Hic !"
+        "is:perle:eteinte"
+       ],
+       "text": "Oh, ma perle ! Mais elle a perdu sa lumière… Il faudrait la réchauffer près du Corail-Soleil."
+      },
+      {
+       "text": "Merci de m'avoir réveillée… Mais mon palais est tout noir : ma perle de lumière s'est éteinte. Il fait si noir ici…"
+      }
+     ]
     }
-  ],
-  "endings": [
+   ]
+  }
+ ],
+ "actions": [
+  {
+   "id": "detacher_ficelle",
+   "effects": [
+    "reveal:ficelle"
+   ],
+   "points": 5,
+   "text": "Tu tires sur un bout du filet… et une longue ficelle se détache !",
+   "triggers": [
     {
-      "id": "perle",
-      "kind": "win",
-      "text": "La perle de lumière brille à nouveau ! Tout le récif se rallume de mille couleurs. Madame Bénitier te remercie, Raya fait des pirouettes de joie, et Octave te nomme gardien de la lumière de la mer."
+     "verb": "search",
+     "object": "filet"
     },
     {
-      "id": "poissons",
-      "kind": "win",
-      "text": "Les poissons-lanternes s'installent dans le palais et l'illuminent de mille petites lumières qui clignotent. Madame Bénitier rit : « C'est encore plus joli qu'avant ! » Tout le récif vient danser."
-    },
-    {
-      "id": "zap",
-      "kind": "lose",
-      "text": "Te voilà à la surface, un peu ébouriffé… Le temps de redescendre, le récif s'est endormi dans le noir. Raya te dit : « Avec Zigzag, il faut être gentil ! »"
-    },
-    {
-      "id": "hoquet",
-      "kind": "lose",
-      "text": "Avec ce hoquet lumineux, impossible de continuer ! Raya te raccompagne à Bulle en riant, et le palais reste dans le noir pour cette nuit."
+     "verb": "pull",
+     "object": "filet"
     }
-  ]
+   ],
+   "hint": "Le vieux filet a des bouts de ficelle qui pendent… Et si tu tirais dessus ?"
+  },
+  {
+   "id": "fouiller_sable",
+   "effects": [
+    "reveal:coquillages",
+    "flag:coquillages_trouves"
+   ],
+   "points": 5,
+   "text": "Tu creuses dans le sable avec tes mains… et tu trouves plein de petits coquillages avec un trou au milieu !",
+   "triggers": [
+    {
+     "verb": "search",
+     "object": "sable"
+    }
+   ],
+   "hint": "Quelque chose brille dans le sable de la plaine… Creuse un peu !"
+  },
+  {
+   "id": "faire_collier",
+   "when": [
+    "has:ficelle",
+    "has:coquillages"
+   ],
+   "effects": [
+    "lose:ficelle",
+    "lose:coquillages",
+    "gain:collier"
+   ],
+   "points": 10,
+   "text": "Tu enfiles les coquillages un par un sur la ficelle… et tu fais un nœud : voilà un joli collier !",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "ficelle",
+     "target": "coquillages"
+    }
+   ],
+   "hint": "Zigzag a perdu son collier de coquillages. Avec une ficelle et des coquillages troués, tu pourrais lui en faire un !"
+  },
+  {
+   "id": "offrir_collier",
+   "when": [
+    "has:collier"
+   ],
+   "effects": [
+    "lose:collier",
+    "flag:passage",
+    "set:zigzag:contente",
+    "reveal:collier_zigzag"
+   ],
+   "points": 10,
+   "text": "Zigzag met le collier et fait des étincelles de joie : bzzt bzzt ! « Qu'il est beau ! Vas-y, tu peux descendre. »",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "collier",
+     "target": "zigzag"
+    }
+   ],
+   "hint": "Zigzag est triste sans son beau collier. Si tu lui en offrais un ?"
+  },
+  {
+   "id": "faire_lampe",
+   "when": [
+    "has:algue_lumineuse",
+    "has:bocal",
+    "is:bocal:vide"
+   ],
+   "effects": [
+    "lose:algue_lumineuse",
+    "set:bocal:lampe"
+   ],
+   "points": 10,
+   "text": "Tu glisses l'algue lumineuse dans le bocal et tu fermes le couvercle : la lumière verte brille bien fort. Une lampe d'algues !",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "algue_lumineuse",
+     "target": "bocal"
+    }
+   ],
+   "hint": "L'algue lumineuse se fane dans l'eau de mer… Dans quoi pourrais-tu la protéger ?"
+  },
+  {
+   "id": "eclairer_fosse",
+   "place": "fosse",
+   "when": [
+    "has:bocal",
+    "is:bocal:lampe"
+   ],
+   "effects": [
+    "flag:fosse_eclairee",
+    "reveal:perle"
+   ],
+   "points": 10,
+   "text": "Tu lèves la lampe d'algues : la fosse s'illumine ! Sur un rocher, tu vois une grosse perle toute grise, et au fond, un passage vers une lueur dorée.",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "bocal"
+    },
+    {
+     "verb": "light",
+     "object": "fosse"
+    },
+    {
+     "verb": "search",
+     "object": "fosse"
+    }
+   ],
+   "not_yet": "Il fait tout noir, tu ne vois rien du tout ! Il te faudrait une lumière… une qui ne s'éteint pas dans l'eau.",
+   "hint": "Il fait tout noir dans la fosse. Ta lampe d'algues, ce serait le moment de la lever !"
+  },
+  {
+   "id": "nourrir_poissons",
+   "when": [
+    "has:miettes",
+    "is:poissons:affames"
+   ],
+   "effects": [
+    "lose:miettes",
+    "set:poissons:amis"
+   ],
+   "points": 10,
+   "text": "Les poissons-lanternes se jettent sur les miettes : blip blip blip ! « Merci ! Maintenant, on te suit partout ! »",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "miettes",
+     "target": "poissons"
+    }
+   ],
+   "hint": "Les poissons-lanternes ont toujours un petit creux… Tu n'aurais pas quelque chose à grignoter pour eux ?"
+  },
+  {
+   "id": "trouver_octave",
+   "effects": [
+    "move:octave:grotte",
+    "gain:conque"
+   ],
+   "points": 10,
+   "text": "Tu regardes derrière un rocher… le rocher a des yeux ! « Hi hi, tu m'as trouvé ! » C'est Octave le poulpe. « Tu as gagné, prends ma conque : elle joue la musique de la mer. »",
+   "triggers": [
+    {
+     "verb": "search",
+     "object": "grotte"
+    }
+   ],
+   "hint": "On entend rire Octave, caché quelque part dans la grotte. Cherche bien dans les recoins !"
+  },
+  {
+   "id": "rallumer_perle",
+   "when": [
+    "has:perle",
+    "is:perle:eteinte"
+   ],
+   "effects": [
+    "set:perle:lumineuse"
+   ],
+   "points": 10,
+   "text": "Tu poses la perle grise sur le Corail-Soleil… elle se réchauffe, rosit, et se met à briller comme une étoile !",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "perle",
+     "target": "corail_soleil"
+    }
+   ],
+   "hint": "La perle est toute froide. Où est-ce qu'il fait chaud et lumineux comme un petit soleil, sous la mer ?"
+  },
+  {
+   "id": "jouer_conque",
+   "place": "palais",
+   "when": [
+    "has:conque",
+    "is:benitier:endormie"
+   ],
+   "effects": [
+    "set:benitier:eveillee"
+   ],
+   "points": 10,
+   "not_yet": "Tu souffles dans la conque : ouuuh ! La mer chante… mais il n'y a personne à réveiller ici.",
+   "text": "Tu souffles dans la conque : ouuuuuh… La musique de la mer remplit le palais, et Madame Bénitier ouvre lentement sa grande coquille.",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "conque"
+    }
+   ],
+   "hint": "Madame Bénitier ne se réveille qu'avec la musique de la mer… Tu as une conque, non ?"
+  },
+  {
+   "id": "rendre_perle",
+   "when": [
+    "has:perle",
+    "is:perle:lumineuse",
+    "is:benitier:eveillee"
+   ],
+   "effects": [
+    "lose:perle",
+    "end:perle"
+   ],
+   "points": 20,
+   "not_yet": "Pas encore : Madame Bénitier doit être bien réveillée, et sa perle doit briller comme avant…",
+   "text": "Tu poses la perle de lumière dans la couronne… FLASH ! Une lumière dorée jaillit et file dans toute la mer.",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "perle",
+     "target": "benitier"
+    }
+   ],
+   "hint": "La couronne de Madame Bénitier attend sa perle… et la tienne brille de nouveau !"
+  },
+  {
+   "id": "inviter_poissons",
+   "when": [
+    "is:benitier:eveillee",
+    "is:poissons:amis"
+   ],
+   "effects": [
+    "end:poissons"
+   ],
+   "points": 20,
+   "not_yet": "Madame Bénitier murmure : « Il fait si noir dans mon palais… »",
+   "text": "Tu dis à Madame Bénitier : « J'ai des amis qui brillent ! » Les poissons-lanternes entrent en dansant dans le palais.",
+   "triggers": [
+    {
+     "verb": "talk",
+     "object": "benitier"
+    }
+   ],
+   "hint": "Madame Bénitier trouve son palais trop noir. Tu ne connais pas des amis qui brillent tout seuls ?"
+  },
+  {
+   "id": "embeter_zigzag",
+   "effects": [
+    "end:zap"
+   ],
+   "points": 0,
+   "text": "Zigzag se fâche tout rouge : BZZZT ! Une grosse étincelle secoue Bulle, et ton sous-marin remonte tout seul à la surface, comme un bouchon.",
+   "triggers": [
+    {
+     "verb": "hit",
+     "object": "zigzag"
+    }
+   ]
+  },
+  {
+   "id": "manger_algue",
+   "when": [
+    "has:algue_lumineuse"
+   ],
+   "effects": [
+    "end:hoquet"
+   ],
+   "points": 0,
+   "text": "Tu croques l'algue lumineuse… hic ! Tu as le hoquet, et à chaque hic, tu t'allumes en vert ! Hic ! Hic !",
+   "triggers": [
+    {
+     "verb": "eat",
+     "object": "algue_lumineuse"
+    }
+   ]
+  }
+ ],
+ "endings": [
+  {
+   "id": "perle",
+   "kind": "win",
+   "text": "La perle de lumière brille à nouveau ! Tout le récif se rallume de mille couleurs. Madame Bénitier te remercie, Raya fait des pirouettes de joie, et Octave te nomme gardien de la lumière de la mer.",
+   "fact": "Une perle naît dans un coquillage : quand un tout petit intrus s'y glisse, le coquillage l'enrobe de nacre, couche après couche, pendant des années !"
+  },
+  {
+   "id": "poissons",
+   "kind": "win",
+   "text": "Les poissons-lanternes s'installent dans le palais et l'illuminent de mille petites lumières qui clignotent. Madame Bénitier rit : « C'est encore plus joli qu'avant ! » Tout le récif vient danser.",
+   "fact": "Tout au fond de la mer, où il fait noir, beaucoup de poissons fabriquent leur propre lumière, comme le poisson-lanterne : ça s'appelle la bioluminescence !"
+  },
+  {
+   "id": "zap",
+   "kind": "lose",
+   "text": "Te voilà à la surface, un peu ébouriffé… Le temps de redescendre, le récif s'est endormi dans le noir. Raya te dit : « Avec Zigzag, il faut être gentil ! »"
+  },
+  {
+   "id": "hoquet",
+   "kind": "lose",
+   "text": "Avec ce hoquet lumineux, impossible de continuer ! Raya te raccompagne à Bulle en riant, et le palais reste dans le noir pour cette nuit."
+  }
+ ],
+ "format": 2,
+ "puzzles": [
+  {
+   "goal": "Rendre la perle de lumière à Madame Bénitier",
+   "action": "rendre_perle",
+   "needs": [
+    "perle",
+    "benitier"
+   ],
+   "clue_in": "raya"
+  },
+  {
+   "goal": "Rallumer la perle sur le Corail-Soleil",
+   "action": "rallumer_perle",
+   "needs": [
+    "perle",
+    "corail_soleil"
+   ],
+   "clue_in": "perle"
+  },
+  {
+   "goal": "Ou inviter les poissons-lanternes dans le palais",
+   "action": "inviter_poissons",
+   "needs": [
+    "poissons",
+    "benitier"
+   ],
+   "clue_in": "poissons"
+  },
+  {
+   "goal": "Se faire des amis des poissons-lanternes",
+   "action": "nourrir_poissons",
+   "needs": [
+    "miettes",
+    "poissons"
+   ],
+   "clue_in": "miettes"
+  },
+  {
+   "goal": "Réveiller Madame Bénitier",
+   "action": "jouer_conque",
+   "needs": [
+    "conque",
+    "benitier"
+   ],
+   "clue_in": "conque"
+  },
+  {
+   "goal": "Trouver Octave (et sa conque)",
+   "action": "trouver_octave",
+   "needs": [
+    "octave"
+   ],
+   "clue_in": "raya"
+  },
+  {
+   "goal": "Éclairer la fosse",
+   "action": "eclairer_fosse",
+   "needs": [
+    "bocal",
+    "fosse"
+   ],
+   "clue_in": "fosse"
+  },
+  {
+   "goal": "Fabriquer une lampe d'algues",
+   "action": "faire_lampe",
+   "needs": [
+    "algue_lumineuse",
+    "bocal"
+   ],
+   "clue_in": "algue_lumineuse"
+  },
+  {
+   "goal": "Ouvrir le passage de Zigzag",
+   "action": "offrir_collier",
+   "needs": [
+    "collier",
+    "zigzag"
+   ],
+   "clue_in": "zigzag"
+  },
+  {
+   "goal": "Fabriquer un collier",
+   "action": "faire_collier",
+   "needs": [
+    "ficelle",
+    "coquillages"
+   ],
+   "clue_in": "zigzag"
+  },
+  {
+   "goal": "Trouver des coquillages",
+   "action": "fouiller_sable",
+   "needs": [
+    "sable"
+   ],
+   "clue_in": "plaine"
+  },
+  {
+   "goal": "Trouver une ficelle",
+   "action": "detacher_ficelle",
+   "needs": [
+    "filet"
+   ],
+   "clue_in": "filet"
+  }
+ ]
 }

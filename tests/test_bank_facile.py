@@ -157,10 +157,12 @@ def test_le_phare_de_piko(tmp_path, monkeypatch):
         ("Je prends une algue et je la donne au crabe",
          [A("take", "une algue"), A("give", "l'algue", "le crabe"), A("take", "la clé")], ["done", "done", "done"]),
         ("Je vais dans la cabane de Zouzou", [G("la plage"), G("la cabane")], ["done", "done"]),
-        ("Je prends les allumettes", [A("take", "les allumettes")], ["not_yet"]),  # in the stuck drawer
+        ("Je prends les allumettes", [A("take", "les allumettes")], ["not_yet"]),  # in the drawer with a code
         ("Aide-moi Flocon", [A("help")], ["hint"]),
-        ("J'ouvre le tiroir et je prends les allumettes",
-         [A("open", "le tiroir"), A("take", "les allumettes")], ["done", "done"]),
+        ("J'ouvre le tiroir", [A("open", "le tiroir")], ["not_yet"]),  # three shells glued on it
+        ("J'appuie sur les coquillages comme sur le dessin : bleu, rose, blanc, et je prends les allumettes",
+         [A("push", "le coquillage bleu"), A("push", "le coquillage rose"), A("push", "le coquillage blanc"),
+          A("take", "les allumettes")], ["done", "done", "done", "done"]),
         ("Je vais au phare et j'ouvre la porte", [G("la plage"), G("le phare"), A("open", "la porte")],
          ["done", "done", "done"]),
         ("Je monte en haut", [G("en haut")], ["done"]),

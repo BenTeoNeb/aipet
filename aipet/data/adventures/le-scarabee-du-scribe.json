@@ -1,126 +1,631 @@
 {
-  "title": "Le scarabée du scribe",
-  "difficulty": "facile",
-  "tags": ["egypte", "pharaon", "nil", "scribe", "hieroglyphes", "chat", "scarabee", "temple"],
-  "fact": "Dans l'Égypte ancienne, on fabriquait des feuilles pour écrire avec une grande plante du Nil, le papyrus ; et chaque année, la crue du Nil recouvrait les champs d'une boue noire qui les rendait très fertiles.",
-  "intro": "Il y a très longtemps, en Égypte, au bord du Nil. Kha, le petit apprenti scribe, pleure dans son atelier : il a perdu le scarabée porte-bonheur qu'il doit offrir à la princesse, au temple, pour la fête de la crue du Nil. Et la fête commence bientôt !",
-  "goal": "Retrouver le scarabée de Kha et l'apporter à la princesse, au temple.",
-  "start": {"place": "atelier", "inventory": []},
-  "places": [
-    {"id": "atelier", "name": "l'atelier des scribes", "aliases": ["atelier", "atelier des scribes", "ecole", "maison"],
-     "description": "L'atelier des scribes, frais et calme. Sur une petite table, une feuille de papyrus et un calame, le petit roseau pour écrire. Kha renifle dans un coin. Un escalier monte vers la terrasse.",
-     "variants": [
-       {"when": ["has:papyrus"], "description": "L'atelier des scribes, frais et calme. Sur une petite table, il reste un calame, le petit roseau pour écrire. Kha renifle dans un coin. Un escalier monte vers la terrasse."},
-       {"when": ["has:calame"], "description": "L'atelier des scribes, frais et calme. Sur une petite table, il reste une feuille de papyrus. Kha renifle dans un coin. Un escalier monte vers la terrasse."},
-       {"when": ["has:calame", "has:papyrus"], "description": "L'atelier des scribes, frais et calme. Kha renifle dans un coin. Un escalier monte vers la terrasse."},
-       {"when": ["flag:pancarte"], "description": "L'atelier des scribes, frais et calme. Kha renifle dans un coin. Un escalier monte vers la terrasse."}],
-     "exits": [
-       {"to": "terrasse", "label": "l'escalier vers la terrasse", "dir": "haut"},
-       {"to": "marche", "label": "vers le marché", "dir": "est"},
-       {"to": "nil", "label": "vers le bord du Nil", "dir": "ouest"}]},
-    {"id": "terrasse", "name": "la terrasse", "aliases": ["terrasse", "toit"],
-     "description": "Le toit plat de l'atelier, tout chaud de soleil. Miou la chatte fait la sieste, roulée en boule… et sous sa patte, quelque chose brille en bleu et vert : le scarabée !",
-     "variants": [
-       {"when": ["flag:scarabee_libre"], "description": "Le toit plat de l'atelier, tout chaud de soleil. Miou la chatte boude à l'ombre en se léchant les pattes."},
-       {"when": ["flag:chatte_amie"], "description": "Le toit plat de l'atelier, tout chaud de soleil. Miou la chatte ronronne, toute contente."}],
-     "exits": [{"to": "atelier", "label": "l'escalier vers l'atelier", "dir": "bas"}]},
-    {"id": "marche", "name": "le marché", "aliases": ["marche"],
-     "description": "Le marché, plein de bruit et de couleurs. Tante Hénout, la marchande de poissons, soupire derrière son étal : il n'y a pas de pancarte, et les gens passent sans savoir ce qu'elle vend. Au nord, on voit les colonnes du temple.",
-     "variants": [{"when": ["flag:pancarte"], "description": "Le marché, plein de bruit et de couleurs. Devant l'étal de Tante Hénout, ta belle pancarte en hiéroglyphes attire tout le monde ! Au nord, on voit les colonnes du temple."}],
-     "exits": [
-       {"to": "atelier", "label": "vers l'atelier des scribes", "dir": "ouest"},
-       {"to": "temple", "label": "vers le temple", "dir": "nord"}]},
-    {"id": "temple", "name": "le temple", "aliases": ["temple"],
-     "description": "Le grand temple, avec ses colonnes peintes de fleurs de lotus. La petite princesse Méryt attend, avec sa robe blanche et ses bracelets d'or. Tout le monde prépare la fête de la crue du Nil.",
-     "exits": [{"to": "marche", "label": "vers le marché", "dir": "sud"}]},
-    {"id": "nil", "name": "le bord du Nil", "aliases": ["nil", "bord du nil", "fleuve", "riviere"],
-     "description": "Le bord du Nil, plein de grands papyrus qui chuchotent dans le vent. Une petite barque en roseaux flotte, attachée à un piquet… sans rame : surtout ne monte pas dedans, le courant l'emporterait ! Sage l'ibis, un grand oiseau au long bec courbé, pêche dans l'eau. Une jolie plume blanche traîne sur le sable.",
-     "variants": [{"when": ["has:plume"], "description": "Le bord du Nil, plein de grands papyrus qui chuchotent dans le vent. Une petite barque en roseaux flotte, attachée à un piquet… sans rame : surtout ne monte pas dedans, le courant l'emporterait ! Sage l'ibis pêche dans l'eau."}],
-     "exits": [{"to": "atelier", "label": "vers l'atelier des scribes", "dir": "est"}]}
-  ],
-  "items": [
-    {"id": "papyrus", "name": "une feuille de papyrus", "aliases": ["papyrus", "feuille", "papier", "rouleau"], "at": "atelier", "takeable": true,
-     "description": "Une feuille de papyrus toute blanche, faite avec les tiges des roseaux du Nil. Parfaite pour écrire !"},
-    {"id": "calame", "name": "un calame", "aliases": ["calame", "crayon", "stylo", "pinceau"], "at": "atelier", "takeable": true,
-     "description": "Un petit roseau taillé en pointe : le stylo des scribes ! On le trempe dans l'encre pour écrire des hiéroglyphes."},
-    {"id": "scarabee", "name": "le scarabée porte-bonheur", "aliases": ["scarabee", "amulette", "porte-bonheur", "bijou"], "at": "", "takeable": true,
-     "description": "Un petit scarabée en pierre bleue et verte, tout brillant. C'est un porte-bonheur !"},
-    {"id": "etal", "name": "l'étal de Tante Hénout", "aliases": ["etal", "stand", "comptoir"], "at": "marche", "takeable": false,
-     "fixed": "C'est l'étal de Tante Hénout, il reste au marché !",
-     "description": "Un étal plein de poissons qui sentent… très fort !"},
-    {"id": "poisson", "name": "un poisson", "aliases": ["poisson", "poisson frais", "sardine"], "at": "", "takeable": true,
-     "description": "Un beau poisson tout frais, qui sent très fort. Les chats adorent ça !"},
-    {"id": "plume", "name": "une plume d'ibis", "aliases": ["plume", "plume blanche", "plume d'ibis"], "at": "nil", "takeable": true,
-     "description": "Une longue plume blanche, toute douce. Parfaite pour chatouiller !"},
-    {"id": "barque", "name": "la barque en roseaux", "aliases": ["barque", "bateau", "radeau", "pirogue"], "at": "nil", "takeable": false,
-     "fixed": "Elle est attachée au piquet, et elle n'a pas de rame.",
-     "description": "Une petite barque en roseaux, attachée à un piquet bien branlant. Il n'y a pas de rame : si on monte dedans, le courant l'emporterait !"},
-    {"id": "roseaux", "name": "les grands papyrus du Nil", "aliases": ["roseaux", "plantes", "tiges", "joncs"], "at": "nil", "takeable": false,
-     "fixed": "Ils ont les pieds dans l'eau ! Et Kha a déjà une feuille de papyrus toute prête à l'atelier.",
-     "description": "De grandes plantes vertes plus hautes que toi. Avec leurs tiges, on fabrique les feuilles de papyrus."}
-  ],
-  "characters": [
-    {"id": "kha", "name": "Kha l'apprenti scribe", "aliases": ["kha", "apprenti", "scribe", "garcon"], "at": "atelier",
-     "description": "Un petit garçon au crâne rasé, avec une mèche sur le côté et les doigts pleins d'encre.",
-     "says": "Bouhouhou ! Mon scarabée porte-bonheur a disparu ! Ce matin, Miou la chatte jouait avec, sur la terrasse… Miou adore le poisson, et elle ne supporte pas les chatouilles ! Et attention : au bord du Nil, ne monte pas dans la barque, elle n'a pas de rame !"},
-    {"id": "miou", "name": "Miou la chatte", "aliases": ["miou", "chatte", "chat", "minou", "minet"], "at": "terrasse",
-     "description": "Une chatte toute fine aux grands yeux verts, qui adore le poisson et déteste les chatouilles.",
-     "says": "Mrrrou… Rrrr… (Miou ouvre un œil et renifle : ça ne sentirait pas le poisson, par ici ?)"},
-    {"id": "henout", "name": "Tante Hénout la marchande", "aliases": ["henout", "tante henout", "tante", "marchande", "dame"], "at": "marche",
-     "description": "Une dame joyeuse avec une grande robe de lin et des colliers de perles.",
-     "says": "Bonjour, petit scribe ! Mes poissons sont les plus frais du marché !"},
-    {"id": "meryt", "name": "la princesse Méryt", "aliases": ["meryt", "princesse", "fille du pharaon"], "at": "temple",
-     "description": "Une petite princesse avec une robe blanche, des bracelets d'or et un grand sourire.",
-     "says": "Bonjour ! Kha devait m'apporter un scarabée porte-bonheur pour la fête de la crue. Tu l'as vu ?"},
-    {"id": "ibis", "name": "Sage l'ibis", "aliases": ["sage", "ibis", "oiseau"], "at": "nil",
-     "description": "Un grand oiseau blanc et noir, au long bec courbé. En Égypte, l'ibis est l'oiseau des scribes.",
-     "says": "Croâ ! Bonjour ! Ma plume est toute douce, parfaite pour chatouiller. Et ne monte surtout pas dans cette barque sans rame : le courant t'emporterait jusqu'à la mer !"}
-  ],
-  "actions": [
-    {"id": "ecrire_pancarte", "verb": "use", "object": "calame", "target": "papyrus", "place": "marche", "when": ["has:calame", "has:papyrus"],
-     "effects": ["lose:papyrus", "gain:poisson", "flag:pancarte"], "points": 10,
-     "text": "Tu trempes le calame dans l'encre et tu dessines des hiéroglyphes : un poisson, des vaguelettes, un soleil. Tante Hénout accroche la pancarte, et tout le monde accourt ! « Merci, petit scribe ! » Elle te donne son plus beau poisson."},
-    {"id": "donner_papyrus", "verb": "give", "object": "papyrus", "target": "henout", "when": ["has:calame", "has:papyrus"],
-     "effects": ["lose:papyrus", "gain:poisson", "flag:pancarte"], "points": 10,
-     "not_yet": "Tante Hénout regarde la feuille : « Elle est toute blanche ! Il faudrait écrire dessus, avec un calame. »",
-     "text": "Tu trempes le calame dans l'encre et tu dessines des hiéroglyphes : un poisson, des vaguelettes, un soleil. Tante Hénout accroche la pancarte, et tout le monde accourt ! « Merci, petit scribe ! » Elle te donne son plus beau poisson."},
-    {"id": "parler_henout", "verb": "talk", "object": "henout", "when": ["flag:pancarte"], "effects": [], "points": 0,
-     "not_yet": "Tante Hénout soupire : « Personne n'achète mes poissons ! Il me faudrait une pancarte écrite en hiéroglyphes, mais je ne sais pas écrire… Toi, tu sais ? Avec une feuille de papyrus et un calame, écris-m'en une, et je te donne mon plus beau poisson ! »",
-     "text": "Tante Hénout rit : « Merci pour la pancarte, petit scribe ! Tout le monde achète mes poissons, maintenant ! »"},
-    {"id": "poisson_miou", "verb": "give", "object": "poisson", "target": "miou", "when": ["has:poisson", "!flag:scarabee_libre"],
-     "effects": ["lose:poisson", "reveal:scarabee", "flag:scarabee_libre", "flag:chatte_amie"], "points": 10,
-     "text": "Miou ouvre un œil, puis deux… Elle renifle le poisson, miaou ! Elle le croque et lâche le scarabée. Puis elle se frotte contre tes jambes en ronronnant : tu es son meilleur ami !"},
-    {"id": "poisson_miou_apres", "verb": "give", "object": "poisson", "target": "miou", "when": ["has:poisson", "flag:scarabee_libre"],
-     "effects": ["lose:poisson", "flag:chatte_amie"], "points": 10,
-     "text": "Miou sort de l'ombre et renifle le poisson, miaou ! Elle le croque, puis se frotte contre tes jambes en ronronnant : elle ne boude plus, tu es son meilleur ami !"},
-    {"id": "chatouiller_miou", "verb": "use", "object": "plume", "target": "miou", "when": ["has:plume"],
-     "effects": ["reveal:scarabee", "flag:scarabee_libre"], "points": 10,
-     "text": "Tu chatouilles le nez de Miou avec la plume… Atchoum ! Miou fait un bond, lâche le scarabée et file bouder à l'ombre."},
-    {"id": "caresser_miou", "verb": "touch", "object": "miou", "target": "plume", "when": ["has:plume"],
-     "effects": ["reveal:scarabee", "flag:scarabee_libre"], "points": 10,
-     "text": "Tu prends la plume et tu chatouilles le nez de Miou… Atchoum ! Miou fait un bond, lâche le scarabée et file bouder à l'ombre."},
-    {"id": "caresser_miou_libre", "verb": "touch", "object": "miou", "when": ["flag:scarabee_libre"], "effects": [], "points": 0,
-     "not_yet": "Tu caresses Miou… Rrrr, elle ronronne, mais elle ne bouge pas sa patte d'un poil. Avec quelque chose de tout doux, tu pourrais la chatouiller !",
-     "text": "Tu caresses doucement Miou… Rrrr, elle ronronne sous ta main."},
-    {"id": "pousser_miou", "verb": "push", "object": "miou", "when": ["flag:miou_ne_bouge_pas"], "effects": [], "points": 0,
-     "not_yet": "Miou grogne et appuie encore plus fort sur le scarabée. Grrr ! Il faudrait plutôt lui faire plaisir… ou la chatouiller.",
-     "text": ""},
-    {"id": "offrir_scarabee", "verb": "give", "object": "scarabee", "target": "meryt", "when": ["has:scarabee", "!flag:chatte_amie"], "effects": ["end:fete"], "points": 20,
-     "text": "Tu tends le scarabée à la princesse Méryt."},
-    {"id": "offrir_scarabee_miou", "verb": "give", "object": "scarabee", "target": "meryt", "when": ["has:scarabee", "flag:chatte_amie"], "effects": ["end:chatte"], "points": 20,
-     "text": "Tu tends le scarabée à la princesse Méryt."},
-    {"id": "grimper_barque", "verb": "climb", "object": "barque", "effects": ["end:derive"], "points": 0,
-     "text": "Tu grimpes dans la barque… crac, le piquet se détache !"},
-    {"id": "asseoir_barque", "verb": "sit", "object": "barque", "effects": ["end:derive"], "points": 0,
-     "text": "Tu t'assois dans la barque… crac, le piquet se détache !"},
-    {"id": "sauter_barque", "verb": "jump", "object": "barque", "effects": ["end:derive"], "points": 0,
-     "text": "Tu sautes dans la barque… crac, le piquet se détache !"},
-    {"id": "utiliser_barque", "verb": "use", "object": "barque", "effects": ["end:derive"], "points": 0,
-     "text": "Tu montes dans la barque… crac, le piquet se détache !"}
-  ],
-  "endings": [
-    {"id": "fete", "kind": "win", "text": "La princesse Méryt serre le scarabée sur son cœur : « Il est magnifique ! » Kha arrive en courant, tout essoufflé et tout content. Les tambours résonnent, boum boum : la fête de la crue du Nil commence, et tu es invité au premier rang !"},
-    {"id": "chatte", "kind": "win", "text": "La princesse Méryt serre le scarabée sur son cœur… mais qui arrive en trottinant ? Miou ! Elle t'a suivi en cachette depuis la terrasse. Elle saute sur les genoux de la princesse et ronronne si fort que tout le temple éclate de rire. « Miou sera la chatte du temple ! » décide la princesse. Et la fête de la crue du Nil commence !"},
-    {"id": "derive", "kind": "lose", "text": "Le courant emporte doucement la barque sur le Nil. Tu fais coucou aux hippopotames qui bâillent et aux pêcheurs qui rigolent. Quand un pêcheur te ramène enfin, la fête de la crue est finie… et le scarabée dort toujours sous la patte de Miou !"}
-  ]
+ "format": 2,
+ "title": "Le scarabée du scribe",
+ "difficulty": "facile",
+ "tags": [
+  "egypte",
+  "pharaon",
+  "nil",
+  "scribe",
+  "hieroglyphes",
+  "chat",
+  "scarabee",
+  "temple"
+ ],
+ "fact": "Dans l'Égypte ancienne, on fabriquait des feuilles pour écrire avec une grande plante du Nil, le papyrus ; et chaque année, la crue du Nil recouvrait les champs d'une boue noire qui les rendait très fertiles.",
+ "intro": "Il y a très longtemps, en Égypte, au bord du Nil. Kha, le petit apprenti scribe, pleure dans son atelier : il a perdu le scarabée porte-bonheur qu'il doit offrir à la princesse, au temple, pour la fête de la crue du Nil. Et la fête commence bientôt !",
+ "goal": "Retrouver le scarabée de Kha et l'apporter à la princesse, au temple.",
+ "start": {
+  "place": "atelier",
+  "inventory": []
+ },
+ "places": [
+  {
+   "id": "atelier",
+   "name": "l'atelier des scribes",
+   "aliases": [
+    "atelier",
+    "atelier des scribes",
+    "ecole",
+    "maison"
+   ],
+   "description": "L'atelier des scribes, frais et calme. Un escalier monte vers la terrasse.",
+   "decor": [
+    "pots d'encre",
+    "nattes",
+    "coffres",
+    "lampes à huile"
+   ],
+   "exits": [
+    {
+     "to": "terrasse",
+     "label": "l'escalier vers la terrasse",
+     "dir": "haut"
+    },
+    {
+     "to": "marche",
+     "label": "vers le marché",
+     "dir": "est"
+    },
+    {
+     "to": "nil",
+     "label": "vers le bord du Nil",
+     "dir": "ouest"
+    }
+   ]
+  },
+  {
+   "id": "terrasse",
+   "name": "la terrasse",
+   "aliases": [
+    "terrasse",
+    "toit"
+   ],
+   "description": "Le toit plat de l'atelier, tout chaud de soleil.",
+   "decor": [
+    "jarres",
+    "linge qui sèche",
+    "palmiers au loin",
+    "soleil"
+   ],
+   "exits": [
+    {
+     "to": "atelier",
+     "label": "l'escalier vers l'atelier",
+     "dir": "bas"
+    }
+   ]
+  },
+  {
+   "id": "marche",
+   "name": "le marché",
+   "aliases": [
+    "marche"
+   ],
+   "description": "Le marché, plein de bruit et de couleurs. Au nord, on voit les colonnes du temple.",
+   "decor": [
+    "paniers de dattes",
+    "oignons",
+    "ânes",
+    "cruches"
+   ],
+   "exits": [
+    {
+     "to": "atelier",
+     "label": "vers l'atelier des scribes",
+     "dir": "ouest"
+    },
+    {
+     "to": "temple",
+     "label": "vers le temple",
+     "dir": "nord"
+    }
+   ]
+  },
+  {
+   "id": "temple",
+   "name": "le temple",
+   "aliases": [
+    "temple"
+   ],
+   "description": "Le grand temple, avec ses colonnes peintes de fleurs de lotus. Tout le monde prépare la fête de la crue du Nil.",
+   "decor": [
+    "colonnes",
+    "statues",
+    "fleurs de lotus",
+    "encens"
+   ],
+   "exits": [
+    {
+     "to": "marche",
+     "label": "vers le marché",
+     "dir": "sud"
+    }
+   ]
+  },
+  {
+   "id": "nil",
+   "name": "le bord du Nil",
+   "aliases": [
+    "nil",
+    "bord du nil",
+    "fleuve",
+    "riviere"
+   ],
+   "description": "Le bord du Nil, plein de grands papyrus qui chuchotent dans le vent.",
+   "decor": [
+    "grenouilles",
+    "boue",
+    "hippopotames au loin",
+    "vaguelettes"
+   ],
+   "exits": [
+    {
+     "to": "atelier",
+     "label": "vers l'atelier des scribes",
+     "dir": "est"
+    }
+   ]
+  }
+ ],
+ "items": [
+  {
+   "id": "papyrus",
+   "kind": "thing",
+   "name": "une feuille de papyrus",
+   "aliases": [
+    "papyrus",
+    "feuille",
+    "papier",
+    "rouleau"
+   ],
+   "at": "atelier",
+   "initial": "Sur une petite table, une feuille de papyrus toute blanche.",
+   "description": "Une feuille de papyrus toute blanche, faite avec les tiges des roseaux du Nil. Parfaite pour écrire !"
+  },
+  {
+   "id": "calame",
+   "kind": "thing",
+   "name": "un calame",
+   "aliases": [
+    "calame",
+    "crayon",
+    "stylo",
+    "pinceau"
+   ],
+   "at": "atelier",
+   "initial": "Sur la table, il y a aussi un calame, le petit roseau pour écrire.",
+   "description": "Un petit roseau taillé en pointe : le stylo des scribes ! On le trempe dans l'encre pour écrire des hiéroglyphes."
+  },
+  {
+   "id": "scarabee",
+   "kind": "thing",
+   "name": "le scarabée porte-bonheur",
+   "aliases": [
+    "scarabee",
+    "amulette",
+    "porte-bonheur",
+    "bijou"
+   ],
+   "at": "miou",
+   "description": "Un petit scarabée en pierre bleue et verte, tout brillant. C'est un porte-bonheur !"
+  },
+  {
+   "id": "etal",
+   "kind": "scenery",
+   "name": "l'étal de Tante Hénout",
+   "aliases": [
+    "etal",
+    "stand",
+    "comptoir"
+   ],
+   "at": "marche",
+   "fixed": "C'est l'étal de Tante Hénout, il reste au marché !",
+   "sturdy": "L'étal de Tante Hénout est en bon bois bien solide !",
+   "description": "Un étal plein de poissons qui sentent… très fort !"
+  },
+  {
+   "id": "poisson",
+   "kind": "thing",
+   "name": "un poisson",
+   "aliases": [
+    "poisson",
+    "poisson frais",
+    "sardine",
+    "poissons"
+   ],
+   "at": "henout",
+   "description": "Un beau poisson tout frais, qui sent très fort. Les chats adorent ça !"
+  },
+  {
+   "id": "plume",
+   "kind": "thing",
+   "name": "une plume d'ibis",
+   "aliases": [
+    "plume",
+    "plume blanche",
+    "plume d'ibis"
+   ],
+   "at": "nil",
+   "initial": "Une jolie plume blanche traîne sur le sable.",
+   "description": "Une longue plume blanche, toute douce. Parfaite pour chatouiller !"
+  },
+  {
+   "id": "barque",
+   "kind": "scenery",
+   "name": "la barque en roseaux",
+   "aliases": [
+    "barque",
+    "bateau",
+    "radeau",
+    "pirogue"
+   ],
+   "at": "nil",
+   "fixed": "Elle est attachée au piquet, et elle n'a pas de rame.",
+   "sturdy": "Elle est faite de roseaux bien serrés : très solide ! Mais surtout, ne monte pas dedans.",
+   "initial": "Une petite barque en roseaux flotte, attachée à un piquet… sans rame : surtout ne monte pas dedans, le courant l'emporterait !",
+   "description": "Une petite barque en roseaux, attachée à un piquet bien branlant. Il n'y a pas de rame : si on monte dedans, le courant l'emporterait !"
+  },
+  {
+   "id": "roseaux",
+   "kind": "scenery",
+   "name": "les grands papyrus du Nil",
+   "aliases": [
+    "roseaux",
+    "plantes",
+    "tiges",
+    "joncs"
+   ],
+   "at": "nil",
+   "fixed": "Ils ont les pieds dans l'eau ! Et Kha a déjà une feuille de papyrus toute prête à l'atelier.",
+   "description": "De grandes plantes vertes plus hautes que toi. Avec leurs tiges, on fabrique les feuilles de papyrus."
+  }
+ ],
+ "characters": [
+  {
+   "id": "kha",
+   "name": "Kha l'apprenti scribe",
+   "aliases": [
+    "kha",
+    "apprenti",
+    "scribe",
+    "garcon"
+   ],
+   "at": "atelier",
+   "description": "Un petit garçon au crâne rasé, avec une mèche sur le côté et les doigts pleins d'encre.",
+   "initial": "Kha renifle dans un coin.",
+   "says": [
+    {
+     "when": [
+      "has:scarabee"
+     ],
+     "text": "Mon scarabée ! Tu l'as retrouvé ! Vite, apporte-le à la princesse, au temple : la fête va commencer !"
+    },
+    {
+     "text": "Bouhouhou ! Mon scarabée porte-bonheur a disparu ! Ce matin, Miou la chatte jouait avec, sur la terrasse… Miou adore le poisson, et elle ne supporte pas les chatouilles ! Et attention : au bord du Nil, ne monte pas dans la barque, elle n'a pas de rame !"
+    }
+   ]
+  },
+  {
+   "id": "miou",
+   "name": "Miou la chatte",
+   "aliases": [
+    "miou",
+    "chatte",
+    "chat",
+    "minou",
+    "minet"
+   ],
+   "at": "terrasse",
+   "description": "Une chatte toute fine aux grands yeux verts, qui adore le poisson et déteste les chatouilles.",
+   "states": [
+    {
+     "id": "sieste",
+     "initial": "Miou la chatte fait la sieste, roulée en boule… et sous sa patte, quelque chose brille en bleu et vert : le scarabée !",
+     "says": "Mrrrou… Rrrr… (Miou ouvre un œil et renifle : ça ne sentirait pas le poisson, par ici ?)"
+    },
+    {
+     "id": "boude",
+     "initial": "Miou la chatte boude à l'ombre en se léchant les pattes.",
+     "description": "Une chatte toute fine aux grands yeux verts. Elle boude : elle déteste les chatouilles ! Un bon poisson la consolerait peut-être…",
+     "says": "Pfff ! (Miou te tourne le dos. Elle renifle quand même l'air : un poisson, peut-être ?)"
+    },
+    {
+     "id": "amie",
+     "initial": "Miou la chatte ronronne, toute contente.",
+     "description": "Une chatte toute fine aux grands yeux verts, qui ronronne contre tes jambes : c'est ton amie !",
+     "says": "Rrrrr ! Miaou ! (Miou se frotte contre tes jambes : elle te suivrait partout !)"
+    }
+   ]
+  },
+  {
+   "id": "henout",
+   "name": "Tante Hénout la marchande",
+   "aliases": [
+    "henout",
+    "tante henout",
+    "tante",
+    "marchande",
+    "dame"
+   ],
+   "at": "marche",
+   "description": "Une dame joyeuse avec une grande robe de lin et des colliers de perles.",
+   "states": [
+    {
+     "id": "triste",
+     "initial": "Tante Hénout, la marchande de poissons, soupire derrière son étal : il n'y a pas de pancarte, et les gens passent sans savoir ce qu'elle vend.",
+     "says": "Personne n'achète mes poissons ! Il me faudrait une pancarte écrite en hiéroglyphes, mais je ne sais pas écrire… Toi, tu sais ? Avec une feuille de papyrus et un calame, écris-m'en une, et je te donne mon plus beau poisson !"
+    },
+    {
+     "id": "contente",
+     "initial": "Devant l'étal de Tante Hénout, ta belle pancarte en hiéroglyphes attire tout le monde !",
+     "says": "Merci pour la pancarte, petit scribe ! Tout le monde achète mes poissons, maintenant !"
+    }
+   ]
+  },
+  {
+   "id": "meryt",
+   "name": "la princesse Méryt",
+   "aliases": [
+    "meryt",
+    "princesse",
+    "fille du pharaon"
+   ],
+   "at": "temple",
+   "description": "Une petite princesse avec une robe blanche, des bracelets d'or et un grand sourire.",
+   "initial": "La petite princesse Méryt attend, avec sa robe blanche et ses bracelets d'or.",
+   "says": "Bonjour ! Kha devait m'apporter un scarabée porte-bonheur pour la fête de la crue. Tu l'as vu ?"
+  },
+  {
+   "id": "ibis",
+   "name": "Sage l'ibis",
+   "aliases": [
+    "sage",
+    "ibis",
+    "oiseau"
+   ],
+   "at": "nil",
+   "description": "Un grand oiseau blanc et noir, au long bec courbé. En Égypte, l'ibis est l'oiseau des scribes.",
+   "initial": "Sage l'ibis, un grand oiseau au long bec courbé, pêche dans l'eau.",
+   "says": "Croâ ! Bonjour ! Ma plume est toute douce, parfaite pour chatouiller. Et ne monte surtout pas dans cette barque sans rame : le courant t'emporterait jusqu'à la mer !"
+  }
+ ],
+ "actions": [
+  {
+   "id": "ecrire_pancarte",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "calame",
+     "target": "papyrus"
+    },
+    {
+     "verb": "give",
+     "object": "papyrus",
+     "target": "henout"
+    }
+   ],
+   "place": "marche",
+   "when": [
+    "has:calame",
+    "has:papyrus"
+   ],
+   "effects": [
+    "lose:papyrus",
+    "gain:poisson",
+    "set:henout:contente"
+   ],
+   "points": 10,
+   "not_yet": "Tante Hénout regarde la feuille : « Elle est toute blanche ! Il faudrait écrire dessus, avec un calame. »",
+   "text": "Tu trempes le calame dans l'encre et tu dessines des hiéroglyphes : un poisson, des vaguelettes, un soleil. Tante Hénout accroche la pancarte, et tout le monde accourt ! « Merci, petit scribe ! » Elle te donne son plus beau poisson.",
+   "hint": "Tante Hénout voudrait une pancarte, mais elle ne sait pas écrire… Toi, avec une feuille et un roseau pour écrire ?"
+  },
+  {
+   "id": "poisson_miou",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "poisson",
+     "target": "miou"
+    }
+   ],
+   "when": [
+    "has:poisson",
+    "is:miou:sieste"
+   ],
+   "effects": [
+    "lose:poisson",
+    "reveal:scarabee",
+    "set:miou:amie"
+   ],
+   "points": 10,
+   "text": "Miou ouvre un œil, puis deux… Elle renifle le poisson, miaou ! Elle le croque et lâche le scarabée. Puis elle se frotte contre tes jambes en ronronnant : tu es son meilleur ami !",
+   "hint": "Miou ne lâchera pas le scarabée pour rien… Qu'est-ce qu'une chatte aime par-dessus tout ?"
+  },
+  {
+   "id": "poisson_miou_apres",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "poisson",
+     "target": "miou"
+    }
+   ],
+   "when": [
+    "has:poisson",
+    "is:miou:boude"
+   ],
+   "effects": [
+    "lose:poisson",
+    "set:miou:amie"
+   ],
+   "points": 10,
+   "text": "Miou sort de l'ombre et renifle le poisson, miaou ! Elle le croque, puis se frotte contre tes jambes en ronronnant : elle ne boude plus, tu es son meilleur ami !",
+   "hint": "Miou boude encore… Un bon poisson la consolerait peut-être ?"
+  },
+  {
+   "id": "chatouiller_miou",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "plume",
+     "target": "miou"
+    },
+    {
+     "verb": "touch",
+     "object": "miou",
+     "target": "plume"
+    }
+   ],
+   "when": [
+    "has:plume",
+    "is:miou:sieste"
+   ],
+   "effects": [
+    "reveal:scarabee",
+    "set:miou:boude"
+   ],
+   "points": 10,
+   "not_yet": "Miou ronronne contre tes jambes : pas besoin de la chatouiller, c'est déjà ton amie !",
+   "text": "Tu chatouilles le nez de Miou avec la plume… Atchoum ! Miou fait un bond, lâche le scarabée et file bouder à l'ombre.",
+   "hint": "Miou ne supporte pas les chatouilles… Avec quelque chose de tout doux, peut-être ?"
+  },
+  {
+   "id": "caresser_miou_libre",
+   "triggers": [
+    {
+     "verb": "touch",
+     "object": "miou"
+    }
+   ],
+   "when": [
+    "!is:miou:sieste"
+   ],
+   "effects": [],
+   "points": 0,
+   "not_yet": "Tu caresses Miou… Rrrr, elle ronronne, mais elle ne bouge pas sa patte d'un poil. Avec quelque chose de tout doux, tu pourrais la chatouiller !",
+   "text": "Tu caresses doucement Miou… Rrrr, elle ronronne sous ta main."
+  },
+  {
+   "id": "pousser_miou",
+   "triggers": [
+    {
+     "verb": "push",
+     "object": "miou"
+    }
+   ],
+   "when": [
+    "is:miou:sieste"
+   ],
+   "effects": [],
+   "points": 0,
+   "not_yet": "Miou fait un bond de côté : pas la peine de la pousser !",
+   "text": "Miou grogne et appuie encore plus fort sur le scarabée. Grrr ! Il faudrait plutôt lui faire plaisir… ou la chatouiller."
+  },
+  {
+   "id": "offrir_scarabee",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "scarabee",
+     "target": "meryt"
+    }
+   ],
+   "when": [
+    "has:scarabee",
+    "!is:miou:amie"
+   ],
+   "effects": [
+    "end:fete"
+   ],
+   "points": 20,
+   "text": "Tu tends le scarabée à la princesse Méryt.",
+   "hint": "Le scarabée porte-bonheur était pour quelqu'un, au temple…"
+  },
+  {
+   "id": "offrir_scarabee_miou",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "scarabee",
+     "target": "meryt"
+    }
+   ],
+   "when": [
+    "has:scarabee",
+    "is:miou:amie"
+   ],
+   "effects": [
+    "end:chatte"
+   ],
+   "points": 20,
+   "text": "Tu tends le scarabée à la princesse Méryt.",
+   "hint": "Le scarabée porte-bonheur était pour quelqu'un, au temple…"
+  },
+  {
+   "id": "grimper_barque",
+   "triggers": [
+    {
+     "verb": "climb",
+     "object": "barque"
+    },
+    {
+     "verb": "sit",
+     "object": "barque"
+    },
+    {
+     "verb": "jump",
+     "object": "barque"
+    },
+    {
+     "verb": "use",
+     "object": "barque"
+    }
+   ],
+   "effects": [
+    "end:derive"
+   ],
+   "points": 0,
+   "warning": "Sage l'ibis claque du bec : « Croâ ! Pas de rame, et le piquet branle : le courant t'emporterait ! » Tu es sûr ?",
+   "text": "Tu montes dans la barque… crac, le piquet se détache !"
+  }
+ ],
+ "endings": [
+  {
+   "id": "fete",
+   "kind": "win",
+   "text": "La princesse Méryt serre le scarabée sur son cœur : « Il est magnifique ! » Kha arrive en courant, tout essoufflé et tout content. Les tambours résonnent, boum boum : la fête de la crue du Nil commence, et tu es invité au premier rang !",
+   "fact": "Pour les Égyptiens, le scarabée qui pousse sa petite boule était le signe du soleil qui revient chaque matin : c'est pour ça qu'il portait bonheur !"
+  },
+  {
+   "id": "chatte",
+   "kind": "win",
+   "text": "La princesse Méryt serre le scarabée sur son cœur… mais qui arrive en trottinant ? Miou ! Elle t'a suivi en cachette depuis la terrasse. Elle saute sur les genoux de la princesse et ronronne si fort que tout le temple éclate de rire. « Miou sera la chatte du temple ! » décide la princesse. Et la fête de la crue du Nil commence !",
+   "fact": "Dans l'Égypte ancienne, les chats étaient très aimés : la déesse Bastet, qui protégeait les maisons, avait une tête de chat !"
+  },
+  {
+   "id": "derive",
+   "kind": "lose",
+   "text": "Le courant emporte doucement la barque sur le Nil. Tu fais coucou aux hippopotames qui bâillent et aux pêcheurs qui rigolent. Quand un pêcheur te ramène enfin, la fête de la crue est finie… et le scarabée dort toujours sous la patte de Miou !"
+  }
+ ],
+ "puzzles": [
+  {
+   "goal": "Apporter le scarabée à la princesse, au temple",
+   "action": "offrir_scarabee",
+   "needs": [
+    "scarabee",
+    "meryt"
+   ],
+   "clue_in": "kha"
+  },
+  {
+   "goal": "Que Miou lâche le scarabée pour un poisson",
+   "action": "poisson_miou",
+   "needs": [
+    "poisson",
+    "miou"
+   ],
+   "clue_in": "kha"
+  },
+  {
+   "goal": "Avoir un poisson : écrire une pancarte pour Tante Hénout",
+   "action": "ecrire_pancarte",
+   "needs": [
+    "papyrus",
+    "calame",
+    "henout"
+   ],
+   "clue_in": "henout"
+  },
+  {
+   "goal": "Ou chatouiller Miou avec une plume",
+   "action": "chatouiller_miou",
+   "needs": [
+    "plume",
+    "miou"
+   ],
+   "clue_in": "ibis"
+  }
+ ]
 }

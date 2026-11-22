@@ -1,706 +1,844 @@
 {
-  "title": "L'atelier de Léonard",
-  "difficulty": "moyen",
-  "tags": [
-    "renaissance",
-    "leonard de vinci",
-    "inventeur",
-    "machine volante",
+ "format": 2,
+ "title": "L'atelier de Léonard",
+ "difficulty": "moyen",
+ "tags": [
+  "renaissance",
+  "leonard de vinci",
+  "inventeur",
+  "machine volante",
+  "atelier",
+  "italie",
+  "florence",
+  "peintre"
+ ],
+ "fact": "Léonard de Vinci observait les oiseaux pour dessiner des machines volantes, et il écrivait ses notes à l'envers, de droite à gauche : pour les lire facilement, il faut un miroir !",
+ "intro": "Nous sommes à Florence, en Italie, il y a plus de cinq cents ans. Tu es apprenti dans l'atelier du grand Léonard de Vinci. Le maître est parti au marché, et un riche seigneur de Florence arrive bientôt pour voir sa petite machine volante… qui n'a pas encore d'ailes ! Et le plan du maître est écrit tout à l'envers.",
+ "goal": "Fixer des ailes sur la maquette de la machine volante et la faire voler devant le riche seigneur.",
+ "start": {
+  "place": "atelier",
+  "inventory": []
+ },
+ "places": [
+  {
+   "id": "atelier",
+   "name": "l'atelier",
+   "aliases": [
     "atelier",
-    "italie",
-    "florence",
-    "peintre"
-  ],
-  "fact": "Léonard de Vinci observait les oiseaux pour dessiner des machines volantes, et il écrivait ses notes à l'envers, de droite à gauche : pour les lire facilement, il faut un miroir !",
-  "intro": "Nous sommes à Florence, en Italie, il y a plus de cinq cents ans. Tu es apprenti dans l'atelier du grand Léonard de Vinci. Le maître est parti au marché, et un riche seigneur de Florence arrive bientôt pour voir sa petite machine volante… qui n'a pas encore d'ailes ! Et le plan du maître est écrit tout à l'envers.",
-  "goal": "Fixer des ailes sur la maquette de la machine volante et la faire voler devant le riche seigneur.",
-  "start": {
-    "place": "atelier",
-    "inventory": []
+    "atelier du maitre",
+    "salle"
+   ],
+   "description": "Un grand atelier plein de dessins, de pinceaux et de drôles de machines. La grande fenêtre est fermée, avec un petit mot du maître : « Ne pas ouvrir, mes dessins s'envolent ! »",
+   "decor": [
+    "pots de peinture",
+    "chevalet",
+    "roues en bois",
+    "copeaux",
+    "bougies"
+   ],
+   "exits": [
+    {
+     "to": "cuisine",
+     "label": "vers la cuisine",
+     "dir": "ouest"
+    },
+    {
+     "to": "cour",
+     "label": "dans la cour",
+     "dir": "dehors"
+    },
+    {
+     "to": "chambre",
+     "label": "par l'escalier vers la chambre du maître",
+     "dir": "haut"
+    }
+   ]
   },
-  "places": [
+  {
+   "id": "cuisine",
+   "name": "la cuisine",
+   "aliases": [
+    "cuisine"
+   ],
+   "description": "Une cuisine qui sent le pain chaud, avec une grande étagère à provisions.",
+   "decor": [
+    "pâtes",
+    "tomates",
+    "four à pain",
+    "casseroles",
+    "jambon"
+   ],
+   "exits": [
     {
-      "id": "atelier",
-      "name": "l'atelier",
-      "aliases": [
-        "atelier",
-        "atelier du maitre",
-        "salle"
-      ],
-      "description": "Un grand atelier plein de dessins, de pinceaux et de drôles de machines. Sur la table, la maquette de la machine volante attend ses ailes. Un plan est accroché au mur, et une pelote de ficelle traîne par terre. La grande fenêtre est fermée, avec un petit mot du maître : « Ne pas ouvrir, mes dessins s'envolent ! »",
-      "variants": [
-        {
-          "when": [
-            "has:plan"
-          ],
-          "description": "Un grand atelier plein de dessins, de pinceaux et de drôles de machines. Sur la table, la maquette de la machine volante attend ses ailes. Une pelote de ficelle traîne par terre. La grande fenêtre est fermée, avec un petit mot du maître : « Ne pas ouvrir, mes dessins s'envolent ! »"
-        },
-        {
-          "when": [
-            "has:ficelle"
-          ],
-          "description": "Un grand atelier plein de dessins, de pinceaux et de drôles de machines. Sur la table, la maquette de la machine volante attend ses ailes. Un plan est accroché au mur. La grande fenêtre est fermée, avec un petit mot du maître : « Ne pas ouvrir, mes dessins s'envolent ! »"
-        },
-        {
-          "when": [
-            "flag:chat_reveille"
-          ],
-          "description": "Un grand atelier plein de dessins, de pinceaux et de drôles de machines. Sur la table, la maquette de la machine volante attend ses ailes. Un plan est accroché au mur. La grande fenêtre est fermée, avec un petit mot du maître : « Ne pas ouvrir, mes dessins s'envolent ! »"
-        },
-        {
-          "when": [
-            "has:plan",
-            "has:ficelle"
-          ],
-          "description": "Un grand atelier plein de dessins, de pinceaux et de drôles de machines. Sur la table, la maquette de la machine volante attend ses ailes. La grande fenêtre est fermée, avec un petit mot du maître : « Ne pas ouvrir, mes dessins s'envolent ! »"
-        },
-        {
-          "when": [
-            "has:plan",
-            "flag:chat_reveille"
-          ],
-          "description": "Un grand atelier plein de dessins, de pinceaux et de drôles de machines. Sur la table, la maquette de la machine volante attend ses ailes. La grande fenêtre est fermée, avec un petit mot du maître : « Ne pas ouvrir, mes dessins s'envolent ! »"
-        },
-        {
-          "when": [
-            "flag:ailes_fixees"
-          ],
-          "description": "Un grand atelier plein de dessins, de pinceaux et de drôles de machines. Sur la table, la maquette de la machine volante a enfin ses ailes : elle est prête à voler ! On entend des pas dans l'escalier : le riche seigneur arrive. La grande fenêtre est toujours fermée : « Ne pas ouvrir, mes dessins s'envolent ! »"
-        }
-      ],
-      "exits": [
-        {
-          "to": "cuisine",
-          "label": "vers la cuisine",
-          "dir": "ouest"
-        },
-        {
-          "to": "cour",
-          "label": "dans la cour",
-          "dir": "dehors"
-        },
-        {
-          "to": "chambre",
-          "label": "par l'escalier vers la chambre du maître",
-          "dir": "haut"
-        }
-      ]
-    },
-    {
-      "id": "cuisine",
-      "name": "la cuisine",
-      "aliases": [
-        "cuisine"
-      ],
-      "description": "Une cuisine qui sent le pain chaud. Mamma Rosa, la cuisinière, roule des pâtes en chantant, à côté de son étagère à provisions.",
-      "exits": [
-        {
-          "to": "atelier",
-          "label": "vers l'atelier",
-          "dir": "est"
-        }
-      ]
-    },
-    {
-      "id": "cour",
-      "name": "la cour",
-      "aliases": [
-        "cour",
-        "jardin",
-        "citronniers"
-      ],
-      "description": "Une petite cour ensoleillée, avec des citronniers et un vieux puits. À côté du puits, il y a un seau plein d'eau.",
-      "exits": [
-        {
-          "to": "atelier",
-          "label": "dans l'atelier",
-          "dir": "dedans"
-        }
-      ],
-      "variants": [
-        {
-          "when": [
-            "has:seau"
-          ],
-          "description": "Une petite cour ensoleillée, avec des citronniers et un vieux puits. Tout est calme : on n'entend que les abeilles dans les citronniers."
-        },
-        {
-          "when": [
-            "has:colle"
-          ],
-          "description": "Une petite cour ensoleillée, avec des citronniers et un vieux puits. Tout est calme : on n'entend que les abeilles dans les citronniers."
-        },
-        {
-          "when": [
-            "has:ailes_plumes"
-          ],
-          "description": "Une petite cour ensoleillée, avec des citronniers et un vieux puits. Tout est calme : on n'entend que les abeilles dans les citronniers."
-        },
-        {
-          "when": [
-            "has:ailes_soie"
-          ],
-          "description": "Une petite cour ensoleillée, avec des citronniers et un vieux puits. Tout est calme : on n'entend que les abeilles dans les citronniers."
-        },
-        {
-          "when": [
-            "flag:ailes_fixees"
-          ],
-          "description": "Une petite cour ensoleillée, avec des citronniers et un vieux puits. Tout est calme : on n'entend que les abeilles dans les citronniers."
-        }
-      ]
-    },
-    {
-      "id": "chambre",
-      "name": "la chambre du maître",
-      "aliases": [
-        "chambre",
-        "chambre du maitre"
-      ],
-      "description": "La chambre du maître, en haut de l'escalier. Il y a un grand miroir au mur, et Mascarpone, le gros chat roux, dort roulé en boule sur quelque chose de doux et brillant. Une échelle monte vers la terrasse.",
-      "variants": [
-        {
-          "when": [
-            "flag:chat_reveille"
-          ],
-          "description": "La chambre du maître, en haut de l'escalier. Il y a un grand miroir au mur, et Mascarpone joue sous le lit avec la pelote de ficelle. Une échelle monte vers la terrasse."
-        }
-      ],
-      "exits": [
-        {
-          "to": "atelier",
-          "label": "par l'escalier vers l'atelier",
-          "dir": "bas"
-        },
-        {
-          "to": "terrasse",
-          "label": "par l'échelle vers la terrasse",
-          "dir": "haut"
-        }
-      ]
-    },
-    {
-      "id": "terrasse",
-      "name": "la terrasse",
-      "aliases": [
-        "terrasse",
-        "toit"
-      ],
-      "description": "La terrasse, tout en haut de la maison. On voit tous les toits rouges de Florence, et le grand dôme de la cathédrale ! Colombo le pigeon roucoule sur le rebord, et des plumes volent un peu quand il bat des ailes.",
-      "exits": [
-        {
-          "to": "chambre",
-          "label": "par l'échelle vers la chambre",
-          "dir": "bas"
-        }
-      ],
-      "variants": [
-        {
-          "when": [
-            "flag:pigeon_content"
-          ],
-          "description": "La terrasse, tout en haut de la maison. On voit tous les toits rouges de Florence, et le grand dôme de la cathédrale ! Colombo le pigeon, le ventre bien plein, roucoule tout content sur le rebord."
-        }
-      ]
+     "to": "atelier",
+     "label": "vers l'atelier",
+     "dir": "est"
     }
-  ],
-  "items": [
+   ]
+  },
+  {
+   "id": "cour",
+   "name": "la cour",
+   "aliases": [
+    "cour",
+    "jardin",
+    "citronniers"
+   ],
+   "description": "Une petite cour ensoleillée, avec des citronniers et un vieux puits. On entend les abeilles bourdonner dans les citronniers.",
+   "decor": [
+    "citronniers",
+    "citrons",
+    "abeilles",
+    "pavés",
+    "pots de fleurs"
+   ],
+   "exits": [
     {
-      "id": "maquette",
-      "name": "la maquette",
-      "aliases": [
-        "maquette",
-        "machine volante",
-        "machine",
-        "modele"
-      ],
-      "at": "atelier",
-      "takeable": false,
-      "fixed": "Elle est bien trop fragile pour la promener partout : elle reste sur la table.",
-      "description": "Une petite machine volante en bois, inspirée des oiseaux. Il ne lui manque que ses ailes !"
-    },
-    {
-      "id": "plan",
-      "name": "le plan du maître",
-      "aliases": [
-        "plan",
-        "notes",
-        "papier",
-        "parchemin"
-      ],
-      "at": "atelier",
-      "takeable": true,
-      "description": "Le plan de la machine volante, avec des notes écrites tout à l'envers, de droite à gauche ! Impossible à lire comme ça."
-    },
-    {
-      "id": "ficelle",
-      "name": "une pelote de ficelle",
-      "aliases": [
-        "ficelle",
-        "pelote",
-        "corde"
-      ],
-      "at": "atelier",
-      "takeable": true,
-      "description": "Une petite pelote de ficelle qui roule toute seule dès qu'on la lâche."
-    },
-    {
-      "id": "fenetre",
-      "name": "la grande fenêtre",
-      "aliases": [
-        "fenetre",
-        "volets",
-        "vitre"
-      ],
-      "at": "atelier",
-      "takeable": false,
-      "fixed": "Une fenêtre dans ton sac ? Le maître inventera peut-être ça un jour !",
-      "description": "Une grande fenêtre bien fermée. Dehors, le vent souffle fort. Un petit mot dit : « Ne pas ouvrir, mes dessins s'envolent ! »"
-    },
-    {
-      "id": "farine",
-      "name": "un bol de farine",
-      "aliases": [
-        "farine",
-        "bol",
-        "bol de farine"
-      ],
-      "at": "cuisine",
-      "takeable": true,
-      "description": "Un bol de farine toute blanche et toute douce."
-    },
-    {
-      "id": "graines",
-      "name": "un sachet de graines",
-      "aliases": [
-        "graines",
-        "grains",
-        "sachet"
-      ],
-      "at": "cuisine",
-      "takeable": true,
-      "description": "Un petit sachet de graines de millet, toutes petites et toutes rondes."
-    },
-    {
-      "id": "puits",
-      "name": "le vieux puits",
-      "aliases": [
-        "puits"
-      ],
-      "at": "cour",
-      "takeable": false,
-      "fixed": "Un puits, ça ne se déplace pas !",
-      "description": "Un vieux puits en pierre. Tout au fond, ton écho répète : « …ou… ou… »"
-    },
-    {
-      "id": "seau",
-      "name": "un seau d'eau",
-      "aliases": [
-        "seau",
-        "eau",
-        "seau d'eau"
-      ],
-      "at": "cour",
-      "takeable": true,
-      "description": "Un seau plein d'eau fraîche du puits."
-    },
-    {
-      "id": "colle",
-      "name": "un pot de colle",
-      "aliases": [
-        "colle",
-        "pot de colle",
-        "pate"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Une colle blanche et gluante, faite avec de la farine et de l'eau. Ça colle comme du miel !"
-    },
-    {
-      "id": "miroir",
-      "name": "le grand miroir",
-      "aliases": [
-        "miroir",
-        "glace"
-      ],
-      "at": "chambre",
-      "takeable": false,
-      "fixed": "Il est bien accroché au mur, et bien trop lourd.",
-      "description": "Un grand miroir. Quand tu lèves la main droite, ton reflet lève la main gauche : tout est à l'envers !"
-    },
-    {
-      "id": "soie",
-      "name": "un foulard de soie",
-      "aliases": [
-        "foulard",
-        "soie",
-        "tissu",
-        "etoffe"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Un foulard de soie bleue, léger comme un souffle."
-    },
-    {
-      "id": "plumes",
-      "name": "des plumes de pigeon",
-      "aliases": [
-        "plumes",
-        "plume"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Une poignée de plumes grises toutes douces."
-    },
-    {
-      "id": "ailes_plumes",
-      "name": "des ailes en plumes",
-      "aliases": [
-        "ailes en plumes",
-        "ailes de plumes"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Deux ailes faites de plumes collées en éventail, comme celles d'un oiseau."
-    },
-    {
-      "id": "ailes_soie",
-      "name": "des ailes en soie",
-      "aliases": [
-        "ailes en soie",
-        "ailes de soie"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Deux ailes faites de soie tendue et collée, légères comme un souffle."
-    },
-    {
-      "id": "dessins",
-      "name": "les dessins du maître",
-      "aliases": [
-        "dessins",
-        "dessin",
-        "pinceaux",
-        "pinceau",
-        "croquis"
-      ],
-      "at": "atelier",
-      "takeable": false,
-      "fixed": "Ce sont les trésors du maître : on regarde, mais on n'y touche pas !",
-      "description": "Des dessins d'oiseaux, de roues, de ponts et de machines bizarres, avec des notes écrites à l'envers. Des pinceaux sèchent dans un pot."
+     "to": "atelier",
+     "label": "dans l'atelier",
+     "dir": "dedans"
     }
-  ],
-  "characters": [
+   ]
+  },
+  {
+   "id": "chambre",
+   "name": "la chambre du maître",
+   "aliases": [
+    "chambre",
+    "chambre du maitre"
+   ],
+   "description": "La chambre du maître, en haut de l'escalier. Il y a un grand miroir au mur, et une échelle monte vers la terrasse.",
+   "decor": [
+    "lit",
+    "coffre à habits",
+    "carnets",
+    "chandelier"
+   ],
+   "exits": [
     {
-      "id": "rosa",
-      "name": "Mamma Rosa",
-      "aliases": [
-        "rosa",
-        "mamma rosa",
-        "mamma",
-        "cuisiniere"
-      ],
-      "at": "cuisine",
-      "description": "Une cuisinière joyeuse, toujours en train de chanter.",
-      "says": "De la colle ? Facile, mon petit ! De la farine et de l'eau, tu mélanges, et ça colle comme du miel. L'eau, il y a un seau plein près du puits, dans la cour. Et le plan du maître… il écrit tout à l'envers, ce génie ! Il faut un miroir pour le lire."
+     "to": "atelier",
+     "label": "par l'escalier vers l'atelier",
+     "dir": "bas"
     },
     {
-      "id": "mascarpone",
-      "name": "Mascarpone le chat",
-      "aliases": [
-        "mascarpone",
-        "chat",
-        "minou"
-      ],
-      "at": "chambre",
-      "description": "Un gros chat roux qui dort tout le temps… sauf quand quelque chose roule devant lui.",
-      "says": "Miaou… rrrrr… (Mascarpone ronronne. Ce chat ne bouge que pour jouer avec ce qui roule !)"
-    },
-    {
-      "id": "colombo",
-      "name": "Colombo le pigeon",
-      "aliases": [
-        "colombo",
-        "pigeon",
-        "oiseau"
-      ],
-      "at": "terrasse",
-      "description": "Un pigeon gris tout dodu, qui gonfle son jabot.",
-      "says": "Rou-rou ! Le maître me regarde voler pendant des heures, pour dessiner ses machines. Et moi, ce que je préfère au monde, ce sont les graines ! Rou-rou…"
+     "to": "terrasse",
+     "label": "par l'échelle vers la terrasse",
+     "dir": "haut"
     }
-  ],
-  "actions": [
+   ]
+  },
+  {
+   "id": "terrasse",
+   "name": "la terrasse",
+   "aliases": [
+    "terrasse",
+    "toit"
+   ],
+   "description": "La terrasse, tout en haut de la maison. On voit tous les toits rouges de Florence, et le grand dôme de la cathédrale !",
+   "decor": [
+    "toits rouges",
+    "dôme",
+    "cheminées",
+    "linge qui sèche",
+    "ciel bleu"
+   ],
+   "exits": [
     {
-      "id": "lire_plan_miroir",
-      "verb": "use",
-      "object": "plan",
-      "target": "miroir",
-      "when": [
-        "has:plan"
-      ],
-      "effects": [
-        "flag:plan_lu"
-      ],
-      "points": 10,
-      "text": "Tu tiens le plan devant le miroir… et hop ! Les lettres se remettent à l'endroit. Le maître a écrit : « Des ailes comme un oiseau : des plumes, ou de la soie, collées avec de la colle. Les fixer sur la machine, puis la lancer doucement. »"
-    },
-    {
-      "id": "lire_plan_chambre",
-      "verb": "read",
-      "object": "plan",
-      "place": "chambre",
-      "when": [
-        "has:plan"
-      ],
-      "effects": [
-        "flag:plan_lu"
-      ],
-      "points": 10,
-      "text": "Tu lis le plan dans le grand miroir… et hop ! Les lettres se remettent à l'endroit. Le maître a écrit : « Des ailes comme un oiseau : des plumes, ou de la soie, collées avec de la colle. Les fixer sur la machine, puis la lancer doucement. »"
-    },
-    {
-      "id": "lire_plan",
-      "verb": "read",
-      "object": "plan",
-      "when": [
-        "flag:plan_lu"
-      ],
-      "not_yet": "Les lettres sont écrites à l'envers, de droite à gauche ! Le maître écrit comme dans un miroir… Pour les lire, il faudrait un miroir.",
-      "text": "Tu relis le plan, et tu te rappelles ce que disait le miroir. Le maître a écrit : « Des ailes comme un oiseau : des plumes, ou de la soie, collées avec de la colle. Les fixer sur la machine, puis la lancer doucement. »"
-    },
-    {
-      "id": "relire_plan_miroir",
-      "verb": "use",
-      "object": "plan",
-      "target": "miroir",
-      "when": [
-        "flag:plan_lu"
-      ],
-      "effects": [],
-      "text": "Tu tiens encore le plan devant le miroir… Les lettres se remettent à l'endroit. Le maître a écrit : « Des ailes comme un oiseau : des plumes, ou de la soie, collées avec de la colle. Les fixer sur la machine, puis la lancer doucement. »"
-    },
-    {
-      "id": "faire_colle",
-      "verb": "combine",
-      "object": "farine",
-      "target": "seau",
-      "when": [
-        "has:farine",
-        "has:seau"
-      ],
-      "effects": [
-        "lose:farine",
-        "lose:seau",
-        "gain:colle"
-      ],
-      "points": 10,
-      "text": "Tu verses l'eau sur la farine et tu mélanges, mélanges… splotch ! Voilà une bonne colle blanche et gluante."
-    },
-    {
-      "id": "jouer_chat",
-      "verb": "throw",
-      "object": "ficelle",
-      "target": "mascarpone",
-      "when": [
-        "has:ficelle"
-      ],
-      "effects": [
-        "lose:ficelle",
-        "flag:chat_reveille",
-        "reveal:soie"
-      ],
-      "points": 10,
-      "text": "Tu fais rouler la pelote de ficelle… Mascarpone ouvre un œil, puis hop, il bondit dessus ! Il était couché sur un beau foulard de soie, tout léger."
-    },
-    {
-      "id": "pousser_chat",
-      "verb": "push",
-      "object": "mascarpone",
-      "place": "chambre",
-      "when": [
-        "flag:jamais"
-      ],
-      "not_yet": "Mascarpone grogne « mmmrrr » et s'étale encore plus. Ce chat ne bougera que pour jouer avec quelque chose qui roule…"
-    },
-    {
-      "id": "tirer_chat",
-      "verb": "pull",
-      "object": "mascarpone",
-      "place": "chambre",
-      "when": [
-        "flag:jamais"
-      ],
-      "not_yet": "Mascarpone plante ses griffes et ronronne encore plus fort. Ce chat ne bougera que pour jouer avec quelque chose qui roule…"
-    },
-    {
-      "id": "nourrir_pigeon",
-      "verb": "give",
-      "object": "graines",
-      "target": "colombo",
-      "when": [
-        "has:graines"
-      ],
-      "effects": [
-        "lose:graines",
-        "flag:pigeon_content",
-        "reveal:plumes"
-      ],
-      "points": 10,
-      "text": "Colombo picore les graines : toc, toc, toc ! Tout content, il bat des ailes… et une pluie de plumes tombe sur la terrasse."
-    },
-    {
-      "id": "attraper_pigeon",
-      "verb": "pull",
-      "object": "colombo",
-      "when": [
-        "flag:jamais"
-      ],
-      "not_yet": "Rou-rou ! Colombo s'envole d'un coup d'aile et se repose un peu plus loin. Il a l'air d'avoir faim…"
-    },
-    {
-      "id": "faire_ailes_plumes",
-      "verb": "combine",
-      "object": "plumes",
-      "target": "colle",
-      "when": [
-        "has:plumes",
-        "has:colle"
-      ],
-      "effects": [
-        "lose:plumes",
-        "lose:colle",
-        "gain:ailes_plumes"
-      ],
-      "points": 10,
-      "text": "Tu colles les plumes une à une, en éventail, comme sur une aile d'oiseau. Voilà deux belles ailes en plumes !"
-    },
-    {
-      "id": "faire_ailes_soie",
-      "verb": "combine",
-      "object": "soie",
-      "target": "colle",
-      "when": [
-        "has:soie",
-        "has:colle"
-      ],
-      "effects": [
-        "lose:soie",
-        "lose:colle",
-        "gain:ailes_soie"
-      ],
-      "points": 10,
-      "text": "Tu tends le foulard de soie et tu le colles bien à plat… Voilà deux ailes en soie, légères comme un souffle !"
-    },
-    {
-      "id": "plumes_sans_colle",
-      "verb": "use",
-      "object": "plumes",
-      "target": "maquette",
-      "when": [
-        "flag:jamais"
-      ],
-      "not_yet": "Les plumes glissent et s'envolent partout ! Il faudrait d'abord les coller ensemble pour en faire des ailes."
-    },
-    {
-      "id": "soie_sans_colle",
-      "verb": "use",
-      "object": "soie",
-      "target": "maquette",
-      "when": [
-        "flag:jamais"
-      ],
-      "not_yet": "Le foulard glisse de la maquette ! Il faudrait d'abord le coller bien tendu pour en faire des ailes."
-    },
-    {
-      "id": "fixer_plumes",
-      "verb": "use",
-      "object": "ailes_plumes",
-      "target": "maquette",
-      "when": [
-        "has:ailes_plumes",
-        "flag:plan_lu"
-      ],
-      "effects": [
-        "lose:ailes_plumes",
-        "flag:ailes_fixees",
-        "flag:pose_plumes"
-      ],
-      "points": 10,
-      "not_yet": "Tu tiens les ailes contre la maquette… mais dans quel sens ? Le plan du maître l'explique, si tu arrives à le lire !",
-      "text": "Tu fixes les ailes en plumes sur la maquette, exactement comme sur le plan. Clic, clac ! Elle ressemble à un vrai oiseau."
-    },
-    {
-      "id": "fixer_soie",
-      "verb": "use",
-      "object": "ailes_soie",
-      "target": "maquette",
-      "when": [
-        "has:ailes_soie",
-        "flag:plan_lu"
-      ],
-      "effects": [
-        "lose:ailes_soie",
-        "flag:ailes_fixees",
-        "flag:pose_soie"
-      ],
-      "points": 10,
-      "not_yet": "Tu tiens les ailes contre la maquette… mais dans quel sens ? Le plan du maître l'explique, si tu arrives à le lire !",
-      "text": "Tu fixes les ailes en soie sur la maquette, exactement comme sur le plan. Clic, clac ! On dirait une grande chauve-souris toute légère."
-    },
-    {
-      "id": "lancer_oiseau",
-      "verb": "throw",
-      "object": "maquette",
-      "when": [
-        "flag:pose_plumes"
-      ],
-      "effects": [
-        "end:oiseau"
-      ],
-      "points": 20,
-      "not_yet": "Sans ailes, la maquette tomberait comme une pierre ! Il faut d'abord lui fixer des ailes.",
-      "text": "Toc, toc ! Le riche seigneur entre dans l'atelier, avec son grand chapeau. Tu lances doucement la maquette…"
-    },
-    {
-      "id": "lancer_soie",
-      "verb": "throw",
-      "object": "maquette",
-      "when": [
-        "flag:pose_soie"
-      ],
-      "effects": [
-        "end:planeur"
-      ],
-      "points": 20,
-      "not_yet": "Sans ailes, la maquette tomberait comme une pierre ! Il faut d'abord lui fixer des ailes.",
-      "text": "Toc, toc ! Le riche seigneur entre dans l'atelier, avec son grand chapeau. Tu lances doucement la maquette…"
-    },
-    {
-      "id": "ouvrir_fenetre",
-      "verb": "open",
-      "object": "fenetre",
-      "effects": [
-        "end:courant_air"
-      ],
-      "points": 0,
-      "text": "Tu ouvres la grande fenêtre… FFFFOUUUU !"
+     "to": "chambre",
+     "label": "par l'échelle vers la chambre",
+     "dir": "bas"
     }
-  ],
-  "endings": [
+   ]
+  }
+ ],
+ "items": [
+  {
+   "id": "maquette",
+   "kind": "scenery",
+   "name": "la maquette",
+   "aliases": [
+    "maquette",
+    "machine volante",
+    "machine",
+    "modele"
+   ],
+   "at": "atelier",
+   "fixed": "Elle est bien trop fragile pour la promener partout : elle reste sur la table.",
+   "sturdy": "Oh non, c'est la maquette du maître ! Le seigneur arrive bientôt : on la traite avec douceur.",
+   "description": "Une petite machine volante en bois, inspirée des oiseaux. Il ne lui manque que ses ailes !",
+   "initial": "Sur la table, la maquette de la machine volante attend ses ailes.",
+   "states": [
     {
-      "id": "oiseau",
-      "kind": "win",
-      "text": "La petite machine plane à travers l'atelier, comme un vrai oiseau, et se pose tout doucement sur la table ! Le seigneur applaudit : « Bravissimo ! » Quand le maître rentre du marché, il te fait un clin d'œil : « Un jour, les hommes voleront… et tu y seras pour quelque chose ! »"
+     "id": "sans_ailes"
     },
     {
-      "id": "planeur",
-      "kind": "win",
-      "text": "Les ailes de soie se gonflent, la petite machine plane, tourne… et se pose pile sur le chapeau du seigneur ! Il éclate de rire : « Magnifico ! » En rentrant du marché, le maître note tout dans son carnet… à l'envers, bien sûr."
+     "id": "plumes",
+     "description": "La petite machine volante a des ailes en plumes, comme un vrai oiseau. Elle est prête à voler !",
+     "initial": "Sur la table, la maquette de la machine volante a enfin ses ailes en plumes : elle est prête à voler ! On entend des pas dans l'escalier : le riche seigneur arrive."
     },
     {
-      "id": "courant_air",
-      "kind": "lose",
-      "text": "Un grand courant d'air entre dans l'atelier, et tous les dessins du maître s'envolent par la fenêtre, au-dessus des toits de Florence ! Le temps de tous les rattraper, le seigneur est déjà reparti. Il reviendra demain… et le maître achètera des pinces à linge pour ses dessins !"
+     "id": "soie",
+     "description": "La petite machine volante a des ailes en soie, légères comme un souffle. Elle est prête à voler !",
+     "initial": "Sur la table, la maquette de la machine volante a enfin ses ailes en soie : elle est prête à voler ! On entend des pas dans l'escalier : le riche seigneur arrive."
     }
-  ]
+   ]
+  },
+  {
+   "id": "plan",
+   "name": "le plan du maître",
+   "aliases": [
+    "plan",
+    "notes",
+    "papier",
+    "parchemin"
+   ],
+   "at": "atelier",
+   "initial": "Un plan est accroché au mur.",
+   "description": "Le plan de la machine volante, avec des notes écrites tout à l'envers, de droite à gauche ! Impossible à lire comme ça.",
+   "details": [
+    {
+     "when": [
+      "flag:plan_lu"
+     ],
+     "text": "Grâce au miroir, tu sais ce qu'il dit : « Des ailes comme un oiseau : des plumes, ou de la soie, collées avec de la colle. Les fixer sur la machine, puis la lancer doucement. »"
+    }
+   ]
+  },
+  {
+   "id": "ficelle",
+   "name": "une pelote de ficelle",
+   "aliases": [
+    "ficelle",
+    "pelote",
+    "corde"
+   ],
+   "at": "atelier",
+   "initial": "Une pelote de ficelle traîne par terre.",
+   "description": "Une petite pelote de ficelle qui roule toute seule dès qu'on la lâche."
+  },
+  {
+   "id": "fenetre",
+   "kind": "scenery",
+   "name": "la grande fenêtre",
+   "aliases": [
+    "fenetre",
+    "volets",
+    "vitre"
+   ],
+   "at": "atelier",
+   "fixed": "Une fenêtre dans ton sac ? Le maître inventera peut-être ça un jour !",
+   "sturdy": "Casser la fenêtre du maître ? Surtout pas : le vent ferait s'envoler tous ses dessins !",
+   "description": "Une grande fenêtre bien fermée. Dehors, le vent souffle fort. Un petit mot dit : « Ne pas ouvrir, mes dessins s'envolent ! »"
+  },
+  {
+   "id": "farine",
+   "name": "un bol de farine",
+   "aliases": [
+    "farine",
+    "bol",
+    "bol de farine"
+   ],
+   "at": "cuisine",
+   "initial": "Sur l'étagère à provisions, il y a un bol de farine.",
+   "description": "Un bol de farine toute blanche et toute douce.",
+   "states": [
+    {
+     "id": "farine"
+    },
+    {
+     "id": "colle",
+     "name": "un bol de colle",
+     "aliases": [
+      "colle",
+      "pot de colle",
+      "pate",
+      "bol de colle"
+     ],
+     "description": "Une colle blanche et gluante, faite avec de la farine et de l'eau. Ça colle comme du miel !"
+    }
+   ]
+  },
+  {
+   "id": "graines",
+   "name": "un sachet de graines",
+   "aliases": [
+    "graines",
+    "grains",
+    "sachet"
+   ],
+   "at": "cuisine",
+   "initial": "Un sachet de graines de millet traîne au bord de l'étagère.",
+   "description": "Un petit sachet de graines de millet, toutes petites et toutes rondes."
+  },
+  {
+   "id": "puits",
+   "kind": "scenery",
+   "name": "le vieux puits",
+   "aliases": [
+    "puits"
+   ],
+   "at": "cour",
+   "fixed": "Un puits, ça ne se déplace pas !",
+   "sturdy": "Un puits en grosses pierres : impossible de le casser !",
+   "description": "Un vieux puits en pierre. Tout au fond, ton écho répète : « …ou… ou… »"
+  },
+  {
+   "id": "seau",
+   "name": "un seau d'eau",
+   "aliases": [
+    "seau",
+    "eau",
+    "seau d'eau"
+   ],
+   "at": "cour",
+   "initial": "À côté du puits, il y a un seau plein d'eau.",
+   "description": "Un seau plein d'eau fraîche du puits."
+  },
+  {
+   "id": "miroir",
+   "kind": "scenery",
+   "name": "le grand miroir",
+   "aliases": [
+    "miroir",
+    "glace"
+   ],
+   "at": "chambre",
+   "fixed": "Il est bien accroché au mur, et bien trop lourd.",
+   "sturdy": "Un miroir cassé, ça fait des éclats partout… et le maître en a besoin pour lire ses notes !",
+   "description": "Un grand miroir. Quand tu lèves la main droite, ton reflet lève la main gauche : tout est à l'envers !"
+  },
+  {
+   "id": "soie",
+   "name": "un foulard de soie",
+   "aliases": [
+    "foulard",
+    "soie",
+    "tissu",
+    "etoffe"
+   ],
+   "at": "",
+   "description": "Un foulard de soie bleue, léger comme un souffle.",
+   "states": [
+    {
+     "id": "foulard"
+    },
+    {
+     "id": "ailes",
+     "name": "des ailes en soie",
+     "aliases": [
+      "ailes en soie",
+      "ailes de soie"
+     ],
+     "description": "Deux ailes faites de soie tendue et collée, légères comme un souffle."
+    }
+   ]
+  },
+  {
+   "id": "plumes",
+   "name": "des plumes de pigeon",
+   "aliases": [
+    "plumes",
+    "plume"
+   ],
+   "at": "",
+   "description": "Une poignée de plumes grises toutes douces.",
+   "states": [
+    {
+     "id": "en_vrac"
+    },
+    {
+     "id": "ailes",
+     "name": "des ailes en plumes",
+     "aliases": [
+      "ailes en plumes",
+      "ailes de plumes"
+     ],
+     "description": "Deux ailes faites de plumes collées en éventail, comme celles d'un oiseau."
+    }
+   ]
+  },
+  {
+   "id": "dessins",
+   "kind": "scenery",
+   "name": "les dessins du maître",
+   "aliases": [
+    "dessins",
+    "dessin",
+    "pinceaux",
+    "pinceau",
+    "croquis"
+   ],
+   "at": "atelier",
+   "fixed": "Ce sont les trésors du maître : on regarde, mais on n'y touche pas !",
+   "sturdy": "Ce sont les trésors du maître : on regarde, mais on n'y touche pas !",
+   "description": "Des dessins d'oiseaux, de roues, de ponts et de machines bizarres, avec des notes écrites à l'envers. Des pinceaux sèchent dans un pot."
+  }
+ ],
+ "characters": [
+  {
+   "id": "rosa",
+   "name": "Mamma Rosa",
+   "aliases": [
+    "rosa",
+    "mamma rosa",
+    "mamma",
+    "cuisiniere"
+   ],
+   "at": "cuisine",
+   "description": "Une cuisinière joyeuse, toujours en train de chanter.",
+   "initial": "Mamma Rosa, la cuisinière, roule des pâtes en chantant.",
+   "says": "De la colle ? Facile, mon petit ! De la farine et de l'eau, tu mélanges, et ça colle comme du miel. L'eau, il y a un seau plein près du puits, dans la cour. Et le plan du maître… il écrit tout à l'envers, ce génie ! Il faut un miroir pour le lire."
+  },
+  {
+   "id": "mascarpone",
+   "name": "Mascarpone le chat",
+   "aliases": [
+    "mascarpone",
+    "chat",
+    "minou"
+   ],
+   "at": "chambre",
+   "description": "Un gros chat roux qui dort tout le temps… sauf quand quelque chose roule devant lui.",
+   "initial": "Mascarpone, le gros chat roux, dort roulé en boule sur quelque chose de doux et brillant.",
+   "says": "Miaou… rrrrr… (Mascarpone ronronne. Ce chat ne bouge que pour jouer avec ce qui roule !)",
+   "states": [
+    {
+     "id": "endormi"
+    },
+    {
+     "id": "joueur",
+     "initial": "Mascarpone joue sous le lit avec la pelote de ficelle.",
+     "description": "Un gros chat roux, bien réveillé, qui fait rouler la pelote de ficelle sous le lit.",
+     "says": "Miaou ! (Mascarpone ne lâche plus sa pelote : il est bien trop occupé à jouer !)"
+    }
+   ]
+  },
+  {
+   "id": "colombo",
+   "name": "Colombo le pigeon",
+   "aliases": [
+    "colombo",
+    "pigeon",
+    "oiseau"
+   ],
+   "at": "terrasse",
+   "description": "Un pigeon gris tout dodu, qui gonfle son jabot.",
+   "initial": "Colombo le pigeon roucoule sur le rebord, et des plumes volent un peu quand il bat des ailes.",
+   "says": "Rou-rou ! Le maître me regarde voler pendant des heures, pour dessiner ses machines. Et moi, ce que je préfère au monde, ce sont les graines ! Rou-rou…",
+   "states": [
+    {
+     "id": "affame"
+    },
+    {
+     "id": "repu",
+     "initial": "Colombo le pigeon, le ventre bien plein, roucoule tout content sur le rebord.",
+     "says": "Rou-rou ! Merci pour les graines ! Prends mes plumes, j'en ai plein : le maître dit que les ailes des oiseaux sont faites comme un éventail. Rou-rou…"
+    }
+   ]
+  }
+ ],
+ "actions": [
+  {
+   "id": "lire_plan_miroir",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "plan",
+     "target": "miroir"
+    },
+    {
+     "verb": "read",
+     "object": "plan"
+    }
+   ],
+   "place": "chambre",
+   "when": [
+    "has:plan"
+   ],
+   "effects": [
+    "flag:plan_lu"
+   ],
+   "points": 10,
+   "text": "Tu tiens le plan devant le grand miroir… et hop ! Les lettres se remettent à l'endroit. Le maître a écrit : « Des ailes comme un oiseau : des plumes, ou de la soie, collées avec de la colle. Les fixer sur la machine, puis la lancer doucement. »",
+   "hint": "Le maître écrit à l'envers, comme dans un miroir… Il y en a un grand dans sa chambre."
+  },
+  {
+   "id": "lire_plan",
+   "triggers": [
+    {
+     "verb": "read",
+     "object": "plan"
+    },
+    {
+     "verb": "use",
+     "object": "plan",
+     "target": "miroir"
+    }
+   ],
+   "when": [
+    "flag:plan_lu"
+   ],
+   "effects": [],
+   "not_yet": "Les lettres sont écrites à l'envers, de droite à gauche ! Le maître écrit comme dans un miroir… Pour les lire, il faudrait un miroir.",
+   "text": "Tu relis le plan, et tu te rappelles ce que disait le miroir. Le maître a écrit : « Des ailes comme un oiseau : des plumes, ou de la soie, collées avec de la colle. Les fixer sur la machine, puis la lancer doucement. »"
+  },
+  {
+   "id": "faire_colle",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "farine",
+     "target": "seau"
+    }
+   ],
+   "when": [
+    "has:farine",
+    "has:seau",
+    "is:farine:farine"
+   ],
+   "effects": [
+    "lose:seau",
+    "set:farine:colle"
+   ],
+   "points": 10,
+   "not_yet": "Il te faut la farine et l'eau, toutes les deux.",
+   "text": "Tu verses l'eau sur la farine et tu mélanges, mélanges… splotch ! Voilà une bonne colle blanche et gluante.",
+   "hint": "Mamma Rosa l'a dit : de la farine et de l'eau, on mélange, et ça colle !"
+  },
+  {
+   "id": "jouer_chat",
+   "triggers": [
+    {
+     "verb": "throw",
+     "object": "ficelle",
+     "target": "mascarpone"
+    }
+   ],
+   "when": [
+    "has:ficelle"
+   ],
+   "effects": [
+    "lose:ficelle",
+    "set:mascarpone:joueur",
+    "reveal:soie"
+   ],
+   "points": 10,
+   "text": "Tu fais rouler la pelote de ficelle… Mascarpone ouvre un œil, puis hop, il bondit dessus ! Il était couché sur un beau foulard de soie, tout léger.",
+   "hint": "Mascarpone ne bouge que pour jouer avec ce qui roule… Tu n'aurais pas quelque chose qui roule ?"
+  },
+  {
+   "id": "pousser_chat",
+   "triggers": [
+    {
+     "verb": "push",
+     "object": "mascarpone"
+    },
+    {
+     "verb": "pull",
+     "object": "mascarpone"
+    }
+   ],
+   "place": "chambre",
+   "when": [
+    "is:mascarpone:endormi"
+   ],
+   "effects": [],
+   "points": 0,
+   "not_yet": "Mascarpone est bien trop occupé à jouer avec sa pelote !",
+   "text": "Mascarpone grogne « mmmrrr », plante ses griffes et s'étale encore plus. Ce chat ne bougera que pour jouer avec quelque chose qui roule…"
+  },
+  {
+   "id": "nourrir_pigeon",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "graines",
+     "target": "colombo"
+    }
+   ],
+   "when": [
+    "has:graines"
+   ],
+   "effects": [
+    "lose:graines",
+    "set:colombo:repu",
+    "reveal:plumes"
+   ],
+   "points": 10,
+   "text": "Colombo picore les graines : toc, toc, toc ! Tout content, il bat des ailes… et une pluie de plumes tombe sur la terrasse.",
+   "hint": "Colombo adore les graines. Il y en a peut-être à la cuisine ?"
+  },
+  {
+   "id": "attraper_pigeon",
+   "triggers": [
+    {
+     "verb": "pull",
+     "object": "colombo"
+    }
+   ],
+   "when": [
+    "is:colombo:affame"
+   ],
+   "effects": [],
+   "points": 0,
+   "not_yet": "Rou-rou ! Colombo, le ventre plein, se laisse caresser en roucoulant.",
+   "text": "Rou-rou ! Colombo s'envole d'un coup d'aile et se repose un peu plus loin. Il a l'air d'avoir faim…"
+  },
+  {
+   "id": "faire_ailes_plumes",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "plumes",
+     "target": "farine"
+    }
+   ],
+   "when": [
+    "has:plumes",
+    "has:farine",
+    "is:farine:colle",
+    "is:plumes:en_vrac"
+   ],
+   "effects": [
+    "lose:farine",
+    "set:plumes:ailes"
+   ],
+   "points": 10,
+   "not_yet": "Pour coller les plumes, il faut de la colle… Mamma Rosa sait la faire.",
+   "text": "Tu colles les plumes une à une, en éventail, comme sur une aile d'oiseau. Voilà deux belles ailes en plumes !",
+   "hint": "Des plumes en vrac, ça s'envole. Avec de la colle, on en fait des ailes !"
+  },
+  {
+   "id": "faire_ailes_soie",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "soie",
+     "target": "farine"
+    }
+   ],
+   "when": [
+    "has:soie",
+    "has:farine",
+    "is:farine:colle",
+    "is:soie:foulard"
+   ],
+   "effects": [
+    "lose:farine",
+    "set:soie:ailes"
+   ],
+   "points": 10,
+   "not_yet": "Pour coller le foulard bien tendu, il faut de la colle… Mamma Rosa sait la faire.",
+   "text": "Tu tends le foulard de soie et tu le colles bien à plat… Voilà deux ailes en soie, légères comme un souffle !",
+   "hint": "Un foulard qui glisse… avec de la colle, il ferait de belles ailes tendues !"
+  },
+  {
+   "id": "fixer_plumes",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "plumes",
+     "target": "maquette"
+    }
+   ],
+   "when": [
+    "has:plumes",
+    "is:plumes:ailes",
+    "flag:plan_lu"
+   ],
+   "effects": [
+    "lose:plumes",
+    "set:maquette:plumes"
+   ],
+   "points": 10,
+   "not_yet": "Les plumes glissent et s'envolent partout ! Il faudrait d'abord les coller en ailes… et savoir comment les fixer : le plan du maître l'explique, si tu arrives à le lire !",
+   "text": "Tu fixes les ailes en plumes sur la maquette, exactement comme sur le plan. Clic, clac ! Elle ressemble à un vrai oiseau.",
+   "hint": "Tes ailes en plumes sont prêtes, et tu as lu le plan : fixe-les sur la maquette !"
+  },
+  {
+   "id": "fixer_soie",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "soie",
+     "target": "maquette"
+    }
+   ],
+   "when": [
+    "has:soie",
+    "is:soie:ailes",
+    "flag:plan_lu"
+   ],
+   "effects": [
+    "lose:soie",
+    "set:maquette:soie"
+   ],
+   "points": 10,
+   "not_yet": "Le foulard glisse de la maquette ! Il faudrait d'abord le coller bien tendu pour en faire des ailes… et savoir comment les fixer : le plan du maître l'explique, si tu arrives à le lire !",
+   "text": "Tu fixes les ailes en soie sur la maquette, exactement comme sur le plan. Clic, clac ! On dirait une grande chauve-souris toute légère.",
+   "hint": "Tes ailes en soie sont prêtes, et tu as lu le plan : fixe-les sur la maquette !"
+  },
+  {
+   "id": "lancer_oiseau",
+   "triggers": [
+    {
+     "verb": "throw",
+     "object": "maquette"
+    }
+   ],
+   "when": [
+    "is:maquette:plumes"
+   ],
+   "effects": [
+    "end:oiseau"
+   ],
+   "points": 20,
+   "not_yet": "Sans ailes, la maquette tomberait comme une pierre ! Il faut d'abord lui fixer des ailes.",
+   "text": "Toc, toc ! Le riche seigneur entre dans l'atelier, avec son grand chapeau. Tu lances doucement la maquette…",
+   "hint": "Le plan le dit : les ailes fixées, on lance doucement la machine !"
+  },
+  {
+   "id": "lancer_soie",
+   "triggers": [
+    {
+     "verb": "throw",
+     "object": "maquette"
+    }
+   ],
+   "when": [
+    "is:maquette:soie"
+   ],
+   "effects": [
+    "end:planeur"
+   ],
+   "points": 20,
+   "not_yet": "Sans ailes, la maquette tomberait comme une pierre ! Il faut d'abord lui fixer des ailes.",
+   "text": "Toc, toc ! Le riche seigneur entre dans l'atelier, avec son grand chapeau. Tu lances doucement la maquette…",
+   "hint": "Le plan le dit : les ailes fixées, on lance doucement la machine !"
+  },
+  {
+   "id": "ouvrir_fenetre",
+   "triggers": [
+    {
+     "verb": "open",
+     "object": "fenetre"
+    }
+   ],
+   "effects": [
+    "end:courant_air"
+   ],
+   "points": 0,
+   "warning": "Le petit mot du maître est bien clair : « Ne pas ouvrir, mes dessins s'envolent ! »",
+   "text": "Tu ouvres la grande fenêtre… FFFFOUUUU !"
+  }
+ ],
+ "endings": [
+  {
+   "id": "oiseau",
+   "kind": "win",
+   "text": "La petite machine plane à travers l'atelier, comme un vrai oiseau, et se pose tout doucement sur la table ! Le seigneur applaudit : « Bravissimo ! » Quand le maître rentre du marché, il te fait un clin d'œil : « Un jour, les hommes voleront… et tu y seras pour quelque chose ! »",
+   "fact": "Léonard de Vinci a rempli tout un petit carnet sur le vol des oiseaux, avec des dessins d'ailes et de plumes : on l'appelle aujourd'hui le « Codex sur le vol des oiseaux »."
+  },
+  {
+   "id": "planeur",
+   "kind": "win",
+   "text": "Les ailes de soie se gonflent, la petite machine plane, tourne… et se pose pile sur le chapeau du seigneur ! Il éclate de rire : « Magnifico ! » En rentrant du marché, le maître note tout dans son carnet… à l'envers, bien sûr.",
+   "fact": "Dans les machines volantes dessinées par Léonard de Vinci, les ailes ressemblent souvent à des ailes de chauve-souris : du tissu tendu sur une armature de bois."
+  },
+  {
+   "id": "courant_air",
+   "kind": "lose",
+   "text": "Un grand courant d'air entre dans l'atelier, et tous les dessins du maître s'envolent par la fenêtre, au-dessus des toits de Florence ! Le temps de tous les rattraper, le seigneur est déjà reparti. Il reviendra demain… et le maître achètera des pinces à linge pour ses dessins !"
+  }
+ ],
+ "puzzles": [
+  {
+   "goal": "Faire voler la machine aux ailes de plumes",
+   "action": "lancer_oiseau",
+   "needs": [
+    "maquette"
+   ],
+   "clue_in": "plan"
+  },
+  {
+   "goal": "Fixer les ailes en plumes, comme sur le plan",
+   "action": "fixer_plumes",
+   "needs": [
+    "plumes",
+    "maquette"
+   ],
+   "clue_in": "plan"
+  },
+  {
+   "goal": "Coller les plumes en ailes",
+   "action": "faire_ailes_plumes",
+   "needs": [
+    "plumes",
+    "farine"
+   ],
+   "clue_in": "plan"
+  },
+  {
+   "goal": "Avoir des plumes de Colombo",
+   "action": "nourrir_pigeon",
+   "needs": [
+    "graines",
+    "colombo"
+   ],
+   "clue_in": "colombo"
+  },
+  {
+   "goal": "Ou faire planer la machine aux ailes de soie",
+   "action": "lancer_soie",
+   "needs": [
+    "maquette"
+   ],
+   "clue_in": "plan"
+  },
+  {
+   "goal": "Fixer les ailes en soie, comme sur le plan",
+   "action": "fixer_soie",
+   "needs": [
+    "soie",
+    "maquette"
+   ],
+   "clue_in": "plan"
+  },
+  {
+   "goal": "Coller le foulard en ailes",
+   "action": "faire_ailes_soie",
+   "needs": [
+    "soie",
+    "farine"
+   ],
+   "clue_in": "plan"
+  },
+  {
+   "goal": "Trouver le foulard sous Mascarpone",
+   "action": "jouer_chat",
+   "needs": [
+    "ficelle",
+    "mascarpone"
+   ],
+   "clue_in": "mascarpone"
+  },
+  {
+   "goal": "Lire le plan dans le miroir",
+   "action": "lire_plan_miroir",
+   "needs": [
+    "plan",
+    "miroir"
+   ],
+   "clue_in": "rosa"
+  },
+  {
+   "goal": "Faire de la colle",
+   "action": "faire_colle",
+   "needs": [
+    "farine",
+    "seau"
+   ],
+   "clue_in": "rosa"
+  }
+ ]
 }

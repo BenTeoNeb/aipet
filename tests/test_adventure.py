@@ -53,6 +53,8 @@ def test_every_way_to_win_can_be_played_with_spoken_words(graph):
                 intent = {"verb": "go", "to": w.name(ident)}
             elif kind == "take":
                 intent = {"verb": "prendre", "object": w.name(ident)}
+            elif kind in ("press", "open"):  # a code's button, a container or door opened (format 2)
+                intent = {"verb": "push" if kind == "press" else "open", "object": w.name(ident)}
             else:
                 a = next(x for x in w.rules if x["id"] == ident)
                 intent = {"verb": a["verb"], "object": w.name(a.get("object", "")),
@@ -171,10 +173,9 @@ def test_natural_ways_to_say_the_right_move():
         {"verb": "open", "object": "la porte"},
         {"verb": "open", "object": "la porte", "target": "la clé"},  # « ouvrir la porte avec la clé »
         {"verb": "use", "object": "la clé", "target": "la porte"},
-        {"verb": "use", "object": "la clé"},  # at the door
     ]:
         st = at(w, "pied_phare", ["cle"])
-        assert w.act(st, intent)["outcome"] == "done" and "porte_ouverte" in st.flags, intent
+        assert w.act(st, intent)["outcome"] == "done" and w.holds(st, ["open:porte"]), intent
 
 
 def test_losing_takes_the_exact_verb():
@@ -241,7 +242,7 @@ def test_wrong_timing_gives_a_clue_and_hints_get_stronger():
 
 def test_hints_skip_useless_pickups_and_speak_french():
     w = World(PHARE)
-    st = at(w, "rochers", ["algue"])
+    st = at(w, "rochers", ["algue", "bocal"])  # the jar already taken: the crab is next on the way
     st.hint_level = 2
     assert w.hint(st, force=True) == "Essaie : donner une algue verte, avec Pinces le crabe."
     path = [("take", "bocal"), ("take", "algue"), ("act", "nourrir_crabe")]  # the solver took the jar on its way
@@ -453,7 +454,7 @@ def test_generation_is_checked_and_repaired_once(monkeypatch):
 
 def test_clean_maps_stray_verbs_and_empty_fields():
     g = copy.deepcopy(PHARE)
-    g["actions"][0]["verb"] = "feed"
+    g["actions"][0]["triggers"][0]["verb"] = "feed"
     g["actions"][0]["place"] = ""
     g["places"][1]["exits"] = []  # the way back from the rocks, forgotten
     g = adv._clean(g, "facile")
@@ -506,6 +507,8 @@ def test_surprise_draws_what_the_child_has_not_played_then_invents(tmp_path, mon
 def test_a_win_tells_the_fact(game, monkeypatch):
     graph = copy.deepcopy(PHARE)
     graph["fact"] = "Le premier phare, celui d'Alexandrie, était une des sept merveilles du monde."
+    for e in graph["endings"]:
+        e.pop("fact", None)  # the endings' own facts would come first
     monkeypatch.setattr(adv, "library", lambda difficulty=None: [graph])
     asyncio.run(game.start("", "facile"))
     out = game.act(win_intents(PHARE))
@@ -691,6 +694,8 @@ def test_the_checker_and_the_game_agree(graph):
                 intent = {"verb": "go", "to": via.get("label") or w.name(ident)}
             elif kind == "take":
                 intent = {"verb": "take", "object": w.name(ident)}
+            elif kind in ("press", "open"):  # a code's button, a container or door opened (format 2)
+                intent = {"verb": "push" if kind == "press" else "open", "object": w.name(ident)}
             else:
                 a = next(x for x in w.rules if x["id"] == ident)
                 intent = {"verb": a["verb"], "object": w.name(a.get("object", "")),
