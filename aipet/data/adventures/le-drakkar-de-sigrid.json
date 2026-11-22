@@ -1,0 +1,684 @@
+{
+  "title": "Le drakkar de Sigrid",
+  "difficulty": "moyen",
+  "tags": [
+    "vikings",
+    "viking",
+    "drakkar",
+    "bateau",
+    "mer",
+    "runes",
+    "chevre",
+    "nord"
+  ],
+  "fact": "Les Vikings naviguaient sur des drakkars à tête de dragon, et les sagas racontent qu'ils trouvaient le soleil caché derrière les nuages grâce à une « pierre de soleil », un cristal transparent.",
+  "intro": "Brrr, le vent du nord se lève ! Sigrid, une petite Viking aux tresses rousses, doit ramener le drakkar de sa famille au village avant les tempêtes d'hiver. Mais la voile est déchirée, et la pierre de soleil, qui aide à trouver le chemin quand le ciel est gris, a disparu !",
+  "goal": "Réparer la voile du drakkar et trouver le chemin du village.",
+  "start": {
+    "place": "plage",
+    "inventory": []
+  },
+  "places": [
+    {
+      "id": "plage",
+      "name": "la plage",
+      "aliases": [
+        "plage",
+        "rivage",
+        "galets"
+      ],
+      "description": "Une plage de galets au bord du fjord, sous un ciel tout gris. Le drakkar de la famille de Sigrid est tiré sur les galets, avec sa grande tête de dragon. Sigrid t'attend, les mains sur les hanches. Brrr, l'eau du fjord est glacée : pas question de s'y baigner !",
+      "exits": [
+        {
+          "to": "drakkar",
+          "label": "à bord du drakkar",
+          "dir": "dedans"
+        },
+        {
+          "to": "cabane",
+          "label": "vers la cabane de pêche",
+          "dir": "nord"
+        },
+        {
+          "to": "colline",
+          "label": "vers la colline aux runes",
+          "dir": "est"
+        }
+      ]
+    },
+    {
+      "id": "drakkar",
+      "name": "le drakkar",
+      "aliases": [
+        "drakkar",
+        "bateau",
+        "navire",
+        "pont"
+      ],
+      "description": "Te voilà à bord du drakkar ! Des boucliers ronds sont alignés sur les côtés, et la grande voile rayée rouge et blanc pend, toute déchirée. Hugin le corbeau est perché sur la tête de dragon. Tout autour, l'eau du fjord est glacée : on reste bien à bord !",
+      "variants": [
+        {
+          "when": [
+            "flag:voile_reparee"
+          ],
+          "description": "Te voilà à bord du drakkar ! Des boucliers ronds sont alignés sur les côtés, et la grande voile rayée rouge et blanc, toute réparée, se gonfle déjà au vent. Hugin le corbeau est perché sur la tête de dragon. Tout autour, l'eau du fjord est glacée : on reste bien à bord !"
+        }
+      ],
+      "exits": [
+        {
+          "to": "plage",
+          "label": "sur la plage",
+          "dir": "dehors"
+        }
+      ]
+    },
+    {
+      "id": "cabane",
+      "name": "la cabane de pêche",
+      "aliases": [
+        "cabane",
+        "cabane de peche",
+        "maison",
+        "hutte"
+      ],
+      "description": "Une cabane en bois qui sent le poisson fumé. Grand-père Olaf se chauffe près du feu en taillant un bout de bois. Il y a un vieux coffre dans un coin, un navet sur la table, et un poisson séché pendu au plafond.",
+      "exits": [
+        {
+          "to": "plage",
+          "label": "vers la plage",
+          "dir": "sud"
+        },
+        {
+          "to": "enclos",
+          "label": "vers l'enclos de la chèvre",
+          "dir": "ouest"
+        }
+      ],
+      "variants": [
+        {
+          "when": [
+            "has:navet"
+          ],
+          "description": "Une cabane en bois qui sent le poisson fumé. Grand-père Olaf se chauffe près du feu en taillant un bout de bois. Il y a un vieux coffre dans un coin, et un poisson séché pendu au plafond."
+        },
+        {
+          "when": [
+            "flag:chevre_contente"
+          ],
+          "description": "Une cabane en bois qui sent le poisson fumé. Grand-père Olaf se chauffe près du feu en taillant un bout de bois. Il y a un vieux coffre dans un coin, et un poisson séché pendu au plafond."
+        },
+        {
+          "when": [
+            "has:poisson"
+          ],
+          "description": "Une cabane en bois qui sent le poisson fumé. Grand-père Olaf se chauffe près du feu en taillant un bout de bois. Il y a un vieux coffre dans un coin, et un navet sur la table."
+        },
+        {
+          "when": [
+            "has:poisson",
+            "has:navet"
+          ],
+          "description": "Une cabane en bois qui sent le poisson fumé. Grand-père Olaf se chauffe près du feu en taillant un bout de bois. Il y a un vieux coffre dans un coin, et la table est vide."
+        },
+        {
+          "when": [
+            "has:poisson",
+            "flag:chevre_contente"
+          ],
+          "description": "Une cabane en bois qui sent le poisson fumé. Grand-père Olaf se chauffe près du feu en taillant un bout de bois. Il y a un vieux coffre dans un coin, et la table est vide."
+        }
+      ]
+    },
+    {
+      "id": "enclos",
+      "name": "l'enclos",
+      "aliases": [
+        "enclos",
+        "barriere",
+        "bergerie",
+        "pre"
+      ],
+      "description": "Un petit enclos tout boueux. Brunhilde, la chèvre la plus grognon de tout le Nord, est couchée sur une grosse pelote de laine et mâchouille d'un air fâché.",
+      "variants": [
+        {
+          "when": [
+            "flag:chevre_contente"
+          ],
+          "description": "Un petit enclos tout boueux. Brunhilde croque son navet avec un grand sourire de chèvre."
+        }
+      ],
+      "exits": [
+        {
+          "to": "cabane",
+          "label": "vers la cabane",
+          "dir": "est"
+        }
+      ]
+    },
+    {
+      "id": "colline",
+      "name": "la colline aux runes",
+      "aliases": [
+        "colline",
+        "colline aux runes",
+        "sommet"
+      ],
+      "description": "Une colline couverte de bruyère, balayée par le vent. Au sommet se dresse un grand rocher gravé de runes, les lettres des Vikings, faites de petits traits.",
+      "exits": [
+        {
+          "to": "plage",
+          "label": "vers la plage",
+          "dir": "ouest"
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "fjord",
+      "name": "le fjord",
+      "aliases": [
+        "fjord",
+        "mer",
+        "eau",
+        "vagues"
+      ],
+      "at": "plage",
+      "takeable": false,
+      "fixed": "Tu ne peux pas mettre le fjord dans ta poche !",
+      "description": "Une longue mer étroite entre les montagnes. L'eau est grise et glacée : brrr !"
+    },
+    {
+      "id": "voile",
+      "name": "la voile",
+      "aliases": [
+        "voile",
+        "voile dechiree",
+        "trou",
+        "mat",
+        "grand mat"
+      ],
+      "at": "drakkar",
+      "takeable": false,
+      "fixed": "Elle est accrochée au grand mât : il faut la réparer sur place.",
+      "description": "Une grande voile rayée rouge et blanc, accrochée au grand mât. C'est elle qui pousse le drakkar quand le vent souffle."
+    },
+    {
+      "id": "dragon",
+      "name": "la tête de dragon",
+      "aliases": [
+        "tete de dragon",
+        "dragon",
+        "proue"
+      ],
+      "at": "drakkar",
+      "takeable": false,
+      "fixed": "Elle est sculptée dans le bois du bateau !",
+      "description": "Une tête de dragon sculptée à l'avant du drakkar, la gueule grande ouverte, pour faire peur aux monstres marins… et rire les mouettes."
+    },
+    {
+      "id": "coffre",
+      "name": "le vieux coffre",
+      "aliases": [
+        "coffre",
+        "malle",
+        "caisse"
+      ],
+      "at": "cabane",
+      "takeable": false,
+      "fixed": "Il est bien trop lourd ! Mais tu peux regarder dedans.",
+      "description": "Un vieux coffre en bois avec des dragons gravés sur le couvercle."
+    },
+    {
+      "id": "aiguille",
+      "name": "une grosse aiguille en os",
+      "aliases": [
+        "aiguille",
+        "aiguille en os"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Une grosse aiguille taillée dans un os, pour coudre les voiles. Mais il n'y a rien dans son trou."
+    },
+    {
+      "id": "navet",
+      "name": "un navet",
+      "aliases": [
+        "navet",
+        "legume"
+      ],
+      "at": "cabane",
+      "takeable": true,
+      "description": "Un gros navet tout blanc et violet, bien croquant."
+    },
+    {
+      "id": "poisson",
+      "name": "un poisson séché",
+      "aliases": [
+        "poisson",
+        "poisson seche",
+        "hareng"
+      ],
+      "at": "cabane",
+      "takeable": true,
+      "description": "Un poisson séché, tout dur. Pour toi, c'est beurk… pour un corbeau, c'est un festin !"
+    },
+    {
+      "id": "laine",
+      "name": "une pelote de laine",
+      "aliases": [
+        "laine",
+        "pelote",
+        "fil"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Une grosse pelote de laine bien solide, un peu mâchouillée."
+    },
+    {
+      "id": "aiguille_fil",
+      "name": "l'aiguille enfilée",
+      "aliases": [
+        "aiguille enfilee",
+        "aiguille avec la laine"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "La grosse aiguille avec la laine passée dans son trou : prête à coudre !"
+    },
+    {
+      "id": "rocher",
+      "name": "le rocher aux runes",
+      "aliases": [
+        "rocher",
+        "runes",
+        "gravures",
+        "lettres",
+        "stele"
+      ],
+      "at": "colline",
+      "takeable": false,
+      "fixed": "Un rocher dans ton sac ? Même un géant n'y arriverait pas !",
+      "description": "Un grand rocher couvert de runes, des lettres faites de petits traits. Elles racontent peut-être un secret."
+    },
+    {
+      "id": "pierre_soleil",
+      "name": "la pierre de soleil",
+      "aliases": [
+        "pierre de soleil",
+        "pierre du soleil",
+        "cristal",
+        "pierre magique"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Un cristal transparent comme de la glace. Quand on regarde le ciel à travers, un petit point brille du côté du soleil, même derrière les nuages !"
+    },
+    {
+      "id": "boucliers",
+      "name": "les boucliers ronds",
+      "aliases": [
+        "boucliers",
+        "bouclier"
+      ],
+      "at": "drakkar",
+      "takeable": false,
+      "fixed": "Ils sont bien attachés au bord du bateau : ce sont les boucliers des rameurs !",
+      "description": "Des boucliers ronds peints de toutes les couleurs, alignés le long du bateau, comme des écailles de dragon."
+    },
+    {
+      "id": "eau_bord",
+      "name": "l'eau glacée du fjord",
+      "aliases": [
+        "eau",
+        "mer",
+        "fjord",
+        "vagues",
+        "eau glacee"
+      ],
+      "at": "drakkar",
+      "takeable": false,
+      "fixed": "De l'eau dans ton sac ? Elle coulerait partout… et elle est glacée !",
+      "description": "L'eau grise et glacée du fjord clapote contre la coque. Brrr, rien que de la regarder, on a froid !"
+    }
+  ],
+  "characters": [
+    {
+      "id": "sigrid",
+      "name": "Sigrid",
+      "aliases": [
+        "sigrid",
+        "petite viking",
+        "viking"
+      ],
+      "at": "plage",
+      "description": "Une petite Viking aux tresses rousses, avec un casque trop grand pour elle.",
+      "says": "Il faut rentrer avant les tempêtes ! D'abord, réparer la voile : Grand-père Olaf a une aiguille dans la cabane, et il nous faut de la laine. Ensuite, trouver le chemin : quand le soleil se cache derrière les nuages, les Vikings regardent le ciel à travers une pierre de soleil. Et surtout, ne plonge pas dans le fjord : l'eau est glacée !"
+    },
+    {
+      "id": "olaf",
+      "name": "Grand-père Olaf",
+      "aliases": [
+        "olaf",
+        "grand-pere",
+        "grand pere",
+        "papi",
+        "grand-pere olaf"
+      ],
+      "at": "cabane",
+      "description": "Un vieux Viking à la longue barbe blanche tressée, qui sculpte du bois.",
+      "says": "Mon aiguille à voile ? Dans le vieux coffre ! La laine ? Demande à Brunhilde… elle dort dessus. Ma pierre de soleil, je l'ai cachée sur la colline aux runes, mais où exactement ? Les runes du rocher le disent ! Hé hé, ma mémoire…"
+    },
+    {
+      "id": "brunhilde",
+      "name": "Brunhilde la chèvre",
+      "aliases": [
+        "brunhilde",
+        "chevre",
+        "biquette"
+      ],
+      "at": "enclos",
+      "description": "Une chèvre grise à barbichette, très grognon, qui mange de tout.",
+      "says": "Mèèèh ! Moi, je suis grognon… sauf quand on m'apporte un bon légume tout croquant ! Mèèèh !"
+    },
+    {
+      "id": "hugin",
+      "name": "Hugin le corbeau",
+      "aliases": [
+        "hugin",
+        "corbeau",
+        "oiseau"
+      ],
+      "at": "drakkar",
+      "description": "Un grand corbeau tout noir, aux yeux malins.",
+      "says": "Croâ ! Moi, je sais toujours où est la terre, même sans soleil ! Mais je ne vole pas le ventre vide. Croâ… un bon poisson, peut-être ? Et pas avant que la voile soit réparée !"
+    }
+  ],
+  "actions": [
+    {
+      "id": "ouvrir_coffre",
+      "verb": "open",
+      "object": "coffre",
+      "when": [
+        "!flag:coffre_ouvert"
+      ],
+      "effects": [
+        "flag:coffre_ouvert",
+        "reveal:aiguille"
+      ],
+      "points": 5,
+      "not_yet": "Le coffre est déjà grand ouvert : il n'y reste que de vieilles moufles qui sentent le poisson.",
+      "text": "Criiic ! Dans le coffre, il y a des cordes, des moufles… et une grosse aiguille en os !"
+    },
+    {
+      "id": "fouiller_coffre",
+      "verb": "search",
+      "object": "coffre",
+      "when": [
+        "!flag:coffre_ouvert"
+      ],
+      "effects": [
+        "flag:coffre_ouvert",
+        "reveal:aiguille"
+      ],
+      "points": 5,
+      "not_yet": "Le coffre est déjà grand ouvert : il n'y reste que de vieilles moufles qui sentent le poisson.",
+      "text": "Tu soulèves le couvercle et tu fouilles : des cordes, des moufles… et une grosse aiguille en os !"
+    },
+    {
+      "id": "donner_navet",
+      "verb": "give",
+      "object": "navet",
+      "target": "brunhilde",
+      "when": [
+        "has:navet"
+      ],
+      "effects": [
+        "lose:navet",
+        "flag:chevre_contente",
+        "reveal:laine"
+      ],
+      "points": 10,
+      "text": "Brunhilde croque le navet : crountch, crountch ! Elle se lève toute contente… et laisse la pelote de laine sur laquelle elle était couchée."
+    },
+    {
+      "id": "pousser_chevre",
+      "verb": "push",
+      "object": "brunhilde",
+      "place": "enclos",
+      "when": [
+        "flag:jamais"
+      ],
+      "not_yet": "Mèèèh ! Brunhilde ne bouge pas d'un sabot. Elle regarde vers la cabane en se léchant les babines…"
+    },
+    {
+      "id": "tirer_chevre",
+      "verb": "pull",
+      "object": "brunhilde",
+      "place": "enclos",
+      "when": [
+        "flag:jamais"
+      ],
+      "not_yet": "Mèèèh ! Brunhilde plante ses sabots dans la boue et ne bouge pas. Elle regarde vers la cabane en se léchant les babines…"
+    },
+    {
+      "id": "enfiler_aiguille",
+      "verb": "combine",
+      "object": "aiguille",
+      "target": "laine",
+      "when": [
+        "has:aiguille",
+        "has:laine"
+      ],
+      "effects": [
+        "lose:aiguille",
+        "lose:laine",
+        "gain:aiguille_fil"
+      ],
+      "points": 10,
+      "text": "Tu passes la laine dans le trou de l'aiguille… en tirant la langue. Voilà une aiguille enfilée, prête à coudre !"
+    },
+    {
+      "id": "coudre_voile",
+      "verb": "use",
+      "object": "aiguille_fil",
+      "target": "voile",
+      "when": [
+        "has:aiguille_fil",
+        "!flag:voile_reparee"
+      ],
+      "effects": [
+        "lose:aiguille_fil",
+        "flag:voile_reparee"
+      ],
+      "points": 10,
+      "text": "Zip, zip, zip ! Tu couds la voile point par point. Le trou a disparu, et la voile se gonfle au vent : flouf !"
+    },
+    {
+      "id": "reparer_voile",
+      "verb": "use",
+      "object": "voile",
+      "when": [
+        "has:aiguille_fil",
+        "!flag:voile_reparee"
+      ],
+      "effects": [
+        "lose:aiguille_fil",
+        "flag:voile_reparee"
+      ],
+      "points": 10,
+      "not_yet": "Pour coudre ce gros trou, il faut une aiguille avec de la laine dedans. Grand-père Olaf en a peut-être une…",
+      "text": "Zip, zip, zip ! Tu couds la voile point par point avec l'aiguille enfilée. Le trou a disparu, et la voile se gonfle au vent : flouf !"
+    },
+    {
+      "id": "coudre_sans_fil",
+      "verb": "use",
+      "object": "aiguille",
+      "target": "voile",
+      "when": [
+        "flag:jamais"
+      ],
+      "not_yet": "Une aiguille sans fil, ça ne coud rien du tout ! Il faudrait de la laine dans son trou."
+    },
+    {
+      "id": "coudre_sans_aiguille",
+      "verb": "use",
+      "object": "laine",
+      "target": "voile",
+      "when": [
+        "flag:jamais"
+      ],
+      "not_yet": "Tu poses la laine sur le trou… elle glisse ! Pour coudre, il faut une aiguille."
+    },
+    {
+      "id": "lire_runes",
+      "verb": "read",
+      "object": "rocher",
+      "effects": [
+        "flag:runes_lues"
+      ],
+      "points": 5,
+      "text": "Tu suis les petits traits du doigt, un par un… Les runes disent : « Sous mon pied dort le soleil. » Sous le pied du rocher ?"
+    },
+    {
+      "id": "fouiller_rocher",
+      "verb": "search",
+      "object": "rocher",
+      "when": [
+        "flag:runes_lues",
+        "!flag:pierre_trouvee"
+      ],
+      "effects": [
+        "reveal:pierre_soleil",
+        "flag:pierre_trouvee"
+      ],
+      "points": 10,
+      "not_yet": "Tu tournes autour du rocher… rien que de la bruyère. Les runes gravées dessus disent peut-être où chercher ?",
+      "text": "Tu grattes la terre au pied du rocher… quelque chose brille ! C'est la pierre de soleil de Grand-père Olaf !"
+    },
+    {
+      "id": "fouiller_colline",
+      "verb": "search",
+      "object": "colline",
+      "when": [
+        "flag:runes_lues",
+        "!flag:pierre_trouvee"
+      ],
+      "effects": [
+        "reveal:pierre_soleil",
+        "flag:pierre_trouvee"
+      ],
+      "points": 10,
+      "not_yet": "Tu cherches dans la bruyère… Les runes gravées sur le rocher disent peut-être où regarder ?",
+      "text": "Tu grattes la terre au pied du rocher… quelque chose brille ! C'est la pierre de soleil de Grand-père Olaf !"
+    },
+    {
+      "id": "naviguer_soleil",
+      "verb": "use",
+      "object": "pierre_soleil",
+      "place": "drakkar",
+      "when": [
+        "has:pierre_soleil",
+        "flag:voile_reparee"
+      ],
+      "effects": [
+        "end:soleil"
+      ],
+      "points": 20,
+      "not_yet": "Tu regardes le ciel à travers la pierre : un petit point brille, là-bas, c'est le soleil ! Mais avec cette voile déchirée, le drakkar n'irait nulle part.",
+      "text": "Tu lèves la pierre de soleil vers le ciel gris… un petit point brille : le soleil est là ! « Cap au sud ! » crie Sigrid."
+    },
+    {
+      "id": "regarder_pierre",
+      "verb": "use",
+      "object": "pierre_soleil",
+      "when": [
+        "has:pierre_soleil",
+        "!at:drakkar"
+      ],
+      "repeatable": true,
+      "points": 0,
+      "text": "Tu regardes le ciel gris à travers la pierre : un petit point brille, c'est là que se cache le soleil ! Pour trouver le chemin en mer, il faudra le faire à bord du drakkar."
+    },
+    {
+      "id": "nourrir_corbeau",
+      "verb": "give",
+      "object": "poisson",
+      "target": "hugin",
+      "when": [
+        "has:poisson",
+        "flag:voile_reparee"
+      ],
+      "effects": [
+        "lose:poisson",
+        "end:corbeau"
+      ],
+      "points": 20,
+      "not_yet": "Hugin regarde le poisson avec envie : « Croâ ! Je te montrerai le chemin… quand la voile sera réparée ! »",
+      "text": "Hugin avale le poisson : croâ, merci ! Puis il s'envole droit vers le sud. « Suivons-le ! » crie Sigrid."
+    },
+    {
+      "id": "manger_poisson",
+      "verb": "eat",
+      "object": "poisson",
+      "when": [
+        "has:poisson"
+      ],
+      "repeatable": true,
+      "points": 0,
+      "text": "Tu croques le poisson séché… crac ! Il est dur comme du bois, et il sent très fort. Beurk ! Un corbeau, lui, adorerait."
+    },
+    {
+      "id": "nager_fjord",
+      "verb": "swim",
+      "object": "fjord",
+      "effects": [
+        "end:plouf"
+      ],
+      "points": 0,
+      "text": "Plouf ! Brrrrr !"
+    },
+    {
+      "id": "nager_plage",
+      "verb": "swim",
+      "place": "plage",
+      "effects": [],
+      "text": "Tu t'approches de l'eau… Sigrid t'attrape par la manche : « Oh là là, non ! L'eau du fjord est glacée ! Si tu plonges là-dedans, adieu le voyage ! »"
+    },
+    {
+      "id": "nager_drakkar",
+      "verb": "swim",
+      "object": "eau_bord",
+      "place": "drakkar",
+      "effects": [
+        "end:plouf"
+      ],
+      "points": 0,
+      "text": "Tu sautes par-dessus bord… plouf ! Brrrrr !"
+    },
+    {
+      "id": "nager_bord",
+      "verb": "swim",
+      "place": "drakkar",
+      "effects": [],
+      "text": "Tu te penches par-dessus bord… Hugin croasse : « Croâ ! Pas dans l'eau glacée, malheureux ! »"
+    }
+  ],
+  "endings": [
+    {
+      "id": "soleil",
+      "kind": "win",
+      "text": "Le drakkar file sur les vagues, droit vers le soleil caché. Le soir même, vous arrivez au village ! Tout le monde fait la fête autour du feu, et Grand-père Olaf raconte ton aventure dans une saga, la saga du marin qui a trouvé le soleil."
+    },
+    {
+      "id": "corbeau",
+      "kind": "win",
+      "text": "Hugin vous guide au-dessus des vagues, croâ, croâ, jusqu'au village ! Ce soir, on chante ton nom autour du feu… et celui de Hugin aussi, qui a droit à un deuxième poisson."
+    },
+    {
+      "id": "plouf",
+      "kind": "lose",
+      "text": "L'eau du fjord est glacée ! Sigrid te repêche et t'emmitoufle dans trois couvertures en peau de mouton. Le temps que tu arrêtes d'éternuer, la tempête est arrivée : le drakkar rentrera au printemps. Atchoum !"
+    }
+  ]
+}

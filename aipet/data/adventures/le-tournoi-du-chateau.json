@@ -1,0 +1,652 @@
+{
+  "title": "Le tournoi du château",
+  "difficulty": "moyen",
+  "tags": [
+    "moyen age",
+    "chevalier",
+    "chateau",
+    "tournoi",
+    "cheval",
+    "blason",
+    "moine",
+    "ecuyer"
+  ],
+  "fact": "Au Moyen Âge, des moines copiaient les livres à la main avec une plume d'oie, et chaque chevalier avait son blason pour qu'on le reconnaisse sous son armure.",
+  "intro": "Ta-ta-taaa ! Aujourd'hui, c'est le grand tournoi du château. Tu es l'écuyer de Sire Bertrand, un chevalier très gentil… mais très distrait. Son bouclier a disparu, son cheval boude dans l'écurie, et sa bannière n'est même pas finie !",
+  "goal": "Préparer Sire Bertrand pour le tournoi : son cheval, son bouclier et sa bannière.",
+  "start": {
+    "place": "cour",
+    "inventory": []
+  },
+  "places": [
+    {
+      "id": "cour",
+      "name": "la cour du château",
+      "aliases": [
+        "cour",
+        "cour du chateau",
+        "chateau"
+      ],
+      "description": "La grande cour du château, où tout le monde court dans tous les sens. Sire Bertrand attend dans son armure qui fait cling-clang. Agathe l'oie se dandine près du puits en cacardant.",
+      "variants": [
+        {
+          "when": [
+            "flag:cheval_dehors"
+          ],
+          "description": "La grande cour du château. Sire Bertrand est parti au champ du tournoi avec Caramel. Agathe l'oie se dandine près du puits en cacardant."
+        }
+      ],
+      "exits": [
+        {
+          "to": "ecurie",
+          "label": "vers l'écurie",
+          "dir": "est"
+        },
+        {
+          "to": "cuisine",
+          "label": "vers la cuisine",
+          "dir": "ouest"
+        },
+        {
+          "to": "scriptorium",
+          "label": "par l'escalier de la tour",
+          "dir": "haut"
+        },
+        {
+          "to": "lice",
+          "label": "par la grande porte du tournoi",
+          "dir": "sud",
+          "when": [
+            "flag:cheval_dehors"
+          ],
+          "blocked": "Le garde croise sa lance : « Halte ! Pas de chevalier sans cheval au tournoi ! » Il faut d'abord faire sortir Caramel de l'écurie."
+        }
+      ]
+    },
+    {
+      "id": "ecurie",
+      "name": "l'écurie",
+      "aliases": [
+        "ecurie",
+        "ecuries",
+        "etable",
+        "box"
+      ],
+      "description": "Une écurie qui sent bon le foin. Caramel, le cheval de Sire Bertrand, est couché dans un gros tas de foin et ne veut pas se lever. Quelque chose de rond dépasse un tout petit peu du foin, juste sous sa tête…",
+      "variants": [
+        {
+          "when": [
+            "flag:bouclier_trouve"
+          ],
+          "description": "Une écurie qui sent bon le foin. Caramel, le cheval de Sire Bertrand, est couché dans un gros tas de foin et ne veut pas se lever."
+        },
+        {
+          "when": [
+            "flag:cheval_dehors"
+          ],
+          "description": "Une écurie qui sent bon le foin. Le box de Caramel est vide : il est parti au tournoi avec Sire Bertrand ! Dans le foin, là où il dormait, quelque chose de rond dépasse un tout petit peu…"
+        },
+        {
+          "when": [
+            "flag:cheval_dehors",
+            "flag:bouclier_trouve"
+          ],
+          "description": "Une écurie qui sent bon le foin. Le box de Caramel est vide : il est parti au tournoi avec Sire Bertrand !"
+        }
+      ],
+      "exits": [
+        {
+          "to": "cour",
+          "label": "vers la cour",
+          "dir": "ouest"
+        }
+      ]
+    },
+    {
+      "id": "cuisine",
+      "name": "la cuisine",
+      "aliases": [
+        "cuisine",
+        "cuisines"
+      ],
+      "description": "Une cuisine immense, avec une cheminée où mijote une grosse marmite de soupe. Dame Berthe, la cuisinière, pétrit la pâte en chantonnant, à côté de sa grande table toute blanche de farine.",
+      "exits": [
+        {
+          "to": "cour",
+          "label": "vers la cour",
+          "dir": "est"
+        }
+      ]
+    },
+    {
+      "id": "scriptorium",
+      "name": "le scriptorium",
+      "aliases": [
+        "scriptorium",
+        "tour",
+        "salle des moines",
+        "bibliotheque"
+      ],
+      "description": "Une salle toute calme en haut de la tour. Frère Anselme copie un gros livre à la main, lettre après lettre, et peint une grande lettre dorée au début de la page. Sur une autre table, une bannière toute blanche attend son blason.",
+      "exits": [
+        {
+          "to": "cour",
+          "label": "par l'escalier vers la cour",
+          "dir": "bas"
+        }
+      ],
+      "variants": [
+        {
+          "when": [
+            "has:banniere"
+          ],
+          "description": "Une salle toute calme en haut de la tour. Frère Anselme copie un gros livre à la main, lettre après lettre, et peint une grande lettre dorée au début de la page."
+        },
+        {
+          "when": [
+            "has:etendard"
+          ],
+          "description": "Une salle toute calme en haut de la tour. Frère Anselme copie un gros livre à la main, lettre après lettre, et peint une grande lettre dorée au début de la page."
+        },
+        {
+          "when": [
+            "flag:etendard_plante"
+          ],
+          "description": "Une salle toute calme en haut de la tour. Frère Anselme copie un gros livre à la main, lettre après lettre, et peint une grande lettre dorée au début de la page."
+        }
+      ]
+    },
+    {
+      "id": "lice",
+      "name": "le champ du tournoi",
+      "aliases": [
+        "champ du tournoi",
+        "tournoi",
+        "lice",
+        "lices",
+        "tribunes"
+      ],
+      "description": "Le champ du tournoi ! Des tentes à rayures, des drapeaux qui claquent au vent, et le public qui crie hourra dans les tribunes. Sire Bertrand attend sur Caramel. Le héraut garde sa grande trompette : « Pas touche ! Un seul coup de trompette, et le tournoi commence ! »",
+      "variants": [
+        {
+          "when": [
+            "flag:etendard_plante"
+          ],
+          "description": "Le champ du tournoi ! Le public crie hourra dans les tribunes. La bannière de Sire Bertrand flotte au vent, toute fière. Sire Bertrand attend sur Caramel, et le héraut garde sa grande trompette : « Pas touche ! Un seul coup de trompette, et le tournoi commence ! »"
+        }
+      ],
+      "exits": [
+        {
+          "to": "cour",
+          "label": "vers la cour du château",
+          "dir": "nord"
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "foin",
+      "name": "le tas de foin",
+      "aliases": [
+        "foin",
+        "tas de foin",
+        "paille",
+        "botte de foin"
+      ],
+      "at": "ecurie",
+      "takeable": false,
+      "fixed": "Tout ce foin dans ton sac ? Tu éternuerais jusqu'à demain !",
+      "description": "Un gros tas de foin tout doré et tout moelleux. Caramel adore s'y coucher."
+    },
+    {
+      "id": "bouclier",
+      "name": "le bouclier de Sire Bertrand",
+      "aliases": [
+        "bouclier",
+        "blason",
+        "ecu"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Un bouclier rouge avec un lion d'or : c'est le blason de Sire Bertrand. Grâce à lui, tout le monde le reconnaît, même caché sous son armure."
+    },
+    {
+      "id": "perche",
+      "name": "une longue perche",
+      "aliases": [
+        "perche",
+        "baton",
+        "long baton",
+        "manche"
+      ],
+      "at": "ecurie",
+      "takeable": true,
+      "description": "Une longue perche en bois, bien droite. Parfait pour accrocher quelque chose tout en haut."
+    },
+    {
+      "id": "pomme",
+      "name": "une pomme rouge",
+      "aliases": [
+        "pomme",
+        "pomme rouge",
+        "fruit"
+      ],
+      "at": "cuisine",
+      "takeable": true,
+      "description": "Une pomme rouge et croquante. Les chevaux en raffolent !"
+    },
+    {
+      "id": "pain",
+      "name": "un quignon de pain",
+      "aliases": [
+        "pain",
+        "quignon",
+        "croute",
+        "miettes"
+      ],
+      "at": "cuisine",
+      "takeable": true,
+      "description": "Un bon quignon de pain tout croustillant."
+    },
+    {
+      "id": "marmite",
+      "name": "la marmite de soupe",
+      "aliases": [
+        "marmite",
+        "soupe",
+        "chaudron",
+        "cheminee"
+      ],
+      "at": "cuisine",
+      "takeable": false,
+      "fixed": "Elle est bien trop lourde, et bien trop chaude !",
+      "description": "Une énorme marmite de soupe aux poireaux qui fait bloup, bloup."
+    },
+    {
+      "id": "plume",
+      "name": "une plume d'oie",
+      "aliases": [
+        "plume",
+        "plume d'oie",
+        "plume blanche"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Une grande plume blanche toute neuve. Taillée en pointe et trempée dans l'encre, elle sert à écrire !"
+    },
+    {
+      "id": "livre",
+      "name": "le grand livre",
+      "aliases": [
+        "livre",
+        "grand livre",
+        "lettre doree",
+        "enluminure",
+        "page"
+      ],
+      "at": "scriptorium",
+      "takeable": false,
+      "fixed": "Frère Anselme pose la main dessus : « Chut ! Il me faut encore des mois pour le finir ! »",
+      "description": "Un livre copié à la main, lettre après lettre. La première lettre est décorée de fleurs et d'or : on appelle ça une enluminure !"
+    },
+    {
+      "id": "banniere",
+      "name": "la bannière de Sire Bertrand",
+      "aliases": [
+        "banniere",
+        "banniere brodee",
+        "toile"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Une belle bannière avec le lion d'or de Sire Bertrand. Il faudrait l'accrocher tout en haut de quelque chose, pour qu'on la voie de loin."
+    },
+    {
+      "id": "etendard",
+      "name": "l'étendard de Sire Bertrand",
+      "aliases": [
+        "etendard",
+        "drapeau",
+        "banniere sur la perche"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "La bannière au lion d'or, accrochée en haut de la longue perche. On la voit de très loin !"
+    },
+    {
+      "id": "trompette",
+      "name": "la grande trompette",
+      "aliases": [
+        "trompette",
+        "cor",
+        "clairon"
+      ],
+      "at": "lice",
+      "takeable": false,
+      "fixed": "Le héraut la surveille du coin de l'œil : pas touche !",
+      "description": "Une longue trompette dorée. Quand le héraut souffle dedans, le tournoi commence."
+    },
+    {
+      "id": "puits",
+      "name": "le puits",
+      "aliases": [
+        "puits",
+        "margelle"
+      ],
+      "at": "cour",
+      "takeable": false,
+      "fixed": "Un puits en pierre ? Même dix chevaliers ne pourraient pas le soulever !",
+      "description": "Un vieux puits en pierre. Agathe l'oie tourne autour en cacardant."
+    }
+  ],
+  "characters": [
+    {
+      "id": "bertrand",
+      "name": "Sire Bertrand",
+      "aliases": [
+        "bertrand",
+        "sire bertrand",
+        "chevalier",
+        "maitre"
+      ],
+      "at": "cour",
+      "description": "Un chevalier dans une armure qui brille, si distrait qu'il a mis son casque à l'envers.",
+      "says": "Mon brave écuyer ! Pour le tournoi, il me faut Caramel, mon bouclier et ma bannière. Mon bouclier… je l'ai posé, euh… quelque part près de Caramel ? Et ce gourmand de Caramel ne bouge que pour une friandise !"
+    },
+    {
+      "id": "caramel",
+      "name": "Caramel le cheval",
+      "aliases": [
+        "caramel",
+        "cheval",
+        "monture",
+        "poney"
+      ],
+      "at": "ecurie",
+      "description": "Un gros cheval couleur caramel, à la crinière dorée, gourmand comme pas deux.",
+      "says": "Hiii-hiii ! (Caramel renifle tes poches en se léchant les babines : ce gourmand rêve toujours de quelque chose de croquant…)"
+    },
+    {
+      "id": "oie",
+      "name": "Agathe l'oie",
+      "aliases": [
+        "oie",
+        "agathe"
+      ],
+      "at": "cour",
+      "description": "Une grosse oie blanche, avec de magnifiques plumes, qui pince tout ce qui bouge.",
+      "says": "Cacaaarde ! (Agathe fixe tes poches avec ses petits yeux ronds. Elle a l'air d'avoir très faim.)"
+    },
+    {
+      "id": "berthe",
+      "name": "Dame Berthe",
+      "aliases": [
+        "berthe",
+        "dame berthe",
+        "cuisiniere"
+      ],
+      "at": "cuisine",
+      "description": "Une cuisinière toute ronde, avec de la farine jusqu'aux coudes.",
+      "says": "Sers-toi sur la table, mon petit ! Le pain, Agathe l'oie l'adore. Et la pomme… Caramel ferait n'importe quoi pour une pomme !"
+    },
+    {
+      "id": "anselme",
+      "name": "Frère Anselme",
+      "aliases": [
+        "anselme",
+        "frere anselme",
+        "moine",
+        "frere"
+      ],
+      "at": "scriptorium",
+      "description": "Un vieux moine aux doigts tachés d'encre, qui copie les livres à la main.",
+      "says": "Chut… Je copie ce livre à la main, ça prend des mois ! La bannière de Sire Bertrand ? Je veux bien la finir, mais il me faut deux choses : une plume neuve, la mienne est toute usée… les meilleures, ce sont les plumes d'oie. Et le modèle du blason, qui est peint sur son bouclier !"
+    },
+    {
+      "id": "heraut",
+      "name": "le héraut",
+      "aliases": [
+        "heraut",
+        "crieur",
+        "annonceur"
+      ],
+      "at": "lice",
+      "description": "Un monsieur en habit à rayures, avec une voix qui porte jusqu'au bout du royaume.",
+      "says": "C'est moi qui annonce les chevaliers ! Mais sous l'armure, comment les reconnaître ? Grâce à leur blason, sur leur bouclier et sur leur bannière, bien haut au bout d'une perche ! Et surtout, ne touche pas à ma trompette : un seul coup, et le tournoi commence !"
+    }
+  ],
+  "actions": [
+    {
+      "id": "fouiller_foin",
+      "verb": "search",
+      "object": "foin",
+      "when": [
+        "!flag:bouclier_trouve"
+      ],
+      "effects": [
+        "reveal:bouclier",
+        "flag:bouclier_trouve"
+      ],
+      "points": 10,
+      "not_yet": "Tu as déjà tout fouillé : il ne reste que du foin… et des brins dans tes cheveux !",
+      "text": "Tu fouilles dans le foin, sous le nez de Caramel… Ça alors ! Le bouclier de Sire Bertrand ! Caramel s'en servait comme oreiller."
+    },
+    {
+      "id": "fouiller_ecurie",
+      "verb": "search",
+      "object": "ecurie",
+      "when": [
+        "!flag:bouclier_trouve"
+      ],
+      "effects": [
+        "reveal:bouclier",
+        "flag:bouclier_trouve"
+      ],
+      "points": 10,
+      "not_yet": "Tu as déjà tout fouillé : il ne reste que du foin… et des brins dans tes cheveux !",
+      "text": "Tu fouilles toute l'écurie, et sous le tas de foin… Ça alors ! Le bouclier de Sire Bertrand ! Caramel s'en servait comme oreiller."
+    },
+    {
+      "id": "donner_pomme",
+      "verb": "give",
+      "object": "pomme",
+      "target": "caramel",
+      "when": [
+        "has:pomme"
+      ],
+      "effects": [
+        "lose:pomme",
+        "flag:cheval_dehors",
+        "move:caramel:lice",
+        "move:bertrand:lice"
+      ],
+      "points": 10,
+      "text": "Crunch ! Caramel croque la pomme, se lève d'un bond et trotte dehors, tout content. Sire Bertrand saute en selle et file au champ du tournoi : « Rejoins-moi avec mon bouclier et ma bannière ! »"
+    },
+    {
+      "id": "pousser_caramel",
+      "verb": "push",
+      "object": "caramel",
+      "place": "ecurie",
+      "when": [
+        "flag:jamais"
+      ],
+      "not_yet": "Caramel est lourd comme une charrette ! Il ne bouge pas d'un sabot. Par contre, il renifle vers la cuisine…"
+    },
+    {
+      "id": "tirer_caramel",
+      "verb": "pull",
+      "object": "caramel",
+      "place": "ecurie",
+      "when": [
+        "flag:jamais"
+      ],
+      "not_yet": "Tu tires, tu tires… Caramel ne bouge pas d'un sabot. Par contre, il renifle vers la cuisine en se léchant les babines…"
+    },
+    {
+      "id": "donner_pain",
+      "verb": "give",
+      "object": "pain",
+      "target": "oie",
+      "when": [
+        "has:pain"
+      ],
+      "effects": [
+        "lose:pain",
+        "gain:plume"
+      ],
+      "points": 10,
+      "text": "Agathe engloutit le pain : miam, cacaaarde ! Toute contente, elle secoue ses ailes… et une belle plume blanche tombe dans ta main."
+    },
+    {
+      "id": "tirer_plume",
+      "verb": "pull",
+      "object": "oie",
+      "when": [
+        "flag:jamais"
+      ],
+      "not_yet": "Couac ! Agathe te pince le doigt. On ne tire pas les plumes d'une oie ! Elle a plutôt l'air d'avoir faim…"
+    },
+    {
+      "id": "donner_plume",
+      "verb": "give",
+      "object": "plume",
+      "target": "anselme",
+      "when": [
+        "has:plume",
+        "has:bouclier"
+      ],
+      "effects": [
+        "lose:plume",
+        "gain:banniere"
+      ],
+      "points": 10,
+      "not_yet": "Frère Anselme : « Pour peindre la bannière, il me faut une plume neuve ET le bouclier, pour copier le blason ! »",
+      "text": "Frère Anselme taille la plume, la trempe dans l'encre et copie le lion d'or du bouclier, trait après trait. « Voilà ta bannière ! Le blason sert à reconnaître ton chevalier de loin. »"
+    },
+    {
+      "id": "montrer_bouclier",
+      "verb": "give",
+      "object": "bouclier",
+      "target": "anselme",
+      "when": [
+        "has:plume",
+        "has:bouclier"
+      ],
+      "effects": [
+        "lose:plume",
+        "gain:banniere"
+      ],
+      "points": 10,
+      "not_yet": "Frère Anselme : « Pour peindre la bannière, il me faut une plume neuve ET le bouclier, pour copier le blason ! »",
+      "text": "Frère Anselme regarde le bouclier, prend ta plume, la trempe dans l'encre et copie le lion d'or, trait après trait. Il te rend le bouclier : « Voilà ta bannière ! »"
+    },
+    {
+      "id": "faire_etendard",
+      "verb": "combine",
+      "object": "banniere",
+      "target": "perche",
+      "when": [
+        "has:banniere",
+        "has:perche"
+      ],
+      "effects": [
+        "lose:banniere",
+        "lose:perche",
+        "gain:etendard"
+      ],
+      "points": 10,
+      "text": "Tu accroches la bannière tout en haut de la longue perche… et voilà un bel étendard qui flotte au vent !"
+    },
+    {
+      "id": "banniere_sans_perche",
+      "verb": "give",
+      "object": "banniere",
+      "target": "bertrand",
+      "when": [
+        "flag:jamais"
+      ],
+      "not_yet": "Sire Bertrand : « Ma bannière ! Mais il faut l'accrocher en haut d'une longue perche, pour qu'on la voie de loin ! »"
+    },
+    {
+      "id": "planter_etendard",
+      "verb": "use",
+      "object": "etendard",
+      "place": "lice",
+      "when": [
+        "has:etendard"
+      ],
+      "effects": [
+        "lose:etendard",
+        "flag:etendard_plante"
+      ],
+      "points": 10,
+      "text": "Tu plantes l'étendard au bord du champ. La bannière flotte, et on voit le lion d'or de très loin ! Le public applaudit."
+    },
+    {
+      "id": "donner_etendard",
+      "verb": "give",
+      "object": "etendard",
+      "target": "bertrand",
+      "place": "lice",
+      "when": [
+        "has:etendard"
+      ],
+      "effects": [
+        "lose:etendard",
+        "flag:etendard_plante"
+      ],
+      "points": 10,
+      "text": "Sire Bertrand plante l'étendard au bord du champ. La bannière flotte, et on voit le lion d'or de très loin ! Le public applaudit."
+    },
+    {
+      "id": "donner_bouclier",
+      "verb": "give",
+      "object": "bouclier",
+      "target": "bertrand",
+      "when": [
+        "has:bouclier",
+        "flag:etendard_plante"
+      ],
+      "effects": [
+        "lose:bouclier",
+        "end:tournoi"
+      ],
+      "points": 20,
+      "not_yet": "Sire Bertrand : « Garde-le encore un peu ! Il faut d'abord que ma bannière flotte au bord du champ du tournoi, pour que le héraut me reconnaisse. »",
+      "text": "Sire Bertrand attrape son bouclier et le lève bien haut. Le lion d'or brille au soleil !"
+    },
+    {
+      "id": "souffler_trompette",
+      "verb": "use",
+      "object": "trompette",
+      "place": "lice",
+      "effects": [
+        "end:faux_depart"
+      ],
+      "points": 0,
+      "text": "Tu souffles de toutes tes forces dans la trompette : TA-TA-TAAAA !"
+    },
+    {
+      "id": "gouter_soupe",
+      "verb": "eat",
+      "object": "marmite",
+      "repeatable": true,
+      "points": 0,
+      "text": "Dame Berthe te tend une grande cuillère en bois : « Goûte ! » Slurp… de la soupe aux poireaux, toute chaude. Miam !"
+    }
+  ],
+  "endings": [
+    {
+      "id": "tournoi",
+      "kind": "win",
+      "text": "Le héraut lève les bras : « Voici Sire Bertrand, le chevalier au lion d'or ! » Toute la foule applaudit. Sire Bertrand fait le tour du champ sur Caramel en saluant tout le monde… et à la fin, il te nomme écuyer d'honneur du château !"
+    },
+    {
+      "id": "faux_depart",
+      "kind": "lose",
+      "text": "Tous les chevaliers partent au galop… sauf Sire Bertrand, qui n'était pas prêt ! Il se gratte le casque en riant : « Ce sera pour l'an prochain ! » Et le héraut soupire : « Je t'avais dit de ne pas toucher à ma trompette ! »"
+    }
+  ]
+}

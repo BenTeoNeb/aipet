@@ -72,8 +72,10 @@ def test_plan_steps_prompt_and_progress(env):
     assert nxt == {"step": f"2 sur {STEPS_DAY}", "event": "événement 2", "choice": "choix 2"}
     assert "1. événement 1 (choix : choix 1) [fait]" in g.prompt_section()
     assert "Plumette trouve une clé elle prend la porte rouge" in g.prompt_section()
-    for _ in range(STEPS_DAY - 2):
+    for _ in range(STEPS_DAY - 3):
         g.next_step("…")
+    last = g.next_step("presque")  # the last step: its ending must be told right away
+    assert last["step"] == f"{STEPS_DAY} sur {STEPS_DAY}" and "Dernière étape" in last["note"]
     assert "dernière étape" in g.next_step("fin proche")["note"]
     clock["t"] += timedelta(minutes=16)
     assert "il est temps de conclure" in g.on_user_message("et après ?")
@@ -264,3 +266,23 @@ def test_preparation_tools_are_asynchronous():
         ("story_start", "quiz_start", "learn_start", "yesno_start"), False
     )
     assert seen["story_next"] is True and seen["quiz_answer"] is True
+
+
+def test_story_names_for_speech_recognition(env):
+    """« Raya » was heard as « Royal », « Plumette » as « Plunette »: the names go to the transcription."""
+    mem, _, _ = env
+    g = game(mem)
+    assert g.names() == []
+    asyncio.run(g.start("un dragon"))
+    assert g.names()[:2] == ["Plumette", "Ami1"]
+
+
+def test_story_end_suggests_something_else(env):
+    """After a story, the pet offered another story: the end now carries the code's suggestion."""
+    mem, _, _ = env
+    g = game(mem)
+    asyncio.run(g.start("un dragon"))
+    assert "propose" not in g.end("il a aimé")  # a game on its own: no suggestion
+    g.host.next_offer = lambda: "si tu proposes une activité, propose d'abord un quiz"
+    asyncio.run(g.start("un autre dragon"))
+    assert g.end("il a adoré")["propose"].endswith("un quiz")

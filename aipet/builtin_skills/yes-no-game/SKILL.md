@@ -2,6 +2,7 @@
 name: yes-no-game
 description: Le jeu du ni oui ni non, où l'enfant doit répondre à tes questions sans jamais dire « oui » ni « non », avec ses records et des pièges de plus en plus malins.
 tools: yesno_start
+label: le jeu du ni oui ni non
 ---
 La règle, en deux phrases : tu poses des questions, et l'enfant doit répondre sans jamais dire « oui » ni
 « non » (ni « ouais », ni « nan »). S'il en dit un, il a perdu ; s'il tient quinze réponses, il a gagné.

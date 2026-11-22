@@ -326,6 +326,8 @@ def test_filler_and_deadline_rearmed_during_a_tool_call(make, monkeypatch):
         await t.process_frame(
             FunctionCallInProgressFrame(function_name="story_start", tool_call_id="1", arguments={}), D.DOWNSTREAM
         )
+        await t.process_frame(BotStartedSpeakingFrame(), D.UPSTREAM)
+        await t.process_frame(BotStoppedSpeakingFrame(), D.UPSTREAM)  # the waiting phrase was played
         await t.process_frame(BotStartedSpeakingFrame(), D.UPSTREAM)  # our own "Hmm": must not cancel
         await asyncio.sleep(0.15)
         spoken = [f.text for f, _ in t.out if isinstance(f, TTSSpeakFrame)]
@@ -449,3 +451,310 @@ def test_pipeline_uses_the_voice_start_unless_disabled(monkeypatch, tmp_path):
     monkeypatch.setenv("PET_HOME", str(tmp_path))
     pipeline.build_worker(T(), mute_while_speaking=False)
     assert seen["start"] == ["QuietVADUserTurnStartStrategy", "MinWordsUserTurnStartStrategy"]
+
+
+def test_no_filler_in_the_middle_of_a_narration(make):
+    """Seen in a real session: the pet narrated, called story_next, and « Attends, je réfléchis… »
+    came between two parts of the story (the next model call waits for the narration to be played)."""
+    from pipecat.frames.frames import FunctionCallInProgressFrame
+
+    async def run():
+        t = make(turns.ThinkingFiller, after=0.05, deadline=1, tool_deadline=1)
+        await t.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
+        await t.process_frame(LLMTextFrame("[parle:Zina] [joie] Raya fait frétiller ses nageoires !"), D.DOWNSTREAM)
+        await t.process_frame(
+            FunctionCallInProgressFrame(function_name="story_next", tool_call_id="1", arguments={}), D.DOWNSTREAM
+        )
+        await asyncio.sleep(0.15)  # the narration is still being played
+        assert not any(isinstance(f, TTSSpeakFrame) for f, _ in t.out)
+        await t.process_frame(BotStoppedSpeakingFrame(), D.UPSTREAM)
+        await t.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)  # the follow-up starts at once
+        await t.process_frame(LLMTextFrame("Ça alors !"), D.DOWNSTREAM)
+        await asyncio.sleep(0.15)
+        assert not any(isinstance(f, TTSSpeakFrame) for f, _ in t.out)
+
+    asyncio.run(run())
+
+
+def test_filler_after_a_narration_if_the_follow_up_is_slow(make):
+    from pipecat.frames.frames import FunctionCallInProgressFrame
+
+    async def run():
+        t = make(turns.ThinkingFiller, after=0.05, deadline=1, tool_deadline=1)
+        await t.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
+        await t.process_frame(LLMTextFrame("Hop !"), D.DOWNSTREAM)
+        await t.process_frame(
+            FunctionCallInProgressFrame(function_name="story_next", tool_call_id="1", arguments={}), D.DOWNSTREAM
+        )
+        await t.process_frame(BotStoppedSpeakingFrame(), D.UPSTREAM)
+        await asyncio.sleep(0.1)
+        assert [f.text for f, _ in t.out if isinstance(f, TTSSpeakFrame)][0] in turns.FILLERS
+
+    asyncio.run(run())
+
+
+def test_tags_alone_are_not_a_narration(make):
+    """« [parle:Rami] » then a tool: nothing will be played, so the filler is counted at once."""
+    from pipecat.frames.frames import FunctionCallInProgressFrame
+
+    async def run():
+        t = make(turns.ThinkingFiller, after=0.05, deadline=1, tool_deadline=1)
+        await t.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
+        await t.process_frame(LLMTextFrame("[parle:"), D.DOWNSTREAM)
+        await t.process_frame(LLMTextFrame("Rami] "), D.DOWNSTREAM)
+        await t.process_frame(
+            FunctionCallInProgressFrame(function_name="story_start", tool_call_id="1", arguments={}), D.DOWNSTREAM
+        )
+        await asyncio.sleep(0.1)
+        assert any(isinstance(f, TTSSpeakFrame) for f, _ in t.out)
+
+    asyncio.run(run())
+
+
+# ---- an empty reply after a tool is asked again, inside the LLM service ----------------------
+class FakeService:
+    """Stands for a Pipecat LLM service: each model call plays the next scripted reply."""
+
+    def __init__(self, replies):
+        self.replies, self.calls, self.said, self.tools = list(replies), [], [], []
+
+    async def _push_llm_text(self, text):
+        self.said.append(text)
+
+    async def run_function_calls(self, function_calls):
+        self.tools.extend(function_calls)
+
+    async def _process_context(self, context):
+        self.calls.append([m["content"] for m in context.get_messages() if m["role"] == "user"])
+        kind, value = self.replies.pop(0) if self.replies else ("text", "")
+        if kind == "text":
+            await self._push_llm_text(value)
+        else:
+            await self.run_function_calls([value])
+
+
+def _service(*replies, skip=lambda: False):
+    from aipet.llm_retry import with_empty_reply_retry
+
+    svc = with_empty_reply_retry(FakeService)(replies)
+    svc.empty_reply_skip, svc.empty_reply_slog = skip, FakeLog()
+    return svc
+
+
+def _after_tool_context():
+    from pipecat.processors.aggregators.llm_context import LLMContext
+
+    return LLMContext(
+        [
+            {"role": "user", "content": "la suite !"},
+            {"role": "assistant", "tool_calls": [{"id": "1", "type": "function", "function": {"name": "story_next", "arguments": "{}"}}]},
+            {"role": "tool", "tool_call_id": "1", "content": "{}"},
+        ]
+    )  # fmt: skip
+
+
+def test_empty_reply_after_a_tool_is_asked_again_once():
+    """Seen in a real session: after the last story_next the model said nothing, no ending told."""
+    from aipet.llm_retry import EmptyReplyRetry
+
+    async def run():
+        svc = _service(("text", ""), ("text", ""))
+        await svc._process_context(_after_tool_context())
+        assert len(svc.calls) == 2 and svc.calls[1][-1] == EmptyReplyRetry.NOTE  # within the same response
+        assert svc.empty_reply_slog.events == ["empty_reply_retry"]  # the retry was empty too: never a loop
+
+    asyncio.run(run())
+
+
+def test_a_reply_with_words_or_a_tool_call_is_not_empty():
+    """Seen on 21/11/2026: the reply after the winning move was only a call to adventure_end; it
+    looked empty, was asked again, and the ending was told twice."""
+
+    async def run():
+        for reply in (("text", "[silence]"), ("text", "Bravo !"), ("tool", "adventure_end")):
+            svc = _service(reply)
+            await svc._process_context(_after_tool_context())
+            assert len(svc.calls) == 1, reply
+
+    asyncio.run(run())
+
+
+def test_no_retry_outside_a_tool_follow_up_or_after_goodbye():
+    from pipecat.processors.aggregators.llm_context import LLMContext
+
+    async def run():
+        svc = _service(("text", ""))
+        await svc._process_context(LLMContext([{"role": "user", "content": "euh"}]))  # the child's turn
+        svc2 = _service(("text", ""), skip=lambda: True)  # the pet said goodbye: its silence is wanted
+        await svc2._process_context(_after_tool_context())
+        assert len(svc.calls) == len(svc2.calls) == 1
+
+    asyncio.run(run())
+
+
+# ---- the turn guard: our own model runs wait until the pet is idle --------------------------
+@pytest.fixture
+def quick_guard(monkeypatch):
+    monkeypatch.setattr(turns.TurnGuard, "POLL_SECS", 0.005)
+    monkeypatch.setattr(turns.TurnGuard, "SETTLE_SECS", 0.02)
+
+
+def _calls(*ids, asynchronous=()):
+    from pipecat.frames.frames import FunctionCallsStartedFrame
+    from pipecat.services.llm_service import FunctionCallFromLLM
+
+    return FunctionCallsStartedFrame(
+        function_calls=[FunctionCallFromLLM(function_name="f", tool_call_id=i, arguments={}, context=None) for i in ids]
+    )
+
+
+def test_guard_waits_for_the_reply_and_the_tool(make, quick_guard):
+    """The pet narrates then calls story_next: a request made meanwhile waits for the tool, its
+    follow-up reply and its speech (it used to run at once: two replies in a row)."""
+    from pipecat.frames.frames import FunctionCallResultFrame, LLMFullResponseEndFrame
+
+    async def run():
+        g = make(turns.TurnGuard)
+        sent = []
+
+        async def send():
+            sent.append(asyncio.get_running_loop().time())
+
+        await g.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
+        await g.process_frame(LLMTextFrame("Il était une fois…"), D.DOWNSTREAM)
+        await g.process_frame(_calls("1"), D.DOWNSTREAM)
+        await g.process_frame(LLMFullResponseEndFrame(), D.DOWNSTREAM)
+        task = asyncio.ensure_future(g.run_when_idle(send, "test"))
+        await asyncio.sleep(0.05)
+        assert g.busy() == "tool running" and not sent
+        await g.process_frame(FunctionCallResultFrame("f", "1", {}, {}), D.DOWNSTREAM)
+        assert g.busy() == "words to speak"  # the narration is not spoken yet
+        await g.process_frame(BotStartedSpeakingFrame(), D.UPSTREAM)
+        await g.process_frame(BotStoppedSpeakingFrame(), D.UPSTREAM)
+        await g.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)  # the follow-up starts
+        await asyncio.sleep(0.05)
+        assert not sent
+        await g.process_frame(LLMFullResponseEndFrame(), D.DOWNSTREAM)  # silent follow-up ([silence])
+        assert await task is True and len(sent) == 1
+        assert g.busy() == "model requested"  # a second request waits for this one to start
+
+    asyncio.run(run())
+
+
+def test_guard_request_can_be_withdrawn_and_is_dropped_when_too_late(make, quick_guard, monkeypatch):
+    async def run():
+        g = make(turns.TurnGuard, slog=FakeLog())
+        sent = []
+
+        async def send():
+            sent.append(1)
+
+        await g.process_frame(UserStartedSpeakingFrame(), D.DOWNSTREAM)
+        task = asyncio.ensure_future(g.run_when_idle(send, "test"))
+        await asyncio.sleep(0.02)
+        task.cancel()  # e.g. the child's own turn makes it pointless
+        await g.process_frame(UserStoppedSpeakingFrame(), D.DOWNSTREAM)
+        await asyncio.sleep(0.05)
+        assert not sent
+        monkeypatch.setattr(turns.TurnGuard, "MAX_WAIT_SECS", 0.03)
+        await g.process_frame(UserStartedSpeakingFrame(), D.DOWNSTREAM)
+        assert await g.run_when_idle(send, "test") is False and not sent
+        assert g._slog.events == ["run_dropped"]
+
+    asyncio.run(run())
+
+
+def test_an_asynchronous_preparation_does_not_make_the_pet_busy(make):
+    from pipecat.frames.frames import FunctionCallInProgressFrame, FunctionCallResultFrame
+
+    async def run():
+        g = make(turns.TurnGuard)
+        await g.process_frame(_calls("p"), D.DOWNSTREAM)
+        await g.process_frame(
+            FunctionCallInProgressFrame(
+                function_name="story_start", tool_call_id="p", arguments={}, cancel_on_interruption=False
+            ),
+            D.DOWNSTREAM,
+        )
+        assert g.busy() == "" and g.preparing()
+        await g.process_frame(FunctionCallResultFrame("story_start", "p", {}, {}), D.DOWNSTREAM)
+        assert not g.preparing()
+
+    asyncio.run(run())
+
+
+def test_short_reply_waits_for_the_tool_follow_up(make, quick_guard):
+    """« vert » said during the narration before story_next: answered after the tool's reply, not
+    alongside it."""
+    from pipecat.frames.frames import FunctionCallResultFrame
+
+    async def run():
+        g = make(turns.TurnGuard)
+        k = make(turns.ShortReplyKeeper, 3, delay=0.01, guard=g)
+        await g.process_frame(_calls("1"), D.DOWNSTREAM)
+        await k.process_frame(BotStartedSpeakingFrame(), D.UPSTREAM)
+        await k.process_frame(tr("vert"), D.DOWNSTREAM)
+        await k.process_frame(BotStoppedSpeakingFrame(), D.UPSTREAM)
+        await asyncio.sleep(0.06)
+        assert not any(isinstance(f, LLMMessagesAppendFrame) for f, _ in k.out)
+        await g.process_frame(FunctionCallResultFrame("f", "1", {}, {}), D.DOWNSTREAM)
+        await asyncio.sleep(0.06)
+        replayed = [f for f, _ in k.out if isinstance(f, LLMMessagesAppendFrame)]
+        assert len(replayed) == 1 and replayed[0].messages[0]["content"] == "vert"
+
+    asyncio.run(run())
+
+
+def test_silence_nudge_not_while_the_pet_is_busy(make):
+    async def run():
+        n = make(turns.SilenceNudge, lambda: True, after=0.02, busy=lambda: "tool running")
+        await n.process_frame(BotStoppedSpeakingFrame(), D.UPSTREAM)
+        await asyncio.sleep(0.05)
+        assert not any(isinstance(f, TTSSpeakFrame) for f, _ in n.out)
+
+    asyncio.run(run())
+
+
+def test_answer_now_waits_for_the_attends_reply_to_end(make, quick_guard):
+    """Too many [attends]: « answer now » is asked while that reply is still being written; it is
+    sent after it (it used to land in the context before the pet's own message)."""
+    from pipecat.frames.frames import LLMFullResponseEndFrame
+
+    async def run():
+        g = make(turns.TurnGuard)
+        w = make_wait(delay=10, enabled=False)
+        w.guard = g
+        await g.process_frame(LLMFullResponseStartFrame(), D.DOWNSTREAM)
+        await w.on_wait_tag()
+        await asyncio.sleep(0.05)
+        assert not answer_requests(w)
+        await g.process_frame(LLMFullResponseEndFrame(), D.DOWNSTREAM)
+        await asyncio.sleep(0.06)
+        assert len(answer_requests(w)) == 1
+
+    asyncio.run(run())
+
+
+def test_a_voice_pauses_the_wait():
+    """The child resumes their sentence at 2 s: no answer on half a sentence. Noise: the wait starts over."""
+
+    async def run():
+        w = make_wait(delay=0.05)
+        await w.on_wait_tag()
+        w.voice_started()
+        await asyncio.sleep(0.08)
+        assert not answer_requests(w)  # paused while the voice lasts
+        w.voice_stopped()  # it was noise: the countdown starts over
+        await asyncio.sleep(0.02)
+        assert not answer_requests(w)
+        await asyncio.sleep(0.06)
+        assert len(answer_requests(w)) == 1
+        w2 = make_wait(delay=0.05)
+        await w2.on_wait_tag()
+        w2.voice_started()
+        w2.child_speaks()  # it was the child: their turn
+        w2.voice_stopped()
+        await asyncio.sleep(0.08)
+        assert not w2.queued and w2.slog.events == ["wait", "wait_useful"]
+
+    asyncio.run(run())

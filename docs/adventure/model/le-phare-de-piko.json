@@ -1,0 +1,645 @@
+{
+ "title": "Le phare de Piko",
+ "difficulty": "facile",
+ "tags": [
+  "phare",
+  "mer",
+  "plage",
+  "herisson",
+  "crabe",
+  "lucioles",
+  "loutre",
+  "lumiere"
+ ],
+ "fact": "Les lucioles fabriquent leur lumière toutes seules, dans leur ventre, et cette lumière ne chauffe presque pas : c'est pour ça qu'on l'appelle une lumière froide !",
+ "intro": "Le soleil se couche sur l'île aux Galets, et la lumière du vieux phare est éteinte. Sans elle, Zouzou la loutre, partie pêcher en bateau, ne retrouvera pas le chemin du port !",
+ "goal": "Aider Papy Pic, le gardien, à rallumer la lumière du phare avant la nuit.",
+ "start": {
+  "place": "plage",
+  "inventory": []
+ },
+ "places": [
+  {
+   "id": "plage",
+   "name": "la plage",
+   "aliases": [
+    "sable",
+    "bord de mer",
+    "port"
+   ],
+   "description": "Une petite plage de sable doré. Au loin, sur la mer, on devine le bateau de Zouzou.",
+   "exits": [
+    {
+     "to": "rochers",
+     "label": "vers les rochers",
+     "dir": "nord"
+    },
+    {
+     "to": "cabane",
+     "label": "vers la cabane de Zouzou",
+     "dir": "est"
+    },
+    {
+     "to": "pied_phare",
+     "label": "vers le phare",
+     "dir": "ouest"
+    }
+   ],
+   "decor": [
+    "sable",
+    "coquillages",
+    "vagues",
+    "galets",
+    "algues échouées"
+   ]
+  },
+  {
+   "id": "rochers",
+   "name": "les rochers",
+   "aliases": [
+    "rocher",
+    "flaques",
+    "falaise"
+   ],
+   "description": "De gros rochers mouillés et des flaques d'eau. Des algues vertes brillent au soleil.",
+   "exits": [
+    {
+     "to": "plage",
+     "label": "vers la plage",
+     "dir": "sud"
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "is:bocal:plein"
+     ],
+     "text": "Quelques lucioles dansent encore au-dessus de l'eau.",
+     "else": "Des lucioles dansent au-dessus de l'eau."
+    }
+   ],
+   "decor": [
+    "cailloux",
+    "flaques",
+    "crevettes",
+    "mouettes",
+    "écume"
+   ]
+  },
+  {
+   "id": "cabane",
+   "name": "la cabane de Zouzou",
+   "aliases": [
+    "maison",
+    "cabane"
+   ],
+   "description": "Une cabane en bois qui sent bon le poisson grillé.",
+   "exits": [
+    {
+     "to": "plage",
+     "label": "vers la plage",
+     "dir": "ouest"
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "open:tiroir"
+     ],
+     "text": "Le tiroir de la commode est grand ouvert.",
+     "else": "Zouzou range ses allumettes dans le tiroir de la commode, mais il est fermé par un drôle de mécanisme : trois coquillages collés dessus."
+    }
+   ],
+   "decor": [
+    "filets de pêche",
+    "table",
+    "chaise",
+    "poisson grillé",
+    "fenêtre"
+   ]
+  },
+  {
+   "id": "pied_phare",
+   "name": "le pied du phare",
+   "aliases": [
+    "phare",
+    "en bas du phare"
+   ],
+   "description": "Le grand phare blanc et rouge monte jusqu'au ciel.",
+   "exits": [
+    {
+     "to": "plage",
+     "label": "vers la plage",
+     "dir": "est"
+    },
+    {
+     "to": "sommet",
+     "label": "l'escalier du phare",
+     "dir": "haut",
+     "door": "porte"
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "open:porte"
+     ],
+     "text": "Sa porte est grande ouverte sur un escalier en colimaçon. Tout en haut, Papy Pic le gardien t'attend."
+    },
+    {
+     "when": [
+      "!open:porte",
+      "!has:cle"
+     ],
+     "text": "Sa porte en bois épais est fermée à clé. Tout en haut, Papy Pic le gardien fait de grands signes par la fenêtre."
+    },
+    {
+     "when": [
+      "!open:porte",
+      "has:cle"
+     ],
+     "text": "Sa porte en bois épais est fermée, avec une petite serrure dorée… comme ta clé ! Tout en haut, Papy Pic fait de grands signes."
+    }
+   ],
+   "decor": [
+    "marches",
+    "herbe",
+    "mouettes",
+    "mur blanc et rouge"
+   ]
+  },
+  {
+   "id": "sommet",
+   "name": "le sommet du phare",
+   "aliases": [
+    "haut du phare",
+    "en haut"
+   ],
+   "description": "Tout en haut, le vent siffle. Au milieu, la grande lampe du phare, toute éteinte, et Papy Pic le gardien qui t'attend. Par la fenêtre, on voit le bateau de Zouzou qui cherche son chemin.",
+   "exits": [
+    {
+     "to": "pied_phare",
+     "label": "redescendre l'escalier",
+     "dir": "bas"
+    }
+   ],
+   "decor": [
+    "fenêtre",
+    "vent",
+    "escalier",
+    "mer"
+   ]
+  }
+ ],
+ "items": [
+  {
+   "id": "dessin",
+   "kind": "scenery",
+   "name": "le dessin sur le sable",
+   "aliases": [
+    "dessin",
+    "coquillages dessines",
+    "sable",
+    "dessin des coquillages"
+   ],
+   "at": "plage",
+   "fixed": "C'est un dessin dans le sable : il ne s'emporte pas !",
+   "initial": "Sur le sable mouillé, quelqu'un a dessiné trois coquillages, bien en rang : un bleu, puis un rose, puis un blanc.",
+   "description": "Trois coquillages dessinés du bout du doigt, bien en rang : d'abord un bleu, puis un rose, puis un blanc. On dirait un message…",
+   "fragile": true
+  },
+  {
+   "id": "algue",
+   "kind": "thing",
+   "name": "une algue verte",
+   "aliases": [
+    "algues",
+    "herbe de mer"
+   ],
+   "at": "rochers",
+   "description": "Une algue verte et brillante, qui sent la mer."
+  },
+  {
+   "id": "lucioles",
+   "kind": "scenery",
+   "name": "les lucioles",
+   "aliases": [
+    "luciole",
+    "petites lumieres",
+    "lumieres"
+   ],
+   "at": "rochers",
+   "fixed": "Les lucioles s'envolent dès que tu tends la main. Il faudrait quelque chose pour les attraper doucement.",
+   "description": "Des petites lumières qui dansent au-dessus de l'eau."
+  },
+  {
+   "id": "cle",
+   "kind": "thing",
+   "name": "une petite clé dorée",
+   "aliases": [
+    "cle",
+    "clef"
+   ],
+   "at": "pinces",
+   "description": "Une petite clé dorée, avec un phare gravé dessus. Elle doit ouvrir une porte…"
+  },
+  {
+   "id": "tiroir",
+   "kind": "container",
+   "name": "le tiroir de la commode",
+   "aliases": [
+    "commode",
+    "tiroir"
+   ],
+   "at": "cabane",
+   "fixed": "La commode est bien trop lourde !",
+   "description": "Une vieille commode en bois, avec un grand tiroir.",
+   "texts": {
+    "open": "Clic, clic, clac ! Le tiroir s'ouvre tout seul. Dedans, une boîte d'allumettes de marin.",
+    "locked": "Le tiroir ne bouge pas. Sur la commode, trois coquillages collés : un rose, un blanc, un bleu. On dirait des boutons…"
+   },
+   "details": [
+    {
+     "when": [
+      "open:tiroir"
+     ],
+     "text": "Le tiroir est grand ouvert.",
+     "else": "Le tiroir est fermé, avec trois coquillages collés dessus."
+    }
+   ],
+   "code": {
+    "press": [
+     "coquillage_bleu",
+     "coquillage_rose",
+     "coquillage_blanc"
+    ],
+    "right": "Clic ! Le coquillage s'enfonce.",
+    "wrong": "Pfuit ! Les coquillages ressortent tous : ce n'était pas le bon ordre.",
+    "hint": "Ces coquillages… tu n'en aurais pas vu d'autres, dessinés quelque part ?"
+   }
+  },
+  {
+   "id": "coquillage_rose",
+   "kind": "scenery",
+   "name": "le coquillage rose",
+   "aliases": [
+    "rose",
+    "coquillage rose"
+   ],
+   "at": "cabane",
+   "fixed": "Il est collé sur la commode.",
+   "description": "Un coquillage rose, collé sur la commode. On peut appuyer dessus."
+  },
+  {
+   "id": "coquillage_blanc",
+   "kind": "scenery",
+   "name": "le coquillage blanc",
+   "aliases": [
+    "blanc",
+    "coquillage blanc"
+   ],
+   "at": "cabane",
+   "fixed": "Il est collé sur la commode.",
+   "description": "Un coquillage blanc, collé sur la commode. On peut appuyer dessus."
+  },
+  {
+   "id": "coquillage_bleu",
+   "kind": "scenery",
+   "name": "le coquillage bleu",
+   "aliases": [
+    "bleu",
+    "coquillage bleu"
+   ],
+   "at": "cabane",
+   "fixed": "Il est collé sur la commode.",
+   "description": "Un coquillage bleu, collé sur la commode. On peut appuyer dessus."
+  },
+  {
+   "id": "allumettes",
+   "kind": "thing",
+   "name": "une boîte d'allumettes",
+   "aliases": [
+    "allumettes",
+    "allumette"
+   ],
+   "at": "tiroir",
+   "description": "Une boîte d'allumettes de marin. Les allumettes, c'est pour les grands : Papy Pic en a besoin pour la lampe."
+  },
+  {
+   "id": "bocal",
+   "kind": "thing",
+   "name": "un bocal vide",
+   "aliases": [
+    "bocal",
+    "pot",
+    "pot en verre"
+   ],
+   "at": "cabane",
+   "description": "Un bocal en verre avec un couvercle percé de petits trous.",
+   "initial": "Sur la table, un bocal vide.",
+   "states": [
+    {
+     "id": "vide"
+    },
+    {
+     "id": "plein",
+     "name": "un bocal de lucioles",
+     "aliases": [
+      "bocal de lucioles",
+      "bocal plein"
+     ],
+     "description": "Le bocal brille comme une petite lune."
+    }
+   ]
+  },
+  {
+   "id": "porte",
+   "kind": "door",
+   "name": "la porte du phare",
+   "aliases": [
+    "porte",
+    "serrure"
+   ],
+   "description": "Une porte en bois épais, avec une petite serrure dorée.",
+   "locked": true,
+   "key": "cle",
+   "texts": {
+    "locked": "La porte du phare est fermée à clé. Il faudrait une petite clé…",
+    "unlock": "Clic ! La petite clé tourne dans la serrure, et la porte s'ouvre en grinçant. Tout en haut, Papy Pic crie : « Hourra ! Monte vite ! »"
+   },
+   "fixed": "Une porte, ça ne s'emporte pas !"
+  },
+  {
+   "id": "lampe",
+   "kind": "scenery",
+   "name": "la grande lampe du phare",
+   "aliases": [
+    "lampe",
+    "lumiere du phare",
+    "lanterne"
+   ],
+   "at": "sommet",
+   "fixed": "Elle est bien trop grosse, et elle est vissée au sol.",
+   "description": "Une énorme lampe en verre, que Papy Pic allume chaque soir.",
+   "sturdy": "La grande lampe est en verre épais et en métal : bien trop solide, et Papy Pic en a besoin !"
+  }
+ ],
+ "characters": [
+  {
+   "id": "piko",
+   "name": "Piko le hérisson",
+   "aliases": [
+    "piko",
+    "herisson"
+   ],
+   "at": "plage",
+   "description": "Un petit hérisson aux piquants tout doux, très inquiet pour son amie Zouzou.",
+   "says": [
+    {
+     "when": [
+      "has:cle"
+     ],
+     "text": "Tu as la clé ! Vite, cours au phare, Papy Pic t'attend tout en haut !"
+    },
+    {
+     "when": [
+      "is:pinces:content"
+     ],
+     "text": "Pinces a lâché la clé ? Ramasse-la vite, et cours au phare !"
+    },
+    {
+     "text": "Il faut rallumer le phare ! Papy Pic, le gardien, est coincé tout en haut : le vent a claqué la porte, et il n'a plus d'allumettes, elles sont restées chez Zouzou. La clé ? C'est Pinces le crabe qui l'a ramassée. Il est grognon quand il a faim… et surtout, ne l'embête pas : il pince !"
+    }
+   ],
+   "initial": "Piko le hérisson fait les cent pas, tout inquiet."
+  },
+  {
+   "id": "pinces",
+   "name": "Pinces le crabe",
+   "aliases": [
+    "crabe",
+    "pinces",
+    "le gros crabe rouge"
+   ],
+   "at": "rochers",
+   "description": "Un gros crabe rouge et grognon, avec deux grosses pinces.",
+   "says": "Grrr ! Moi, j'adore les algues. Et ne m'embête pas, sinon je pince !",
+   "initial": "Pinces le crabe, tout grognon, serre une petite clé dans sa pince : gare à ses pinces si on l'embête !",
+   "states": [
+    {
+     "id": "grognon"
+    },
+    {
+     "id": "content",
+     "initial": "Pinces le crabe grignote, tout content.",
+     "description": "Un gros crabe rouge, tout content, qui grignote son algue.",
+     "says": "Miam, merci pour l'algue ! La clé ? Elle ouvre la porte du phare."
+    }
+   ]
+  },
+  {
+   "id": "papy",
+   "name": "Papy Pic le gardien",
+   "aliases": [
+    "papy",
+    "papy pic",
+    "gardien",
+    "grand-pere",
+    "pic"
+   ],
+   "at": "sommet",
+   "description": "Un vieux hérisson aux piquants tout blancs, avec une casquette de marin.",
+   "says": "Ah, merci d'être monté ! Pour allumer la grande lampe, il me faut des allumettes : les allumettes, c'est pour les grands, alors apporte-les-moi et c'est moi qui l'allumerai. Ou alors… une lumière qui ne brûle pas, comme celle des lucioles ?"
+  }
+ ],
+ "puzzles": [
+  {
+   "goal": "Allumer le phare avec les allumettes",
+   "action": "allumer_lampe",
+   "needs": [
+    "allumettes",
+    "papy"
+   ],
+   "clue_in": "papy"
+  },
+  {
+   "goal": "Ouvrir le tiroir aux allumettes (le code des coquillages)",
+   "action": "tiroir",
+   "needs": [
+    "coquillage_bleu",
+    "coquillage_rose",
+    "coquillage_blanc"
+   ],
+   "clue_in": "dessin"
+  },
+  {
+   "goal": "Ou l'allumer avec des lucioles",
+   "action": "lucioles_dans_lampe",
+   "needs": [
+    "bocal",
+    "lampe"
+   ],
+   "clue_in": "papy"
+  },
+  {
+   "goal": "Remplir le bocal de lucioles",
+   "action": "attraper_lucioles",
+   "needs": [
+    "bocal",
+    "lucioles"
+   ],
+   "clue_in": "lucioles"
+  },
+  {
+   "goal": "Avoir la clé de la porte du phare",
+   "action": "nourrir_crabe",
+   "needs": [
+    "algue",
+    "pinces"
+   ],
+   "clue_in": "pinces"
+  }
+ ],
+ "actions": [
+  {
+   "id": "nourrir_crabe",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "algue",
+     "target": "pinces"
+    }
+   ],
+   "when": [
+    "has:algue"
+   ],
+   "effects": [
+    "lose:algue",
+    "reveal:cle",
+    "set:pinces:content"
+   ],
+   "points": 10,
+   "text": "Pinces croque l'algue, crunch crunch ! Il sourit, ouvre sa pince… et une petite clé dorée tombe sur le rocher.",
+   "hint": "Pinces a l'air d'avoir faim… Qu'est-ce qu'un crabe aime manger ?"
+  },
+  {
+   "id": "embeter_crabe",
+   "triggers": [
+    {
+     "verb": "hit",
+     "object": "pinces"
+    }
+   ],
+   "effects": [
+    "end:pince"
+   ],
+   "points": 0,
+   "text": "Pinces se fâche tout rouge et te pince le doigt : aïe aïe aïe !"
+  },
+  {
+   "id": "attraper_lucioles",
+   "triggers": [
+    {
+     "verb": "fill",
+     "object": "bocal",
+     "target": "lucioles"
+    }
+   ],
+   "when": [
+    "has:bocal",
+    "is:bocal:vide"
+   ],
+   "effects": [
+    "set:bocal:plein"
+   ],
+   "points": 10,
+   "text": "Tout doucement, tu ouvres le bocal… les lucioles entrent une à une. Le bocal brille comme une petite lune !",
+   "hint": "Les lucioles s'envolent quand on tend la main… Dans quoi pourrait-on les garder ?"
+  },
+  {
+   "id": "allumer_lampe",
+   "triggers": [
+    {
+     "verb": "light",
+     "object": "lampe"
+    },
+    {
+     "verb": "use",
+     "object": "allumettes",
+     "target": "lampe"
+    },
+    {
+     "verb": "give",
+     "object": "allumettes",
+     "target": "papy"
+    }
+   ],
+   "when": [
+    "has:allumettes"
+   ],
+   "effects": [
+    "end:feu"
+   ],
+   "points": 20,
+   "not_yet": "La lampe est toute froide. Papy Pic soupire : « Si seulement j'avais mes allumettes… »",
+   "text": "Papy Pic prend la boîte d'allumettes : « Merci ! Les allumettes, c'est pour les grands. » Il en frotte une, pfiout ! La grande lampe s'allume et tourne : sa lumière balaie la mer.",
+   "hint": "Papy Pic a besoin de quelque chose pour allumer sa lampe. Il l'a dit, tu te souviens ?"
+  },
+  {
+   "id": "lucioles_dans_lampe",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "bocal",
+     "target": "lampe"
+    }
+   ],
+   "when": [
+    "is:bocal:plein"
+   ],
+   "effects": [
+    "end:lucioles"
+   ],
+   "points": 20,
+   "not_yet": "Un bocal vide dans la lampe ? Ça ne brillerait pas beaucoup… Il faudrait d'abord y mettre de la lumière.",
+   "text": "Papy Pic ouvre le grand verre de la lampe, tu y poses le bocal et tu l'ouvres : les lucioles s'installent derrière le verre, et le phare se met à briller de mille petites lumières !",
+   "hint": "Un bocal plein de lumière… et une lampe éteinte."
+  },
+  {
+   "id": "donner_lucioles",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "bocal",
+     "target": "papy"
+    }
+   ],
+   "when": [
+    "is:bocal:plein"
+   ],
+   "effects": [],
+   "points": 0,
+   "text": "Papy Pic regarde le bocal briller, les yeux tout ronds : « Quelle bonne idée ! Mets-le donc dans la grande lampe ! »"
+  }
+ ],
+ "endings": [
+  {
+   "id": "feu",
+   "kind": "win",
+   "text": "Le phare brille ! Zouzou voit la lumière, fait demi-tour et rentre au port en chantant. Piko danse de joie sur la plage, et Papy Pic te fait un clin d'œil.",
+   "fact": "Le plus célèbre phare de l'Antiquité, à Alexandrie en Égypte, était si haut que son feu se voyait à plus de 40 kilomètres en mer !"
+  },
+  {
+   "id": "lucioles",
+   "kind": "win",
+   "text": "Le phare des lucioles scintille de toutes les couleurs ! Zouzou n'a jamais vu un phare aussi beau : elle rentre au port en riant, et Papy Pic dit que c'est le plus joli phare du monde.",
+   "fact": "Les lucioles fabriquent leur lumière toutes seules, dans leur ventre, et cette lumière ne chauffe presque pas : c'est pour ça qu'on l'appelle une lumière froide !"
+  },
+  {
+   "id": "pince",
+   "kind": "lose",
+   "text": "Ouille ! Avec ton doigt pincé, tu rentres à la cabane te faire un bisou magique… et la nuit tombe sans phare. Zouzou devra dormir sur son bateau !"
+  }
+ ],
+ "format": 2
+}

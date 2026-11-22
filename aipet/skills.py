@@ -7,6 +7,7 @@ A skill = a folder with a SKILL.md file (same format as Claude or Pi skills):
     name: quiz
     description: Un quiz sur un thème choisi par l'enfant, adapté à son âge.
     tools: quiz_history, quiz_start, quiz_answer   (optional)
+    label: un quiz   (optional: how the pet names it when suggesting it)
     ---
     (the full instructions of the activity, free text)
 
@@ -46,6 +47,7 @@ class Skill:
     instructions: str
     source: str
     tools: tuple[str, ...] = ()  # tools sent to the model only while this activity runs
+    label: str = ""  # how the pet names it when suggesting it (French), e.g. « un quiz »
 
 
 def read_skill(path: Path) -> Skill:
@@ -69,7 +71,7 @@ def read_skill(path: Path) -> Skill:
     if not instructions or len(instructions) > MAX_INSTRUCTIONS:
         raise ValueError(f"instructions empty or too long (max {MAX_INSTRUCTIONS} characters)")
     tools = tuple(t.strip() for t in header.get("tools", "").split(",") if t.strip())
-    return Skill(name, description, instructions, str(path), tools)
+    return Skill(name, description, instructions, str(path), tools, header.get("label", ""))
 
 
 class Skills:
@@ -121,7 +123,10 @@ class Skills:
 - Quand l'enfant veut faire une de ces activités, ou accepte quand tu la proposes, appelle d'abord
   `use_skill` avec son nom, sans le dire, puis suis ses consignes. Une seule à la fois.
 - Quand l'activité est finie, ou que l'enfant veut faire autre chose, appelle `end_skill`.
-- Quand l'enfant s'ennuie ou ne sait pas quoi faire, propose-en une, sans insister.
+- Quand une activité se termine, ou que l'enfant ne sait pas quoi faire, propose autre chose, sans
+  insister : de préférence l'idée du moment (dans l'étiquette du message ou le résultat de l'outil),
+  pas toujours une histoire ou une devinette. Ce que les enfants aiment (leurs fiches) t'aide à choisir
+  le thème, pas à proposer toujours la même activité.
 """
 
     def active_instructions(self) -> str:

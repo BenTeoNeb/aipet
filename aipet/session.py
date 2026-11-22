@@ -21,7 +21,6 @@ from pipecat.frames.frames import LLMRunFrame
 from aipet import session_log
 from aipet.config import config_snapshot, load_config
 from aipet.pipeline import build_worker
-from aipet.prompts import GREETING
 from aipet.tasks import BackgroundTasks
 
 
@@ -50,7 +49,7 @@ class Session(ABC):
         self.log.start(config=config_snapshot(self.cfg), **log_info)
         await self.conversation.on_wake()
         if greet:
-            self.context.add_message({"role": "developer", "content": GREETING})
+            self.context.add_message({"role": "developer", "content": self.conversation.greeting()})
             await self.worker.queue_frames([LLMRunFrame()])
 
     def pause(self):

@@ -34,6 +34,7 @@ WORDS_IN_PROMPT = 25
 # On-disk directories (French data names).
 DIR_FAMILY, DIR_MEMORIES, DIR_STORIES, DIR_CONVERSATIONS = "famille", "souvenirs", "histoires", "conversations"
 DIR_GAMES = "jeux"  # game records (JSON), written by aipet.games
+DIR_ADVENTURES = "histoires/aventures"  # one JSON file per adventure (world, state, runs)
 
 
 # --------------------------------------------------------------------------

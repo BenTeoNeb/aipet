@@ -62,6 +62,11 @@ class Energy:
         self._last_activity: float | None = None
         self._protect_until = 0.0
         self._last_state = "normal"
+        # Something that must finish first (a story going on): the pet gets very tired, but does
+        # not fall asleep in the middle of it. Set by the conversation.
+        self.keep_awake: Callable[[], bool] = lambda: False
+        # An adventure going on: the pet is never tired, its energy neither drains nor recharges.
+        self.frozen: Callable[[], bool] = lambda: False
         self._load()
 
     @classmethod
@@ -112,6 +117,9 @@ class Energy:
         if self._asleep:
             return  # talking to a sleeping pet neither drains nor resets its nap
         now = self.clock()
+        if self.frozen():
+            self._last_activity = now
+            return
         if self._last_activity is not None:
             gap = now - self._last_activity
             if gap <= ACTIVE_GAP or continuous:
@@ -120,8 +128,8 @@ class Energy:
                 self._level = min(1.0, self._level + (gap - ACTIVE_GAP) * self.charge)
         self._last_activity = now
         if self._level <= 0:
-            if now < self._protect_until:
-                self._level = 0.02  # never fall asleep in the middle of a sad moment
+            if now < self._protect_until or self.keep_awake():
+                self._level = 0.02  # never fall asleep in the middle of a sad moment or of a story
             else:
                 self._level, self._asleep = 0.0, True
                 self._log("fell_asleep")

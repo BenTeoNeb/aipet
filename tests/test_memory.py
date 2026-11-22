@@ -514,6 +514,29 @@ def test_sleep_reason_night_with_bedtime_grace(mem, monkeypatch):
     assert k.sleep.reason() == "night"
 
 
+def test_tired_pet_yawns_now_and_then_not_at_each_reply(mem, monkeypatch):
+    """Seen in a real session: « Ouaaah… je bâille » at the start of nearly every reply, three times
+    in eight seconds."""
+    from aipet import sleep as sleep_mod
+    from aipet.energy import Energy
+
+    k, _ = make_keeper(mem, monkeypatch, (2026, 11, 12, 16, 0))
+
+    class Tired(Energy):
+        def state(self):
+            return "tired"
+
+    k.sleep.energy = Tired()
+    yawns = ["Ouaaah" in " · ".join(k.sleep.hints()) for _ in range(sleep_mod.YAWN_EVERY + 1)]
+    assert yawns == [True] + [False] * (sleep_mod.YAWN_EVERY - 1) + [True]
+    k.sleep.hints()
+    assert "Ouaaah" not in " · ".join(k.sleep.hints(new_turn=False))  # a relabel is not a new turn
+    k.sleep.story_running = lambda: True
+    assert "continue l'histoire" in " · ".join(k.sleep.hints())
+    k.sleep.adventure_running = lambda: True  # in an adventure, never tired
+    assert not [h for h in k.sleep.hints() if "fatigu" in h]
+
+
 def test_energy_hints_and_nap(mem, monkeypatch):
     from aipet.energy import Energy
 
@@ -537,6 +560,10 @@ def test_energy_hints_and_nap(mem, monkeypatch):
     assert "dis au revoir joyeusement" in " · ".join(k.sleep.hints()) and "reste avec lui" in " · ".join(
         k.sleep.hints()
     )
+    k.sleep.story_running = lambda: True  # a story going on: it is finished before the goodbye
+    very = " · ".join(k.sleep.hints())
+    assert "finis d'abord l'histoire" in very and "story_end" in very
+    k.sleep.story_running = lambda: False
     k.sleep.energy = FakeEnergy("asleep")
     assert k.sleep.reason() == "nap"
     k.context.add_message({"role": "user", "content": "Coucou"})

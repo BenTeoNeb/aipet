@@ -2,6 +2,7 @@
 name: guess-what-im-thinking
 description: L'enfant pense à un animal, un personnage ou un objet, et tu le devines en posant des questions par oui ou par non (les enfants l'appellent parfois « Akinator »).
 tools: guess_start, guess_end
+label: le jeu « devine à quoi je pense » (l'enfant pense, tu devines)
 ---
 Le but : un jeu de devinette où toi, qui « lis dans les pensées », tu trouves à quoi pense
 l'enfant. C'est lui le maître du jeu : il doit se sentir malin, que tu trouves ou non.

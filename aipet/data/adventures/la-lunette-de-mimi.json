@@ -1,0 +1,825 @@
+{
+  "title": "La lunette de Mimi",
+  "difficulty": "difficile",
+  "intro": "Cette nuit, une pluie d'étoiles filantes va traverser le ciel du village ! Mais Mimi la souris astronome est désespérée : sa grande lunette est cassée, et la porte de sa tour est fermée.",
+  "goal": "Aider Mimi à voir la pluie d'étoiles filantes.",
+  "tags": [
+    "etoiles",
+    "etoile filante",
+    "astronomie",
+    "souris",
+    "lunette",
+    "cerf-volant",
+    "nuit",
+    "ciel"
+  ],
+  "fact": "Les étoiles filantes ne sont pas des étoiles : ce sont de minuscules grains de poussière venus de l'espace, qui brûlent en traversant l'air, tout là-haut !",
+  "start": {
+    "place": "place",
+    "inventory": []
+  },
+  "places": [
+    {
+      "id": "place",
+      "name": "la place du village",
+      "aliases": [
+        "place",
+        "village",
+        "fontaine"
+      ],
+      "description": "La place du village, avec sa vieille fontaine qui glougloute : au fond du bassin, quelque chose brille. Mimi la souris fait les cent pas, une carte du ciel sous le bras.",
+      "exits": [
+        {
+          "to": "foret",
+          "label": "vers la forêt",
+          "dir": "nord"
+        },
+        {
+          "to": "boulangerie",
+          "label": "vers la boulangerie",
+          "dir": "est"
+        },
+        {
+          "to": "jardin",
+          "label": "vers le jardin",
+          "dir": "ouest"
+        },
+        {
+          "to": "puits",
+          "label": "vers le vieux puits",
+          "dir": "sud"
+        }
+      ],
+      "variants": [
+        {
+          "when": [
+            "flag:piece_trouvee"
+          ],
+          "description": "La place du village, avec sa vieille fontaine qui glougloute. Mimi la souris fait les cent pas, une carte du ciel sous le bras."
+        }
+      ]
+    },
+    {
+      "id": "boulangerie",
+      "name": "la boulangerie",
+      "aliases": [
+        "boulangerie",
+        "boutique",
+        "magasin"
+      ],
+      "description": "Ça sent le pain chaud ! Choco l'écureuil, le boulanger, range des croissants dorés. Dans un coin, un gros tonneau de farine, avec des traces par terre, comme s'il cachait quelque chose.",
+      "variants": [
+        {
+          "when": [
+            "flag:trappe"
+          ],
+          "description": "Ça sent le pain chaud ! Choco l'écureuil range des croissants. Le tonneau poussé laisse voir une trappe ouverte vers la cave."
+        }
+      ],
+      "exits": [
+        {
+          "to": "place",
+          "label": "vers la place",
+          "dir": "ouest"
+        },
+        {
+          "to": "cave",
+          "label": "la trappe de la cave",
+          "dir": "bas",
+          "when": [
+            "flag:trappe"
+          ],
+          "blocked": "Tu ne vois pas de chemin par là… à moins que quelque chose soit caché."
+        }
+      ]
+    },
+    {
+      "id": "cave",
+      "name": "la cave",
+      "aliases": [
+        "cave",
+        "sous-sol"
+      ],
+      "description": "Une cave fraîche pleine de sacs de farine, avec des étagères et des crochets au mur. Grignote le rat est assis sur un sac, le ventre qui gargouille : il serre contre lui un disque de verre tout brillant. Sur l'étagère des potions, une étiquette prévient : « NE PAS BOIRE ! »",
+      "exits": [
+        {
+          "to": "boulangerie",
+          "label": "remonter à la boulangerie",
+          "dir": "haut"
+        }
+      ],
+      "variants": [
+        {
+          "when": [
+            "flag:lentille_donnee"
+          ],
+          "description": "Une cave fraîche pleine de sacs de farine, avec des étagères et des crochets au mur. Grignote le rat est assis sur un sac, tout content : il se lèche les moustaches, plein de miettes de croissant. Sur l'étagère des potions, une étiquette prévient : « NE PAS BOIRE ! »"
+        }
+      ]
+    },
+    {
+      "id": "jardin",
+      "name": "le jardin",
+      "aliases": [
+        "jardin",
+        "potager"
+      ],
+      "description": "Un jardin plein de légumes. Néro le renard dort sur un banc, près d'une grande haie : un bout de ficelle dépasse entre les feuilles. Le fil à linge est vide : le drap a disparu.",
+      "exits": [
+        {
+          "to": "place",
+          "label": "vers la place",
+          "dir": "est"
+        }
+      ],
+      "variants": [
+        {
+          "when": [
+            "flag:ficelle_trouvee"
+          ],
+          "description": "Un jardin plein de légumes. Néro le renard dort sur un banc, près d'une grande haie. Le fil à linge est vide : le drap a disparu."
+        }
+      ]
+    },
+    {
+      "id": "puits",
+      "name": "le vieux puits",
+      "aliases": [
+        "puits"
+      ],
+      "description": "Un vieux puits en pierre, très profond. Tout au fond, quelque chose brille dans l'eau.",
+      "exits": [
+        {
+          "to": "place",
+          "label": "vers la place",
+          "dir": "nord"
+        }
+      ],
+      "variants": [
+        {
+          "when": [
+            "has:cle"
+          ],
+          "description": "Un vieux puits en pierre, très profond. Tout au fond, l'eau est noire et calme."
+        }
+      ]
+    },
+    {
+      "id": "foret",
+      "name": "la forêt",
+      "aliases": [
+        "foret",
+        "bois",
+        "arbres"
+      ],
+      "description": "Une petite forêt de bouleaux. La tour de Mimi s'élève entre les arbres, avec une porte ronde. Un chemin monte vers une colline. Des buissons bordent le sentier, avec plein de petites branches mortes en dessous.",
+      "variants": [
+        {
+          "when": [
+            "!flag:porte_ouverte",
+            "flag:baguettes_trouvees"
+          ],
+          "description": "Une petite forêt de bouleaux. La tour de Mimi s'élève entre les arbres, avec une porte ronde. Un chemin monte vers une colline. Des buissons bordent le sentier."
+        },
+        {
+          "when": [
+            "flag:porte_ouverte",
+            "!flag:baguettes_trouvees"
+          ],
+          "description": "Une petite forêt de bouleaux. La porte ronde de la tour de Mimi est grande ouverte. Un chemin monte vers une colline. Des buissons bordent le sentier, avec plein de petites branches mortes en dessous."
+        },
+        {
+          "when": [
+            "flag:porte_ouverte",
+            "flag:baguettes_trouvees"
+          ],
+          "description": "Une petite forêt de bouleaux. La porte ronde de la tour de Mimi est grande ouverte. Un chemin monte vers une colline. Des buissons bordent le sentier."
+        }
+      ],
+      "exits": [
+        {
+          "to": "place",
+          "label": "vers la place",
+          "dir": "sud"
+        },
+        {
+          "to": "colline",
+          "label": "vers la colline",
+          "dir": "est"
+        },
+        {
+          "to": "observatoire",
+          "label": "la tour de Mimi",
+          "dir": "haut",
+          "when": [
+            "flag:porte_ouverte"
+          ],
+          "blocked": "La porte ronde de la tour est fermée à clé."
+        }
+      ]
+    },
+    {
+      "id": "colline",
+      "name": "la colline",
+      "aliases": [
+        "colline",
+        "sommet",
+        "butte"
+      ],
+      "description": "Le haut d'une colline toute ronde. Le vent souffle fort ici, c'est l'endroit rêvé pour faire voler quelque chose ! De l'autre côté, la pente est très raide : surtout, ne saute pas par là, tu roulerais jusqu'en bas !",
+      "exits": [
+        {
+          "to": "foret",
+          "label": "vers la forêt",
+          "dir": "ouest"
+        }
+      ]
+    },
+    {
+      "id": "observatoire",
+      "name": "l'observatoire",
+      "aliases": [
+        "observatoire",
+        "tour",
+        "haut de la tour"
+      ],
+      "description": "Tout en haut de la tour, sous un toit qui s'ouvre sur le ciel. La grande lunette de Mimi est là, mais il lui manque sa lentille.",
+      "variants": [
+        {
+          "when": [
+            "flag:lunette_ok"
+          ],
+          "description": "Tout en haut de la tour. La grande lunette de Mimi est réparée, pointée vers le ciel."
+        }
+      ],
+      "exits": [
+        {
+          "to": "foret",
+          "label": "redescendre dans la forêt",
+          "dir": "bas"
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "fontaine",
+      "name": "la fontaine",
+      "aliases": [
+        "fontaine",
+        "bassin"
+      ],
+      "at": "place",
+      "takeable": false,
+      "fixed": "Une fontaine entière ? Elle pèse plus lourd que dix éléphants !",
+      "description": "Une vieille fontaine en pierre, avec un grand bassin d'eau froide."
+    },
+    {
+      "id": "piece",
+      "name": "une pièce d'or",
+      "aliases": [
+        "piece",
+        "sou",
+        "argent",
+        "pièce"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Une petite pièce d'or toute brillante."
+    },
+    {
+      "id": "croissants_choco",
+      "name": "les croissants de Choco",
+      "aliases": [
+        "croissants",
+        "plateau",
+        "plateau de croissants"
+      ],
+      "at": "boulangerie",
+      "takeable": false,
+      "fixed": "Choco tape sur sa caisse : « Un croissant, c'est une pièce d'or, petit ! »",
+      "description": "Des croissants dorés, bien rangés sur un plateau. Ça sent le beurre !"
+    },
+    {
+      "id": "croissant",
+      "name": "un croissant doré",
+      "aliases": [
+        "croissant",
+        "viennoiserie"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Un croissant tout chaud qui sent le beurre."
+    },
+    {
+      "id": "tonneau",
+      "name": "le gros tonneau",
+      "aliases": [
+        "tonneau",
+        "baril",
+        "tonneau de farine"
+      ],
+      "at": "boulangerie",
+      "takeable": false,
+      "fixed": "Il est bien trop lourd à porter… mais on pourrait peut-être le pousser.",
+      "description": "Un gros tonneau plein de farine, lourd comme tout."
+    },
+    {
+      "id": "aimant",
+      "name": "un aimant rouge",
+      "aliases": [
+        "aimant"
+      ],
+      "at": "cave",
+      "takeable": true,
+      "description": "Un aimant rouge en forme de fer à cheval. Il attrape tout ce qui est en métal !"
+    },
+    {
+      "id": "fiole",
+      "name": "une fiole verte",
+      "aliases": [
+        "fiole",
+        "potion",
+        "bouteille"
+      ],
+      "at": "cave",
+      "takeable": true,
+      "description": "Une petite fiole de potion verte, avec une étiquette : « NE PAS BOIRE — potion de grenouille »."
+    },
+    {
+      "id": "lentille",
+      "name": "la lentille de la lunette",
+      "aliases": [
+        "lentille",
+        "verre",
+        "loupe"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Un disque de verre tout rond et transparent : la lentille de la lunette de Mimi !"
+    },
+    {
+      "id": "haie",
+      "name": "la grande haie",
+      "aliases": [
+        "haie",
+        "buisson du jardin"
+      ],
+      "at": "jardin",
+      "takeable": false,
+      "fixed": "Une haie, ça ne s'emporte pas, ça pique !",
+      "description": "Une grande haie touffue, pleine de petites feuilles qui piquent."
+    },
+    {
+      "id": "ficelle",
+      "name": "une longue ficelle",
+      "aliases": [
+        "ficelle",
+        "corde",
+        "fil"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Une longue ficelle solide. Il n'y en a qu'une : il faudra bien choisir à quoi elle sert !"
+    },
+    {
+      "id": "drap",
+      "name": "un drap blanc",
+      "aliases": [
+        "drap",
+        "tissu",
+        "linge"
+      ],
+      "at": "cave",
+      "takeable": true,
+      "description": "Un grand drap blanc, léger comme une plume : Grignote l'a pris pour se faire un lit."
+    },
+    {
+      "id": "buissons",
+      "name": "les buissons",
+      "aliases": [
+        "buissons",
+        "buisson",
+        "taillis"
+      ],
+      "at": "foret",
+      "takeable": false,
+      "fixed": "Les buissons ont de bonnes racines, ils restent là !",
+      "description": "Des buissons touffus au bord du sentier."
+    },
+    {
+      "id": "baguettes",
+      "name": "deux baguettes de bois",
+      "aliases": [
+        "baguettes",
+        "batons",
+        "branches"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Deux baguettes de bois bien droites et légères."
+    },
+    {
+      "id": "canne",
+      "name": "une canne à aimant",
+      "aliases": [
+        "canne",
+        "canne a peche",
+        "canne aimantee"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "La ficelle avec l'aimant au bout : parfait pour pêcher le métal !"
+    },
+    {
+      "id": "cle",
+      "name": "une clé ronde",
+      "aliases": [
+        "cle",
+        "clef",
+        "cle ronde"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Une clé ronde en fer, avec une étoile gravée : la clé de la tour de Mimi !"
+    },
+    {
+      "id": "cadre",
+      "name": "un cadre de cerf-volant",
+      "aliases": [
+        "cadre",
+        "cerf-volant pas fini"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Le drap tendu sur les baguettes. Il manque juste une ficelle pour le faire voler."
+    },
+    {
+      "id": "cerf_volant",
+      "name": "un cerf-volant",
+      "aliases": [
+        "cerf-volant",
+        "cerf volant"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Un grand cerf-volant blanc, prêt à monter jusqu'aux nuages."
+    },
+    {
+      "id": "porte_tour",
+      "name": "la porte de la tour",
+      "aliases": [
+        "porte",
+        "porte ronde",
+        "serrure"
+      ],
+      "at": "foret",
+      "takeable": false,
+      "fixed": "Une porte ? Tu ne vas quand même pas l'emporter !",
+      "description": "Une porte ronde avec une serrure en forme d'étoile."
+    },
+    {
+      "id": "lunette",
+      "name": "la grande lunette",
+      "aliases": [
+        "lunette",
+        "telescope",
+        "longue-vue"
+      ],
+      "at": "observatoire",
+      "takeable": false,
+      "fixed": "Elle est vissée au plancher, et Mimi y tient comme à ses moustaches.",
+      "description": "Une grande lunette en cuivre, pointée vers le toit ouvert sur le ciel."
+    }
+  ],
+  "characters": [
+    {
+      "id": "mimi",
+      "name": "Mimi la souris",
+      "aliases": [
+        "mimi",
+        "souris",
+        "astronome"
+      ],
+      "at": "place",
+      "description": "Une petite souris astronome avec un bonnet pointu plein d'étoiles.",
+      "says": "Ma lunette n'a plus sa lentille : Grignote le rat l'a emportée dans sa cave, sous la boulangerie ! Et j'ai fait tomber la clé de ma tour dans le vieux puits… Sinon, il paraît que du haut de la colline, un cerf-volant monte presque jusqu'aux étoiles."
+    },
+    {
+      "id": "choco",
+      "name": "Choco l'écureuil",
+      "aliases": [
+        "choco",
+        "ecureuil",
+        "boulanger"
+      ],
+      "at": "boulangerie",
+      "description": "Un écureuil boulanger avec un tablier plein de farine.",
+      "says": "Un croissant ? C'est une pièce d'or, petit ! Et pousse-toi de mon tonneau, il n'aime pas qu'on le bouscule… hi hi."
+    },
+    {
+      "id": "grignote",
+      "name": "Grignote le rat",
+      "aliases": [
+        "grignote",
+        "rat"
+      ],
+      "at": "cave",
+      "description": "Un rat gourmand aux longues moustaches, avec un gros ventre.",
+      "says": "Ce verre brillant, je ne le lâche que pour un croissant tout chaud ! Le drap ? Prends-le, il gratte. Et ne bois surtout pas mes potions : c'est de la potion de grenouille !"
+    },
+    {
+      "id": "nero",
+      "name": "Néro le renard",
+      "aliases": [
+        "nero",
+        "renard"
+      ],
+      "at": "jardin",
+      "description": "Un renard roux qui dort en ronflant doucement.",
+      "says": "Zzz… les étoiles filantes… zzz… il faut les voir de très haut… zzz…"
+    }
+  ],
+  "actions": [
+    {
+      "id": "fouiller_fontaine",
+      "verb": "search",
+      "object": "fontaine",
+      "effects": [
+        "reveal:piece",
+        "flag:piece_trouvee"
+      ],
+      "points": 5,
+      "text": "Tu plonges la main dans l'eau froide, brrr… et tu attrapes une petite pièce d'or !"
+    },
+    {
+      "id": "acheter_croissant",
+      "verb": "give",
+      "object": "piece",
+      "target": "choco",
+      "when": [
+        "has:piece"
+      ],
+      "effects": [
+        "lose:piece",
+        "gain:croissant"
+      ],
+      "points": 10,
+      "text": "Choco mord la pièce pour vérifier, tac ! « Elle est vraie ! » Il te tend un croissant tout chaud."
+    },
+    {
+      "id": "pousser_tonneau",
+      "verb": "push",
+      "object": "tonneau",
+      "effects": [
+        "flag:trappe"
+      ],
+      "points": 10,
+      "text": "Tu pousses le gros tonneau… grrrr… il glisse ! Dessous, une trappe en bois s'ouvre vers une cave."
+    },
+    {
+      "id": "nourrir_grignote",
+      "verb": "give",
+      "object": "croissant",
+      "target": "grignote",
+      "when": [
+        "has:croissant"
+      ],
+      "effects": [
+        "lose:croissant",
+        "gain:lentille",
+        "flag:lentille_donnee"
+      ],
+      "points": 10,
+      "text": "Grignote renifle, sourit et engloutit le croissant. « Bon, bon… tiens, ton verre brillant. »"
+    },
+    {
+      "id": "fouiller_haie",
+      "verb": "search",
+      "object": "haie",
+      "effects": [
+        "reveal:ficelle",
+        "flag:ficelle_trouvee"
+      ],
+      "points": 5,
+      "text": "Tu tires doucement sur le bout qui dépasse… et une longue ficelle sort de la haie !"
+    },
+    {
+      "id": "fouiller_buissons",
+      "verb": "search",
+      "object": "buissons",
+      "effects": [
+        "reveal:baguettes",
+        "flag:baguettes_trouvees"
+      ],
+      "points": 5,
+      "text": "Sous les buissons, tu trouves deux baguettes de bois bien droites."
+    },
+    {
+      "id": "faire_canne",
+      "verb": "combine",
+      "object": "ficelle",
+      "target": "aimant",
+      "when": [
+        "has:ficelle",
+        "has:aimant"
+      ],
+      "effects": [
+        "lose:ficelle",
+        "lose:aimant",
+        "gain:canne"
+      ],
+      "points": 10,
+      "text": "Tu noues l'aimant au bout de la ficelle : voilà une canne à pêche pour attraper le métal !"
+    },
+    {
+      "id": "pecher_cle",
+      "verb": "use",
+      "object": "canne",
+      "target": "puits",
+      "when": [
+        "has:canne"
+      ],
+      "effects": [
+        "gain:cle"
+      ],
+      "points": 10,
+      "text": "Tu fais descendre l'aimant tout au fond… clac ! Tu remontes doucement : une clé ronde est collée à l'aimant !"
+    },
+    {
+      "id": "ouvrir_tour",
+      "verb": "open",
+      "object": "porte_tour",
+      "when": [
+        "has:cle"
+      ],
+      "effects": [
+        "flag:porte_ouverte"
+      ],
+      "points": 10,
+      "not_yet": "La porte est fermée à clé. Mimi a dit que sa clé était tombée quelque part…",
+      "text": "La clé ronde tourne dans la serrure en étoile : clic-clac ! La porte s'ouvre sur un escalier en colimaçon."
+    },
+    {
+      "id": "reparer_lunette",
+      "verb": "use",
+      "object": "lentille",
+      "target": "lunette",
+      "when": [
+        "has:lentille"
+      ],
+      "effects": [
+        "lose:lentille",
+        "flag:lunette_ok"
+      ],
+      "points": 10,
+      "text": "Tu glisses la lentille au bout de la lunette : elle se met en place avec un petit « tic » parfait."
+    },
+    {
+      "id": "regarder_lunette",
+      "verb": "examine",
+      "object": "lunette",
+      "when": [
+        "flag:lunette_ok"
+      ],
+      "effects": [
+        "end:etoiles"
+      ],
+      "points": 20,
+      "not_yet": "Sans sa lentille, la lunette ne montre que du noir…",
+      "text": "Tu colles ton œil à la lunette… et whouaaa ! Des centaines d'étoiles filantes traversent le ciel !"
+    },
+    {
+      "id": "utiliser_lunette",
+      "verb": "use",
+      "object": "lunette",
+      "when": [
+        "flag:lunette_ok"
+      ],
+      "effects": [
+        "end:etoiles"
+      ],
+      "points": 20,
+      "not_yet": "Sans sa lentille, la lunette ne montre que du noir…",
+      "text": "Tu colles ton œil à la lunette… et whouaaa ! Des centaines d'étoiles filantes traversent le ciel !"
+    },
+    {
+      "id": "faire_cadre",
+      "verb": "combine",
+      "object": "drap",
+      "target": "baguettes",
+      "when": [
+        "has:drap",
+        "has:baguettes"
+      ],
+      "effects": [
+        "lose:drap",
+        "lose:baguettes",
+        "gain:cadre"
+      ],
+      "points": 10,
+      "text": "Tu croises les baguettes et tu tends le drap dessus : ça ressemble déjà à un cerf-volant !"
+    },
+    {
+      "id": "finir_cerf_volant",
+      "verb": "combine",
+      "object": "cadre",
+      "target": "ficelle",
+      "when": [
+        "has:cadre",
+        "has:ficelle"
+      ],
+      "effects": [
+        "lose:cadre",
+        "lose:ficelle",
+        "gain:cerf_volant"
+      ],
+      "points": 10,
+      "text": "Tu attaches la longue ficelle au cadre : voilà un vrai cerf-volant !"
+    },
+    {
+      "id": "faire_voler",
+      "verb": "throw",
+      "object": "cerf_volant",
+      "place": "colline",
+      "when": [
+        "has:cerf_volant"
+      ],
+      "effects": [
+        "end:cerf_volant"
+      ],
+      "points": 20,
+      "not_yet": "Ici il n'y a pas assez de vent… il faudrait un endroit tout en haut.",
+      "text": "Tu lances le cerf-volant dans le vent : il monte, il monte, jusqu'à toucher les étoiles !"
+    },
+    {
+      "id": "faire_voler_2",
+      "verb": "use",
+      "object": "cerf_volant",
+      "place": "colline",
+      "when": [
+        "has:cerf_volant"
+      ],
+      "effects": [
+        "end:cerf_volant"
+      ],
+      "points": 20,
+      "not_yet": "Ici il n'y a pas assez de vent… il faudrait un endroit tout en haut.",
+      "text": "Tu lances le cerf-volant dans le vent : il monte, il monte, jusqu'à toucher les étoiles !"
+    },
+    {
+      "id": "boire_fiole",
+      "verb": "drink",
+      "object": "fiole",
+      "when": [
+        "has:fiole"
+      ],
+      "effects": [
+        "end:grenouille"
+      ],
+      "points": 0,
+      "text": "Glou glou… beurk ! Tes oreilles rapetissent, tes pieds s'aplatissent… croâ ?"
+    },
+    {
+      "id": "sauter_colline",
+      "verb": "jump",
+      "object": "colline",
+      "place": "colline",
+      "effects": [
+        "end:roulade"
+      ],
+      "points": 0,
+      "text": "Tu sautes de l'autre côté… la pente est raide, et tu roules, roules, roules comme une boule !"
+    },
+    {
+      "id": "petit_saut",
+      "verb": "jump",
+      "place": "colline",
+      "effects": [],
+      "points": 0,
+      "text": "Tu fais un petit saut de joie sur l'herbe, hop ! Mais pas de l'autre côté : la pente est bien trop raide, tu roulerais jusqu'en bas."
+    }
+  ],
+  "endings": [
+    {
+      "id": "etoiles",
+      "kind": "win",
+      "text": "Mimi pousse un cri de joie : « Regarde, une étoile filante ! Fais un vœu ! » Vous comptez les étoiles jusqu'à minuit, et Mimi te nomme astronome d'honneur du village."
+    },
+    {
+      "id": "cerf_volant",
+      "kind": "win",
+      "text": "Ton cerf-volant danse au milieu des étoiles filantes. Mimi arrive en courant : « Tu as inventé une nouvelle façon de toucher le ciel ! » Tout le village vient admirer."
+    },
+    {
+      "id": "grenouille",
+      "kind": "lose",
+      "text": "Te voilà transformé en petite grenouille jusqu'au matin ! Tu sautilles jusqu'à la mare, croâ… et la pluie d'étoiles passe sans toi."
+    },
+    {
+      "id": "roulade",
+      "kind": "lose",
+      "text": "Tu roules jusqu'en bas, dans un tas de feuilles toutes douces. Rien de cassé ! Mais le temps de remonter, la pluie d'étoiles est déjà finie."
+    }
+  ]
+}

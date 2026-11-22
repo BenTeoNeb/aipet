@@ -1,0 +1,504 @@
+{
+  "title": "Le petit train de Tutu",
+  "difficulty": "moyen",
+  "tags": [
+    "train",
+    "gare",
+    "locomotive",
+    "tortue",
+    "ours",
+    "miel",
+    "pie"
+  ],
+  "fact": "Dans une locomotive à vapeur, le feu fait bouillir l'eau de la chaudière, et c'est la vapeur qui pousse les pistons et fait tourner les roues : voilà pourquoi les gares avaient un château d'eau !",
+  "intro": "Tutu la tortue conduit le petit train qui monte jusqu'à la fête des nuages. Mais ce matin, rien ne va : la chaudière est froide, et quelqu'un a chipé son sifflet !",
+  "goal": "Faire partir le petit train de Tutu pour la fête des nuages.",
+  "start": {
+    "place": "gare",
+    "inventory": []
+  },
+  "places": [
+    {
+      "id": "gare",
+      "name": "la gare",
+      "aliases": [
+        "gare",
+        "quai",
+        "train"
+      ],
+      "description": "Une petite gare toute fleurie. Le train rouge attend sur les rails, et Tutu la tortue tapote sa locomotive en soupirant. La chaudière est toute froide.",
+      "variants": [
+        {
+          "when": [
+            "flag:feu"
+          ],
+          "description": "Une petite gare toute fleurie. La locomotive crache des petits nuages : la chaudière est chaude ! Tutu attend, les pattes sur les manettes."
+        }
+      ],
+      "exits": [
+        {
+          "to": "salle",
+          "label": "vers la salle d'attente",
+          "dir": "est"
+        },
+        {
+          "to": "chateau_eau",
+          "label": "vers le château d'eau",
+          "dir": "nord"
+        },
+        {
+          "to": "maisonnette",
+          "label": "vers la maisonnette de la garde-barrière",
+          "dir": "ouest"
+        },
+        {
+          "to": "foret",
+          "label": "vers la forêt",
+          "dir": "sud"
+        }
+      ]
+    },
+    {
+      "id": "salle",
+      "name": "la salle d'attente",
+      "aliases": [
+        "salle",
+        "salle d'attente",
+        "buffet"
+      ],
+      "description": "Une salle d'attente avec des bancs en bois. Un vieux manteau est oublié sur un porte-manteau, et sur le buffet il reste une tranche de pain.",
+      "exits": [
+        {
+          "to": "gare",
+          "label": "vers le quai",
+          "dir": "ouest"
+        }
+      ],
+      "variants": [
+        {
+          "when": [
+            "has:pain"
+          ],
+          "description": "Une salle d'attente avec des bancs en bois. Un vieux manteau est oublié sur un porte-manteau, et le buffet est vide : plus une miette !"
+        },
+        {
+          "when": [
+            "has:tartine"
+          ],
+          "description": "Une salle d'attente avec des bancs en bois. Un vieux manteau est oublié sur un porte-manteau, et le buffet est vide : plus une miette !"
+        },
+        {
+          "when": [
+            "flag:ours_reveille"
+          ],
+          "description": "Une salle d'attente avec des bancs en bois. Un vieux manteau est oublié sur un porte-manteau, et le buffet est vide : plus une miette !"
+        }
+      ]
+    },
+    {
+      "id": "chateau_eau",
+      "name": "le château d'eau",
+      "aliases": [
+        "chateau d'eau",
+        "tour",
+        "reservoir"
+      ],
+      "description": "Une grande tour ronde pleine d'eau pour le train. Tout en haut, dans un nid plein de choses brillantes, Chipie la pie fait briller un sifflet argenté.",
+      "exits": [
+        {
+          "to": "gare",
+          "label": "vers la gare",
+          "dir": "sud"
+        }
+      ],
+      "variants": [
+        {
+          "when": [
+            "has:sifflet"
+          ],
+          "description": "Une grande tour ronde pleine d'eau pour le train. Tout en haut, dans son nid plein de choses brillantes, Chipie la pie admire son bouton doré, toute fière."
+        }
+      ]
+    },
+    {
+      "id": "maisonnette",
+      "name": "la maisonnette de la garde-barrière",
+      "aliases": [
+        "maisonnette",
+        "maison",
+        "barriere"
+      ],
+      "description": "Une maisonnette à côté du passage à niveau. Madame Taupe, la garde-barrière, regarde la grande barrière restée ouverte en se grattant la tête. Il y a un gros levier rouge.",
+      "exits": [
+        {
+          "to": "gare",
+          "label": "vers la gare",
+          "dir": "est"
+        }
+      ],
+      "variants": [
+        {
+          "when": [
+            "flag:barriere"
+          ],
+          "description": "Une maisonnette à côté du passage à niveau. La grande barrière est bien fermée, et Madame Taupe sifflote, toute contente, à côté du gros levier rouge."
+        }
+      ]
+    },
+    {
+      "id": "foret",
+      "name": "la forêt",
+      "aliases": [
+        "foret",
+        "bois",
+        "arbres"
+      ],
+      "description": "Une forêt de sapins. Sur un gros tas de bûches, Gros Ours fait la sieste en ronflant : rrron, pchhh… Impossible de prendre une bûche sans le réveiller. Mais attention : on ne tape jamais un ours qui dort, il se fâcherait tout rouge ! Un ours, ça se réveille en douceur.",
+      "variants": [
+        {
+          "when": [
+            "flag:ours_reveille"
+          ],
+          "description": "Une forêt de sapins. Gros Ours s'est assis sur une souche et lèche ses pattes pleines de miel."
+        }
+      ],
+      "exits": [
+        {
+          "to": "gare",
+          "label": "vers la gare",
+          "dir": "nord"
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "locomotive",
+      "name": "la locomotive",
+      "aliases": [
+        "locomotive",
+        "chaudiere",
+        "machine",
+        "train"
+      ],
+      "at": "gare",
+      "takeable": false,
+      "fixed": "Une locomotive dans ton sac ? Tutu en rirait pendant une semaine !",
+      "description": "Une locomotive rouge avec une chaudière ronde. Pour avancer, il lui faut du bois dans la chaudière… et un coup de sifflet pour partir."
+    },
+    {
+      "id": "manteau",
+      "name": "le vieux manteau",
+      "aliases": [
+        "manteau",
+        "veste",
+        "poches"
+      ],
+      "at": "salle",
+      "takeable": false,
+      "fixed": "Ce n'est pas ton manteau ! Mais tu peux regarder dans les poches…",
+      "description": "Un vieux manteau de chef de gare, avec de grandes poches."
+    },
+    {
+      "id": "bouton",
+      "name": "un bouton doré",
+      "aliases": [
+        "bouton",
+        "bouton dore",
+        "truc brillant"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Un bouton doré qui brille comme un petit soleil."
+    },
+    {
+      "id": "pain",
+      "name": "une tranche de pain",
+      "aliases": [
+        "pain",
+        "tranche",
+        "tranche de pain"
+      ],
+      "at": "salle",
+      "takeable": true,
+      "description": "Une tranche de pain toute moelleuse."
+    },
+    {
+      "id": "sifflet",
+      "name": "le sifflet de Tutu",
+      "aliases": [
+        "sifflet"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Un sifflet argenté : quand on souffle dedans, ça fait tuuut !"
+    },
+    {
+      "id": "levier",
+      "name": "le levier rouge",
+      "aliases": [
+        "levier",
+        "manette"
+      ],
+      "at": "maisonnette",
+      "takeable": false,
+      "fixed": "Il est bien vissé : on peut juste le tirer ou le pousser.",
+      "description": "Un gros levier rouge qui sert à fermer la barrière."
+    },
+    {
+      "id": "miel",
+      "name": "un pot de miel",
+      "aliases": [
+        "miel",
+        "pot",
+        "pot de miel"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Un petit pot de miel doré qui sent les fleurs."
+    },
+    {
+      "id": "tartine",
+      "name": "une tartine de miel",
+      "aliases": [
+        "tartine",
+        "tartine de miel"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Une tartine toute collante de miel. Miam… mais elle n'est pas pour toi !"
+    },
+    {
+      "id": "buches",
+      "name": "des bûches",
+      "aliases": [
+        "buches",
+        "bois",
+        "buche"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Trois belles bûches sèches, parfaites pour une chaudière."
+    },
+    {
+      "id": "nid",
+      "name": "le nid de Chipie",
+      "aliases": [
+        "nid"
+      ],
+      "at": "chateau_eau",
+      "takeable": false,
+      "fixed": "Il est tout en haut de la tour, bien trop haut pour toi !",
+      "description": "Un grand nid de brindilles, plein de choses qui brillent : des capsules, des cuillères, des boutons… Chipie adore les trésors brillants."
+    }
+  ],
+  "characters": [
+    {
+      "id": "tutu",
+      "name": "Tutu la tortue",
+      "aliases": [
+        "tutu",
+        "tortue",
+        "conductrice"
+      ],
+      "at": "gare",
+      "description": "Une tortue conductrice avec une casquette de cheminot.",
+      "says": "Pour partir, il me faut deux choses : du bois dans la chaudière, et mon sifflet. Mon sifflet, c'est Chipie la pie qui l'a chipé : elle adore tout ce qui brille. Le bois, il y en a un gros tas dans la forêt… mais Gros Ours fait la sieste dessus."
+    },
+    {
+      "id": "chipie",
+      "name": "Chipie la pie",
+      "aliases": [
+        "chipie",
+        "pie",
+        "oiseau"
+      ],
+      "at": "chateau_eau",
+      "description": "Une pie noire et blanche, très coquette, qui collectionne les choses brillantes.",
+      "says": "J'adore tout ce qui brille ! Mes trésors, je ne les échange que contre quelque chose de doré, qui brille encore plus."
+    },
+    {
+      "id": "taupe",
+      "name": "Madame Taupe",
+      "aliases": [
+        "taupe",
+        "madame taupe",
+        "garde-barriere"
+      ],
+      "at": "maisonnette",
+      "description": "Une taupe avec un gilet orange et de grosses lunettes.",
+      "says": "Ma barrière, il faut la fermer avec le gros levier rouge quand le train passe ! Celui qui m'aide à la fermer gagne un pot de mon meilleur miel."
+    },
+    {
+      "id": "ours",
+      "name": "Gros Ours",
+      "aliases": [
+        "ours",
+        "gros ours"
+      ],
+      "at": "foret",
+      "description": "Un énorme ours brun au ventre tout rond, qui adore le miel.",
+      "says": "Mmmh… miel… tartine… Rien ne vaut une bonne tartine de miel… mmmh…"
+    }
+  ],
+  "actions": [
+    {
+      "id": "fouiller_manteau",
+      "verb": "search",
+      "object": "manteau",
+      "effects": [
+        "reveal:bouton"
+      ],
+      "points": 5,
+      "text": "Tu fouilles les grandes poches… dans le fond, un bouton doré tout brillant !"
+    },
+    {
+      "id": "echanger_sifflet",
+      "verb": "give",
+      "object": "bouton",
+      "target": "chipie",
+      "when": [
+        "has:bouton"
+      ],
+      "effects": [
+        "lose:bouton",
+        "gain:sifflet"
+      ],
+      "points": 10,
+      "text": "Chipie attrape le bouton doré : « Oh, qu'il est beau ! » Elle laisse tomber le sifflet, que tu rattrapes au vol."
+    },
+    {
+      "id": "tirer_levier",
+      "verb": "pull",
+      "object": "levier",
+      "when": [
+        "!flag:barriere"
+      ],
+      "effects": [
+        "flag:barriere",
+        "reveal:miel"
+      ],
+      "points": 10,
+      "text": "Tu tires le gros levier : crrrrr, la barrière se ferme. Madame Taupe applaudit et pose un pot de miel sur la table : « Pour toi ! »"
+    },
+    {
+      "id": "pousser_levier",
+      "verb": "push",
+      "object": "levier",
+      "when": [
+        "!flag:barriere"
+      ],
+      "effects": [
+        "flag:barriere",
+        "reveal:miel"
+      ],
+      "points": 10,
+      "text": "Tu pousses le gros levier : crrrrr, la barrière se ferme. Madame Taupe applaudit et pose un pot de miel sur la table : « Pour toi ! »"
+    },
+    {
+      "id": "faire_tartine",
+      "verb": "combine",
+      "object": "miel",
+      "target": "pain",
+      "when": [
+        "has:miel",
+        "has:pain"
+      ],
+      "effects": [
+        "lose:miel",
+        "lose:pain",
+        "gain:tartine"
+      ],
+      "points": 10,
+      "text": "Tu étales le miel sur le pain avec ton doigt… slurp, ça colle ! Voilà une tartine de miel. Attention, elle sent si bon… mais elle n'est pas pour toi : si tu la manges, il n'y aura plus rien pour Gros Ours !"
+    },
+    {
+      "id": "reveiller_ours",
+      "verb": "give",
+      "object": "tartine",
+      "target": "ours",
+      "when": [
+        "has:tartine"
+      ],
+      "effects": [
+        "lose:tartine",
+        "flag:ours_reveille",
+        "gain:buches"
+      ],
+      "points": 10,
+      "not_yet": "Gros Ours dort trop fort… Il marmonne « miel… tartine… » dans son sommeil.",
+      "text": "Gros Ours renifle, ouvre un œil… et engloutit la tartine. « Merci ! Tiens, prends des bûches, j'en ai plein. »"
+    },
+    {
+      "id": "remplir_chaudiere",
+      "verb": "use",
+      "object": "buches",
+      "target": "locomotive",
+      "when": [
+        "has:buches"
+      ],
+      "effects": [
+        "lose:buches",
+        "flag:feu"
+      ],
+      "points": 10,
+      "text": "Tu glisses les bûches dans la chaudière. Tutu allume le feu : fffouf ! La locomotive se met à fumer : tchou, tchou !"
+    },
+    {
+      "id": "siffler",
+      "verb": "use",
+      "object": "sifflet",
+      "place": "gare",
+      "when": [
+        "has:sifflet",
+        "flag:feu"
+      ],
+      "effects": [
+        "end:depart"
+      ],
+      "points": 20,
+      "not_yet": "Tuuut ! Ça siffle très bien… mais la chaudière est froide, le train ne peut pas partir.",
+      "text": "Tu souffles de toutes tes forces dans le sifflet : TUUUUT ! Tutu crie « En voiture ! » et le petit train démarre."
+    },
+    {
+      "id": "manger_tartine",
+      "verb": "eat",
+      "object": "tartine",
+      "when": [
+        "has:tartine"
+      ],
+      "effects": [
+        "end:gourmand"
+      ],
+      "points": 0,
+      "text": "Tu croques la tartine… miam miam… et voilà, il n'y en a plus !"
+    },
+    {
+      "id": "taper_ours",
+      "verb": "hit",
+      "object": "ours",
+      "effects": [
+        "end:ours_fache"
+      ],
+      "points": 0,
+      "text": "Gros Ours se réveille en sursaut et pousse un énorme grrraaah ! Il attrape toutes les bûches et file se cacher au fond de la forêt."
+    }
+  ],
+  "endings": [
+    {
+      "id": "depart",
+      "kind": "win",
+      "text": "Le petit train monte, monte, jusqu'au-dessus des nuages ! À la fête des nuages, tout le monde t'acclame, et Tutu te prête sa casquette de conductrice pour tout le voyage."
+    },
+    {
+      "id": "gourmand",
+      "kind": "lose",
+      "text": "La tartine était délicieuse… mais Gros Ours continue de ronfler sur les bûches, et sans bois, le train ne part pas. Tutu soupire : « On essaiera demain ! »"
+    },
+    {
+      "id": "ours_fache",
+      "kind": "lose",
+      "text": "Plus une seule bûche ! Gros Ours boude au fond de la forêt, et le train reste en gare. Tutu dit gentiment : « Les ours, on les réveille avec douceur… et avec du miel. »"
+    }
+  ]
+}

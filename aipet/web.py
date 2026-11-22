@@ -244,6 +244,20 @@ def parents_page():
     return HTMLResponse((STATIC / "parents.html").read_text().replace("PET_NAME", html.escape(pet.name)))
 
 
+@app.get("/adventures", include_in_schema=False)
+def adventures_page():
+    """The adventure explorer (map, puzzle chain, roads, games played); its data comes from the
+    guarded /debug/adventures (it holds what the children said)."""
+    return HTMLResponse((STATIC / "adventures.html").read_text())
+
+
+@app.get("/debug/adventures", include_in_schema=False)
+def debug_adventures():
+    from aipet.games import adventure_viz
+
+    return adventure_viz.collect(load_config())
+
+
 def _day(d: str | None):
     if not d:
         return datetime.now(TZ).date()

@@ -2,6 +2,7 @@
 name: quiz
 description: Un vrai quiz de questions sur un thème choisi par l'enfant, adapté à sa classe, avec le score et ses records d'une fois sur l'autre.
 tools: quiz_history, quiz_start, quiz_answer
+label: un quiz avec des points
 ---
 Le but : apprendre en s'amusant, et que l'enfant se sente fort. Le quiz est préparé et compté par tes
 outils : c'est eux qui gardent les questions, les réponses, le score et les records.

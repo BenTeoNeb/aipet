@@ -1,0 +1,1353 @@
+{
+  "title": "Le miroir du phare d'Alexandrie",
+  "difficulty": "difficile",
+  "intro": "Alexandrie, en Égypte, il y a très, très longtemps. C'est la nuit, l'orage gronde, et le grand phare, une des Sept Merveilles du monde, s'est éteint ! Au large, un bateau chargé de blé cherche le port. Toi, l'apprenti du gardien du phare, tu dois l'aider à rentrer.",
+  "goal": "Guider le bateau jusqu'au port avant qu'il se perde dans la nuit.",
+  "tags": [
+    "alexandrie",
+    "phare",
+    "egypte",
+    "antiquite",
+    "bibliotheque",
+    "merveille",
+    "bateau",
+    "mer"
+  ],
+  "fact": "Le phare d'Alexandrie était une des Sept Merveilles du monde : la nuit, un grand feu brillait tout en haut, et on raconte qu'un immense miroir de bronze renvoyait sa lumière très loin sur la mer.",
+  "start": {
+    "place": "port",
+    "inventory": []
+  },
+  "places": [
+    {
+      "id": "port",
+      "name": "le port",
+      "aliases": [
+        "port",
+        "quai",
+        "bateaux"
+      ],
+      "description": "Le port d'Alexandrie, sous la pluie, plic, ploc ! Théon, le vieux gardien du phare, est assis sur une caisse, la cheville bandée. Miou le chat se lèche les pattes près des filets de pêche, où quelque chose brille entre les mailles, et d'un panier de poissons. Sur un tonneau, une petite lampe vide. Au loin, la lueur d'un bateau qui hésite.",
+      "exits": [
+        {
+          "to": "marche",
+          "label": "vers le marché",
+          "dir": "ouest"
+        },
+        {
+          "to": "digue",
+          "label": "vers la longue digue",
+          "dir": "nord"
+        }
+      ],
+      "variants": [
+        {
+          "when": [
+            "!flag:obole_trouvee",
+            "has:lampe"
+          ],
+          "description": "Le port d'Alexandrie, sous la pluie, plic, ploc ! Théon, le vieux gardien du phare, est assis sur une caisse, la cheville bandée. Miou le chat se lèche les pattes près des filets de pêche, où quelque chose brille entre les mailles, et d'un panier de poissons. Au loin, la lueur d'un bateau qui hésite."
+        },
+        {
+          "when": [
+            "!flag:obole_trouvee",
+            "has:lampe_pleine"
+          ],
+          "description": "Le port d'Alexandrie, sous la pluie, plic, ploc ! Théon, le vieux gardien du phare, est assis sur une caisse, la cheville bandée. Miou le chat se lèche les pattes près des filets de pêche, où quelque chose brille entre les mailles, et d'un panier de poissons. Au loin, la lueur d'un bateau qui hésite."
+        },
+        {
+          "when": [
+            "flag:obole_trouvee",
+            "!has:lampe",
+            "!has:lampe_pleine"
+          ],
+          "description": "Le port d'Alexandrie, sous la pluie, plic, ploc ! Théon, le vieux gardien du phare, est assis sur une caisse, la cheville bandée. Miou le chat se lèche les pattes près des filets de pêche et d'un panier de poissons. Sur un tonneau, une petite lampe vide. Au loin, la lueur d'un bateau qui hésite."
+        },
+        {
+          "when": [
+            "flag:obole_trouvee",
+            "has:lampe"
+          ],
+          "description": "Le port d'Alexandrie, sous la pluie, plic, ploc ! Théon, le vieux gardien du phare, est assis sur une caisse, la cheville bandée. Miou le chat se lèche les pattes près des filets de pêche et d'un panier de poissons. Au loin, la lueur d'un bateau qui hésite."
+        },
+        {
+          "when": [
+            "flag:obole_trouvee",
+            "has:lampe_pleine"
+          ],
+          "description": "Le port d'Alexandrie, sous la pluie, plic, ploc ! Théon, le vieux gardien du phare, est assis sur une caisse, la cheville bandée. Miou le chat se lèche les pattes près des filets de pêche et d'un panier de poissons. Au loin, la lueur d'un bateau qui hésite."
+        }
+      ]
+    },
+    {
+      "id": "marche",
+      "name": "le marché",
+      "aliases": [
+        "marche",
+        "souk",
+        "etals"
+      ],
+      "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand garde sa dernière amphore d'huile d'olive. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. Sur un étal, un pot en terre et des figues bien mûres.",
+      "exits": [
+        {
+          "to": "port",
+          "label": "vers le port",
+          "dir": "est"
+        },
+        {
+          "to": "bibliotheque",
+          "label": "vers la grande bibliothèque",
+          "dir": "sud"
+        }
+      ],
+      "variants": [
+        {
+          "when": [
+            "!flag:huile_achetee",
+            "!has:pot",
+            "!has:pot_braises",
+            "has:figues"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand garde sa dernière amphore d'huile d'olive. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. Sur un étal, un pot en terre."
+        },
+        {
+          "when": [
+            "!flag:huile_achetee",
+            "!has:pot",
+            "!has:pot_braises",
+            "flag:pistache_bouge"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand garde sa dernière amphore d'huile d'olive. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. Sur un étal, un pot en terre."
+        },
+        {
+          "when": [
+            "!flag:huile_achetee",
+            "has:pot",
+            "!has:figues",
+            "!flag:pistache_bouge"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand garde sa dernière amphore d'huile d'olive. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. Sur un étal, des figues bien mûres."
+        },
+        {
+          "when": [
+            "!flag:huile_achetee",
+            "has:pot_braises",
+            "!has:figues",
+            "!flag:pistache_bouge"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand garde sa dernière amphore d'huile d'olive. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. Sur un étal, des figues bien mûres."
+        },
+        {
+          "when": [
+            "!flag:huile_achetee",
+            "has:pot",
+            "has:figues"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand garde sa dernière amphore d'huile d'olive. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. L'étal est vide."
+        },
+        {
+          "when": [
+            "!flag:huile_achetee",
+            "has:pot",
+            "flag:pistache_bouge"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand garde sa dernière amphore d'huile d'olive. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. L'étal est vide."
+        },
+        {
+          "when": [
+            "!flag:huile_achetee",
+            "has:pot_braises",
+            "has:figues"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand garde sa dernière amphore d'huile d'olive. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. L'étal est vide."
+        },
+        {
+          "when": [
+            "!flag:huile_achetee",
+            "has:pot_braises",
+            "flag:pistache_bouge"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand garde sa dernière amphore d'huile d'olive. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. L'étal est vide."
+        },
+        {
+          "when": [
+            "flag:huile_achetee",
+            "!has:pot",
+            "!has:pot_braises",
+            "!has:figues",
+            "!flag:pistache_bouge"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand se frotte les mains, tout content : il a vendu sa dernière amphore. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. Sur un étal, un pot en terre et des figues bien mûres."
+        },
+        {
+          "when": [
+            "flag:huile_achetee",
+            "!has:pot",
+            "!has:pot_braises",
+            "has:figues"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand se frotte les mains, tout content : il a vendu sa dernière amphore. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. Sur un étal, un pot en terre."
+        },
+        {
+          "when": [
+            "flag:huile_achetee",
+            "!has:pot",
+            "!has:pot_braises",
+            "flag:pistache_bouge"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand se frotte les mains, tout content : il a vendu sa dernière amphore. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. Sur un étal, un pot en terre."
+        },
+        {
+          "when": [
+            "flag:huile_achetee",
+            "has:pot",
+            "!has:figues",
+            "!flag:pistache_bouge"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand se frotte les mains, tout content : il a vendu sa dernière amphore. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. Sur un étal, des figues bien mûres."
+        },
+        {
+          "when": [
+            "flag:huile_achetee",
+            "has:pot_braises",
+            "!has:figues",
+            "!flag:pistache_bouge"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand se frotte les mains, tout content : il a vendu sa dernière amphore. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. Sur un étal, des figues bien mûres."
+        },
+        {
+          "when": [
+            "flag:huile_achetee",
+            "has:pot",
+            "has:figues"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand se frotte les mains, tout content : il a vendu sa dernière amphore. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. L'étal est vide."
+        },
+        {
+          "when": [
+            "flag:huile_achetee",
+            "has:pot",
+            "flag:pistache_bouge"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand se frotte les mains, tout content : il a vendu sa dernière amphore. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. L'étal est vide."
+        },
+        {
+          "when": [
+            "flag:huile_achetee",
+            "has:pot_braises",
+            "has:figues"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand se frotte les mains, tout content : il a vendu sa dernière amphore. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. L'étal est vide."
+        },
+        {
+          "when": [
+            "flag:huile_achetee",
+            "has:pot_braises",
+            "flag:pistache_bouge"
+          ],
+          "description": "Le marché couvert, qui sent les épices et le pain chaud. Ménès le marchand se frotte les mains, tout content : il a vendu sa dernière amphore. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. L'étal est vide."
+        }
+      ]
+    },
+    {
+      "id": "bibliotheque",
+      "name": "la grande bibliothèque",
+      "aliases": [
+        "bibliotheque",
+        "salle des rouleaux"
+      ],
+      "description": "Une salle immense, pleine d'étagères, avec des milliers de rouleaux de papyrus ! Kallia la bibliothécaire les époussette un par un. Perché sur une statue, Bec-Long l'ibis serre dans son bec une clé qui brille. Un vieux chiffon traîne sur une table.",
+      "variants": [
+        {
+          "when": [
+            "!flag:ibis_content",
+            "has:chiffon"
+          ],
+          "description": "Une salle immense, pleine d'étagères, avec des milliers de rouleaux de papyrus ! Kallia la bibliothécaire les époussette un par un. Perché sur une statue, Bec-Long l'ibis serre dans son bec une clé qui brille."
+        },
+        {
+          "when": [
+            "!flag:ibis_content",
+            "has:tampon"
+          ],
+          "description": "Une salle immense, pleine d'étagères, avec des milliers de rouleaux de papyrus ! Kallia la bibliothécaire les époussette un par un. Perché sur une statue, Bec-Long l'ibis serre dans son bec une clé qui brille."
+        },
+        {
+          "when": [
+            "!flag:ibis_content",
+            "flag:miroir_poli"
+          ],
+          "description": "Une salle immense, pleine d'étagères, avec des milliers de rouleaux de papyrus ! Kallia la bibliothécaire les époussette un par un. Perché sur une statue, Bec-Long l'ibis serre dans son bec une clé qui brille."
+        },
+        {
+          "when": [
+            "flag:ibis_content",
+            "!has:chiffon",
+            "!has:tampon",
+            "!flag:miroir_poli"
+          ],
+          "description": "Une salle immense, pleine d'étagères, avec des milliers de rouleaux de papyrus ! Kallia la bibliothécaire les époussette un par un. Sur sa statue, Bec-Long l'ibis se lèche le bec, tout content. Un vieux chiffon traîne sur une table."
+        },
+        {
+          "when": [
+            "flag:ibis_content",
+            "has:chiffon"
+          ],
+          "description": "Une salle immense, pleine d'étagères, avec des milliers de rouleaux de papyrus ! Kallia la bibliothécaire les époussette un par un. Sur sa statue, Bec-Long l'ibis se lèche le bec, tout content."
+        },
+        {
+          "when": [
+            "flag:ibis_content",
+            "has:tampon"
+          ],
+          "description": "Une salle immense, pleine d'étagères, avec des milliers de rouleaux de papyrus ! Kallia la bibliothécaire les époussette un par un. Sur sa statue, Bec-Long l'ibis se lèche le bec, tout content."
+        },
+        {
+          "when": [
+            "flag:ibis_content",
+            "flag:miroir_poli"
+          ],
+          "description": "Une salle immense, pleine d'étagères, avec des milliers de rouleaux de papyrus ! Kallia la bibliothécaire les époussette un par un. Sur sa statue, Bec-Long l'ibis se lèche le bec, tout content."
+        }
+      ],
+      "exits": [
+        {
+          "to": "marche",
+          "label": "vers le marché",
+          "dir": "nord"
+        }
+      ]
+    },
+    {
+      "id": "digue",
+      "name": "la grande digue",
+      "aliases": [
+        "digue",
+        "chaussee",
+        "chemin du phare"
+      ],
+      "description": "Une longue digue de pierre relie la ville à l'île du phare. Les vagues éclaboussent, splash ! Du sable fin s'est entassé contre le muret. Au nord, la silhouette noire du grand phare. À l'est, une jetée s'avance dans la mer.",
+      "exits": [
+        {
+          "to": "port",
+          "label": "vers le port",
+          "dir": "sud"
+        },
+        {
+          "to": "pied",
+          "label": "vers le phare",
+          "dir": "nord"
+        },
+        {
+          "to": "jetee",
+          "label": "vers la jetée",
+          "dir": "est"
+        }
+      ]
+    },
+    {
+      "id": "jetee",
+      "name": "le bout de la jetée",
+      "aliases": [
+        "jetee",
+        "bout de la jetee",
+        "ponton",
+        "mer",
+        "vagues"
+      ],
+      "description": "Le bout de la jetée, tout au bord de la mer qui gronde. Un vieux marin surveille les vagues, une corde à la main. Ici, pas question de nager : la nuit, pendant l'orage, la mer est bien trop dangereuse ! D'ici, on voit très bien la lueur du bateau, perdu dans la nuit. S'il voyait une lumière, il trouverait l'entrée du port !",
+      "exits": [
+        {
+          "to": "digue",
+          "label": "vers la digue",
+          "dir": "ouest"
+        }
+      ],
+      "variants": [
+        {
+          "when": [
+            "flag:feu"
+          ],
+          "description": "Le bout de la jetée, tout au bord de la mer qui gronde. Un vieux marin surveille les vagues, une corde à la main. Ici, pas question de nager : la nuit, pendant l'orage, la mer est bien trop dangereuse ! D'ici, on voit la lueur du bateau, perdu dans la nuit. Tout là-haut, le feu du phare brille… mais sa lumière part vers le mur : le bateau ne la voit pas encore !"
+        }
+      ]
+    },
+    {
+      "id": "pied",
+      "name": "le pied du phare",
+      "aliases": [
+        "pied du phare",
+        "ile",
+        "ile du phare",
+        "entree du phare"
+      ],
+      "description": "L'île du phare. Le grand phare monte si haut qu'on ne voit pas son sommet dans la nuit ! Une lourde porte de bronze est fermée à clé.",
+      "variants": [
+        {
+          "when": [
+            "flag:porte_ouverte"
+          ],
+          "description": "L'île du phare. Le grand phare monte si haut qu'on ne voit pas son sommet dans la nuit ! La lourde porte de bronze est grande ouverte."
+        }
+      ],
+      "exits": [
+        {
+          "to": "digue",
+          "label": "vers la digue",
+          "dir": "sud"
+        },
+        {
+          "to": "rampe",
+          "label": "la porte du phare",
+          "dir": "dedans",
+          "when": [
+            "flag:porte_ouverte"
+          ],
+          "blocked": "La lourde porte de bronze est fermée à clé."
+        }
+      ]
+    },
+    {
+      "id": "rampe",
+      "name": "la rampe du phare",
+      "aliases": [
+        "rampe",
+        "escalier",
+        "interieur du phare",
+        "dedans"
+      ],
+      "description": "À l'intérieur du phare, une large rampe tourne et monte, monte, monte… Pistache, l'âne du phare, est planté au beau milieu, les oreilles basses. Il ne bouge pas d'un sabot. Théon a accroché une petite plaque à son collier : « Ne montez pas sur mon dos : je rentre à l'écurie ! »",
+      "variants": [
+        {
+          "when": [
+            "flag:pistache_bouge"
+          ],
+          "description": "À l'intérieur du phare, une large rampe tourne et monte, monte, monte… Pistache l'âne s'est rangé contre le mur, tout content : le passage est libre ! Théon a accroché une petite plaque à son collier : « Ne montez pas sur mon dos : je rentre à l'écurie ! »"
+        }
+      ],
+      "exits": [
+        {
+          "to": "pied",
+          "label": "vers la porte",
+          "dir": "dehors"
+        },
+        {
+          "to": "sommet",
+          "label": "vers le sommet",
+          "dir": "haut",
+          "when": [
+            "flag:pistache_bouge"
+          ],
+          "blocked": "Pistache est planté au milieu de la rampe : impossible de passer ! Il a l'air d'avoir un petit creux…"
+        }
+      ]
+    },
+    {
+      "id": "sommet",
+      "name": "le sommet du phare",
+      "aliases": [
+        "sommet",
+        "haut du phare",
+        "tout en haut"
+      ],
+      "description": "Tout en haut du phare ! Le vent siffle, whiii. Au milieu, le grand foyer est éteint et vide, avec sa grosse mèche de lin. Les longues pinces de fer du gardien sont posées à côté. Derrière, un immense miroir de bronze, tout terne, est tourné vers le mur.",
+      "variants": [
+        {
+          "when": [
+            "!flag:foyer_huile",
+            "flag:miroir_poli"
+          ],
+          "description": "Tout en haut du phare ! Le vent siffle, whiii. Au milieu, le grand foyer est éteint et vide, avec sa grosse mèche de lin. Les longues pinces de fer du gardien sont posées à côté. Derrière, l'immense miroir de bronze brille comme un soleil… mais il est encore tourné vers le mur."
+        },
+        {
+          "when": [
+            "flag:foyer_huile",
+            "!flag:feu",
+            "!flag:miroir_poli"
+          ],
+          "description": "Tout en haut du phare ! Le vent siffle, whiii. Le grand foyer est plein d'huile, et sa grosse mèche n'attend plus qu'une braise. Les longues pinces de fer sont posées à côté. Derrière, un immense miroir de bronze, tout terne, est tourné vers le mur."
+        },
+        {
+          "when": [
+            "flag:foyer_huile",
+            "!flag:feu",
+            "flag:miroir_poli"
+          ],
+          "description": "Tout en haut du phare ! Le vent siffle, whiii. Le grand foyer est plein d'huile, et sa grosse mèche n'attend plus qu'une braise. Les longues pinces de fer sont posées à côté. Derrière, l'immense miroir de bronze brille comme un soleil… mais il est encore tourné vers le mur."
+        },
+        {
+          "when": [
+            "flag:feu",
+            "!flag:miroir_poli"
+          ],
+          "description": "Tout en haut du phare ! Le vent siffle, whiii. Un grand feu flambe dans le foyer, crac, crac ! Derrière, un immense miroir de bronze, tout terne, est tourné vers le mur."
+        },
+        {
+          "when": [
+            "flag:feu",
+            "flag:miroir_poli"
+          ],
+          "description": "Tout en haut du phare ! Le vent siffle, whiii. Un grand feu flambe dans le foyer, crac, crac ! Derrière, l'immense miroir de bronze brille comme un soleil… mais il est encore tourné vers le mur."
+        }
+      ],
+      "exits": [
+        {
+          "to": "rampe",
+          "label": "vers la rampe",
+          "dir": "bas"
+        }
+      ]
+    }
+  ],
+  "items": [
+    {
+      "id": "filets",
+      "name": "les filets de pêche",
+      "aliases": [
+        "filets",
+        "filet",
+        "filets de peche"
+      ],
+      "at": "port",
+      "takeable": false,
+      "fixed": "Ils sont lourds et tout mouillés, et Théon en a besoin pour pêcher demain.",
+      "description": "De grands filets mouillés, pleins de nœuds et d'algues."
+    },
+    {
+      "id": "panier",
+      "name": "le panier de poissons",
+      "aliases": [
+        "panier",
+        "panier de poissons",
+        "poissons"
+      ],
+      "at": "port",
+      "takeable": false,
+      "fixed": "Tout le panier ? Bien trop lourd ! Mais tu pourrais fouiller dedans pour y trouver un petit poisson.",
+      "description": "Un panier qui déborde de poissons. Ça sent la marée !"
+    },
+    {
+      "id": "obole",
+      "name": "une pièce d'argent",
+      "aliases": [
+        "piece",
+        "obole",
+        "sou",
+        "monnaie",
+        "piece d'argent"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Une petite pièce d'argent, avec une chouette gravée dessus."
+    },
+    {
+      "id": "sardine",
+      "name": "une sardine",
+      "aliases": [
+        "sardine",
+        "poisson",
+        "petit poisson"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Une petite sardine toute brillante. Pas très appétissante… pour toi !"
+    },
+    {
+      "id": "lampe",
+      "name": "une petite lampe vide",
+      "aliases": [
+        "lampe",
+        "petite lampe",
+        "lampe a huile"
+      ],
+      "at": "port",
+      "takeable": true,
+      "description": "Une petite lampe en terre cuite, avec une mèche. Elle est vide : pas une goutte d'huile."
+    },
+    {
+      "id": "pot",
+      "name": "un pot en terre",
+      "aliases": [
+        "pot",
+        "pot en terre",
+        "pot vide"
+      ],
+      "at": "marche",
+      "takeable": true,
+      "description": "Un petit pot en terre cuite, solide, qui ne craint pas la chaleur."
+    },
+    {
+      "id": "figues",
+      "name": "des figues",
+      "aliases": [
+        "figues",
+        "figue",
+        "fruits"
+      ],
+      "at": "marche",
+      "takeable": true,
+      "description": "Des figues violettes, bien mûres et toutes sucrées."
+    },
+    {
+      "id": "four",
+      "name": "le four du boulanger",
+      "aliases": [
+        "four",
+        "four a pain",
+        "braises",
+        "boulanger"
+      ],
+      "at": "marche",
+      "takeable": false,
+      "fixed": "Aïe, c'est brûlant ! Pour emporter des braises, il te faudrait un pot.",
+      "description": "Un grand four à pain. Tout au fond, des braises rougeoient encore."
+    },
+    {
+      "id": "amphore",
+      "name": "une amphore d'huile",
+      "aliases": [
+        "amphore",
+        "huile",
+        "jarre",
+        "huile d'olive"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Une grande amphore pleine d'huile d'olive. C'est la dernière du marché : pas une goutte à gaspiller !"
+    },
+    {
+      "id": "pot_braises",
+      "name": "un pot de braises",
+      "aliases": [
+        "pot de braises",
+        "braise",
+        "pot chaud"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Le pot en terre, plein de braises rouges qui crépitent. Parfait pour allumer un feu !"
+    },
+    {
+      "id": "rouleaux",
+      "name": "les rouleaux de papyrus",
+      "aliases": [
+        "rouleaux",
+        "rouleau",
+        "papyrus",
+        "livres",
+        "etageres"
+      ],
+      "at": "bibliotheque",
+      "takeable": false,
+      "fixed": "Kallia fronce les sourcils : « Les rouleaux restent à la bibliothèque ! Mais tu peux les lire. »",
+      "description": "Tu déroules un rouleau : « Pour que le bronze brille comme le soleil, frottez-le avec un chiffon et du sable fin. » Le rouleau d'à côté explique comment apprendre à nager aux crocodiles. Hum…"
+    },
+    {
+      "id": "cle",
+      "name": "la clé du phare",
+      "aliases": [
+        "cle",
+        "clef",
+        "cle du phare",
+        "grosse cle"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Une grosse clé de bronze, un peu mouillée de bave d'ibis. Beurk !"
+    },
+    {
+      "id": "chiffon",
+      "name": "un vieux chiffon",
+      "aliases": [
+        "chiffon",
+        "torchon",
+        "tissu"
+      ],
+      "at": "bibliotheque",
+      "takeable": true,
+      "description": "Un vieux chiffon tout doux, plein de poussière de papyrus."
+    },
+    {
+      "id": "sable",
+      "name": "du sable fin",
+      "aliases": [
+        "sable",
+        "sable fin",
+        "poignee de sable"
+      ],
+      "at": "digue",
+      "takeable": true,
+      "description": "Une poignée de sable fin et doux, qui crisse entre les doigts."
+    },
+    {
+      "id": "tampon",
+      "name": "un chiffon plein de sable",
+      "aliases": [
+        "chiffon a polir",
+        "tampon",
+        "chiffon plein de sable"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "Le chiffon replié sur le sable fin : de quoi frotter le bronze jusqu'à ce qu'il brille !"
+    },
+    {
+      "id": "lampe_pleine",
+      "name": "une lampe pleine d'huile",
+      "aliases": [
+        "lampe",
+        "petite lampe",
+        "lampe a huile"
+      ],
+      "at": "",
+      "takeable": true,
+      "description": "La petite lampe pleine d'huile d'olive, avec sa mèche."
+    },
+    {
+      "id": "porte",
+      "name": "la porte de bronze",
+      "aliases": [
+        "porte",
+        "serrure",
+        "porte du phare"
+      ],
+      "at": "pied",
+      "takeable": false,
+      "fixed": "Une porte de bronze ? Même dix éléphants ne pourraient pas la porter !",
+      "description": "Une lourde porte de bronze, avec une grosse serrure."
+    },
+    {
+      "id": "foyer",
+      "name": "le grand foyer",
+      "aliases": [
+        "foyer",
+        "feu",
+        "grand feu",
+        "brasier"
+      ],
+      "at": "sommet",
+      "takeable": false,
+      "fixed": "Le foyer est en pierre, et il est bien trop gros !",
+      "description": "Un grand foyer de pierre, tout noir de suie, avec une grosse mèche de lin au milieu. Assez grand pour un énorme feu !"
+    },
+    {
+      "id": "miroir",
+      "name": "le grand miroir",
+      "aliases": [
+        "miroir",
+        "miroir de bronze",
+        "grand miroir",
+        "bronze"
+      ],
+      "at": "sommet",
+      "takeable": false,
+      "fixed": "Il est grand comme un mur ! On peut seulement le faire pivoter.",
+      "description": "Un immense miroir de bronze, monté sur un pivot pour qu'on puisse le tourner."
+    }
+  ],
+  "characters": [
+    {
+      "id": "theon",
+      "name": "Théon le gardien",
+      "aliases": [
+        "theon",
+        "gardien",
+        "vieux gardien"
+      ],
+      "at": "port",
+      "description": "Un vieux gardien à la barbe blanche, la cheville enroulée dans un bandage.",
+      "says": "Aïe, ma cheville ! Je ne peux pas monter au phare. Écoute bien, apprenti : il faut de l'huile pour le grand feu, des braises pour l'allumer, et le grand miroir doit briller pour envoyer la lumière sur la mer. Le feu, c'est un travail de gardien : on porte les braises dans un pot, et on les pose sur la mèche avec les longues pinces de fer, les mains bien loin. Ce coquin de Bec-Long l'ibis m'a chipé la clé de la porte, il s'est envolé vers la bibliothèque ! Et Pistache, mon âne, ne bouge que pour des douceurs. Mais ne grimpe jamais sur son dos : il te ramènerait droit à son écurie ! Sinon… une petite lampe au bout de la jetée, peut-être ? Ce serait bien faible, mais mieux que rien."
+    },
+    {
+      "id": "miou",
+      "name": "Miou le chat",
+      "aliases": [
+        "miou",
+        "chat",
+        "minou"
+      ],
+      "at": "port",
+      "description": "Un chat tigré, bien rond, qui ronronne près des filets.",
+      "says": "Miaou… Mrrrr… (Miou bâille. Il a l'air d'avoir déjà très bien dîné.)"
+    },
+    {
+      "id": "menes",
+      "name": "Ménès le marchand",
+      "aliases": [
+        "menes",
+        "marchand",
+        "vendeur"
+      ],
+      "at": "marche",
+      "description": "Un marchand jovial, avec un grand tablier taché d'huile.",
+      "says": "De l'huile d'olive, la meilleure d'Égypte ! C'est ma dernière amphore : une pièce et elle est à toi. Et si tu veux des braises du four, prends donc un pot : ça brûle les doigts !"
+    },
+    {
+      "id": "kallia",
+      "name": "Kallia la bibliothécaire",
+      "aliases": [
+        "kallia",
+        "bibliothecaire",
+        "savante"
+      ],
+      "at": "bibliotheque",
+      "description": "Une savante aux longues tresses, un plumeau à la main.",
+      "says": "Chut ! Ici dorment des milliers de rouleaux de papyrus. Faire briller le bronze ? Les savants disent : un chiffon et du sable fin, et on frotte, on frotte ! Quant à Bec-Long, cet ibis gourmand ne lâche rien… sauf pour un poisson."
+    },
+    {
+      "id": "ibis",
+      "name": "Bec-Long l'ibis",
+      "aliases": [
+        "bec-long",
+        "bec long",
+        "ibis",
+        "oiseau"
+      ],
+      "at": "bibliotheque",
+      "description": "Un grand oiseau blanc à tête noire, avec un long bec tout courbé.",
+      "says": "Couic ! (Bec-Long regarde tes poches, l'air gourmand. Un ibis, ça raffole du poisson.)"
+    },
+    {
+      "id": "pistache",
+      "name": "Pistache l'âne",
+      "aliases": [
+        "pistache",
+        "ane",
+        "baudet",
+        "bourricot"
+      ],
+      "at": "rampe",
+      "description": "Un petit âne gris aux grandes oreilles. C'est lui qui monte l'huile tout en haut du phare.",
+      "says": "Hi-han ! (Pistache renifle tes poches. Il rêve de quelque chose de sucré.)"
+    },
+    {
+      "id": "marin",
+      "name": "le vieux marin",
+      "aliases": [
+        "marin",
+        "vieux marin",
+        "matelot"
+      ],
+      "at": "jetee",
+      "description": "Un vieux marin au visage tout ridé par le soleil, enroulé dans un manteau de laine.",
+      "says": "Ohé, petit ! Surtout, ne va jamais nager dans la mer cette nuit : avec l'orage, les vagues t'emporteraient ! Ce bateau, là-bas, il lui faudrait une lumière pour trouver le port…"
+    }
+  ],
+  "actions": [
+    {
+      "id": "fouiller_filets",
+      "verb": "search",
+      "object": "filets",
+      "when": [
+        "!flag:obole_trouvee"
+      ],
+      "effects": [
+        "reveal:obole",
+        "flag:obole_trouvee"
+      ],
+      "points": 5,
+      "not_yet": "Tu as déjà tout fouillé : il ne reste que des nœuds et des algues.",
+      "text": "Tu passes la main entre les mailles mouillées… et tu trouves une pièce d'argent !"
+    },
+    {
+      "id": "tirer_filets",
+      "verb": "pull",
+      "object": "filets",
+      "when": [
+        "!flag:obole_trouvee"
+      ],
+      "effects": [
+        "reveal:obole",
+        "flag:obole_trouvee"
+      ],
+      "points": 5,
+      "not_yet": "Tu as déjà tout fouillé : il ne reste que des nœuds et des algues.",
+      "text": "Tu secoues les filets… cling ! Une pièce d'argent tombe sur le quai."
+    },
+    {
+      "id": "fouiller_panier",
+      "verb": "search",
+      "object": "panier",
+      "effects": [
+        "reveal:sardine"
+      ],
+      "points": 5,
+      "text": "Tu fouilles dans le panier, splotch… Voilà une petite sardine toute brillante !"
+    },
+    {
+      "id": "acheter_huile",
+      "verb": "give",
+      "object": "obole",
+      "target": "menes",
+      "when": [
+        "has:obole"
+      ],
+      "effects": [
+        "lose:obole",
+        "gain:amphore",
+        "flag:huile_achetee"
+      ],
+      "points": 10,
+      "text": "Ménès mord la pièce, tac ! « Elle est bonne ! » Il te tend sa dernière amphore d'huile d'olive. Elle est lourde !"
+    },
+    {
+      "id": "prendre_braises",
+      "verb": "use",
+      "object": "pot",
+      "target": "four",
+      "when": [
+        "has:pot"
+      ],
+      "effects": [
+        "lose:pot",
+        "gain:pot_braises"
+      ],
+      "points": 10,
+      "text": "Avec un bâton, tu fais rouler des braises dans le pot en terre. Elles rougeoient et crépitent, fsss !"
+    },
+    {
+      "id": "remplir_pot",
+      "verb": "fill",
+      "object": "pot",
+      "target": "four",
+      "when": [
+        "has:pot"
+      ],
+      "effects": [
+        "lose:pot",
+        "gain:pot_braises"
+      ],
+      "points": 10,
+      "text": "Avec un bâton, tu fais rouler des braises dans le pot en terre. Elles rougeoient et crépitent, fsss !"
+    },
+    {
+      "id": "nourrir_ibis",
+      "verb": "give",
+      "object": "sardine",
+      "target": "ibis",
+      "when": [
+        "has:sardine"
+      ],
+      "effects": [
+        "lose:sardine",
+        "reveal:cle",
+        "flag:ibis_content"
+      ],
+      "points": 10,
+      "text": "Bec-Long ouvre le bec pour gober la sardine, glop ! La clé tombe par terre, cling !"
+    },
+    {
+      "id": "lancer_sardine",
+      "verb": "throw",
+      "object": "sardine",
+      "target": "ibis",
+      "when": [
+        "has:sardine"
+      ],
+      "effects": [
+        "lose:sardine",
+        "reveal:cle",
+        "flag:ibis_content"
+      ],
+      "points": 10,
+      "text": "Tu lances la sardine en l'air. Bec-Long ouvre le bec pour l'attraper, glop ! La clé tombe par terre, cling !"
+    },
+    {
+      "id": "faire_tampon",
+      "verb": "combine",
+      "object": "chiffon",
+      "target": "sable",
+      "when": [
+        "has:chiffon",
+        "has:sable"
+      ],
+      "effects": [
+        "lose:chiffon",
+        "lose:sable",
+        "gain:tampon"
+      ],
+      "points": 10,
+      "text": "Tu verses le sable fin sur le chiffon et tu le replies : voilà un super chiffon à polir !"
+    },
+    {
+      "id": "ouvrir_porte",
+      "verb": "open",
+      "object": "porte",
+      "when": [
+        "has:cle"
+      ],
+      "effects": [
+        "flag:porte_ouverte"
+      ],
+      "points": 10,
+      "not_yet": "La porte de bronze est fermée à clé. Théon a dit que Bec-Long l'ibis la lui avait chipée…",
+      "text": "La grosse clé tourne dans la serrure, clonk ! La porte de bronze s'ouvre en grinçant, criiii…"
+    },
+    {
+      "id": "nourrir_pistache",
+      "verb": "give",
+      "object": "figues",
+      "target": "pistache",
+      "when": [
+        "has:figues"
+      ],
+      "effects": [
+        "lose:figues",
+        "flag:pistache_bouge"
+      ],
+      "points": 10,
+      "text": "Pistache croque les figues, crunch, crunch ! Il remue la queue et se range contre le mur. Hi-han, merci !"
+    },
+    {
+      "id": "verser_huile",
+      "verb": "use",
+      "object": "amphore",
+      "target": "foyer",
+      "when": [
+        "has:amphore"
+      ],
+      "effects": [
+        "lose:amphore",
+        "flag:foyer_huile"
+      ],
+      "points": 10,
+      "text": "Glou, glou, glou… tu verses toute l'huile dans le grand foyer."
+    },
+    {
+      "id": "remplir_foyer",
+      "verb": "fill",
+      "object": "foyer",
+      "target": "amphore",
+      "when": [
+        "has:amphore"
+      ],
+      "effects": [
+        "lose:amphore",
+        "flag:foyer_huile"
+      ],
+      "points": 10,
+      "text": "Glou, glou, glou… tu verses toute l'huile dans le grand foyer."
+    },
+    {
+      "id": "allumer_feu",
+      "verb": "light",
+      "object": "foyer",
+      "when": [
+        "has:pot_braises",
+        "flag:foyer_huile"
+      ],
+      "effects": [
+        "flag:feu"
+      ],
+      "points": 10,
+      "not_yet": "Pour un grand feu, il faut de l'huile dans le foyer… et une braise pour l'allumer !",
+      "text": "Avec les longues pinces de fer, tu prends une braise dans le pot et tu la poses tout doucement sur la grosse mèche, les mains bien loin, comme Théon te l'a appris. La mèche s'allume, la flamme boit l'huile et grandit, grandit… Un grand feu brille dans le foyer, crac, crac !"
+    },
+    {
+      "id": "braise_foyer",
+      "verb": "use",
+      "object": "pot_braises",
+      "target": "foyer",
+      "when": [
+        "has:pot_braises",
+        "flag:foyer_huile"
+      ],
+      "effects": [
+        "flag:feu"
+      ],
+      "points": 10,
+      "not_yet": "Une braise dans un foyer vide ? Elle s'éteindrait tout de suite. Il faut d'abord de l'huile !",
+      "text": "Avec les longues pinces de fer, tu prends une braise dans le pot et tu la poses tout doucement sur la grosse mèche, les mains bien loin, comme Théon te l'a appris. La mèche s'allume, la flamme boit l'huile et grandit, grandit… Un grand feu brille dans le foyer, crac, crac !"
+    },
+    {
+      "id": "polir_miroir",
+      "verb": "use",
+      "object": "tampon",
+      "target": "miroir",
+      "when": [
+        "has:tampon"
+      ],
+      "effects": [
+        "lose:tampon",
+        "flag:miroir_poli"
+      ],
+      "points": 10,
+      "text": "Tu frottes, frotti, frotta… Le bronze se met à briller comme un soleil !"
+    },
+    {
+      "id": "polir_chiffon",
+      "verb": "use",
+      "object": "chiffon",
+      "target": "miroir",
+      "when": [
+        "flag:jamais"
+      ],
+      "effects": [],
+      "points": 0,
+      "not_yet": "Tu frottes avec le chiffon tout seul… le bronze reste terne. Kallia parlait de sable fin !",
+      "text": ""
+    },
+    {
+      "id": "tourner_miroir",
+      "verb": "push",
+      "object": "miroir",
+      "when": [
+        "flag:feu",
+        "flag:miroir_poli"
+      ],
+      "effects": [
+        "end:navire"
+      ],
+      "points": 10,
+      "not_yet": "Tourner le miroir maintenant ? Il faut d'abord un grand feu à renvoyer… et un miroir qui brille comme un soleil !",
+      "text": "Tu pousses le grand miroir de toutes tes forces… il pivote, grrrinc ! La lumière du feu rebondit sur le bronze et file sur la mer."
+    },
+    {
+      "id": "tirer_miroir",
+      "verb": "pull",
+      "object": "miroir",
+      "when": [
+        "flag:feu",
+        "flag:miroir_poli"
+      ],
+      "effects": [
+        "end:navire"
+      ],
+      "points": 10,
+      "not_yet": "Tourner le miroir maintenant ? Il faut d'abord un grand feu à renvoyer… et un miroir qui brille comme un soleil !",
+      "text": "Tu tires le grand miroir de toutes tes forces… il pivote, grrrinc ! La lumière du feu rebondit sur le bronze et file sur la mer."
+    },
+    {
+      "id": "utiliser_miroir",
+      "verb": "use",
+      "object": "miroir",
+      "when": [
+        "flag:feu",
+        "flag:miroir_poli"
+      ],
+      "effects": [
+        "end:navire"
+      ],
+      "points": 10,
+      "not_yet": "Tourner le miroir maintenant ? Il faut d'abord un grand feu à renvoyer… et un miroir qui brille comme un soleil !",
+      "text": "Tu fais pivoter le grand miroir, grrrinc ! La lumière du feu rebondit sur le bronze et file sur la mer."
+    },
+    {
+      "id": "remplir_lampe",
+      "verb": "combine",
+      "object": "lampe",
+      "target": "amphore",
+      "when": [
+        "has:lampe",
+        "has:amphore"
+      ],
+      "effects": [
+        "lose:lampe",
+        "lose:amphore",
+        "gain:lampe_pleine"
+      ],
+      "points": 10,
+      "text": "Glou, glou… tu verses l'huile dans la petite lampe… oups, tout le reste coule aussi ! L'amphore est vide, mais la lampe est pleine."
+    },
+    {
+      "id": "remplir_lampe_2",
+      "verb": "fill",
+      "object": "lampe",
+      "target": "amphore",
+      "when": [
+        "has:lampe",
+        "has:amphore"
+      ],
+      "effects": [
+        "lose:lampe",
+        "lose:amphore",
+        "gain:lampe_pleine"
+      ],
+      "points": 10,
+      "text": "Glou, glou… tu verses l'huile dans la petite lampe… oups, tout le reste coule aussi ! L'amphore est vide, mais la lampe est pleine."
+    },
+    {
+      "id": "allumer_lampe_vide",
+      "verb": "light",
+      "object": "lampe",
+      "when": [
+        "flag:jamais"
+      ],
+      "effects": [],
+      "points": 0,
+      "not_yet": "La lampe est vide : sans huile, la mèche ne brûlerait pas une seconde !",
+      "text": ""
+    },
+    {
+      "id": "allumer_lampe",
+      "verb": "light",
+      "object": "lampe_pleine",
+      "when": [
+        "has:lampe_pleine",
+        "has:pot_braises"
+      ],
+      "effects": [
+        "flag:lampe_allumee"
+      ],
+      "points": 10,
+      "not_yet": "Il te faudrait une braise, ou une flamme, pour allumer la mèche.",
+      "text": "Avec un petit bâton, tu poses une braise contre la mèche, tout doucement… fffout ! La petite lampe s'allume."
+    },
+    {
+      "id": "braise_lampe",
+      "verb": "use",
+      "object": "pot_braises",
+      "target": "lampe_pleine",
+      "when": [
+        "has:lampe_pleine",
+        "has:pot_braises"
+      ],
+      "effects": [
+        "flag:lampe_allumee"
+      ],
+      "points": 10,
+      "text": "Avec un petit bâton, tu poses une braise contre la mèche, tout doucement… fffout ! La petite lampe s'allume."
+    },
+    {
+      "id": "agiter_lampe",
+      "verb": "use",
+      "object": "lampe_pleine",
+      "place": "jetee",
+      "when": [
+        "flag:lampe_allumee"
+      ],
+      "effects": [
+        "end:lampe"
+      ],
+      "points": 10,
+      "not_yet": "Une lampe éteinte, personne ne la verra ! Il faut d'abord l'allumer.",
+      "text": "Tu lèves la petite lampe bien haut et tu la balances, de droite à gauche, de gauche à droite…"
+    },
+    {
+      "id": "agiter_lampe_ailleurs",
+      "verb": "use",
+      "object": "lampe_pleine",
+      "when": [
+        "flag:jamais"
+      ],
+      "effects": [],
+      "points": 0,
+      "not_yet": "D'ici, le bateau ne verrait rien. Il faudrait aller tout au bout de la jetée, face à la mer.",
+      "text": ""
+    },
+    {
+      "id": "chat_sardine",
+      "verb": "give",
+      "object": "sardine",
+      "target": "miou",
+      "when": [
+        "flag:jamais"
+      ],
+      "effects": [],
+      "points": 0,
+      "not_yet": "Miou renifle la sardine… et bâille. Il a déjà mangé six poissons ce soir !",
+      "text": ""
+    },
+    {
+      "id": "ibis_figues",
+      "verb": "give",
+      "object": "figues",
+      "target": "ibis",
+      "when": [
+        "flag:jamais"
+      ],
+      "effects": [],
+      "points": 0,
+      "not_yet": "Bec-Long tourne la tête : des figues ? Beurk ! Un ibis, ça préfère le poisson.",
+      "text": ""
+    },
+    {
+      "id": "pistache_sardine",
+      "verb": "give",
+      "object": "sardine",
+      "target": "pistache",
+      "when": [
+        "flag:jamais"
+      ],
+      "effects": [],
+      "points": 0,
+      "not_yet": "Pistache fait la grimace : un âne, ça ne mange pas de poisson !",
+      "text": ""
+    },
+    {
+      "id": "manger_figues",
+      "verb": "eat",
+      "object": "figues",
+      "when": [
+        "flag:jamais"
+      ],
+      "effects": [],
+      "points": 0,
+      "not_yet": "Tu croques une figue, miam ! Tu gardes les autres : quelqu'un en rêve sûrement encore plus que toi.",
+      "text": ""
+    },
+    {
+      "id": "boire_huile",
+      "verb": "drink",
+      "object": "amphore",
+      "when": [
+        "flag:jamais"
+      ],
+      "effects": [],
+      "points": 0,
+      "not_yet": "Beurk ! De l'huile toute pure, ça ne se boit pas. Elle servira à faire de la lumière !",
+      "text": ""
+    },
+    {
+      "id": "nager",
+      "verb": "swim",
+      "place": "jetee",
+      "effects": [
+        "end:plouf"
+      ],
+      "points": 0,
+      "text": "Tu enjambes le bord de la jetée pour plonger… SPLASH ! Une grosse vague froide t'éclabousse de la tête aux pieds, et le vieux marin t'attrape par la tunique : « Pas question, petit ! »",
+      "object": "jetee"
+    },
+    {
+      "id": "nager_non",
+      "verb": "swim",
+      "place": "jetee",
+      "effects": [],
+      "points": 0,
+      "text": "Le vieux marin te retient par la manche : « Nager dans la mer en pleine nuit, avec l'orage ? Jamais, petit ! Les vagues sont bien trop fortes. »"
+    },
+    {
+      "id": "grimper_pistache",
+      "verb": "climb",
+      "object": "pistache",
+      "effects": [
+        "end:dodo"
+      ],
+      "points": 0,
+      "text": "Tu grimpes sur le dos de Pistache… Hi-han ! L'âne fait demi-tour et descend la rampe au trot !"
+    }
+  ],
+  "endings": [
+    {
+      "id": "navire",
+      "kind": "win",
+      "text": "Le miroir envoie la lumière du grand feu très loin sur la mer. Au large, le bateau tourne… et file droit vers le port ! Tout Alexandrie applaudit, et Théon crie depuis le quai : « Bravo, apprenti ! Te voilà gardien de la merveille du monde ! »"
+    },
+    {
+      "id": "lampe",
+      "kind": "win",
+      "text": "Au large, les marins voient une toute petite lumière qui danse… et ils la suivent jusqu'au port ! Théon éclate de rire : « Une si petite lampe pour un si gros bateau ! » Le grand phare, on le rallumera demain."
+    },
+    {
+      "id": "plouf",
+      "kind": "lose",
+      "text": "Tout trempé et grelottant, tu es ramené à la maison pour te sécher près du feu, sous une grosse couverture. Atchoum ! Le vieux marin avait raison : la mer, la nuit, pendant l'orage, c'est jamais. Et sans lumière, le bateau doit attendre au large jusqu'au matin."
+    },
+    {
+      "id": "dodo",
+      "kind": "lose",
+      "text": "Pistache trotte jusqu'à son écurie, et te voilà dans la paille toute chaude. Tu bâilles… et tu t'endors. Au matin, le bateau attend toujours au large, et Théon soupire : « Mon âne est plus têtu que la tempête ! »"
+    }
+  ]
+}

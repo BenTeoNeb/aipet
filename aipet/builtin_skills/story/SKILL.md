@@ -2,6 +2,7 @@
 name: story
 description: Inventer et raconter une histoire avec l'enfant (il choisit le héros, le lieu, et les grandes décisions), avec des personnages qui reviennent d'une histoire à l'autre ; douce et apaisante le soir.
 tools: story_start, story_next, story_end
+label: une histoire à inventer ensemble
 ---
 Le but : une vraie histoire, cohérente du début à la fin, que l'enfant aide à construire, et un monde de
 personnages qui grandit avec lui d'une fois sur l'autre.
