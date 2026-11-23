@@ -120,7 +120,11 @@ def test_le_scarabee_du_scribe(tmp_path, monkeypatch):
          [G("l'atelier"), G("la terrasse"), A("give", "le poisson", "Miou")], ["done", "done", "done"]),
         ("Je prends le scarabée", [A("take", "le scarabée")], ["done"]),
         ("Je vais au temple", [G("en bas"), G("le marché"), G("le temple")], ["done", "done", "done"]),
-        ("Princesse, voilà ton scarabée !", [A("give", "le scarabée", "la princesse")], ["end"]),
+        ("Princesse, voilà ton scarabée !", [A("give", "le scarabée", "la princesse")], ["not_yet"]),  # her riddle first
+        ("Bonjour princesse !", [A("talk", "la princesse")], ["done"]),  # the riddle, like the Sphinx's
+        ("C'est la lune !", [A("answer", "la lune", "Méryt")], ["not_yet"]),
+        ("C'est le soleil !", [A("answer", "le soleil", "Méryt")], ["done"]),
+        ("Voilà ton scarabée !", [A("give", "le scarabée", "la princesse")], ["end"]),
     ])  # fmt: skip
     assert game.state.ending == "chatte"
 
@@ -138,10 +142,30 @@ def test_le_scarabee_du_scribe_barque(tmp_path, monkeypatch):
          [G("l'atelier"), G("la terrasse"), A("chatouiller", "Miou", "la plume")], ["done", "done", "done"]),
         ("Je caresse Miou", [A("caresser", "Miou")], ["clue"]),  # she purrs: nothing more to do here
         ("Je prends le scarabée et je l'apporte à la princesse",
-         [A("take", "le scarabée"), G("en bas"), G("le marché"), G("le temple"), A("give", "le scarabée", "Méryt")],
-         ["done", "done", "done", "done", "end"]),
+         [A("take", "le scarabée"), G("en bas"), G("le marché"), G("le temple"), A("answer", "le soleil", "Méryt"),
+          A("give", "le scarabée", "Méryt")],
+         ["done", "done", "done", "done", "done", "end"]),
     ])  # fmt: skip
     assert game.state.ending == "fete"
+
+
+def test_le_scarabee_du_scribe_souris(tmp_path, monkeypatch):
+    """The silly recipe: a papyrus mouse with an ibis-feather tail, a third way to the scarab."""
+    game = play(tmp_path, monkeypatch, "Le scarabée du scribe", [
+        ("Je prends le papyrus", [A("take", "le papyrus")], ["done"]),
+        ("Je vais au bord du Nil et je prends la plume", [G("le Nil"), A("take", "la plume")], ["done", "done"]),
+        ("Je fabrique une souris avec le papyrus et la plume",
+         [A("combine", "la plume", "le papyrus")], ["done"]),
+        ("Je montre la souris à Miou",
+         [G("l'atelier"), G("la terrasse"), A("give", "la souris", "Miou")], ["done", "done", "done"]),
+        ("Je prends le scarabée et je vais au temple",
+         [A("take", "le scarabée"), G("en bas"), G("le marché"), G("le temple")], ["done"] * 4),
+        ("Bonjour princesse", [A("talk", "Méryt")], ["done"]),
+        ("Un chat ?", [A("answer", "un chat", "Méryt")], ["not_yet"]),
+        ("Le soleil !", [A("answer", "le soleil")], ["done"]),
+        ("Voilà le scarabée", [A("give", "le scarabée", "Méryt")], ["end"]),
+    ])  # fmt: skip
+    assert game.state.ending == "chatte"
 
 
 def test_le_phare_de_piko(tmp_path, monkeypatch):

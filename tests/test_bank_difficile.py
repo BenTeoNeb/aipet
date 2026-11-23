@@ -64,6 +64,9 @@ def test_la_lanterne_de_la_grande_muraille(tmp_path, monkeypatch):
         ("Je vais à l'atelier de papier", [G("l'atelier")], ["done"]),
         ("Bonjour Petit Lu", [A("talk", "Lu")], ["done"]),
         ("Je prends une feuille", [A("take", "une feuille")], ["not_yet"]),  # seen, still on the rack
+        ("Je cherche une feuille sur le séchoir", [A("search", "le séchoir")], ["not_yet"]),  # his lantern riddle first
+        ("C'est le soleil !", [A("answer", "le soleil", "Petit Lu")], ["not_yet"]),
+        ("C'est la lune !", [A("answer", "la lune", "Petit Lu")], ["done"]),
         ("Je cherche une feuille bien sèche sur le séchoir", [A("search", "le séchoir")], ["done"]),
         ("Je prends la feuille", [A("take", "la feuille")], ["done"]),
         ("Je retourne au village et à la maison de thé",
@@ -89,6 +92,27 @@ def test_la_lanterne_de_la_grande_muraille(tmp_path, monkeypatch):
         ("Je lance le cerf-volant dans le vent", [A("throw", "le cerf-volant")], ["end"]),
     ])  # fmt: skip
     assert game.state.ending == "cerf_volant" and [r["outcome"] for r in game.adventure["runs"]] == ["lose", "win"]
+
+
+def test_la_lanterne_de_la_grande_muraille_eternuement(tmp_path, monkeypatch):
+    """The silly recipe: a scarf full of Sichuan pepper sneezes Ah-Fu awake (the gong's other way)."""
+    game = play(tmp_path, monkeypatch, "La lanterne de la Grande Muraille", [
+        ("Je prends la lanterne et le foulard", [A("take", "la lanterne"), A("take", "le foulard")], ["done", "done"]),
+        ("Je prends la pièce dans la gueule du dragon", [A("search", "le dragon"), A("take", "la pièce")], ["done", "done"]),
+        ("Je vais à la maison de thé", [G("la maison de thé")], ["done"]),
+        ("Je donne la pièce à Madame Hua", [A("give", "la pièce", "Madame Hua")], ["done"]),
+        ("J'allume la lanterne au réchaud", [A("use", "la lanterne", "le réchaud")], ["done"]),
+        ("Je mets du poivre sur le foulard", [A("use", "le poivre", "le foulard")], ["done"]),
+        ("Je vais dans la forêt de bambous et je donne le petit pain au chameau",
+         [G("la place du village"), G("les bambous"), A("give", "le petit pain", "le chameau"), A("take", "les bambous")],
+         ["done"] * 4),
+        ("Je monte sur la Muraille", [G("la Grande Muraille"), G("le grand escalier")], ["done", "done"]),
+        ("Je chatouille le nez du garde avec le foulard", [A("use", "le foulard", "le garde")], ["done"]),  # TCHOUM
+        ("J'entre dans la tour", [G("la tour de guet")], ["done"]),
+        ("Je mets les bambous dans le foyer", [A("use", "les bambous", "le foyer")], ["done"]),
+        ("J'allume le feu avec ma lanterne", [A("use", "la lanterne", "le foyer")], ["end"]),
+    ])  # fmt: skip
+    assert game.state.ending == "fumee"
 
 
 def test_le_petit_rover_de_la_lune(tmp_path, monkeypatch):

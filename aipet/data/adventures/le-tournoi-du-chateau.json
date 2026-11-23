@@ -230,7 +230,22 @@
    ],
    "at": "ecurie",
    "initial": "Contre le mur, une longue perche en bois attend qu'on s'en serve.",
-   "description": "Une longue perche en bois, bien droite. Parfait pour accrocher quelque chose tout en haut."
+   "description": "Une longue perche en bois, bien droite. Parfaite pour accrocher quelque chose tout au bout : une bannière… ou même une pomme, à balancer sous le nez d'un cheval gourmand !",
+   "states": [
+    {
+     "id": "nue"
+    },
+    {
+     "id": "avec_pomme",
+     "name": "la perche avec une pomme au bout",
+     "aliases": [
+      "perche a pomme",
+      "canne a pomme",
+      "pomme au bout de la perche"
+     ],
+     "description": "La longue perche, avec la pomme rouge accrochée tout au bout par sa queue. Elle se balance, toc, toc… Un cheval gourmand la suivrait jusqu'au bout du monde !"
+    }
+   ]
   },
   {
    "id": "pomme",
@@ -255,7 +270,23 @@
    ],
    "at": "cuisine",
    "initial": "Un quignon de pain croustillant attend sur la table.",
-   "description": "Un bon quignon de pain tout croustillant."
+   "description": "Un bon quignon de pain tout croustillant.",
+   "states": [
+    {
+     "id": "sec"
+    },
+    {
+     "id": "trempe",
+     "name": "un quignon trempé dans la soupe",
+     "aliases": [
+      "pain trempe",
+      "tartine de soupe",
+      "pain mouille",
+      "quignon trempe"
+     ],
+     "description": "Un quignon tout mou, tout dégoulinant de soupe aux poireaux. Beurk… ou miam ?"
+    }
+   ]
   },
   {
    "id": "marmite",
@@ -457,7 +488,7 @@
    "at": "cuisine",
    "description": "Une cuisinière toute ronde, avec de la farine jusqu'aux coudes.",
    "initial": "Dame Berthe, la cuisinière, pétrit la pâte en chantonnant.",
-   "says": "Sers-toi sur la table, mon petit ! Le pain, Agathe l'oie l'adore. Et la pomme… Caramel ferait n'importe quoi pour une pomme !"
+   "says": "Sers-toi sur la table, mon petit ! Le pain, Agathe l'oie l'adore. Et la pomme… Caramel ferait n'importe quoi pour une pomme ! Et ma soupe aux poireaux, tout le monde l'adore… même les oies, je parie !"
   },
   {
    "id": "anselme",
@@ -558,6 +589,62 @@
    "text": "Tu pousses, tu tires… Caramel est lourd comme une charrette ! Il ne bouge pas d'un sabot. Par contre, il renifle vers la cuisine en se léchant les babines…"
   },
   {
+   "id": "pomme_perche",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "pomme",
+     "target": "perche"
+    }
+   ],
+   "when": [
+    "has:pomme",
+    "has:perche",
+    "is:perche:nue"
+   ],
+   "effects": [
+    "lose:pomme",
+    "set:perche:avec_pomme"
+   ],
+   "points": 5,
+   "text": "Tu accroches la pomme tout au bout de la longue perche, par sa petite queue. Elle se balance, toc, toc… Une vraie canne à pêche à cheval !",
+   "hint": "Caramel ferait n'importe quoi pour une pomme… Et si elle se balançait devant son nez, au bout de quelque chose de long ?"
+  },
+  {
+   "id": "caramel_perche",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "perche",
+     "target": "caramel"
+    },
+    {
+     "verb": "give",
+     "object": "perche",
+     "target": "caramel"
+    },
+    {
+     "verb": "pull",
+     "object": "caramel",
+     "target": "perche"
+    }
+   ],
+   "when": [
+    "has:perche",
+    "is:perche:avec_pomme",
+    "is:caramel:boudeur"
+   ],
+   "effects": [
+    "set:perche:nue",
+    "set:caramel:content",
+    "move:caramel:lice",
+    "move:bertrand:lice"
+   ],
+   "points": 10,
+   "text": "Tu tends la perche, et la pomme se balance juste devant le nez de Caramel… Il se lève, il avance, il avance encore, clop, clop, jusque dans la cour ! Hop, il croque enfin la pomme. Sire Bertrand saute en selle en riant : « Quelle ruse, mon écuyer ! Rejoins-moi au tournoi avec mon bouclier et ma bannière ! » Et toi, tu gardes la perche : elle peut encore servir.",
+   "hint": "La pomme se balance au bout de ta perche… Va la faire danser sous le nez de Caramel !"
+  },
+  {
    "id": "donner_pain",
    "triggers": [
     {
@@ -567,7 +654,8 @@
     }
    ],
    "when": [
-    "has:pain"
+    "has:pain",
+    "is:pain:sec"
    ],
    "effects": [
     "lose:pain",
@@ -577,6 +665,28 @@
    "points": 10,
    "text": "Agathe engloutit le pain : miam, cacaaarde ! Toute contente, elle secoue ses ailes… et une belle plume blanche tombe dans ta main.",
    "hint": "Agathe a très faim… Dame Berthe a dit ce qu'elle adore."
+  },
+  {
+   "id": "donner_pain_soupe",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "pain",
+     "target": "oie"
+    }
+   ],
+   "when": [
+    "has:pain",
+    "is:pain:trempe"
+   ],
+   "effects": [
+    "lose:pain",
+    "set:oie:repue",
+    "gain:plume"
+   ],
+   "points": 10,
+   "text": "Agathe plonge le bec dans la tartine de soupe : slurp, slurp, CACAAARDE ! Elle en a jusqu'aux yeux ! Toute contente, elle secoue ses ailes… et une belle plume blanche tombe dans ta main, avec une petite goutte de soupe au bout.",
+   "hint": "Agathe a très faim… et ce quignon trempé dans la soupe sent si bon !"
   },
   {
    "id": "tirer_plume",
@@ -631,14 +741,15 @@
    "when": [
     "has:banniere",
     "has:perche",
-    "is:banniere:peinte"
+    "is:banniere:peinte",
+    "is:perche:nue"
    ],
    "effects": [
     "lose:perche",
     "set:banniere:etendard"
    ],
    "points": 10,
-   "not_yet": "Il te faut la bannière peinte et la longue perche, toutes les deux.",
+   "not_yet": "Il te faut la bannière peinte et la longue perche, toutes les deux… avec rien d'autre au bout !",
    "text": "Tu accroches la bannière tout en haut de la longue perche… et voilà un bel étendard qui flotte au vent !",
    "hint": "Une bannière, ça se voit de loin quand elle est bien haut… au bout de quelque chose de long ?"
   },
@@ -719,6 +830,32 @@
    "effects": [],
    "points": 0,
    "text": "Dame Berthe te tend une grande cuillère en bois : « Goûte ! » Slurp… de la soupe aux poireaux, toute chaude. Miam !"
+  },
+  {
+   "id": "tremper_pain",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "pain",
+     "target": "marmite"
+    },
+    {
+     "verb": "use",
+     "object": "pain",
+     "target": "marmite"
+    }
+   ],
+   "when": [
+    "has:pain",
+    "is:pain:sec"
+   ],
+   "effects": [
+    "set:pain:trempe"
+   ],
+   "points": 5,
+   "not_yet": "Ton quignon est déjà tout trempé : encore un plouf, et il fondrait dans la marmite !",
+   "text": "Tu trempes le quignon dans la marmite, plouf ! Il ressort tout mou, tout dégoulinant de soupe aux poireaux. Dame Berthe éclate de rire : « Une tartine de soupe ! Ça, c'est une recette de chevalier ! »",
+   "hint": "Dame Berthe parie que même les oies adorent sa soupe… Et si tu y trempais quelque chose ?"
   }
  ],
  "endings": [
@@ -795,6 +932,42 @@
    "needs": [
     "pomme",
     "caramel"
+   ],
+   "clue_in": "berthe"
+  },
+  {
+   "goal": "Ou attirer Caramel avec une pomme au bout de la perche",
+   "action": "caramel_perche",
+   "needs": [
+    "perche",
+    "caramel"
+   ],
+   "clue_in": "perche"
+  },
+  {
+   "goal": "Accrocher la pomme au bout de la perche",
+   "action": "pomme_perche",
+   "needs": [
+    "pomme",
+    "perche"
+   ],
+   "clue_in": "perche"
+  },
+  {
+   "goal": "Pour rire : tremper le pain dans la soupe, Agathe l'adore encore plus",
+   "action": "donner_pain_soupe",
+   "needs": [
+    "pain",
+    "oie"
+   ],
+   "clue_in": "berthe"
+  },
+  {
+   "goal": "Faire une tartine de soupe",
+   "action": "tremper_pain",
+   "needs": [
+    "pain",
+    "marmite"
    ],
    "clue_in": "berthe"
   }

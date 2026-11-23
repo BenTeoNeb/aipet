@@ -76,6 +76,8 @@ def _moves(w: World, st: State, reduce: bool):
             continue
         tried.add(a["id"])
         n = State.from_dict(st.to_dict())
+        t = _trigger_for(w, a["id"], st)  # the words a narrator sends (`intent_for`): the turn takes what they name
+        w.builtins.implicit_take(n, t.get("verb", ""), t.get("object"), t.get("target"))
         w.apply(n, a.get("effects", []))
         n.done_actions.append(a["id"])
         yield ("act", a["id"]), n

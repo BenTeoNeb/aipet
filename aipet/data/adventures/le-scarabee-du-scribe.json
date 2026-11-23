@@ -228,7 +228,7 @@
    ],
    "at": "nil",
    "initial": "Une jolie plume blanche traîne sur le sable.",
-   "description": "Une longue plume blanche, toute douce. Parfaite pour chatouiller !"
+   "description": "Une longue plume blanche, toute douce. Parfaite pour chatouiller… ou pour faire une queue qui frétille à un jouet en papyrus !"
   },
   {
    "id": "barque",
@@ -259,6 +259,19 @@
    "at": "nil",
    "fixed": "Ils ont les pieds dans l'eau ! Et Kha a déjà une feuille de papyrus toute prête à l'atelier.",
    "description": "De grandes plantes vertes plus hautes que toi. Avec leurs tiges, on fabrique les feuilles de papyrus."
+  },
+  {
+   "id": "souris",
+   "kind": "thing",
+   "name": "une souris en papyrus",
+   "aliases": [
+    "souris",
+    "souris en papyrus",
+    "souris de papier",
+    "jouet"
+   ],
+   "at": "",
+   "description": "Une petite souris pliée dans le papyrus, avec une longue queue en plume d'ibis qui frétille. On dirait une vraie !"
   }
  ],
  "characters": [
@@ -297,7 +310,7 @@
     "minet"
    ],
    "at": "terrasse",
-   "description": "Une chatte toute fine aux grands yeux verts, qui adore le poisson et déteste les chatouilles.",
+   "description": "Une chatte toute fine aux grands yeux verts, qui adore le poisson, déteste les chatouilles et bondit sur tout ce qui frétille.",
    "states": [
     {
      "id": "sieste",
@@ -354,7 +367,30 @@
    "at": "temple",
    "description": "Une petite princesse avec une robe blanche, des bracelets d'or et un grand sourire.",
    "initial": "La petite princesse Méryt attend, avec sa robe blanche et ses bracelets d'or.",
-   "says": "Bonjour ! Kha devait m'apporter un scarabée porte-bonheur pour la fête de la crue. Tu l'as vu ?"
+   "says": "Bonjour ! Kha devait m'apporter un scarabée porte-bonheur pour la fête de la crue. Tu l'as vu ? Mais attention : au temple, un porte-bonheur ne se reçoit qu'après une énigme, comme celles du Sphinx des légendes !",
+   "states": [
+    {
+     "id": "attend"
+    },
+    {
+     "id": "devinee",
+     "says": "Bravo, petit malin ! Maintenant, si tu as le scarabée porte-bonheur de Kha, tu peux me le donner."
+    }
+   ],
+   "answer": {
+    "question": "Écoute bien : je suis tout rond, tout jaune et tout chaud. Le matin, je me lève au-dessus du Nil, et le soir, je vais me coucher derrière le désert. Qui suis-je ?",
+    "accept": [
+     "soleil",
+     "le soleil",
+     "un soleil"
+    ],
+    "wrong": "La princesse Méryt éclate de rire : « Hi hi, non, ce n'est pas ça ! Réfléchis encore ! »",
+    "right": "« Oui, c'est le soleil ! Tu es aussi malin que le Sphinx ! » La princesse Méryt tape dans ses mains, et ses bracelets d'or font cling cling.",
+    "hint": "Lève les yeux vers le ciel, en plein jour : qu'est-ce qui brille et qui chauffe si fort ?",
+    "effects": [
+     "set:meryt:devinee"
+    ]
+   }
   },
   {
    "id": "ibis",
@@ -471,6 +507,91 @@
    "hint": "Miou ne supporte pas les chatouilles… Avec quelque chose de tout doux, peut-être ?"
   },
   {
+   "id": "fabriquer_souris",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "papyrus",
+     "target": "plume"
+    }
+   ],
+   "when": [
+    "has:papyrus",
+    "has:plume"
+   ],
+   "effects": [
+    "lose:papyrus",
+    "lose:plume",
+    "gain:souris"
+   ],
+   "points": 10,
+   "text": "Tu plies le papyrus, pli, pli, pli, en une toute petite souris, et tu piques la plume derrière pour faire la queue. Elle frétille au moindre souffle ! Elle a l'air si vraie que tu as presque envie de lui dire bonjour.",
+   "hint": "Miou bondit sur tout ce qui frétille… Avec une feuille qu'on plie et une plume toute douce, tu pourrais lui fabriquer un jouet ?"
+  },
+  {
+   "id": "souris_miou",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "souris",
+     "target": "miou"
+    },
+    {
+     "verb": "throw",
+     "object": "souris",
+     "target": "miou"
+    },
+    {
+     "verb": "use",
+     "object": "souris",
+     "target": "miou"
+    }
+   ],
+   "when": [
+    "has:souris",
+    "is:miou:sieste"
+   ],
+   "effects": [
+    "lose:souris",
+    "reveal:scarabee",
+    "set:miou:amie"
+   ],
+   "points": 10,
+   "text": "Tu fais frétiller la souris en papyrus sous le nez de Miou… Elle ouvre un œil, remue le derrière, et HOP ! Elle bondit sur la souris et lâche le scarabée. Elle la fait rouler, elle la mordille, elle ronronne : quel super jouet ! Tu es son meilleur ami.",
+   "hint": "Miou bondit sur tout ce qui frétille… Fais-lui voir ta souris !"
+  },
+  {
+   "id": "souris_miou_apres",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "souris",
+     "target": "miou"
+    },
+    {
+     "verb": "throw",
+     "object": "souris",
+     "target": "miou"
+    },
+    {
+     "verb": "use",
+     "object": "souris",
+     "target": "miou"
+    }
+   ],
+   "when": [
+    "has:souris",
+    "is:miou:boude"
+   ],
+   "effects": [
+    "lose:souris",
+    "set:miou:amie"
+   ],
+   "points": 10,
+   "text": "Miou boude… mais la souris en papyrus frétille devant elle. Elle ne résiste pas : HOP ! Elle bondit dessus, la fait rouler, et vient ronronner contre tes jambes. Elle ne boude plus !",
+   "hint": "Miou boude encore… Un jouet qui frétille la consolerait peut-être ?"
+  },
+  {
    "id": "caresser_miou_libre",
    "triggers": [
     {
@@ -513,14 +634,16 @@
    ],
    "when": [
     "has:scarabee",
-    "!is:miou:amie"
+    "!is:miou:amie",
+    "is:meryt:devinee"
    ],
    "effects": [
     "end:fete"
    ],
    "points": 20,
    "text": "Tu tends le scarabée à la princesse Méryt.",
-   "hint": "Le scarabée porte-bonheur était pour quelqu'un, au temple…"
+   "hint": "Le scarabée porte-bonheur était pour quelqu'un, au temple…",
+   "not_yet": "La princesse Méryt cache ses mains derrière son dos en riant : « D'abord, mon énigme ! Parle-moi, et devine ! »"
   },
   {
    "id": "offrir_scarabee_miou",
@@ -533,14 +656,16 @@
    ],
    "when": [
     "has:scarabee",
-    "is:miou:amie"
+    "is:miou:amie",
+    "is:meryt:devinee"
    ],
    "effects": [
     "end:chatte"
    ],
    "points": 20,
    "text": "Tu tends le scarabée à la princesse Méryt.",
-   "hint": "Le scarabée porte-bonheur était pour quelqu'un, au temple…"
+   "hint": "Le scarabée porte-bonheur était pour quelqu'un, au temple…",
+   "not_yet": "La princesse Méryt cache ses mains derrière son dos en riant : « D'abord, mon énigme ! Parle-moi, et devine ! »"
   },
   {
    "id": "grimper_barque",
@@ -600,6 +725,14 @@
    "clue_in": "kha"
   },
   {
+   "goal": "Deviner l'énigme de la princesse Méryt",
+   "action": "meryt",
+   "needs": [
+    "meryt"
+   ],
+   "clue_in": "meryt"
+  },
+  {
    "goal": "Que Miou lâche le scarabée pour un poisson",
    "action": "poisson_miou",
    "needs": [
@@ -626,6 +759,24 @@
     "miou"
    ],
    "clue_in": "ibis"
+  },
+  {
+   "goal": "Ou fabriquer une souris en papyrus pour que Miou lâche le scarabée",
+   "action": "souris_miou",
+   "needs": [
+    "souris",
+    "miou"
+   ],
+   "clue_in": "miou"
+  },
+  {
+   "goal": "Fabriquer la souris avec le papyrus et la plume",
+   "action": "fabriquer_souris",
+   "needs": [
+    "papyrus",
+    "plume"
+   ],
+   "clue_in": "plume"
   }
  ]
 }

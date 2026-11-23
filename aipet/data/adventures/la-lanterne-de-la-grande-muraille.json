@@ -142,7 +142,8 @@
     "écorce",
     "tamis",
     "seaux d'eau",
-    "copeaux"
+    "copeaux",
+    "lanterne à devinette"
    ]
   },
   {
@@ -353,7 +354,21 @@
    "at": "village",
    "description": "Un foulard de soie rouge, léger comme une plume. Le vent adore jouer avec.",
    "kind": "thing",
-   "initial": "À côté, sur le banc, un foulard de soie rouge."
+   "initial": "À côté, sur le banc, un foulard de soie rouge.",
+   "states": [
+    {
+     "id": "propre"
+    },
+    {
+     "id": "poivre",
+     "name": "un foulard plein de poivre",
+     "aliases": [
+      "foulard poivre",
+      "foulard qui pique"
+     ],
+     "description": "Le foulard de soie rouge, tout plein de poivre du Sichuan. Rien qu'à l'approcher, ça chatouille le nez… aaa… tchoum !"
+    }
+   ]
   },
   {
    "id": "theiere",
@@ -397,6 +412,23 @@
    "description": "Un panier en bambou plein de petits pains à la vapeur, tout blancs, tout moelleux.",
    "kind": "scenery",
    "sturdy": "Madame Hua surveille son panier : pas touche !"
+  },
+  {
+   "id": "poivre",
+   "kind": "scenery",
+   "name": "le pot de poivre du Sichuan",
+   "aliases": [
+    "poivre",
+    "pot de poivre",
+    "poivre du sichuan",
+    "epices",
+    "pot"
+   ],
+   "at": "maison_the",
+   "fixed": "Madame Hua lève un doigt : « Le pot reste sur mon comptoir ! Mais une pincée, si tu veux. »",
+   "sturdy": "Madame Hua attrape son pot : « Pas touche, c'est mon meilleur poivre ! »",
+   "initial": "Au bout du comptoir, un petit pot de poivre du Sichuan, celui qui pique le nez et fait éternuer.",
+   "description": "Un petit pot plein de grains de poivre du Sichuan, tout rouges. Rien qu'en le sentant, ça pique le nez… Une pincée sur un mouchoir ou un foulard, et tout le monde éternue !"
   },
   {
    "id": "baozi",
@@ -647,7 +679,7 @@
    ],
    "at": "maison_the",
    "description": "La patronne de la maison de thé, avec un grand tablier fleuri.",
-   "says": "Bienvenue ! Un petit pain à la vapeur ? C'est une pièce, mon petit. Mais ne touche pas à ma théière : c'est mon thé du soir. Une gorgée, et on dort jusqu'au matin !",
+   "says": "Bienvenue ! Un petit pain à la vapeur ? C'est une pièce, mon petit. Mais ne touche pas à ma théière : c'est mon thé du soir. Une gorgée, et on dort jusqu'au matin ! Et attention à mon poivre du Sichuan : une pincée sous le nez, et atchoum !",
    "initial": "Madame Hua fait chauffer l'eau sur un petit réchaud, pschhh. « Pas touche à mon thé du soir, prévient-elle : une gorgée, et on dort jusqu'au matin ! »"
   },
   {
@@ -690,8 +722,32 @@
    ],
    "at": "atelier",
    "description": "Un garçon aux manches retroussées, couvert de pâte à papier jusqu'aux coudes.",
-   "says": "Ici, on fait le papier avec de l'écorce écrasée dans l'eau, puis séchée. C'est en Chine qu'on l'a inventé ! Tu veux une feuille ? Cherche une feuille bien sèche sur le séchoir.",
-   "initial": "Petit Lu, l'apprenti, écrase de l'écorce dans le grand bac de pâte."
+   "says": "Ici, on fait le papier avec de l'écorce écrasée dans l'eau, puis séchée. C'est en Chine qu'on l'a inventé ! Avec mon papier, on fabrique aussi les lanternes de la fête, et ce soir, on écrit des devinettes dessus ! Tu veux une feuille bien sèche ? Devine d'abord la devinette de ma lanterne.",
+   "initial": "Petit Lu, l'apprenti, écrase de l'écorce dans le grand bac de pâte. Au-dessus de lui pend une lanterne de papier, avec une devinette écrite dessus.",
+   "states": [
+    {
+     "id": "attend"
+    },
+    {
+     "id": "devinee",
+     "says": "Ici, on fait le papier avec de l'écorce écrasée dans l'eau, puis séchée. C'est en Chine qu'on l'a inventé ! Tu veux une feuille ? Cherche une feuille bien sèche sur le séchoir."
+    }
+   ],
+   "answer": {
+    "question": "Je ne sors que la nuit. Parfois je suis toute ronde comme une lanterne, parfois toute fine comme un sourire, et je brille tout là-haut, sans bougie. Qui suis-je ?",
+    "accept": [
+     "lune",
+     "la lune",
+     "pleine lune",
+     "croissant de lune"
+    ],
+    "wrong": "Petit Lu secoue la tête en riant, et un peu de pâte à papier lui tombe du coude, flic ! « Non, ce n'est pas ça ! Écoute encore ma devinette. »",
+    "right": "« Bravo, c'est la lune ! Ce soir, c'est la première pleine lune de l'année : c'est pour elle qu'on allume toutes les lanternes ! Tu as gagné ta feuille : cherche-la bien sèche sur le séchoir. »",
+    "hint": "Pense au ciel de la nuit, quand la fête commence : qu'est-ce qui brille tout là-haut, rond certains soirs et tout fin d'autres soirs ?",
+    "effects": [
+     "set:lu:devinee"
+    ]
+   }
   },
   {
    "id": "dodu",
@@ -885,7 +941,11 @@
      "object": "sechoir"
     }
    ],
-   "hint": "Petit Lu l'a dit : il y a peut-être une feuille bien sèche sur le séchoir. Cherche bien !"
+   "hint": "Petit Lu l'a dit : il y a peut-être une feuille bien sèche sur le séchoir. Cherche bien !",
+   "when": [
+    "is:lu:devinee"
+   ],
+   "not_yet": "Petit Lu lève le nez de son bac : « Pas si vite ! Ce soir, c'est la fête des lanternes : une feuille, ça se gagne avec une devinette. Parle-moi ! »"
   },
   {
    "id": "ecrire_message",
@@ -1004,7 +1064,7 @@
    ],
    "effects": [],
    "points": 0,
-   "not_yet": "Rrrr… zzz… Ah-Fu ronfle comme un dragon, même quand tu lui chatouilles le nez ! Il faudrait un bruit énorme pour le réveiller.",
+   "not_yet": "Rrrr… zzz… Ah-Fu ronfle comme un dragon, même quand tu lui parles dans l'oreille ! Il faudrait un bruit énorme pour le réveiller… ou un éternuement géant !",
    "repeatable": true,
    "text": "« Hein ? Quoi ? Ah, c'est toi ! Le signal ? Du bambou bien sec dans le foyer de la tour, et une flamme. La fumée montera, et la tour lointaine allumera ses lanternes ! »",
    "triggers": [
@@ -1033,6 +1093,66 @@
     }
    ],
    "hint": "Ah-Fu ronfle comme un dragon. Il faudrait un bruit énorme… Et ce grand gong, juste à côté ?"
+  },
+  {
+   "id": "poivrer_foulard",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "foulard",
+     "target": "poivre"
+    },
+    {
+     "verb": "use",
+     "object": "poivre",
+     "target": "foulard"
+    }
+   ],
+   "when": [
+    "has:foulard",
+    "is:foulard:propre"
+   ],
+   "effects": [
+    "set:foulard:poivre"
+   ],
+   "points": 5,
+   "not_yet": "Ton foulard est déjà plein de poivre : une pincée de plus, et c'est toi qui éternuerais toute la nuit !",
+   "text": "Tu saupoudres une pincée de poivre du Sichuan sur le foulard… Aaa… aaa… TCHOUM ! Même Madame Hua éternue, et Maître Wen en fait une tache d'encre. Ce foulard-là ferait éternuer un dragon !",
+   "hint": "Ce poivre fait éternuer tout le monde… Si tu en mettais sur quelque chose de léger, à agiter sous un nez qui ronfle ?"
+  },
+  {
+   "id": "eternuer_ahfu",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "foulard",
+     "target": "ahfu"
+    },
+    {
+     "verb": "touch",
+     "object": "ahfu",
+     "target": "foulard"
+    },
+    {
+     "verb": "give",
+     "object": "foulard",
+     "target": "ahfu"
+    }
+   ],
+   "place": "rempart",
+   "when": [
+    "has:foulard",
+    "is:foulard:poivre",
+    "is:ahfu:endormi"
+   ],
+   "effects": [
+    "set:ahfu:reveille",
+    "open:porte_guet"
+   ],
+   "points": 10,
+   "not_yet": "Tu chatouilles le nez d'Ah-Fu avec le foulard… il se gratte, et zzz, il ronfle de plus belle ! Avec quelque chose qui pique le nez, peut-être ?",
+   "text": "Tu agites le foulard poivré sous le nez d'Ah-Fu… Son nez frétille… AAA… AAAA… TCHOUUUM ! L'éternuement est si fort que le gong résonne tout seul, BONG ! Ah-Fu saute en l'air : « Hein ? La fête ? J'arrive ! » En reniflant, il ouvre la porte de la tour de guet.",
+   "hint": "Ah-Fu ronfle comme un dragon… Un foulard qui pique le nez le ferait peut-être éternuer ?"
   },
   {
    "id": "mettre_bambou",
@@ -1172,7 +1292,7 @@
    "id": "cerf_volant",
    "kind": "win",
    "text": "Ton cerf-volant file dans le vent jusqu'à la tour lointaine. Là-bas, un soldat l'attrape et lit le message : « La fête peut commencer ! » Il allume sa lanterne… et bientôt, des milliers de lanternes brillent dans la nuit. Bravo !",
-   "fact": "Le cerf-volant a été inventé en Chine il y a plus de 2 000 ans : les premiers étaient en soie et en bambou, comme le tien !"
+   "fact": "Le cerf-volant a été inventé en Chine il y a plus de 2 000 ans : les premiers étaient en soie et en bambou, comme le tien ! Et à la fête des lanternes, on écrit des devinettes sur les lanternes : celui qui trouve la réponse gagne un petit cadeau !"
   },
   {
    "id": "plouf",
@@ -1214,6 +1334,24 @@
    "clue_in": "ahfu"
   },
   {
+   "goal": "Ou réveiller Ah-Fu d'un éternuement, avec un foulard poivré",
+   "action": "eternuer_ahfu",
+   "needs": [
+    "foulard",
+    "ahfu"
+   ],
+   "clue_in": "ahfu"
+  },
+  {
+   "goal": "Mettre du poivre du Sichuan sur le foulard",
+   "action": "poivrer_foulard",
+   "needs": [
+    "foulard",
+    "poivre"
+   ],
+   "clue_in": "poivre"
+  },
+  {
    "goal": "Allumer la lanterne",
    "action": "allumer_lanterne",
    "needs": [
@@ -1248,6 +1386,14 @@
     "wen"
    ],
    "clue_in": "wen"
+  },
+  {
+   "goal": "Deviner la devinette de la lanterne de Petit Lu",
+   "action": "lu",
+   "needs": [
+    "lu"
+   ],
+   "clue_in": "lu"
   },
   {
    "goal": "Trouver une feuille sèche",

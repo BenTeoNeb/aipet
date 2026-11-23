@@ -129,7 +129,10 @@ apparaît ici, ou le personnage qui le tenait le lâche), "set:OBJET:ETAT", "fla
 Un flag, c'est un fait qui n'appartient à aucun objet ; si c'est un objet qui change, utilise ses states.
 
 Des mécanismes qui marchent (choisis-en quelques-uns, variés) : clé et porte ou coffre ; objet caché à
-fouiller ; A + B = C ; troc avec un personnage qui tient l'objet ; personnage à gagner en plusieurs fois
+fouiller ; recettes : A + B = C (ou A + B quand on a aussi C), ou un outil qui change l'état d'un objet
+(l'ouvre-boîte et la conserve → la conserve ouverte, et ce qu'elle contient apparaît) ; une recette
+loufoque et drôle (une chaussette et du poivre → une bombe à éternuer) comme deuxième façon de réussir,
+jamais un piège ; troc avec un personnage qui tient l'objet ; personnage à gagner en plusieurs fois
 (states) ; rassembler plusieurs objets ; passage bloqué (noir, pont cassé) ; carte qui révèle un chemin ;
 code de boutons dans l'ordre vu ailleurs ; devinette ou mot de passe ; compagnon qui suit et aide ; choix
 et bêtise annoncée.

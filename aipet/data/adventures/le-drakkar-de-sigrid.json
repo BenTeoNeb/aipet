@@ -250,11 +250,11 @@
      "when": [
       "open:coffre"
      ],
-     "text": "Il est grand ouvert, plein de cordes et de vieilles moufles qui sentent le poisson."
+     "text": "Il est grand ouvert, plein de cordes qui sentent le poisson."
     }
    ],
    "texts": {
-    "open": "Criiic ! Tu soulèves le couvercle. Dans le coffre, il y a des cordes, des moufles… et une grosse aiguille en os !"
+    "open": "Criiic ! Tu soulèves le couvercle. Dans le coffre, il y a des cordes, une vieille moufle… et une grosse aiguille en os !"
    }
   },
   {
@@ -302,7 +302,7 @@
    ],
    "at": "cabane",
    "initial": "Un poisson séché pend au plafond.",
-   "description": "Un poisson séché, tout dur. Pour toi, c'est beurk… pour un corbeau, c'est un festin !"
+   "description": "Un poisson séché, tout dur, qui sent très fort. Pour toi, c'est beurk… même Brunhilde la chèvre se boucherait le nez ! Mais pour un corbeau, c'est un festin !"
   },
   {
    "id": "laine",
@@ -329,13 +329,39 @@
    "at": "colline",
    "fixed": "Un rocher dans ton sac ? Même un géant n'y arriverait pas !",
    "sturdy": "Ce rocher est là depuis des centaines d'années : même un géant ne pourrait pas le casser !",
-   "description": "Un grand rocher couvert de runes, des lettres faites de petits traits. Elles racontent peut-être un secret.",
+   "description": "Un grand rocher couvert de runes, des lettres faites de petits traits. Grand-père Olaf y a gravé une devinette : qui la devine saura où chercher.",
    "details": [
     {
      "when": [
-      "flag:runes_lues"
+      "is:rocher:devine"
      ],
      "text": "Les runes disent : « Sous mon pied dort le soleil. »"
+    }
+   ],
+   "answer": {
+    "question": "Les runes disent : « Je cours sans jambes, je gronde sans bouche, et je porte les drakkars sur mon dos. Qui suis-je ? »",
+    "accept": [
+     "mer",
+     "vague",
+     "fjord",
+     "océan",
+     "eau"
+    ],
+    "wrong": "Le vent siffle sur les runes… Non, ce n'est pas ça. Regarde bien autour de toi, et réessaie !",
+    "right": "C'est ça ! Sous la devinette, tu découvres d'autres petits traits, cachés dans la mousse : « Sous mon pied dort le soleil. » Sous le pied du rocher ?",
+    "hint": "Du haut de la colline, regarde en bas : sur quoi glissent les drakkars, et qu'est-ce qui fait des vagues ?",
+    "effects": [
+     "set:rocher:devine",
+     "flag:runes_lues"
+    ]
+   },
+   "states": [
+    {
+     "id": "devinette"
+    },
+    {
+     "id": "devine",
+     "description": "Un grand rocher couvert de runes. Sous la devinette, de petits traits cachés dans la mousse disent : « Sous mon pied dort le soleil. »"
     }
    ]
   },
@@ -379,6 +405,31 @@
    "fixed": "De l'eau dans ton sac ? Elle coulerait partout… et elle est glacée !",
    "sturdy": "De l'eau, ça ne se casse pas : ça fait juste plouf !",
    "description": "L'eau grise et glacée du fjord clapote contre la coque. Brrr, rien que de la regarder, on a froid !"
+  },
+  {
+   "id": "moufle",
+   "name": "une vieille moufle",
+   "aliases": [
+    "moufle",
+    "gant",
+    "vieille moufle"
+   ],
+   "at": "coffre",
+   "description": "Une vieille moufle en laine, toute trouée au bout du pouce.",
+   "states": [
+    {
+     "id": "propre"
+    },
+    {
+     "id": "puante",
+     "name": "la moufle qui pue",
+     "aliases": [
+      "moufle qui pue",
+      "moufle puante"
+     ],
+     "description": "La vieille moufle, frottée au poisson séché : elle pue le hareng à trois kilomètres ! Pouah !"
+    }
+   ]
   }
  ],
  "characters": [
@@ -428,10 +479,10 @@
      "when": [
       "has:aiguille"
      ],
-     "text": "Tu as trouvé mon aiguille à voile ! La laine ? Demande à Brunhilde… elle dort dessus. Et ma pierre de soleil, je l'ai cachée sur la colline aux runes : les runes du rocher disent où !"
+     "text": "Tu as trouvé mon aiguille à voile ! La laine ? Demande à Brunhilde… elle dort dessus. Et ma pierre de soleil, je l'ai cachée sur la colline aux runes : les runes du rocher posent une devinette : devine-la, et tu sauras où !"
     },
     {
-     "text": "Mon aiguille à voile ? Dans le vieux coffre ! La laine ? Demande à Brunhilde… elle dort dessus. Ma pierre de soleil, je l'ai cachée sur la colline aux runes, mais où exactement ? Les runes du rocher le disent ! Hé hé, ma mémoire…"
+     "text": "Mon aiguille à voile ? Dans le vieux coffre ! La laine ? Demande à Brunhilde… elle dort dessus. Ma pierre de soleil, je l'ai cachée sur la colline aux runes, mais où exactement ? Les runes du rocher posent une devinette : devine-la, et tu sauras ! Hé hé, ma mémoire…"
     }
    ]
   },
@@ -456,6 +507,12 @@
      "initial": "Brunhilde croque son navet avec un grand sourire de chèvre.",
      "description": "Une chèvre grise à barbichette, toute contente, qui croque son navet.",
      "says": "Mèèèh ! Miam, ce navet ! Prends donc ma pelote, je n'en ai plus besoin pour faire la sieste. Mèèèh !"
+    },
+    {
+     "id": "boudeuse",
+     "initial": "Brunhilde boude tout au fond de l'enclos, la patte sur le nez.",
+     "description": "Une chèvre grise à barbichette, qui se bouche le nez d'un air vexé.",
+     "says": "Mèèèh ! Garde ta moufle qui pue loin de moi ! Ta pelote, prends-la, je ne me recouche pas dessus ! Mèèèh !"
     }
    ]
   },
@@ -596,8 +653,9 @@
     "flag:runes_lues"
    ],
    "points": 5,
-   "text": "Tu suis les petits traits du doigt, un par un… Les runes disent : « Sous mon pied dort le soleil. » Sous le pied du rocher ?",
-   "hint": "Grand-père Olaf l'a dit : les runes du rocher disent où est cachée la pierre. Et si tu les lisais ?"
+   "text": "Tu suis les petits traits du doigt, un par un… C'est une devinette de Grand-père Olaf : « Je cours sans jambes, je gronde sans bouche, et je porte les drakkars sur mon dos. Qui suis-je ? »",
+   "hint": "Les runes posent une devinette : lis-les, puis dis ta réponse au rocher.",
+   "repeatable": true
   },
   {
    "id": "fouiller_rocher",
@@ -612,13 +670,13 @@
     }
    ],
    "when": [
-    "flag:runes_lues"
+    "is:rocher:devine"
    ],
    "effects": [
     "reveal:pierre_soleil"
    ],
    "points": 10,
-   "not_yet": "Tu tournes autour du rocher… rien que de la bruyère. Les runes gravées dessus disent peut-être où chercher ?",
+   "not_yet": "Tu tournes autour du rocher… rien que de la bruyère. La devinette des runes dit peut-être où chercher ?",
    "text": "Tu grattes la terre au pied du rocher… quelque chose brille ! C'est la pierre de soleil de Grand-père Olaf !",
    "hint": "« Sous mon pied dort le soleil »… Le pied du rocher, c'est tout en bas : creuse là !"
   },
@@ -738,6 +796,67 @@
    "place": "drakkar",
    "effects": [],
    "text": "Tu te penches par-dessus bord… Hugin croasse : « Croâ ! Pas dans l'eau glacée, malheureux ! »"
+  },
+  {
+   "id": "frotter_moufle",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "moufle",
+     "target": "poisson"
+    },
+    {
+     "verb": "use",
+     "object": "poisson",
+     "target": "moufle"
+    }
+   ],
+   "when": [
+    "has:moufle",
+    "has:poisson",
+    "is:moufle:propre"
+   ],
+   "effects": [
+    "set:moufle:puante"
+   ],
+   "points": 5,
+   "not_yet": "Il te faut la moufle et le poisson séché, tous les deux.",
+   "text": "Tu frottes la vieille moufle sur le poisson séché, frotte, frotte… Pouah ! Voilà une moufle qui pue le hareng à trois kilomètres !",
+   "hint": "Une vieille moufle, un poisson séché qui sent très fort… Et si tu frottais l'une avec l'autre ?"
+  },
+  {
+   "id": "moufle_chevre",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "moufle",
+     "target": "brunhilde"
+    },
+    {
+     "verb": "throw",
+     "object": "moufle",
+     "target": "brunhilde"
+    },
+    {
+     "verb": "use",
+     "object": "moufle",
+     "target": "brunhilde"
+    }
+   ],
+   "when": [
+    "has:moufle",
+    "is:moufle:puante",
+    "is:brunhilde:grognon"
+   ],
+   "effects": [
+    "lose:moufle",
+    "set:brunhilde:boudeuse",
+    "reveal:laine"
+   ],
+   "points": 10,
+   "not_yet": "Brunhilde renifle la moufle et bâille. Mèèèh… Elle ne sent rien de spécial, cette moufle.",
+   "text": "Brunhilde renifle… MÈÈÈH ! Elle bondit comme un ressort, file au fond de l'enclos en se bouchant le nez avec la patte, et laisse sa pelote de laine toute seule !",
+   "hint": "Brunhilde est couchée sur la laine… Une odeur vraiment horrible la ferait peut-être bondir ?"
   }
  ],
  "endings": [
@@ -745,7 +864,7 @@
    "id": "soleil",
    "kind": "win",
    "text": "Le drakkar file sur les vagues, droit vers le soleil caché. Le soir même, vous arrivez au village ! Tout le monde fait la fête autour du feu, et Grand-père Olaf raconte ton aventure dans une saga, la saga du marin qui a trouvé le soleil.",
-   "fact": "Dans l'épave d'un vieux navire de 1592, près de l'île d'Aurigny, on a retrouvé un cristal transparent appelé spath d'Islande : peut-être une vraie pierre de soleil, comme celles des sagas vikings !"
+   "fact": "Dans l'épave d'un vieux navire de 1592, près de l'île d'Aurigny, on a retrouvé un cristal transparent appelé spath d'Islande : peut-être une vraie pierre de soleil, comme celles des sagas vikings ! Et les Vikings adoraient les devinettes : dans une saga, le dieu Odin, déguisé en vieillard sous le nom de Gestumblindi, joue aux devinettes avec un roi… et l'une d'elles parle des vagues de la mer !"
   },
   {
    "id": "corbeau",
@@ -787,8 +906,8 @@
    "clue_in": "rocher"
   },
   {
-   "goal": "Lire les runes du rocher",
-   "action": "lire_runes",
+   "goal": "Deviner la devinette des runes",
+   "action": "rocher",
    "needs": [
     "rocher"
    ],
@@ -820,6 +939,15 @@
     "brunhilde"
    ],
    "clue_in": "olaf"
+  },
+  {
+   "goal": "Ou faire bondir Brunhilde avec une moufle qui pue",
+   "action": "moufle_chevre",
+   "needs": [
+    "moufle",
+    "brunhilde"
+   ],
+   "clue_in": "poisson"
   }
  ]
 }

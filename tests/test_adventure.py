@@ -55,6 +55,8 @@ def test_every_way_to_win_can_be_played_with_spoken_words(graph):
                 intent = {"verb": "prendre", "object": w.name(ident)}
             elif kind in ("press", "open"):  # a code's button, a container or door opened (format 2)
                 intent = {"verb": "push" if kind == "press" else "open", "object": w.name(ident)}
+            elif kind == "answer":  # a riddle answered in words
+                intent = {"verb": "answer", "object": w.thing(ident)["answer"]["accept"][0], "target": w.name(ident)}
             else:
                 a = next(x for x in w.rules if x["id"] == ident)
                 intent = {"verb": a["verb"], "object": w.name(a.get("object", "")),
@@ -696,6 +698,8 @@ def test_the_checker_and_the_game_agree(graph):
                 intent = {"verb": "take", "object": w.name(ident)}
             elif kind in ("press", "open"):  # a code's button, a container or door opened (format 2)
                 intent = {"verb": "push" if kind == "press" else "open", "object": w.name(ident)}
+            elif kind == "answer":  # a riddle answered in words
+                intent = {"verb": "answer", "object": w.thing(ident)["answer"]["accept"][0], "target": w.name(ident)}
             else:
                 a = next(x for x in w.rules if x["id"] == ident)
                 intent = {"verb": a["verb"], "object": w.name(a.get("object", "")),

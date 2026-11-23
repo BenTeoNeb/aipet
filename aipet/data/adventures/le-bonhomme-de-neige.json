@@ -51,6 +51,14 @@
      "label": "vers la cabane",
      "dir": "ouest"
     }
+   ],
+   "details": [
+    {
+     "when": [
+      "flag:echarpe_chaussette"
+     ],
+     "text": "Le bonhomme porte fièrement sa chaussette géante autour du cou."
+    }
    ]
   },
   {
@@ -167,6 +175,14 @@
      "initial": "Au milieu, le bonhomme de neige a un beau chapeau noir, mais toujours pas de nez.",
      "description": "Un gros bonhomme de neige tout rond, avec un beau chapeau noir. Il lui manque encore un nez !"
     }
+   ],
+   "details": [
+    {
+     "when": [
+      "flag:echarpe_chaussette"
+     ],
+     "text": "Autour du cou, il porte une chaussette géante en guise d'écharpe."
+    }
    ]
   },
   {
@@ -272,6 +288,19 @@
      "description": "Un clou planté tout en haut du mur. Il est vide, maintenant."
     }
    ]
+  },
+  {
+   "id": "chaussette",
+   "name": "une chaussette géante",
+   "aliases": [
+    "chaussette",
+    "grande chaussette",
+    "chaussette rayee",
+    "chaussette d'ours"
+   ],
+   "at": "cabane",
+   "initial": "Par terre traîne une chaussette de laine géante, rayée rouge et vert : sûrement la chaussette d'un ours !",
+   "description": "Une chaussette de laine énorme, rayée rouge et vert. Tu pourrais rentrer dedans tout entier ! Ça ferait une drôle d'écharpe…"
   }
  ],
  "characters": [
@@ -528,6 +557,36 @@
    "points": 0,
    "warning": "Plumette s'affole : « Non, non ! Il est tout fragile, il va s'écrouler ! » Tu es sûr ?",
    "text": "Tu pousses le bonhomme de toutes tes forces… il penche, il penche… et plouf, il s'écroule en tas de neige !"
+  },
+  {
+   "id": "echarpe_chaussette",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "chaussette",
+     "target": "bonhomme"
+    },
+    {
+     "verb": "use",
+     "object": "chaussette",
+     "target": "bonhomme"
+    },
+    {
+     "verb": "wear",
+     "object": "chaussette",
+     "target": "bonhomme"
+    }
+   ],
+   "when": [
+    "has:chaussette"
+   ],
+   "effects": [
+    "lose:chaussette",
+    "flag:echarpe_chaussette"
+   ],
+   "points": 5,
+   "text": "Tu enroules la chaussette géante autour du cou du bonhomme : une écharpe-chaussette ! Plumette rit tellement qu'elle fait trois loopings : « Il n'aura jamais froid au cou, celui-là ! »",
+   "hint": "Une chaussette géante, un bonhomme qui a froid au cou… Et si tu lui faisais une écharpe ?"
   }
  ],
  "endings": [

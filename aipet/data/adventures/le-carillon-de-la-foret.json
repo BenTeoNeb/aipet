@@ -117,7 +117,6 @@
    ],
    "description": "Une rivière rapide qui chante sur de gros galets gris. Le courant est bien trop fort pour nager ! Au nord, un vieux pont de bois.",
    "decor": [
-    "roseaux",
     "libellules",
     "écume",
     "sable mouillé"
@@ -318,6 +317,31 @@
    ],
    "at": "",
    "description": "Une boule de bronze avec un crochet : c'est elle qui fait ding-dong !"
+  },
+  {
+   "id": "roseau",
+   "name": "un roseau creux",
+   "aliases": [
+    "roseau",
+    "roseaux",
+    "tige",
+    "tuyau"
+   ],
+   "at": "riviere",
+   "initial": "Au bord de l'eau poussent de grands roseaux tout creux, comme des petits tuyaux.",
+   "description": "Un grand roseau tout creux : quand on souffle dedans, ça fait fffff… Avec des petits trous, ça ferait peut-être de la musique ?"
+  },
+  {
+   "id": "pipeau",
+   "name": "un pipeau en roseau",
+   "aliases": [
+    "pipeau",
+    "flute",
+    "flute en roseau",
+    "sifflet"
+   ],
+   "at": "",
+   "description": "Un petit pipeau taillé dans un roseau, avec trois trous. Il fait un bruit de canard enrhumé : POUÊÊÊT !"
   }
  ],
  "characters": [
@@ -388,18 +412,34 @@
    "at": "pont",
    "description": "Un blaireau ronchon aux sourcils broussailleux.",
    "initial": "Grognon le blaireau est planté au milieu, les bras croisés.",
-   "says": "C'est moi qui garde ce pont ! Personne ne passe… sauf quelqu'un qui me chante une chanson. J'adore les chansons.",
+   "says": "C'est moi qui garde ce pont ! Personne ne passe… sauf qui devine ma devinette. Grrr !",
    "states": [
     {
      "id": "ronchon"
     },
     {
      "id": "content",
-     "initial": "Grognon le blaireau s'est poussé sur le côté et fredonne ta chanson.",
-     "description": "Un blaireau aux sourcils broussailleux, qui sourit en fredonnant.",
-     "says": "Quelle belle chanson ! Passe donc, la grotte est juste là."
+     "initial": "Grognon le blaireau s'est poussé sur le côté et sourit dans sa barbe.",
+     "description": "Un blaireau aux sourcils broussailleux, qui sourit, tout fier de sa devinette.",
+     "says": "Bien deviné ! Passe donc, la grotte est juste là."
     }
-   ]
+   ],
+   "answer": {
+    "question": "Écoute bien ! Plus il y en a, moins on y voit. Il dort au fond des grottes, et il s'enfuit dès qu'arrive la lumière. Qu'est-ce que c'est ?",
+    "accept": [
+     "noir",
+     "nuit",
+     "obscurité",
+     "ténèbres",
+     "ombre"
+    ],
+    "wrong": "Grrr ! Raté ! Mais je suis un blaireau patient : réfléchis encore un peu.",
+    "right": "Grognon fronce ses gros sourcils… puis il éclate de rire : « Le noir ! Bien trouvé ! Et justement, il fait tout noir dans la grotte : prends une lumière ! » Il se pousse pour te laisser passer.",
+    "hint": "Pense à la grotte, de l'autre côté du pont : qu'est-ce qu'il y a dedans, quand on n'a pas de lanterne ?",
+    "effects": [
+     "set:grognon:content"
+    ]
+   }
   }
  ],
  "actions": [
@@ -494,12 +534,10 @@
      "object": "grognon"
     }
    ],
-   "effects": [
-    "set:grognon:content"
-   ],
-   "points": 10,
-   "text": "Tu chantes ta plus belle chanson. Grognon tape du pied, sourit… et se pousse : « Bon, bon, tu peux passer ! »",
-   "hint": "Grognon adore les chansons… Tu en connais une ?"
+   "effects": [],
+   "points": 0,
+   "text": "Tu chantes ta plus belle chanson. Grognon tape du pied en rythme… « Jolie chanson ! Mais pour passer mon pont, il faut deviner ma devinette ! »",
+   "hint": "Grognon ne laisse passer que ceux qui devinent sa devinette : parle-lui pour l'entendre."
   },
   {
    "id": "eclairer_grotte",
@@ -598,6 +636,72 @@
    "points": 0,
    "warning": "Zouzou crie : « Non ! Le courant est bien trop fort, il t'emporterait comme une feuille ! »",
    "text": "Tu sautes dans la rivière… et plouf, le courant t'emporte comme une feuille !"
+  },
+  {
+   "id": "tailler_pipeau",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "silex",
+     "target": "roseau"
+    },
+    {
+     "verb": "use",
+     "object": "silex",
+     "target": "roseau"
+    }
+   ],
+   "when": [
+    "has:silex",
+    "has:roseau"
+   ],
+   "effects": [
+    "lose:roseau",
+    "gain:pipeau"
+   ],
+   "points": 5,
+   "not_yet": "Pour percer des trous dans ce roseau, il faudrait quelque chose de pointu… comme une pierre bien coupante.",
+   "text": "Tu perces le roseau avec le bout pointu de la pierre : tchic, tchic, tchic, trois petits trous ! Tu souffles dedans… POUÊÊÊT ! Voilà un pipeau qui fait le canard enrhumé.",
+   "hint": "Un roseau tout creux, une pierre pointue… et si tu y perçais des trous pour faire de la musique ?"
+  },
+  {
+   "id": "pipeau_grognon",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "pipeau",
+     "target": "grognon"
+    },
+    {
+     "verb": "give",
+     "object": "pipeau",
+     "target": "grognon"
+    }
+   ],
+   "when": [
+    "has:pipeau"
+   ],
+   "effects": [],
+   "points": 0,
+   "text": "Tu souffles de toutes tes forces : POUÊÊÊT ! Grognon sursaute si fort que ses sourcils s'envolent. Puis il rit tellement qu'il en a le hoquet : « Hic ! Quel boucan ! Hic ! Ça me plaît… mais pour passer, il faut quand même deviner ma devinette ! »",
+   "hint": "Un pipeau qui fait le canard enrhumé… Qui aurait besoin d'un bon fou rire, par ici ?"
+  },
+  {
+   "id": "jouer_pipeau",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "pipeau"
+    }
+   ],
+   "when": [
+    "has:pipeau"
+   ],
+   "effects": [],
+   "points": 0,
+   "repeatable": true,
+   "text": "POUÊÊÊT ! POUÊT-POUÊT ! Ton pipeau fait le canard enrhumé, et on l'entend dans toute la forêt. Quelque part, un écureuil se bouche les oreilles.",
+   "hint": "Souffle dans ton pipeau, pour rire !"
   }
  ],
  "endings": [
@@ -638,8 +742,8 @@
    "clue_in": "bambou"
   },
   {
-   "goal": "Passer le pont de Grognon",
-   "action": "chanter_grognon",
+   "goal": "Passer le pont de Grognon en devinant sa devinette",
+   "action": "grognon",
    "needs": [
     "grognon"
    ],

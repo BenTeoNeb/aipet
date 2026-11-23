@@ -75,7 +75,10 @@ class World:
                     self.doors.setdefault(p["id"], []).append(x["door"])
         rules = [r for a in self.actions for r in a.get("when", [])]
         rules += [r for p in self.places.values() for x in p.get("exits", []) for r in exit_rules(x)]
-        self.settable = {f for a in self.actions for f in args_of(a.get("effects"), "flag")}
+        effects = [a.get("effects") for a in self.actions] + [
+            self.thing(r)["answer"].get("effects") for r in self.riddles
+        ]
+        self.settable = {f for e in effects for f in args_of(e, "flag")}
         self.idempotent_ids = {a["id"] for a in self.actions if self.idempotent(a)}
         self.eager_ok = self._eager_ok(rules)
 

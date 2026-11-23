@@ -18,8 +18,14 @@ versions follow [Semantic Versioning](https://semver.org/) once the first releas
   against the real narrator, with a judge for the narrator's slips.
 - Activity suggestions: the pet proposes something new or not done for a while, and something the
   child likes. Story characters' names are given to speech recognition.
+- Riddles in four bank adventures (Grognon's bridge, the Viking runes, the lantern riddle, the
+  princess's Sphinx-like riddle) and recipes, concrete and silly (a smelly mitten for the goat, a
+  peppered scarf that makes the guard sneeze, a papyrus mouse for the cat), each a second way to
+  solve a puzzle or a harmless joke. Three recipe patterns in the catalogue.
 
 ### Fixed
+- The solver now takes what an action's words name, as the turn does (combining with something
+  lying here), and a flag set by a riddle's answer counts as reachable.
 - `pet-headless` crashed at startup (it read a config key that does not exist).
 - A forget request could be undone by a condensation running at the same time, and missed the
   pet's life file, the stories, the card history and the game records; the forgotten words were

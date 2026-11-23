@@ -110,7 +110,8 @@ verb. Changed before propagating:
 
 One tiny model 2 adventure per classic mechanism (escape games, gamebooks, point-and-click), each
 accepted by the checker and won by speaking: key and door; something hidden found by searching;
-A + B = C; a trade with someone who holds the thing; a character won over in steps (states);
+A + B = C; recipes (a tool that changes a thing's state, three ingredients with the third in `when`, a
+silly mix as a second way to win); a trade with someone who holds the thing; a character won over in steps (states);
 collecting several things; a way blocked until something is done; a map revealing a way; a code;
 a riddle; a companion; a choice and a folly announced before it loses. A change to the model must keep
 them green; the generator's prompt lists the same recipes. Left out on purpose: timers (a tide in N
