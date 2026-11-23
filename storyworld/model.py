@@ -107,6 +107,7 @@ class State:
     items_at: dict[str, str] = field(default_factory=dict)  # item → place id, "" (nowhere) or "gone"
     chars_at: dict[str, str] = field(default_factory=dict)
     visited: list[str] = field(default_factory=list)
+    seen: list[str] = field(default_factory=list)  # places seen lit (a dark place visited blind is not)
     ending: str | None = None
     turns: int = 0
     stalled: int = 0  # turns without progress (for the reminders and hints)
@@ -130,6 +131,8 @@ class State:
     @classmethod
     def from_dict(cls, d: dict) -> State:
         known = {k: v for k, v in d.items() if k in cls.__dataclass_fields__}
+        if "seen" not in known:  # saved before darkness: every visited place was seen
+            known["seen"] = list(known.get("visited") or [])
         return cls(**copy.deepcopy(known))
 
     def key(self) -> tuple:

@@ -130,7 +130,44 @@ class World:
                 known = set(exit_rules(x)) | sure[p["id"]]  # flags never unset: still true on the way back
                 if not any(set(exit_rules(b)) <= known for b in back):
                     return set()
-        return set(self.items) - args_of(rules, "has", negated=True)
+        return set(self.items) - args_of(rules, "has", negated=True) - self._maybe_in_the_dark()
+
+    def _maybe_in_the_dark(self) -> set[str]:
+        """Items that may lie in a dark place: seen there by a light, they may be unseen later (the
+        light burnt, lost, put out), so taking them first is not always as good."""
+        dark = {p for p, place in self.places.items() if place.get("dark")}
+        if not dark:
+            return set()
+
+        def where(i: str) -> str:
+            at, seen = self.items[i].get("at") or "", {i}
+            while at in self.items and at not in seen:  # in a container
+                seen.add(at)
+                at = self.items[at].get("at") or ""
+            return at
+
+        dark_doors = {d for p in dark for d in self.doors.get(p, [])}
+        followers = args_of([e for a in self.actions for e in a.get("effects") or []], "follow")
+
+        def there(x: str) -> bool:
+            """Can it be in reach in a dark place (lit by then): the place, a thing carried in, a
+            companion, something lying there, one of its doors."""
+            if x in dark or x in followers or x in dark_doors:  # a character there is unseen, but a companion
+                return True
+            return x in self.items and (self.items[x].get("takeable") or where(x) in dark)
+
+        def may_be_dark(a: dict) -> bool:
+            if a.get("place"):
+                return a["place"] in dark
+            return any(
+                all(there(x) for x in (t.get("object"), t.get("target")) if x) for t in a.get("triggers") or [{}]
+            )
+
+        revealed = {i for a in self.actions if may_be_dark(a) for i in args_of(a.get("effects"), "reveal")}
+        revealed |= {
+            e for r in self.riddles if there(r) for e in args_of(self.thing(r)["answer"].get("effects"), "reveal")
+        }
+        return {i for i in self.items if where(i) in dark or i in revealed}
 
     def _flags_sure(self) -> dict[str, set[str]]:
         """For each place, the exit flags that are always set when the hero is there (every way in
@@ -207,6 +244,7 @@ class World:
                 st.items_at[i] = "inv"
         st.chars_at = {c: ch.get("at", "") for c, ch in self.chars.items()}
         st.visited = [st.place]
+        st.seen = [] if self.dark(st) else [st.place]
         return st
 
     # ------------------------------------------------------------ conditions / effects

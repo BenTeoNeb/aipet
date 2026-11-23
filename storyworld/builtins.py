@@ -214,7 +214,8 @@ class Builtins:
         (`senses`), the narrator says it (None: nothing written, the narrator imagines)."""
         w = self.w
         t = w.places.get(obj) if obj == st.place else w.look(obj, st)
-        text = ((t or {}).get("senses") or {}).get(verb)
+        senses = (t or {}).get("senses")
+        text = senses.get(verb) if isinstance(senses, dict) else None
         return {"outcome": "done", "description": text} if text else None
 
     def talk(self, st: State, obj: str) -> dict | None:

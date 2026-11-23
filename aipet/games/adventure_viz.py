@@ -294,12 +294,14 @@ def chain(w: World) -> dict:
         return made or None
 
     def lit(place: str) -> list[str]:
-        """In a dark place, what makes the light shine: having it, and its conditions."""
-        if not w.places.get(place, {}).get("dark") or not w.lights:
+        """In a dark place, what makes a light shine: having it, and its conditions (any light)."""
+        if not w.places.get(place, {}).get("dark"):
             return []
-        light = w.lights[0]
-        rules = w.items[light]["light"] if isinstance(w.items[light]["light"], list) else []
-        return [n for r in [f"has:{light}", *rules] for n in producers(r) or []]
+        out = []
+        for light in w.lights:
+            rules = w.items[light]["light"] if isinstance(w.items[light]["light"], list) else []
+            out += [n for r in [f"has:{light}", *rules] for n in producers(r) or []]
+        return out
 
     def need(target: str, prods: list[str] | None, why: str, alt: bool = False):
         if not prods:

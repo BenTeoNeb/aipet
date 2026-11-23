@@ -144,6 +144,6 @@ class Ways:
         place = at
         while place and place not in w.places:  # in a container, or held by someone
             place = st.items_at.get(place) or st.chars_at.get(place) or ""
-        if place in st.visited and place != st.place:
+        if place in st.seen and place != st.place:
             return w.say("You saw {name} near {of_place}.", name=name, of_place=w.lang.of(w.name(place)))
         return w.say("You haven't seen {name} yet. Explore, or ask someone!", name=name)

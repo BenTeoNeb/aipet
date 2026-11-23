@@ -433,7 +433,11 @@ there, whose conditions hold (`light: ["is:lampe:allumee"]`; `true`: always) and
 with one left. In the dark the hero sees nothing: the description is the `dark` text (a generic one
 when `dark` is `true`), no item, character or decor is in reach, only the ways out (felt, doors
 included), the bag and the companions who follow. Naming a thing there answers `not_yet` ("Il fait
-trop noir…"). The ways out always work, so the hero can always go back to the light.
+trop noir…"). The ways out always work, so the hero can always go back to the light. A light shines
+only from the bag or the ground (not from a container, nor held by a character). What needs nothing
+seen still happens in the dark: an action bound to the place (its `place`, or the place as its
+object: searching, listening, groping here) is how one feels or listens there, and `here:C` holds
+for a character unseen. "Where is…" and "seen elsewhere" only count places seen lit.
 
 ### 7.13 Uses (charges)
 

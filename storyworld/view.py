@@ -38,7 +38,7 @@ class View:
         return {
             "place": p.get("name", st.place),
             **({"in_the_dark": w.lang.dark_note} if dark else {}),
-            **({"senses": list(p["senses"].values())} if dark and p.get("senses") else {}),
+            **({"senses": list(p["senses"].values())} if dark and isinstance(p.get("senses"), dict) else {}),
             "description": self.place_text(st),
             "here": [w.name(i, st) for i in w.visible_items(st)],
             "people": [w.name(c, st) for c in w.chars_here(st)],
@@ -138,9 +138,9 @@ class View:
         return None
 
     def seen_elsewhere(self, st: State, ident: str) -> bool:
-        """The hero saw it in a place he has been to, not here."""
+        """The hero saw it in a place he has seen lit, not here."""
         where = st.items_at.get(ident) or st.chars_at.get(ident) or ""
-        return where in st.visited and where != st.place
+        return where in st.seen and where != st.place
 
     # ------------------------------------------------------------ memories
     def note(self, st: State, text: str, about: str = "") -> str:

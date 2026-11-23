@@ -188,6 +188,9 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
         if (i.get("texts") or {}).get("empty") and not w.max_uses(i["id"]):
             warn("item.empty_text", f"item {i['id']}: texts.empty is told when it has no use left, and it has no uses")
     for t in [*w.places.values(), *w.items.values()]:
+        if "senses" in t and not isinstance(t["senses"], dict):
+            err("senses.field", f"{t['id']}: senses is {{listen, smell, touch}}")
+            continue
         for k in set(t.get("senses") or {}) - SENSE_FIELDS:
             err("senses.field", f"{t['id']}: senses.{k} is not one of {sorted(SENSE_FIELDS)}")
     if any(p.get("dark") for p in w.places.values()) and not w.lights:

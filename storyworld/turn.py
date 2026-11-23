@@ -53,6 +53,8 @@ class Turn:
         self.count_progress(st, res, before)
         place = self.w.places.get(st.place, {}).get("name", st.place)
         res.setdefault("you_are", place)  # the narrator never loses track
+        if st.place not in st.seen and not self.w.dark(st):
+            st.seen.append(st.place)
         self.detect_doom(st, res, before_all)
         self.end_if_doomed(st, verb, res)
         self.tell_ending(st, res)
@@ -72,8 +74,12 @@ class Turn:
 
     @staticmethod
     def progress_mark(st: State) -> tuple:
-        """What counts as progress (a code's pressed buttons aside)."""
-        props = {i: {k: v for k, v in d.items() if k != "pressed"} for i, d in st.props.items()}
+        """What counts as progress (a code's pressed buttons and uses aside)."""
+        props = {
+            i: kept
+            for i, d in st.props.items()
+            if (kept := {k: v for k, v in d.items() if k not in ("pressed", "uses")})
+        }
         return len(st.inventory), len(st.flags), len(st.visited), len(st.done_actions), repr(props)
 
     # ------------------------------------------------------------ the stages
@@ -155,7 +161,9 @@ class Turn:
                     "note": w.lang.dark_note}  # fmt: skip
         if inside := w.builtins.in_closed(st, missing):
             return w.builtins.from_closed(st, verb, *inside)
-        if decor := w.builtins.decor(st, missing):  # « je prends un galet » on the beach: there are some
+        if not w.dark(st) and (
+            decor := w.builtins.decor(st, missing)
+        ):  # « je prends un galet » on the beach: there are some
             out = w.builtins.free(intent.get("object"), intent.get("target"))
             out.update({"to_know": w.say("There are {decor} here, it's scenery: he can take some or play "
                                          "with them, but it doesn't help solve the adventure (nothing is "

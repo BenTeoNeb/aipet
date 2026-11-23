@@ -249,7 +249,7 @@ class Actions:
             failing = [r for r in parse_all(a.get("when")) if not w.holds(st, [str(r)])]
             if failing and all(r.kind == "charged" and not r.negated for r in failing):
                 x = failing[0].arg
-                return w.items[x].get("texts", {}).get("empty") or w.say(
+                return w.items.get(x, {}).get("texts", {}).get("empty") or w.say(
                     "{Name} is empty.", Name=w.lang.cap(w.name(x, st))
                 )
         return ""

@@ -28,6 +28,8 @@ def useful_steps(w: World, path: list[tuple]) -> list[tuple]:
         elif kind == "open":
             needed |= {w.items[ident].get("key", "")}
         elif kind == "go":
+            if w.places.get(ident, {}).get("dark"):
+                needed |= set(w.lights)  # to see there
             for p in w.places.values():
                 for x in p.get("exits", []):
                     if x.get("to") == ident:

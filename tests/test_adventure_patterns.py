@@ -127,3 +127,64 @@ def test_in_the_dark_touching_talking_or_lighting_the_air_says_it_is_too_dark():
     assert say(w, st, "touch", "tresor")["outcome"] == "not_yet"
     assert say(w, st, "talk", "roi")["outcome"] == "not_yet"
     assert say(w, st, "light", "b")["outcome"] == "not_yet"
+
+
+def _dark_world(lantern: dict, extra_actions=(), places=None):
+    """A lantern in a, a treasure in the dark b, the king in a (who wants it)."""
+    from aipet.games.adventure_patterns import act, adventure, person, place, thing
+
+    return adventure(
+        places or [place("a", ("b", "est")), place("b", ("a", "ouest"), dark=True)],
+        [thing("lanterne", lantern.pop("at", "a"), **lantern), thing("tresor", "b")],
+        [person("roi", "a")],
+        [act("rendre", [("give", "tresor", "roi")], ["lose:tresor", "end:gagne"], ["has:tresor"]), *extra_actions],
+    )
+
+
+def test_the_checker_sees_a_treasure_lost_in_the_dark_once_the_light_is_spent():
+    errors, _ = check(_dark_world({"light": True, "uses": 1}))  # seen lit, left behind, never seen again
+    assert any("get stuck" in e for e in errors)
+
+
+def test_the_checker_sees_a_treasure_lost_in_the_dark_once_the_light_is_given_away():
+    from aipet.games.adventure_patterns import act, person, place
+
+    g = _dark_world({"light": True}, [act("troc", [("give", "lanterne", "taupe")], ["lose:lanterne"], ["has:lanterne"])],
+                    [place("a", ("b", "est")), place("b", ("a", "ouest"), ("c", "est"), dark=True), place("c", ("b", "ouest"))])  # fmt: skip
+    g["characters"].append(person("taupe", "c"))
+    errors, _ = check(g)
+    assert any("get stuck" in e for e in errors)
+
+
+def test_the_checker_sees_a_lantern_burnt_out_on_the_floor_of_the_dark():
+    from aipet.games.adventure_patterns import act
+
+    refill = act("remplir", [("fill", "lanterne", "roi")], ["refill:lanterne"], ["has:lanterne"])
+    errors, _ = check(_dark_world({"light": True, "uses": 1, "at": "b"}, [refill]))
+    assert any("get stuck" in e for e in errors)
+
+
+def test_a_hint_says_to_take_the_light_and_where_only_counts_what_was_seen():
+    w = World(_dark_world({"light": True}))
+    st = w.start()
+    say(w, st, "go", "est")  # blind
+    say(w, st, "go", "ouest")
+    assert "pas encore vu" in say(w, st, "where", "le tresor")["où"]
+    st.stalled, st.hint_level = 99, 2
+    assert "lanterne" in w.hint(st, force=True)
+
+
+def test_in_the_dark_no_decor_and_burning_a_light_is_no_progress():
+    graph, _ = PATTERNS["lantern_that_burns"]
+    g = json.loads(json.dumps(graph))
+    g["places"][1]["decor"] = ["cailloux"]
+    w = World(g)
+    st = w.start()
+    say(w, st, "take", "la lanterne")
+    say(w, st, "go", "ouest")
+    say(w, st, "take", "la clé")
+    st.stalled = 3
+    say(w, st, "go", "est")  # the lantern burns out: not progress
+    assert st.stalled == 3
+    say(w, st, "go", "ouest")
+    assert "à_savoir" not in say(w, st, "sing", "un caillou")
