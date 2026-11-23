@@ -9,8 +9,8 @@ it. The format is designed so that a checker can prove, before anyone plays, tha
 be won and that the player can never get stuck.
 
 The world model follows the interactive-fiction tradition: Inform 7 (kinds, states, initial
-appearance, implicit actions), TADS 3 (remap, verify/check), TextWorld (STRIPS-style rules, a world
-that only moves forward), storylets (texts gated by conditions) and Ron Gilbert's puzzle dependency
+appearance, implicit actions), TADS 3 (remap, verify/check), TextWorld (typed rules with preconditions
+and effects, quests built and checked by a program), storylets (texts gated by conditions) and Ron Gilbert's puzzle dependency
 charts.
 
 Normative artefacts:
@@ -301,7 +301,7 @@ Applied in order.
 player cannot close, lock or drop things (7.8): what was done stays done. Uses are the one thing
 that goes back and forth (`spend`, `refill`, 7.13): the solver counts them, and "never stuck" still
 holds (a use that runs out must be refillable, or never needed). The hero is never locked
-out, and the state space the checker explores stays small (TextWorld's quests are monotonic too).
+out, and the state space the checker explores stays small (TextWorld, too, builds its quests as paths without cycles).
 
 ## 6. A turn
 

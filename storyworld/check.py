@@ -57,7 +57,7 @@ from storyworld.world import (
 # ---- validation ---------------------------------------------------------------------------------
 CONDITIONS = set(CONDITION_KINDS)
 # A world that never goes back (no unflag, hide, close or lock): what was done stays done, so the
-# hero is never locked out and the solver stays small (TextWorld's quests are monotonic too).
+# hero is never locked out and the solver stays small (TextWorld builds its quests without cycles too).
 EFFECTS = set(EFFECT_KINDS)
 
 

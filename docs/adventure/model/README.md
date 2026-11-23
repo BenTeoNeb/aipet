@@ -75,8 +75,8 @@ verb. Changed before propagating:
   « attraper les lucioles » does it when the jar is in the bag. Never for a loss, a blow, a cuddle,
   a look, talking or playing (`NO_REMAP`), nor for a one-thing trigger (there the verb matters).
   Pulling, pushing or using a drawer opens it; taking what a closed drawer holds opens it first.
-- **A world that only moves forward**: no `close:`, `lock:`, `unflag:`, `hide:` (TextWorld's quests
-  are monotonic too): the hero is never locked out and the solver stays small.
+- **A world that only moves forward**: no `close:`, `lock:`, `unflag:`, `hide:` (TextWorld, too,
+  builds its quests as paths without cycles): the hero is never locked out and the solver stays small.
 - **The checker plays the game**: every way to win the solver finds is replayed through `act()`
   (`replay`), so a scripted action can't shadow a built-in one the solver counted on; a trigger
   that only opens something built in is an error. An unreachable ending says why (« action X needs
@@ -188,7 +188,7 @@ After a second review aimed at « something that can become an open-source stand
 - **The checker plays every move** the solver explores through the turn (`disagreements`), and
   property tests fuzz graphs and intents.
 
-Not taken, on purpose: supporters, light and dark, wearables, per-trigger conditions, PDDL export,
+Not taken, on purpose: supporters, wearables, per-trigger conditions, PDDL export,
 social simulation (Versu, Façade): a children's spoken adventure doesn't need them.
 
 ### Piko, version 1 → 2
@@ -199,10 +199,8 @@ gone. Solver: same endings (feu, lucioles; loss: pince), 108 states, shortest wi
 
 ### Next
 
-- The generator writes model 2 (schema, prompt, `_clean`); the bank is still version 1, read through
-  `upgrade` and the booleans. Rewrite it in model 2 (kinds, triggers merging duplicate actions,
-  `details` instead of `variants`, held things), then drop the version 1 reading. Stored adventures
-  keep their own graph: no migration needed while `upgrade` stays.
+- The generator and the bank are in model 2. Stored adventures keep their own graph, read through
+  `upgrade`: drop the version 1 reading only once none is left.
 - Character lines that depend on the situation (`says` with details): Piko still says « Pinces a la
   clé » once the hero has it.
 - A lint for place descriptions naming a movable character or thing (it belongs in `initial`).
