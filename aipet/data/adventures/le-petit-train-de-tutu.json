@@ -65,7 +65,11 @@
      "label": "vers la forêt",
      "dir": "sud"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Pfff… pfff… la locomotive soupire, et la grande horloge fait tic-tac, tic-tac.",
+    "smell": "Ça sent le charbon… et les fleurs de la gare."
+   }
   },
   {
    "id": "salle",
@@ -112,7 +116,10 @@
      "label": "vers la gare",
      "dir": "sud"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Glouglou, l'eau dans la tour… et tout là-haut, une pie qui jacasse : tchac-tchac-tchac !"
+   }
   },
   {
    "id": "maisonnette",
@@ -169,7 +176,11 @@
      "label": "vers la gare",
      "dir": "nord"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Rrrron… pfiou… Rrrron… Un énorme ronflement sort de derrière les sapins !",
+    "smell": "Mmm, la résine des sapins et les champignons."
+   }
   }
  ],
  "items": [
@@ -431,13 +442,17 @@
     {
      "verb": "search",
      "object": "manteau"
+    },
+    {
+     "verb": "touch",
+     "object": "manteau"
     }
    ],
    "effects": [
     "reveal:bouton"
    ],
    "points": 5,
-   "text": "Tu fouilles les grandes poches… dans le fond, un bouton doré tout brillant !",
+   "text": "Tu tâtes les grandes poches… dans le fond, quelque chose de tout rond et de tout dur : un bouton doré tout brillant !",
    "hint": "Ce vieux manteau a de grandes poches… et si on regardait dedans ?"
   },
   {

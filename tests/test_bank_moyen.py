@@ -49,6 +49,7 @@ def test_le_drakkar_de_sigrid(tmp_path, monkeypatch):
         ("Je descends et je vais dans la cabane", [G("sur la plage"), G("la cabane")], ["done", "done"]),
         ("Bonjour papi Olaf", [A("talk", "papi")], ["done"]),
         ("J'ouvre le coffre", [A("open", "le coffre")], ["done"]),
+        ("Pouah, ça sent fort ! Je renifle", [A("smell")], ["done"]),  # the smell leads up: a fish drying
         ("Je prends tout",
          [A("take", "l'aiguille"), A("take", "le navet"), A("take", "le poisson")], ["done", "done", "done"]),
         ("Je mange le poisson", [A("eat", "le poisson")], ["clue"]),  # beurk: a raven would love it
@@ -90,7 +91,6 @@ def test_le_carillon_de_la_foret(tmp_path, monkeypatch):
         ("Je prends la pierre à étincelles et un roseau", [A("take", "la pierre à étincelles"), A("take", "le roseau")], ["done", "done"]),
         ("Je fais des trous dans le roseau avec la pierre",
          [A("use", "la pierre à étincelles", "le roseau")], ["done"]),  # silly recipe: a duck-with-a-cold pipe
-        ("J'allume la lanterne avec la pierre", [A("light", "la lanterne")], ["done"]),
         ("Je vais sur le pont", [G("le vieux pont")], ["done"]),
         ("Je passe", [G("la grotte")], ["not_yet"]),  # Grognon bars the way
         ("Bonjour Grognon !", [A("talk", "Grognon")], ["done"]),  # his riddle
@@ -98,8 +98,12 @@ def test_le_carillon_de_la_foret(tmp_path, monkeypatch):
         ("Je joue du pipeau à Grognon", [A("use", "le pipeau", "Grognon")], ["clue"]),  # he laughs, hic!
         ("La lumière !", [A("answer", "la lumière", "Grognon")], ["not_yet"]),
         ("C'est le noir !", [A("answer", "le noir", "Grognon")], ["done"]),
-        ("J'entre dans la grotte et je regarde avec la lanterne",
-         [G("la grotte"), A("use", "la lanterne")], ["done", "done"]),
+        ("J'entre dans la grotte", [G("la grotte")], ["done"]),  # a dark place: only the way out is felt
+        ("Je cherche le battant", [A("search", "les cristaux")], ["not_yet"]),  # too dark to see
+        ("J'écoute", [A("listen")], ["done"]),  # plic, ploc… and a « ding » somewhere
+        ("J'allume la lanterne avec la pierre", [A("light", "la lanterne")], ["done"]),  # now the crystals shine
+        ("Je prends le battant", [A("take", "le battant")], ["absent"]),  # which one? they all shine alike
+        ("Je tapote les cristaux et j'écoute", [A("listen", "les cristaux")], ["done"]),  # DING: the sense puzzle
         ("Je prends le battant", [A("take", "le battant")], ["done"]),
         ("Je retourne à la clairière", [G("le pont"), G("la rivière"), G("la clairière")], ["done"] * 3),
         ("Je raccroche le battant au carillon", [A("use", "le battant", "le carillon")], ["end"]),
@@ -115,7 +119,10 @@ def test_l_atelier_de_leonard(tmp_path, monkeypatch):
         ("Je dessine un oiseau sur le mur", [A("other", "un oiseau", "le mur")], ["free"]),
         ("Je vais à la cuisine", [G("la cuisine")], ["done"]),
         ("Bonjour Mamma Rosa !", [A("talk", "Mamma Rosa")], ["done"]),
-        ("Je prends la farine et les graines", [A("take", "la farine"), A("take", "les graines")], ["done", "done"]),
+        ("Je prends la farine et les graines", [A("take", "la farine"), A("take", "les graines")], ["done", "absent"]),
+        ("J'écoute", [A("listen")], ["done"]),  # a jar on the shelf goes tchic-tchic
+        ("Je secoue les pots", [A("push", "les pots")], ["done"]),  # the seeds' jar
+        ("Je prends les graines", [A("take", "les graines")], ["done"]),
         ("Je vais dans la cour", [G("l'atelier"), G("la cour")], ["done", "done"]),
         ("Je prends le seau", [A("take", "le seau")], ["done"]),
         ("Je mélange la farine et l'eau", [A("combine", "la farine", "l'eau")], ["done"]),
@@ -174,6 +181,7 @@ def test_descriptions_follow_the_story():
     st = w.start()
     w.act(st, {"verb": "go", "to": "la cabane"})
     w.act(st, {"verb": "take", "object": "le navet"})
+    w.act(st, {"verb": "smell"})
     w.act(st, {"verb": "take", "object": "le poisson"})
     assert w.describe(st)["description"].endswith("la table est vide.")
 

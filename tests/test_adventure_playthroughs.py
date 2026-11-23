@@ -76,7 +76,7 @@ def test_le_petit_train_de_tutu(tmp_path, monkeypatch):
         ("Chipie, rends le sifflet !", [A("talk", "la pie", "le sifflet")], ["done"]),
         ("Je lui donne mon doudou", [A("give", "mon doudou", "Chipie")], ["absent"]),  # Flocon plays along
         ("Je vais dans la salle d'attente", [G("gare"), G("la salle d'attente")], ["done", "done"]),
-        ("Je fouille les poches du manteau", [A("search", "les poches")], ["done"]),
+        ("Je tâte les poches du manteau", [A("touch", "les poches")], ["done"]),  # something round and hard
         ("Je prends le bouton et le pain", [A("take", "le bouton"), A("take", "le pain")], ["done", "done"]),
         ("Je donne le bouton brillant à la pie",
          [G("gare"), G("nord"), A("give", "le bouton", "la pie")], ["done", "done", "done"]),
@@ -113,24 +113,29 @@ def test_raya_et_la_perle_de_lumiere(tmp_path, monkeypatch):
         ("Je fais un collier", [A("take", "les coquillages"), A("combine", "la ficelle", "les coquillages")], ["done", "done"]),
         ("Je donne le collier à Zigzag", [A("give", "le collier", "Zigzag")], ["done"]),
         ("Je descends dans la fosse", [G("la fosse")], ["done"]),
-        ("J'allume la lumière", [A("light", "la fosse")], ["not_yet"]),  # Flocon: light up here → « il te faut une lumière »
+        ("Je cherche la perle", [A("search", "la perle")], ["not_yet"]),  # a dark place: « il te faudrait de la lumière »
         ("Aide-moi", [A("help")], ["hint"]),
         ("Je vais dans la forêt d'algues et je prends l'algue qui brille",
          [G("haut"), G("récif"), G("la forêt d'algues"), A("take", "l'algue qui brille")], ["done"] * 4),
         ("Je mets l'algue dans le bocal", [A("use", "l'algue", "le bocal")], ["done"]),
         ("Je vais dans la grotte", [G("la grotte")], ["done"]),
-        ("Je cherche partout", [A("search")], ["done"]),  # Octave is found
+        ("Chut, j'écoute", [A("listen")], ["done"]),  # the sense puzzle: Octave's giggle gives him away
         ("Je retourne à la fosse", [G("algues"), G("récif"), G("plaine"), G("fosse")], ["done"] * 4),
-        ("Je lève la lampe", [A("use", "la lampe")], ["done"]),
+        ("Je regarde autour de moi", [A("look")], ["done"]),  # the jar of algae lights the dark pit
         ("Je prends la perle et je donne les miettes aux poissons",
          [A("take", "la perle"), A("give", "les miettes", "les poissons")], ["done", "done"]),
         ("Je vais vers la lueur et je souffle dans la conque", [G("la lueur dorée"), A("use", "la conque")], ["done", "done"]),
         ("Je donne la perle à Madame Bénitier", [A("give", "la perle", "Madame Bénitier")], ["not_yet"]),  # still grey: « elle doit briller »
+        ("Je redescends voir les poissons", [G("la fosse")], ["done"]),  # leaving the palace, the alga fades: « il lui faudrait une algue fraîche »
+        ("Je regarde les poissons", [A("examine", "les poissons")], ["not_yet"]),  # too dark now
+        ("Je vais mettre une algue fraîche dans le bocal",
+         [G("haut"), G("récif"), G("la forêt d'algues"), A("fill", "le bocal", "les grandes algues")], ["done"] * 4),
+        ("Je retourne au palais", [G("récif"), G("plaine"), G("fosse"), G("la lueur dorée")], ["done"] * 4),
         ("Je dis à Madame Bénitier que j'ai des amis qui brillent",
          [A("talk", "Madame Bénitier", "mes amis qui brillent")], ["end"]),
     ])  # fmt: skip
     assert game.state.ending == "poissons"
-    assert "miettes" not in game.state.inventory and game.state.turns == 39
+    assert "miettes" not in game.state.inventory and game.state.turns == 49
 
 
 @pytest.mark.parametrize("graph", adv.library(), ids=lambda g: g["title"])

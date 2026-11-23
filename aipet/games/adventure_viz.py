@@ -92,8 +92,11 @@ def _snapshot(w: World, st: State) -> dict:
         "chars_at": dict(st.chars_at),
         "done": list(st.done_actions),
         "props": {i: {k: w.prop(st, i, k) for k in ("open", "locked", "state", "answered", "follows", "pressed")}
+                  | ({"uses": w.uses_left(st, i)} if w.max_uses(i) else {})
                   for i in [*w.items, *w.chars]
-                  if w.thing(i).get("openable") or w.thing(i).get("states") or i in w.riddles or i in w.chars},
+                  if w.thing(i).get("openable") or w.thing(i).get("states") or i in w.riddles or i in w.chars
+                  or w.max_uses(i)},
+        "dark": w.dark(st),
         "handled": list(st.handled),
         "names": {i: w.name(i, st) for i in [*w.items, *w.chars] if w.thing(i).get("states")},
     }  # fmt: skip
@@ -287,8 +290,16 @@ def chain(w: World) -> dict:
         if at in w.items:  # in a container
             made = (opened(at) or []) + (present(at) or []) + made
         elif at:
-            made = (reach(at) or []) + made
+            made = (reach(at) or []) + lit(at) + made
         return made or None
+
+    def lit(place: str) -> list[str]:
+        """In a dark place, what makes the light shine: having it, and its conditions."""
+        if not w.places.get(place, {}).get("dark") or not w.lights:
+            return []
+        light = w.lights[0]
+        rules = w.items[light]["light"] if isinstance(w.items[light]["light"], list) else []
+        return [n for r in [f"has:{light}", *rules] for n in producers(r) or []]
 
     def need(target: str, prods: list[str] | None, why: str, alt: bool = False):
         if not prods:
@@ -470,7 +481,20 @@ def describe(graph: dict, source: str, records: list[dict], games: list[dict]) -
         "things": {
             i: {
                 k: t.get(k)
-                for k in ("kind", "takeable", "openable", "container", "open", "locked", "key", "at", "state", "states")
+                for k in (
+                    "kind",
+                    "takeable",
+                    "openable",
+                    "container",
+                    "open",
+                    "locked",
+                    "key",
+                    "at",
+                    "state",
+                    "states",
+                    "uses",
+                    "light",
+                )
                 if k in t
             }
             for i, t in [*w.items.items(), *w.chars.items()]

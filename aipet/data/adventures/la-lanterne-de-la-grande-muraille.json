@@ -59,7 +59,10 @@
     "guirlandes",
     "pavés",
     "puits"
-   ]
+   ],
+   "senses": {
+    "listen": "Des rires, des pétards au loin, pan-pan… et dans la gueule du dragon, quelque chose fait ding !"
+   }
   },
   {
    "id": "maison_the",
@@ -83,7 +86,10 @@
     "tables basses",
     "encre",
     "pinceaux"
-   ]
+   ],
+   "senses": {
+    "smell": "Le jasmin, le thé chaud et les petits pains à la vapeur… miam !"
+   }
   },
   {
    "id": "pont",
@@ -176,7 +182,10 @@
     "pousses",
     "papillons",
     "sentier"
-   ]
+   ],
+   "senses": {
+    "listen": "Crrr, crrr, les bambous se frottent dans le vent… et rrron, rrron : quelqu'un ronfle sur un tas de bambous !"
+   }
   },
   {
    "id": "pied",
@@ -243,7 +252,10 @@
     "drapeaux",
     "vent",
     "dalles de pierre"
-   ]
+   ],
+   "senses": {
+    "listen": "Whooo, le vent ! Et entre deux coups de vent : rrrrRRRON… Ah-Fu ronfle comme un dragon."
+   }
   },
   {
    "id": "tour",
@@ -938,6 +950,10 @@
    "triggers": [
     {
      "verb": "search",
+     "object": "sechoir"
+    },
+    {
+     "verb": "touch",
      "object": "sechoir"
     }
    ],

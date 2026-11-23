@@ -106,7 +106,7 @@
      "when": [
       "!here:octave"
      ],
-     "text": "On entend un petit rire : « Hi hi, tu ne me trouveras jamais ! »"
+     "text": "On entend un petit rire : « Hi hi, tu ne me trouveras jamais ! » Tends bien l'oreille…"
     }
    ],
    "decor": [
@@ -114,7 +114,11 @@
     "rochers",
     "algues sombres",
     "petits cailloux"
-   ]
+   ],
+   "senses": {
+    "smell": "Ça sent l'algue et le sel.",
+    "touch": "Des rochers tout bosselés… et l'un d'eux est tout mou !"
+   }
   },
   {
    "id": "epave",
@@ -147,7 +151,10 @@
     "ancre rouillée",
     "planches",
     "coquillages collés"
-   ]
+   ],
+   "senses": {
+    "listen": "Crrrouiii… le vieux bateau grince doucement dans le courant."
+   }
   },
   {
    "id": "jardin",
@@ -220,7 +227,7 @@
     "trou noir",
     "abysses"
    ],
-   "description": "",
+   "description": "Une fosse aux rochers tout bleus, où les poissons-lanternes clignotent. Au nord, un passage mène vers une lueur dorée.",
    "exits": [
     {
      "to": "plaine",
@@ -230,20 +237,7 @@
     {
      "to": "palais",
      "label": "vers la lueur dorée",
-     "dir": "nord",
-     "when": [
-      "flag:fosse_eclairee"
-     ],
-     "blocked": "Il fait bien trop noir pour trouver le chemin…"
-    }
-   ],
-   "details": [
-    {
-     "when": [
-      "flag:fosse_eclairee"
-     ],
-     "text": "La lampe éclaire la fosse : des rochers tout bleus, des poissons-lanternes qui clignotent, et au fond, un passage vers une lueur dorée.",
-     "else": "Il fait tout noir dans la fosse. Tu ne vois même pas le bout de ton nez. Quelque part, de petites lumières clignotent : ce sont les poissons-lanternes."
+     "dir": "nord"
     }
    ],
    "decor": [
@@ -251,7 +245,12 @@
     "eau noire",
     "bulles",
     "sable sombre"
-   ]
+   ],
+   "dark": "Il fait tout noir dans la fosse : tu ne vois même pas le bout de ton nez ! Blip… blip… de toutes petites lumières clignotent, bien trop petites pour y voir. Et l'eau fait glou… glou… tout autour.",
+   "senses": {
+    "listen": "Blip, blip ! De petits bruits de bulles tout autour de toi. Et vers le nord, comme une douce chanson de vagues…",
+    "touch": "Des rochers froids et lisses, et du sable tout doux."
+   }
   },
   {
    "id": "palais",
@@ -273,7 +272,12 @@
     "couronne vide",
     "rideaux d'algues",
     "trône de corail"
-   ]
+   ],
+   "dark": "Il fait tout noir dans le palais : tu ne vois rien du tout ! Tes mains touchent des colonnes toutes lisses, comme l'intérieur d'un coquillage. Et l'eau chante tout doucement : ouuuh…",
+   "senses": {
+    "listen": "Ouuuh… l'eau chante doucement entre les colonnes de nacre.",
+    "touch": "Des colonnes lisses et fraîches, douces comme l'intérieur d'un coquillage."
+   }
   }
  ],
  "items": [
@@ -288,6 +292,21 @@
    "at": "algues",
    "description": "Une algue qui brille d'une douce lumière verte. Elle se fane vite si on la laisse dans l'eau de mer : il faudrait la protéger. Et surtout, on ne la mange pas !",
    "kind": "thing"
+  },
+  {
+   "id": "algues_brillantes",
+   "kind": "scenery",
+   "name": "les grandes algues qui brillent",
+   "aliases": [
+    "grandes algues",
+    "algues brillantes",
+    "algues fraiches",
+    "algues vertes"
+   ],
+   "at": "algues",
+   "fixed": "Elles sont bien accrochées au fond de la mer.",
+   "sturdy": "Ce sont les algues de la forêt : on les laisse danser !",
+   "description": "De grandes algues qui brillent d'une petite lumière verte, toutes fraîches. Il y en a plein !"
   },
   {
    "id": "filet",
@@ -366,9 +385,16 @@
       "bocal lumineux",
       "lumiere"
      ],
-     "description": "Le bocal fermé, avec l'algue lumineuse dedans : une vraie lampe sous la mer !"
+     "description": "Le bocal fermé, avec l'algue lumineuse dedans : une vraie lampe sous la mer ! Mais l'algue se fane vite : quand elle s'éteint, il faut en mettre une fraîche."
     }
-   ]
+   ],
+   "light": [
+    "is:bocal:lampe"
+   ],
+   "uses": 2,
+   "texts": {
+    "empty": "L'algue du bocal pâlit… pâlit… et s'éteint : elle est toute fanée ! Il lui faudrait une algue bien fraîche…"
+   }
   },
   {
    "id": "sable",
@@ -414,7 +440,7 @@
     "perle eteinte",
     "perle grise"
    ],
-   "at": "",
+   "at": "fosse",
    "description": "Une grosse perle toute grise et froide. Elle a dû perdre sa lumière… il faudrait la réchauffer quelque part.",
    "kind": "thing",
    "states": [
@@ -430,6 +456,10 @@
      ],
      "description": "La perle brille comme un petit soleil !"
     }
+   ],
+   "initial": "Sur un rocher, une grosse perle toute grise.",
+   "light": [
+    "is:perle:lumineuse"
    ]
   },
   {
@@ -444,7 +474,10 @@
    "fixed": "Il a des racines jusqu'au fond de la mer, il reste là !",
    "description": "Un corail orange et chaud qui brille comme un petit soleil. Tout ce qu'on pose dessus se met à briller.",
    "kind": "scenery",
-   "sturdy": "Le Corail-Soleil est le cœur chaud du jardin : on ne l'abîme pas !"
+   "sturdy": "Le Corail-Soleil est le cœur chaud du jardin : on ne l'abîme pas !",
+   "senses": {
+    "touch": "C'est tout chaud, comme une bouillotte ! Tout ce qu'on pose dessus se réchauffe."
+   }
   },
   {
    "id": "conque",
@@ -712,34 +745,37 @@
    "hint": "L'algue lumineuse se fane dans l'eau de mer… Dans quoi pourrais-tu la protéger ?"
   },
   {
-   "id": "eclairer_fosse",
-   "place": "fosse",
+   "id": "changer_algue",
+   "place": "algues",
    "when": [
     "has:bocal",
     "is:bocal:lampe"
    ],
    "effects": [
-    "flag:fosse_eclairee",
-    "reveal:perle"
+    "refill:bocal"
    ],
-   "points": 10,
-   "text": "Tu lèves la lampe d'algues : la fosse s'illumine ! Sur un rocher, tu vois une grosse perle toute grise, et au fond, un passage vers une lueur dorée.",
+   "points": 0,
+   "repeatable": true,
+   "not_yet": "Ton bocal est encore vide : mets d'abord une algue lumineuse dedans !",
+   "text": "Tu ouvres le bocal, tu remets une algue toute fraîche, et tu refermes le couvercle : ta lampe brille de nouveau bien fort !",
    "triggers": [
     {
+     "verb": "fill",
+     "object": "bocal",
+     "target": "algues_brillantes"
+    },
+    {
      "verb": "use",
-     "object": "bocal"
+     "object": "bocal",
+     "target": "algues_brillantes"
     },
     {
-     "verb": "light",
-     "object": "fosse"
-    },
-    {
-     "verb": "search",
-     "object": "fosse"
+     "verb": "combine",
+     "object": "bocal",
+     "target": "algues_brillantes"
     }
    ],
-   "not_yet": "Il fait tout noir, tu ne vois rien du tout ! Il te faudrait une lumière… une qui ne s'éteint pas dans l'eau.",
-   "hint": "Il fait tout noir dans la fosse. Ta lampe d'algues, ce serait le moment de la lever !"
+   "hint": "L'algue de ton bocal s'est fanée… Où est-ce que les algues brillent encore, toutes fraîches ?"
   },
   {
    "id": "nourrir_poissons",
@@ -769,14 +805,22 @@
     "gain:conque"
    ],
    "points": 10,
-   "text": "Tu regardes derrière un rocher… le rocher a des yeux ! « Hi hi, tu m'as trouvé ! » C'est Octave le poulpe. « Tu as gagné, prends ma conque : elle joue la musique de la mer. »",
+   "text": "Tu fermes les yeux et tu écoutes… « hi hi hi »… ça vient de derrière ce rocher ! Tu regardes : le rocher a des yeux ! C'est Octave le poulpe. « Tu m'as trouvé ! Tu as gagné, prends ma conque : elle joue la musique de la mer. »",
    "triggers": [
+    {
+     "verb": "listen"
+    },
+    {
+     "verb": "listen",
+     "object": "grotte"
+    },
     {
      "verb": "search",
      "object": "grotte"
     }
    ],
-   "hint": "On entend rire Octave, caché quelque part dans la grotte. Cherche bien dans les recoins !"
+   "hint": "Octave rit, caché quelque part dans la grotte. Ferme les yeux et écoute bien d'où vient son rire !",
+   "place": "grotte"
   },
   {
    "id": "rallumer_perle",
@@ -966,24 +1010,24 @@
    "clue_in": "conque"
   },
   {
-   "goal": "Trouver Octave (et sa conque)",
+   "goal": "Trouver Octave à l'oreille (et sa conque)",
    "action": "trouver_octave",
    "needs": [
     "octave"
    ],
-   "clue_in": "raya"
+   "clue_in": "grotte"
   },
   {
-   "goal": "Éclairer la fosse",
-   "action": "eclairer_fosse",
+   "goal": "Remettre une algue fraîche dans la lampe fanée",
+   "action": "changer_algue",
    "needs": [
     "bocal",
-    "fosse"
+    "algues_brillantes"
    ],
-   "clue_in": "fosse"
+   "clue_in": "bocal"
   },
   {
-   "goal": "Fabriquer une lampe d'algues",
+   "goal": "Fabriquer une lampe d'algues pour voir dans la fosse noire",
    "action": "faire_lampe",
    "needs": [
     "algue_lumineuse",

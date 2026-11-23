@@ -104,6 +104,8 @@ shortest win, number of puzzles and lose endings, how soon hints come, how many 
 | `details` | Detail[] | Situation-dependent sentences. | `[]` |
 | `decor` | string[] | Plain things seen here that serve no purpose ("galets", "flaques"). | `[]` |
 | `exits` | Exit[] | The ways out. | `[]` |
+| `dark` | boolean \| string | Dark: without a light, nothing is seen here but the ways out (7.12). A string is what the hero feels there in the dark. | `false` |
+| `senses` | Senses | What is heard, smelled, felt here (7.14). | none |
 | `variants` | `{when, description}`[] | Deprecated: version 1 whole descriptions. | — |
 
 **Exit**:
@@ -137,7 +139,10 @@ Exits are one-way: a way back is a separate exit on the destination (generators 
 | `open` | boolean | Starts open (container, door). | `false` |
 | `locked` | boolean | Starts locked (container, door). | `false` |
 | `key` | item id | The item that unlocks it (container, door). | none |
-| `texts` | `{open, locked, unlock, closed}` | What opening says: `open` when it opens, `locked` when it is locked and cannot open yet, `unlock` when the key unlocks and opens it, `closed` for an exit behind this unlocked, closed door. | generic texts |
+| `texts` | `{open, locked, unlock, closed, empty}` | What opening says: `open` when it opens, `locked` when it is locked and cannot open yet, `unlock` when the key unlocks and opens it, `closed` for an exit behind this unlocked, closed door; `empty` when it has no use left (7.13). | generic texts |
+| `uses` | integer ≥ 1 | How many times it can be used before it is refilled (7.13). | none |
+| `light` | boolean \| Conditions | Gives light in dark places: always, or while the conditions hold (7.12). | none |
+| `senses` | Senses | What is heard, smelled, felt about it (7.14). | none |
 | `states` | State[] | Value states (4.6). | none |
 | `code` | Code | A code lock that opens it (7.6). | none |
 | `answer` | Answer | A riddle or password it asks (7.7). | none |
@@ -244,10 +249,10 @@ authors, generators and the hint system, and checked.
 
 ```ebnf
 condition = [ "!" ] , ( unary-cond , ":" , id | "is" , ":" , id , ":" , id ) ;
-unary-cond = "has" | "flag" | "at" | "visited" | "here" | "open" | "locked" ;
+unary-cond = "has" | "flag" | "at" | "visited" | "here" | "open" | "locked" | "charged" ;
 
 effect    = unary-eff , ":" , id | ( "move" | "set" ) , ":" , id , ":" , id ;
-unary-eff = "gain" | "lose" | "flag" | "reveal" | "follow" | "goto" | "end" | "open" | "unlock" ;
+unary-eff = "gain" | "lose" | "flag" | "reveal" | "follow" | "goto" | "end" | "open" | "unlock" | "spend" | "refill" ;
 
 id        = first-char , { char } ;      (* no ":" and no whitespace *)
 first-char = ? any character except "!", ":" and whitespace ? ;
@@ -268,6 +273,7 @@ Effects are never negated. Flag names are free (they need not be declared).
 | `open:X` | container or door X is open | openable item id |
 | `locked:X` | container or door X is locked | openable item id |
 | `is:X:S` | thing X (item or character) is in state S | id and one of its state ids |
+| `charged:X` | item X has at least one use left (7.13) | item id with `uses` |
 
 `!` negates. A list holds when every condition holds.
 
@@ -288,9 +294,13 @@ Applied in order.
 | `open:X` | opens (and unlocks) container or door X | openable item id |
 | `unlock:X` | unlocks X | openable item id |
 | `set:X:S` | X's state becomes S | id and one of its state ids |
+| `spend:X` | X has one use less (an action that spends X needs `charged:X`, implicitly) | item id with `uses` |
+| `refill:X` | X has all its uses again | item id with `uses` |
 
 **A world that only moves forward.** There is no `close`, `lock`, unflag or hide effect, and the
-player cannot close, lock or drop things (7.8): what was done stays done. The hero is never locked
+player cannot close, lock or drop things (7.8): what was done stays done. Uses are the one thing
+that goes back and forth (`spend`, `refill`, 7.13): the solver counts them, and "never stuck" still
+holds (a use that runs out must be refillable, or never needed). The hero is never locked
 out, and the state space the checker explores stays small (TextWorld's quests are monotonic too).
 
 ## 6. A turn
@@ -415,6 +425,31 @@ or a failed try, ignored by the solver.
 A character that `follow`s goes wherever the hero goes (`here:C` keeps holding) until `move`d.
 "Where is X?" is answered from what the hero has seen, never guessed. Words naming the place's
 `decor` are played along with and never help.
+
+### 7.12 Light and darkness (Inform's darkness)
+
+A `dark` place is dark unless a light shines there: an item with `light` in the bag or on the ground
+there, whose conditions hold (`light: ["is:lampe:allumee"]`; `true`: always) and, if it has `uses`,
+with one left. In the dark the hero sees nothing: the description is the `dark` text (a generic one
+when `dark` is `true`), no item, character or decor is in reach, only the ways out (felt, doors
+included), the bag and the companions who follow. Naming a thing there answers `not_yet` ("Il fait
+trop noir…"). The ways out always work, so the hero can always go back to the light.
+
+### 7.13 Uses (charges)
+
+An item with `uses: N` can be used N times: an action with `spend:X` needs a use left (an implicit
+`charged:X`), and when none is left it answers `not_yet` with `texts.empty`. `refill:X` gives back
+all N (doing it when full is already done). A light with uses burns one each time the hero leaves a
+dark place it lit (unless a light without uses shone there too); the last one tells `texts.empty`
+("La lanterne s'éteint…"). Examining it and the inventory tell the uses left.
+
+### 7.14 Senses
+
+`senses: {listen, smell, touch}` on a place or an item: listening to, smelling or touching it (or
+listening with nothing named: here) tells that text when no action is written for it. In the dark,
+the place's senses are given to the narrator with the `dark` text: what the hero hears and smells
+there. A sense puzzle is an action triggered by `listen`, `smell` or `touch` ("écouter le mur" → a
+hiding place).
 
 ## 8. What a valid adventure guarantees
 

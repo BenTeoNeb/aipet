@@ -113,7 +113,9 @@ accepted by the checker and won by speaking: key and door; something hidden foun
 A + B = C; recipes (a tool that changes a thing's state, three ingredients with the third in `when`, a
 silly mix as a second way to win); a trade with someone who holds the thing; a character won over in steps (states);
 collecting several things; a way blocked until something is done; a map revealing a way; a code;
-a riddle; a companion; a choice and a folly announced before it loses. A change to the model must keep
+a riddle; a companion; a choice and a folly announced before it loses; a dark place and a light; a
+thing with uses refilled; a lantern that burns out on leaving the dark; listening for a hiding place.
+A change to the model must keep
 them green; the generator's prompt lists the same recipes. Left out on purpose: timers (a tide in N
 turns: against « never stuck », maybe later for « difficile »), dialogue trees (the narrator talks
 freely), limited inventories and dice.

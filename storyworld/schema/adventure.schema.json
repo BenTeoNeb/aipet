@@ -105,7 +105,7 @@
     "condition": {
       "description": "A condition: has:ITEM, flag:NAME, at:PLACE, visited:PLACE, here:CHARACTER, open:ITEM, locked:ITEM, is:THING:STATE, optionally negated with a leading `!`.",
       "type": "string",
-      "pattern": "^!?(?:(?:has|flag|at|visited|here|open|locked):[^!:\\s][^:\\s]*|is:[^!:\\s][^:\\s]*:[^!:\\s][^:\\s]*)$"
+      "pattern": "^!?(?:(?:has|flag|at|visited|here|open|locked|charged):[^!:\\s][^:\\s]*|is:[^!:\\s][^:\\s]*:[^!:\\s][^:\\s]*)$"
     },
     "conditions": {
       "description": "Conditions that must all hold (an empty list always holds).",
@@ -115,7 +115,7 @@
     "effect": {
       "description": "An effect: gain:ITEM, lose:ITEM, flag:NAME, reveal:ITEM, move:CHARACTER:PLACE, follow:CHARACTER, goto:PLACE, end:ENDING, open:ITEM, unlock:ITEM, set:THING:STATE.",
       "type": "string",
-      "pattern": "^(?:(?:gain|lose|flag|reveal|follow|goto|end|open|unlock):[^!:\\s][^:\\s]*|(?:move|set):[^!:\\s][^:\\s]*:[^!:\\s][^:\\s]*)$"
+      "pattern": "^(?:(?:gain|lose|flag|reveal|follow|goto|end|open|unlock|spend|refill):[^!:\\s][^:\\s]*|(?:move|set):[^!:\\s][^:\\s]*:[^!:\\s][^:\\s]*)$"
     },
     "effects": {
       "description": "Effects applied in order.",
@@ -223,14 +223,26 @@
       "patternProperties": {"^x-": true},
       "additionalProperties": false
     },
+    "senses": {
+      "description": "What the hero hears, smells or feels there (told when they listen, smell or touch; heard in the dark).",
+      "type": "object",
+      "properties": {
+        "listen": {"$ref": "#/$defs/text", "description": "What is heard."},
+        "smell": {"$ref": "#/$defs/text", "description": "What is smelled."},
+        "touch": {"$ref": "#/$defs/text", "description": "What is felt."}
+      },
+      "patternProperties": {"^x-": true},
+      "additionalProperties": false
+    },
     "openingTexts": {
-      "description": "What opening a container or door says.",
+      "description": "What opening a container or door says, and what a thing says when it has no use left.",
       "type": "object",
       "properties": {
         "open": {"$ref": "#/$defs/text", "description": "Told when it opens (not locked)."},
         "locked": {"$ref": "#/$defs/text", "description": "Told when it is locked and cannot be opened yet."},
         "unlock": {"$ref": "#/$defs/text", "description": "Told when the key in the bag unlocks and opens it."},
-        "closed": {"$ref": "#/$defs/text", "description": "Told for an exit closed by this (unlocked) door."}
+        "closed": {"$ref": "#/$defs/text", "description": "Told for an exit closed by this (unlocked) door."},
+        "empty": {"$ref": "#/$defs/text", "description": "Told when it has no use left (`uses`): trying to use it, or its light going out."}
       },
       "patternProperties": {"^x-": true},
       "additionalProperties": false
@@ -271,6 +283,8 @@
         "description": {"$ref": "#/$defs/text", "description": "What never changes here."},
         "details": {"$ref": "#/$defs/details", "description": "Sentences that depend on the situation."},
         "decor": {"description": "Plain things seen here that serve no purpose (the narrator may play along with them).", "type": "array", "items": {"type": "string"}},
+        "dark": {"description": "Dark: without a light (an item's `light`) the hero sees nothing here but the ways out. A string is what is felt there in the dark.", "type": ["boolean", "string"]},
+        "senses": {"$ref": "#/$defs/senses", "description": "What is heard, smelled, felt here."},
         "exits": {"description": "The ways out.", "type": "array", "items": {"$ref": "#/$defs/exit"}},
         "variants": {"description": "Deprecated: version 1 whole descriptions; use `details`.", "deprecated": true, "type": "array", "items": {"$ref": "#/$defs/variant"}}
       },
@@ -296,7 +310,10 @@
         "open": {"description": "Starts open (containers and doors). Default: false.", "type": "boolean", "default": false},
         "locked": {"description": "Starts locked (containers and doors). Implied by `code` and `answer`. Default: false.", "type": "boolean", "default": false},
         "key": {"$ref": "#/$defs/id", "description": "The item that unlocks it."},
-        "texts": {"$ref": "#/$defs/openingTexts", "description": "What opening it says."},
+        "texts": {"$ref": "#/$defs/openingTexts", "description": "What opening it says (and `empty`, with uses)."},
+        "uses": {"description": "How many times it can be used before an effect refills it: an action with `spend:ID` needs one left. A light with uses burns one when the hero leaves a dark place it lit.", "type": "integer", "minimum": 1},
+        "light": {"description": "Gives light in dark places, from the bag or the ground: always (true) or while these conditions hold (and a use is left).", "anyOf": [{"type": "boolean"}, {"$ref": "#/$defs/conditions"}]},
+        "senses": {"$ref": "#/$defs/senses", "description": "What is heard, smelled, felt about it."},
         "states": {
           "description": "Value states, the first is the start (a deprecated map form is still accepted).",
           "anyOf": [{"$ref": "#/$defs/states"}, {"$ref": "#/$defs/legacyStates"}]

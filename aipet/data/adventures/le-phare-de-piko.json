@@ -51,7 +51,11 @@
     "vagues",
     "galets",
     "algues échouées"
-   ]
+   ],
+   "senses": {
+    "listen": "Chhh… chhh… les vagues. Et tout au loin, tuut-tuuut : la corne du bateau de Zouzou qui cherche son chemin.",
+    "smell": "Ça sent le sel et le sable chaud."
+   }
   },
   {
    "id": "rochers",
@@ -84,7 +88,11 @@
     "crevettes",
     "mouettes",
     "écume"
-   ]
+   ],
+   "senses": {
+    "listen": "Ploc, les flaques… et cric-cric, des pinces qui claquent sur les rochers.",
+    "smell": "Ça sent la mer et les algues !"
+   }
   },
   {
    "id": "cabane",
@@ -116,7 +124,10 @@
     "chaise",
     "poisson grillé",
     "fenêtre"
-   ]
+   ],
+   "senses": {
+    "smell": "Mmm, le poisson grillé !"
+   }
   },
   {
    "id": "pied_phare",
@@ -188,7 +199,10 @@
     "vent",
     "escalier",
     "mer"
-   ]
+   ],
+   "senses": {
+    "listen": "Le vent siffle, fiouuu ! Et tout en bas, la mer cogne contre les rochers : boum… boum…"
+   }
   }
  ],
  "items": [

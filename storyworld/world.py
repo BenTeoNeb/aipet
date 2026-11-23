@@ -59,7 +59,8 @@ class World:
                                         for b in it["code"].get("press", [])}  # fmt: skip
         # Riddles and passwords: who asks (a character, or a door or chest that speaks).
         self.riddles = [i for i in [*self.chars, *self.items] if self.thing(i).get("answer")]
-        self.actions = list(graph.get("actions", []))
+        # An action that spends a use needs one left (`charged:`), implicitly: copies, the graph stays as written.
+        self.actions = [self._needs_a_use(a) for a in graph.get("actions", [])]
         # One rule per trigger: what the matching ranks. A rule carries its action's id, conditions
         # and effects, so whichever trigger worked, the action is done once.
         self.rules = [{**{k: v for k, v in a.items() if k != "triggers"}, **t}
@@ -81,6 +82,15 @@ class World:
         self.settable = {f for e in effects for f in args_of(e, "flag")}
         self.idempotent_ids = {a["id"] for a in self.actions if self.idempotent(a)}
         self.eager_ok = self._eager_ok(rules)
+        self.lights = [i for i, it in self.items.items() if it.get("light")]
+
+    @staticmethod
+    def _needs_a_use(a: dict) -> dict:
+        if not isinstance(a, dict):
+            return a
+        when: list = a["when"] if isinstance(a.get("when"), list) else []
+        extra = [f"charged:{x}" for x in sorted(args_of(a.get("effects"), "spend")) if f"charged:{x}" not in when]
+        return {**a, "when": [*when, *extra]} if extra else a
 
     def _mirror_doors(self) -> list[str]:
         """A door is written once, on one side: the way back goes through the same door. A door
@@ -217,6 +227,8 @@ class World:
                 ok = bool(self.prop(st, a, kind))
             elif kind == "is":
                 ok = len(args) > 1 and self.prop(st, a, "state") == args[1]
+            elif kind == "charged":
+                ok = self.uses_left(st, a) > 0
             else:
                 ok = False  # an unknown condition never holds (the checker reports it)
             if ok == neg:
@@ -253,7 +265,7 @@ class World:
                 self.set_prop(st, a, "follows", True)
                 changes.append(self.say("follows you: {who}", who=self.name(a, st)))
             elif kind == "goto" and a in self.places:
-                self.enter(st, a)
+                self.enter(st, a, changes)
             elif kind == "end" and a in self.endings:
                 st.ending = a
             elif kind == "open" and a in self.items:
@@ -267,19 +279,76 @@ class World:
                 self.set_prop(st, a, "locked", False)
             elif kind == "set" and self.thing(a) and len(args) > 1:
                 self.set_prop(st, a, "state", args[1])
+            elif kind == "spend" and self.uses_left(st, a) > 0:
+                changes += self.spend(st, a)
+            elif kind == "refill" and a in self.items and self.uses_left(st, a) < self.max_uses(a):
+                self.set_prop(st, a, "uses", self.max_uses(a))
+                changes.append(self.say("full again: {thing}", thing=self.name(a, st)))
         return changes
+
+    # ------------------------------------------------------------ uses, light
+    def max_uses(self, ident: str) -> int:
+        n = self.items.get(ident, {}).get("uses")
+        return n if isinstance(n, int) and not isinstance(n, bool) else 0
+
+    def uses_left(self, st: State, ident: str) -> int:
+        """How many times it can still be used (a watering can, a lantern's oil); 0 when it has no uses."""
+        n = st.props.get(ident, {}).get("uses")
+        return n if isinstance(n, int) else self.max_uses(ident)
+
+    def spend(self, st: State, ident: str) -> list[str]:
+        """One use less; what changed, in words (empty: its `texts.empty`)."""
+        left = self.uses_left(st, ident) - 1
+        self.set_prop(st, ident, "uses", left)
+        name = self.name(ident, st)
+        if left:
+            return [self.say("{thing}: {n} left", thing=name, n=left)]
+        return [self.items[ident].get("texts", {}).get("empty") or self.say("empty: {thing}", thing=name)]
+
+    def shines(self, st: State, ident: str) -> bool:
+        """A light that gives light now: its conditions hold and, if it has uses, one is left."""
+        light = self.items.get(ident, {}).get("light")
+        if not light or (self.max_uses(ident) and not self.uses_left(st, ident)):
+            return False
+        return light is True or (isinstance(light, list) and self.holds(st, light))
+
+    def dark(self, st: State, place: str | None = None) -> bool:
+        """A dark place with no light in the bag or on the ground there (Inform's darkness)."""
+        place = place or st.place
+        if not self.places.get(place, {}).get("dark"):
+            return False
+        near = [i for i in self.lights if i in st.inventory or st.items_at.get(i) == place]
+        return not any(self.shines(st, i) for i in near)
+
+    def burn(self, st: State) -> list[str]:
+        """Leaving a dark place lit by a light that has uses spends one of them (unless a light
+        without uses was there too)."""
+        p = st.place
+        if not self.places.get(p, {}).get("dark") or self.dark(st):
+            return []
+        near = [i for i in self.lights if (i in st.inventory or st.items_at.get(i) == p) and self.shines(st, i)]
+        if any(not self.max_uses(i) for i in near):
+            return []
+        return self.spend(st, near[0])
 
     # ------------------------------------------------------------ what is around
     def visible_items(self, st: State) -> list[str]:
-        """Here: on the ground, in an open container here, and the doors of the ways out."""
+        """Here: on the ground, in an open container here, and the doors of the ways out (only the
+        doors, felt in the dark)."""
+        if self.dark(st):
+            return list(self.doors.get(st.place, []))
         seen = [i for i, at in st.items_at.items() if at == st.place]
         for c in seen:  # grows while open containers show what they hold
             if self.prop(st, c, "open") or not self.items.get(c, {}).get("openable"):
                 seen += [i for i, at in st.items_at.items() if at == c and i not in seen]
         return seen + [d for d in self.doors.get(st.place, []) if d not in seen]
 
-    def enter(self, st: State, place: str) -> bool:
-        """The hero arrives somewhere, with the companions who follow (True: a new place)."""
+    def enter(self, st: State, place: str, changes: list[str] | None = None) -> bool:
+        """The hero arrives somewhere, with the companions who follow (True: a new place). Leaving a
+        dark place burns a use of the light (`changes` gets what it says)."""
+        burnt = self.burn(st)
+        if changes is not None:
+            changes += burnt
         st.place = place
         for c in self.chars:
             if self.prop(st, c, "follows"):
@@ -307,7 +376,9 @@ class World:
         return door_ok and self.holds(st, x.get("when"))
 
     def chars_here(self, st: State) -> list[str]:
-        return [c for c, at in st.chars_at.items() if at == st.place]
+        """The people here (in the dark, only the companions who hold the hero's hand)."""
+        here = [c for c, at in st.chars_at.items() if at == st.place]
+        return [c for c in here if self.prop(st, c, "follows")] if here and self.dark(st) else here
 
     def exits(self, st: State) -> list[dict]:
         return list(self.places.get(st.place, {}).get("exits", []))

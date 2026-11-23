@@ -148,6 +148,7 @@ class State:
 # ---- fields ----
 STATE_FIELDS = {"id", "name", "aliases", "description", "initial", "says"}
 SITUATED = ("says", "initial")  # a text, or [{when, text}]: the first that holds
-TEXT_FIELDS = {"open", "locked", "unlock", "closed"}
+TEXT_FIELDS = {"open", "locked", "unlock", "closed", "empty"}
+SENSE_FIELDS = {"listen", "smell", "touch"}
 CODE_FIELDS = {"press", "right", "wrong", "done", "hint"}
 ANSWER_FIELDS = {"question", "accept", "right", "wrong", "hint", "effects"}

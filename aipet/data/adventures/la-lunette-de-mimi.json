@@ -63,7 +63,10 @@
     "pigeons",
     "lampadaire",
     "banc"
-   ]
+   ],
+   "senses": {
+    "listen": "La fontaine fait glouglou, et les pigeons font rou-rou."
+   }
   },
   {
    "id": "boulangerie",
@@ -105,7 +108,10 @@
     "baguettes de pain",
     "caisse",
     "farine"
-   ]
+   ],
+   "senses": {
+    "smell": "Mmm… le pain chaud et le beurre des croissants !"
+   }
   },
   {
    "id": "cave",
@@ -127,7 +133,13 @@
     "étagères",
     "crochets",
     "toiles d'araignée"
-   ]
+   ],
+   "dark": "Il fait tout noir dans la cave : tu ne vois même pas le bout de ton nez ! Ça sent la farine… et tout près, un ventre gargouille : grouiii…",
+   "senses": {
+    "listen": "Grouiii… un gros ventre qui gargouille, et des petites griffes qui grattent un sac de farine.",
+    "smell": "Ça sent la farine, la poussière… et un vieux bout de fromage !",
+    "touch": "Des sacs de farine tout mous, et des toiles d'araignée qui chatouillent. Hi hi !"
+   }
   },
   {
    "id": "jardin",
@@ -158,7 +170,10 @@
     "banc",
     "fil à linge",
     "arrosoir"
-   ]
+   ],
+   "senses": {
+    "listen": "Rrrr… pfff… Néro le renard ronfle sur son banc."
+   }
   },
   {
    "id": "puits",
@@ -188,7 +203,10 @@
     "margelle",
     "mousse",
     "écho"
-   ]
+   ],
+   "senses": {
+    "listen": "Ploc… ploc… Et quand tu cries « ohé », le puits répond : ohé… ohé… ohé…"
+   }
   },
   {
    "id": "foret",
@@ -366,7 +384,39 @@
      "text": "Il est poussé contre le mur : à sa place, une trappe ouverte vers la cave."
     }
    ],
-   "sturdy": "Un tonneau de chêne cerclé de fer : bien trop solide !"
+   "sturdy": "Un tonneau de chêne cerclé de fer : bien trop solide !",
+   "senses": {
+    "listen": "Tu colles l'oreille au tonneau… En dessous, ça sonne creux, et on entend gargouiller : grouiii !"
+   }
+  },
+  {
+   "id": "bougie",
+   "name": "une bougie éteinte",
+   "aliases": [
+    "bougie",
+    "bougeoir",
+    "chandelle"
+   ],
+   "at": "boulangerie",
+   "description": "Une bougie blanche dans un petit bougeoir en cuivre, avec une mèche toute neuve.",
+   "kind": "thing",
+   "initial": "Sur le comptoir, une bougie éteinte dans un petit bougeoir.",
+   "light": [
+    "is:bougie:allumee"
+   ],
+   "states": [
+    {
+     "id": "eteinte"
+    },
+    {
+     "id": "allumee",
+     "name": "une bougie allumée",
+     "aliases": [
+      "bougie allumee"
+     ],
+     "description": "Une bougie blanche dans son petit bougeoir, avec une jolie flamme qui danse."
+    }
+   ]
   },
   {
    "id": "aimant",
@@ -609,7 +659,7 @@
    ],
    "at": "boulangerie",
    "description": "Un écureuil boulanger avec un tablier plein de farine.",
-   "says": "Un croissant ? C'est une pièce d'or, petit ! Et pousse-toi de mon tonneau, il n'aime pas qu'on le bouscule… hi hi.",
+   "says": "Un croissant ? C'est une pièce d'or, petit ! Et pousse-toi de mon tonneau, il n'aime pas qu'on le bouscule… hi hi. Et si un jour tu descends dans ma cave, prends ma bougie : il y fait noir comme dans un four éteint !",
    "initial": "Choco l'écureuil, le boulanger, range des croissants dorés."
   },
   {
@@ -699,6 +749,47 @@
     }
    ],
    "hint": "Ces traces par terre, près du tonneau… Il est trop lourd à porter, mais peut-être pas à pousser ?"
+  },
+  {
+   "id": "allumer_bougie",
+   "place": "boulangerie",
+   "when": [
+    "has:bougie",
+    "is:bougie:eteinte"
+   ],
+   "effects": [
+    "set:bougie:allumee"
+   ],
+   "points": 5,
+   "not_yet": "Pour allumer une bougie, il faut du feu… Le four de Choco, lui, est tout chaud !",
+   "text": "Tu approches la mèche du four de Choco, tout doucement… fffout ! La bougie s'allume, avec une jolie flamme qui danse.",
+   "triggers": [
+    {
+     "verb": "light",
+     "object": "bougie"
+    },
+    {
+     "verb": "use",
+     "object": "bougie"
+    }
+   ],
+   "hint": "Une bougie éteinte… et le four de Choco qui est encore tout chaud !"
+  },
+  {
+   "id": "allumer_bougie_ailleurs",
+   "when": [
+    "flag:jamais"
+   ],
+   "effects": [],
+   "points": 0,
+   "not_yet": "Pour allumer une bougie, il faut du feu… Le four de Choco, à la boulangerie, est tout chaud !",
+   "text": "",
+   "triggers": [
+    {
+     "verb": "light",
+     "object": "bougie"
+    }
+   ]
   },
   {
    "id": "nourrir_grignote",
@@ -1031,7 +1122,8 @@
    "action": "nourrir_grignote",
    "needs": [
     "croissant",
-    "grignote"
+    "grignote",
+    "bougie"
    ],
    "clue_in": "grignote"
   },
@@ -1057,6 +1149,15 @@
    "action": "pousser_tonneau",
    "needs": [
     "tonneau"
+   ],
+   "clue_in": "choco"
+  },
+  {
+   "goal": "Allumer une bougie pour voir dans la cave",
+   "action": "allumer_bougie",
+   "needs": [
+    "bougie",
+    "cave"
    ],
    "clue_in": "choco"
   },

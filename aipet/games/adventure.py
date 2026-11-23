@@ -108,6 +108,11 @@ le monde, en JSON, qu'un programme fera tourner.
    question, accept = les réponses acceptées (des mots-clés courts : « peigne », « sesame »), right / wrong,
    hint, effects = ce que la bonne réponse déclenche (une porte ou un coffre s'ouvre tout seul). L'action du
    puzzle = l'id de celui qui pose la question. Répondre est automatique : pas d'action pour ça.
+   uses = combien de fois l'objet sert avant d'être vide (0 sinon) : une action qui l'use a l'effet
+   "spend:OBJET", une autre le recharge ("refill:OBJET", à la fontaine, avec des lucioles) ; texts.empty =
+   ce qu'on dit quand il est vide. light = il éclaire les lieux noirs (light_when : quand, ex.
+   "is:lampe:allumee" ; une lumière avec uses en perd une en sortant d'un lieu noir). senses = ce qu'on
+   entend, sent ou touche (listen, smell, touch).
 5. characters : 1 à 3 personnages (id, name, aliases, description, at, says = ce qu'il dit quand on lui
    parle, qui donne un indice ou le but ; initial = ce qu'il fait quand on arrive ; states comme les
    objets, avec says et initial, ex. « grognon » puis « content »).
@@ -117,15 +122,17 @@ le monde, en JSON, qu'un programme fera tourner.
    servent (cailloux, flaques, mouettes). details = des phrases qui dépendent de la situation, chacune avec
    when, text (quand c'est vrai) et else (sinon). exits : to, label (un repère, ex. « vers l'étang »), dir
    (nord, sud, est, ouest, haut, bas, dedans, dehors), door (l'id de la porte, d'un seul côté suffit), when et
-   blocked (ce qu'on dit si c'est bloqué). Les sorties vont dans les deux sens.
+   blocked (ce qu'on dit si c'est bloqué). Les sorties vont dans les deux sens. dark = ce qu'on sent dans
+   le noir si le lieu est noir (sans lumière on n'y voit rien d'autre que les sorties ; une lumière doit
+   exister dans l'aventure), vide sinon. senses = ce qu'on y entend, sent ou touche.
 7. start (lieu de départ, inventaire), goal (le but en une phrase), intro (2 phrases), tags (4 à 8 mots-clés
    sans accents), fact (une anecdote vraie et simple liée au thème, si une fin n'a pas la sienne).
 
 Conditions (toutes vraies) : "has:OBJET", "flag:NOM", "at:LIEU", "here:PERSONNAGE", "open:OBJET",
-"is:OBJET:ETAT", avec "!" devant pour « pas ». Effets : "gain:OBJET", "lose:OBJET", "reveal:OBJET" (il
+"is:OBJET:ETAT", "charged:OBJET" (il lui reste au moins une utilisation), avec "!" devant pour « pas ». Effets : "gain:OBJET", "lose:OBJET", "reveal:OBJET" (il
 apparaît ici, ou le personnage qui le tenait le lâche), "set:OBJET:ETAT", "flag:NOM", "move:PERSONNAGE:LIEU",
 "open:OBJET", "follow:PERSONNAGE" (il suit le héros partout, pour aider plus loin : « here:PERSONNAGE »),
-"end:FIN". Rien ne se referme et rien ne disparaît tout seul : ce qui est fait reste fait.
+"spend:OBJET" (une utilisation de moins), "refill:OBJET" (rechargé), "end:FIN". Rien ne se referme et rien ne disparaît tout seul : ce qui est fait reste fait.
 Un flag, c'est un fait qui n'appartient à aucun objet ; si c'est un objet qui change, utilise ses states.
 
 Des mécanismes qui marchent (choisis-en quelques-uns, variés) : clé et porte ou coffre ; objet caché à
@@ -135,7 +142,10 @@ loufoque et drôle (une chaussette et du poivre → une bombe à éternuer) comm
 jamais un piège ; troc avec un personnage qui tient l'objet ; personnage à gagner en plusieurs fois
 (states) ; rassembler plusieurs objets ; passage bloqué (noir, pont cassé) ; carte qui révèle un chemin ;
 code de boutons dans l'ordre vu ailleurs ; devinette ou mot de passe ; compagnon qui suit et aide ; choix
-et bêtise annoncée.
+et bêtise annoncée ; un lieu noir (une grotte, une cale, un grenier) où l'on ne voit rien sans une
+lumière qu'on allume ; un objet qui sert quelques fois puis se recharge (l'arrosoir qu'on remplit à la
+fontaine, la lanterne à lucioles qui s'éteint en sortant du noir et qu'on recharge) ; écouter, sentir ou
+toucher pour trouver (le mur qui sonne creux, l'odeur de tarte qui mène à la cuisine).
 
 Les règles d'or :
 - Toujours gagnable, jamais coincé : aucun objet indispensable ne doit pouvoir être perdu ou gaspillé
@@ -152,7 +162,7 @@ LEVEL_SHAPE = {
 # Verbs the generator writes in triggers: the ones that say what a puzzle is. The others (open, take,
 # go…) are built in, or mean looking and playing.
 TRIGGER_VERBS = ["use", "give", "combine", "push", "pull", "light", "fill", "throw", "eat", "drink", "climb",
-                 "swim", "jump", "wear", "read", "talk", "ask", "touch", "hit", "search"]  # fmt: skip
+                 "swim", "jump", "wear", "read", "talk", "ask", "touch", "hit", "search", "listen", "smell"]  # fmt: skip
 
 
 def level_rules(difficulty: str) -> str:
@@ -195,6 +205,11 @@ _ANSWER = {
         "hint": {"type": "string"},
         "effects": _RULES,
     },
+}
+_SENSES = {
+    "type": "object",
+    "description": "ce qu'on entend, sent, touche (vide sinon)",
+    "properties": {"listen": {"type": "string"}, "smell": {"type": "string"}, "touch": {"type": "string"}},
 }
 _DETAILS = {
     "type": "array",
@@ -278,8 +293,19 @@ GRAPH_SCHEMA = {
                     "key": {"type": "string"},
                     "texts": {
                         "type": "object",
-                        "properties": {"open": {"type": "string"}, "locked": {"type": "string"}},
+                        "properties": {
+                            "open": {"type": "string"},
+                            "locked": {"type": "string"},
+                            "empty": {"type": "string"},
+                        },
                     },
+                    "uses": {
+                        "type": "integer",
+                        "description": "combien de fois il sert avant d'être rechargé, 0 sinon",
+                    },
+                    "light": {"type": "boolean", "description": "il éclaire les lieux noirs"},
+                    "light_when": {**_RULES, "description": "quand il éclaire (ex. is:lampe:allumee), vide = toujours"},
+                    "senses": _SENSES,
                     "states": _STATES,
                     "answer": _ANSWER,
                     "code": {
@@ -322,6 +348,8 @@ GRAPH_SCHEMA = {
                     "aliases": _ALIASES,
                     "description": {"type": "string"},
                     "decor": {"type": "array", "items": {"type": "string"}},
+                    "dark": {"type": "string", "description": "lieu noir : ce qu'on y sent dans le noir, vide sinon"},
+                    "senses": _SENSES,
                     "details": _DETAILS,
                     "exits": {
                         "type": "array",
@@ -415,7 +443,8 @@ def _clean(graph: dict, difficulty: str) -> dict:
             if not v.get("when"):
                 p["variants"].remove(v)
         p["decor"] = [x for x in p.get("decor") or [] if x]
-        _drop_empty(p, "details", "aliases", "decor")
+        _drop_empty(p, "details", "aliases", "decor", "dark")
+        _clean_senses(p)
     for t in [*graph.get("items", []), *graph.get("characters", [])]:
         t["at"] = t.get("at") or ""
         for s in t.get("states") or []:
@@ -435,7 +464,11 @@ def _clean(graph: dict, difficulty: str) -> dict:
             t["locked"] = True
             if t.get("kind") not in ("container", "door"):
                 t["kind"] = "container"
-        _drop_empty(t, "fixed", "sturdy", "fragile", "initial", "key", "states", "aliases")
+        _drop_empty(t, "fixed", "sturdy", "fragile", "initial", "key", "states", "aliases", "uses")
+        light, when = t.pop("light", None), t.pop("light_when", None) or []
+        if light:
+            t["light"] = when or True
+        _clean_senses(t)
         if t.get("key"):
             t["locked"] = True
             if t.get("kind") not in ("container", "door"):
@@ -445,6 +478,12 @@ def _clean(graph: dict, difficulty: str) -> dict:
     for p in graph.get("puzzles", []):
         p["needs"] = [x for x in p.get("needs") or [] if x]
     return graph
+
+
+def _clean_senses(t: dict) -> None:
+    senses = {k: v for k, v in (t.pop("senses", None) or {}).items() if v}
+    if senses:
+        t["senses"] = senses
 
 
 def generate_adventure(cfg: dict, idea: str, who: str, difficulty: str, recurring: list[str], past: list[str]) -> dict:

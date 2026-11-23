@@ -52,7 +52,11 @@
      "label": "vers la colline aux runes",
      "dir": "est"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Chhh… chhh… les vagues sur les galets, et les mouettes rient : kya-kya !",
+    "smell": "L'air salé, les algues… brrr, ça sent le froid !"
+   }
   },
   {
    "id": "drakkar",
@@ -85,7 +89,10 @@
      "label": "sur la plage",
      "dir": "dehors"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Les cordages grincent, la coque craque, crrrr… et l'eau du fjord clapote : plic, ploc."
+   }
   },
   {
    "id": "cabane",
@@ -98,6 +105,12 @@
    ],
    "description": "Une cabane en bois qui sent le poisson fumé. Grand-père Olaf se chauffe près du feu en taillant un bout de bois. Il y a un vieux coffre dans un coin.",
    "details": [
+    {
+     "when": [
+      "!flag:poisson_trouve"
+     ],
+     "text": "Une drôle d'odeur, très forte, flotte ici… D'où peut-elle bien venir ?"
+    },
     {
      "when": [
       "has:navet"
@@ -123,7 +136,10 @@
      "label": "vers l'enclos de la chèvre",
      "dir": "ouest"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Le feu crépite, cric-crac, et Grand-père Olaf taille son bout de bois : chip, chip."
+   }
   },
   {
    "id": "enclos",
@@ -147,7 +163,11 @@
      "label": "vers la cabane",
      "dir": "est"
     }
-   ]
+   ],
+   "senses": {
+    "smell": "Pouah, la boue… et la chèvre !",
+    "listen": "Mèèèh… Brunhilde rouspète en mâchouillant."
+   }
   },
   {
    "id": "colline",
@@ -170,7 +190,10 @@
      "label": "vers la plage",
      "dir": "ouest"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Le vent siffle dans la bruyère, hou-hou… et des moutons bêlent au loin."
+   }
   }
  ],
  "items": [
@@ -300,9 +323,12 @@
     "poisson seche",
     "hareng"
    ],
-   "at": "cabane",
+   "at": "",
    "initial": "Un poisson séché pend au plafond.",
-   "description": "Un poisson séché, tout dur, qui sent très fort. Pour toi, c'est beurk… même Brunhilde la chèvre se boucherait le nez ! Mais pour un corbeau, c'est un festin !"
+   "description": "Un poisson séché, tout dur, qui sent très fort. Pour toi, c'est beurk… même Brunhilde la chèvre se boucherait le nez ! Mais pour un corbeau, c'est un festin !",
+   "senses": {
+    "smell": "Pouah ! Ça sent le hareng à trois kilomètres !"
+   }
   },
   {
    "id": "laine",
@@ -757,6 +783,25 @@
    "text": "Tu croques le poisson séché… crac ! Il est dur comme du bois, et il sent très fort. Beurk ! Un corbeau, lui, adorerait."
   },
   {
+   "id": "sentir_poisson",
+   "triggers": [
+    {
+     "verb": "smell",
+     "object": "cabane"
+    }
+   ],
+   "when": [
+    "!flag:poisson_trouve"
+   ],
+   "effects": [
+    "reveal:poisson",
+    "flag:poisson_trouve"
+   ],
+   "points": 5,
+   "text": "Snif, snif… pouah ! Tu suis l'odeur… elle vient d'en haut ! Tout là-haut, caché dans la fumée, un poisson séché pend au plafond. Grand-père Olaf rigole : « Mon poisson qui sèche ! Prends-le, si ça te chante. »",
+   "hint": "Ça sent très fort, dans la cabane… Renifle pour trouver d'où vient l'odeur !"
+  },
+  {
    "id": "nager_fjord",
    "triggers": [
     {
@@ -896,6 +941,14 @@
     "hugin"
    ],
    "clue_in": "hugin"
+  },
+  {
+   "goal": "Trouver le poisson séché à l'odeur",
+   "action": "sentir_poisson",
+   "needs": [
+    "cabane"
+   ],
+   "clue_in": "cabane"
   },
   {
    "goal": "Trouver la pierre de soleil au pied du rocher",

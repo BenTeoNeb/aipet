@@ -356,6 +356,140 @@ PATTERNS = {
         ),
         [("talk", "l'ours"), ("go", "est"), ("push", "le rocher")],
     ),
+    # A dark place (Inform's darkness): without a light, nothing is seen there but the ways out; a lamp
+    # lit (a state) shows what is there.
+    "light_in_the_dark": (
+        adventure(
+            [
+                place("a", ("b", "est")),
+                place(
+                    "b",
+                    ("a", "ouest"),
+                    dark="Il fait noir comme dans un four. Ploc… ploc… quelque chose goutte.",
+                    senses={"listen": "Ploc… ploc… de l'eau goutte du plafond."},
+                ),
+            ],
+            [
+                thing(
+                    "lampe",
+                    "a",
+                    light=["is:lampe:allumee"],
+                    states=[
+                        {"id": "eteinte", "name": "la lampe éteinte"},
+                        {"id": "allumee", "name": "la lampe allumée"},
+                    ],
+                ),
+                thing("tresor", "b", aliases=["trésor", "tresor"]),
+            ],
+            [person("roi", "a")],
+            [
+                act("allumer", [("light", "lampe")], ["set:lampe:allumee"], ["has:lampe", "is:lampe:eteinte"]),
+                act("rendre", [("give", "tresor", "roi")], ["lose:tresor", "end:gagne"], ["has:tresor"]),
+            ],
+        ),
+        [
+            ("take", "la lampe"),
+            ("light", "la lampe"),
+            ("go", "est"),
+            ("take", "le trésor"),
+            ("go", "ouest"),
+            ("give", "le trésor", "au roi"),
+        ],
+    ),
+    # Uses, and refilling: a watering can waters once, then it is filled again at the fountain.
+    "uses_and_refill": (
+        adventure(
+            AB,
+            [
+                thing("arrosoir", "a", uses=1, texts={"empty": "L'arrosoir est vide : plus une goutte !"}),
+                thing("rose", "a", "scenery"),
+                thing("tulipe", "b", "scenery"),
+                thing("fontaine", "b", "scenery"),
+            ],
+            [],
+            [
+                act("arroser_rose", [("use", "arrosoir", "rose")], ["spend:arrosoir", "flag:rose"], ["has:arrosoir"]),
+                act(
+                    "arroser_tulipe",
+                    [("use", "arrosoir", "tulipe")],
+                    ["spend:arrosoir", "end:gagne"],
+                    ["has:arrosoir", "flag:rose"],
+                    not_yet="La rose d'abord, elle a très soif !",
+                ),
+                act("remplir", [("fill", "arrosoir", "fontaine")], ["refill:arrosoir"], ["has:arrosoir"]),
+            ],
+        ),
+        [
+            ("take", "l'arrosoir"),
+            ("use", "l'arrosoir", "la rose"),
+            ("go", "est"),
+            ("use", "l'arrosoir", "la tulipe"),
+            ("fill", "l'arrosoir", "la fontaine"),
+            ("use", "l'arrosoir", "la tulipe"),
+        ],
+    ),
+    # A light that burns: a lantern with one use lights a dark place, and goes out when the hero leaves it;
+    # the fireflies fill it again (never stuck: the ways out are felt in the dark).
+    "lantern_that_burns": (
+        adventure(
+            [
+                place("a", ("b", "ouest"), ("c", "est", {"door": "grille"})),
+                place("b", ("a", "est"), dark=True),
+                place("c", ("a", "ouest"), dark=True),
+            ],
+            [
+                thing("lanterne", "a", light=True, uses=1, texts={"empty": "La lanterne s'éteint doucement…"}),
+                thing("lucioles", "a", "scenery"),
+                thing("cle", "b", aliases=["clé", "cle"]),
+                thing("grille", "", "door", locked=True, key="cle"),
+                thing("tresor", "c", aliases=["trésor", "tresor"]),
+            ],
+            [person("roi", "a")],
+            [
+                act("remplir", [("fill", "lanterne", "lucioles")], ["refill:lanterne"], ["has:lanterne"]),
+                act("rendre", [("give", "tresor", "roi")], ["lose:tresor", "end:gagne"], ["has:tresor"]),
+            ],
+        ),
+        [
+            ("take", "la lanterne"),
+            ("go", "ouest"),
+            ("take", "la clé"),
+            ("go", "est"),
+            ("fill", "la lanterne", "les lucioles"),
+            ("go", "est"),
+            ("take", "le trésor"),
+            ("go", "ouest"),
+            ("give", "le trésor", "au roi"),
+        ],
+    ),
+    # Listening (a voice game's sense): the wall sounds hollow where the hiding place is.
+    "listen_for_it": (
+        adventure(
+            AB,
+            [
+                thing("mur", "b", "scenery", senses={"touch": "Des pierres froides et lisses."}),
+                thing("cachette", "", "container", open=True),
+                thing("bague", "cachette"),
+            ],
+            [person("reine", "a", says="J'ai caché ma bague dans le mur… mais où ? Écoute bien, ça sonne creux !")],
+            [
+                act(
+                    "ecouter_mur",
+                    [("listen", "mur"), ("hit", "mur")],
+                    ["reveal:cachette"],
+                    text="Toc toc… ici, ça sonne creux ! Une pierre bouge : une cachette !",
+                ),
+                act("rendre", [("give", "bague", "reine")], ["lose:bague", "end:gagne"], ["has:bague"]),
+            ],
+        ),
+        [
+            ("go", "est"),
+            ("listen", "le mur"),
+            ("take", "la bague"),
+            ("go", "ouest"),
+            ("give", "la bague", "à la reine"),
+        ],
+    ),
     # A choice that closes another way, and a folly announced before it loses.
     "choice_and_folly": (
         adventure(

@@ -36,6 +36,11 @@ DESTROY_NOTE = (
     "(don't say so now)."
 )
 
+DARK_NOTE = (
+    "It is dark here: the hero sees nothing but can feel the ways out. Describe only what they hear, smell or "
+    "feel (“senses”), never a thing or a person (none is in reach): they need a light to see."
+)
+
 
 def of(name: str) -> str:
     """A name after « of »: English needs no contraction (« near the lighthouse »)."""
@@ -63,6 +68,7 @@ ENGLISH = Language(
     free_note=FREE_NOTE,
     absent_note=ABSENT_NOTE,
     destroy_note=DESTROY_NOTE,
+    dark_note=DARK_NOTE,
     of=of,
     bare=bare,
     plural=plural,

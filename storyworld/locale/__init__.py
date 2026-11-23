@@ -53,6 +53,7 @@ class Language:
     free_note: str = ""
     absent_note: str = ""
     destroy_note: str = ""
+    dark_note: str = ""
     of: Callable[[str], str] = _same  # a name after « of » (« du jardin »)
     bare: Callable[[str], str] = _same  # a name without its article (« des cailloux » → « cailloux »)
     plural: Callable[[str], bool] = _never  # does the name speak of several things?

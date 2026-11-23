@@ -22,7 +22,9 @@ from storyworld.solver import (
 )
 from storyworld.verbs import (
     FAILED,
+    LOOK_AT,
     NEEDS_A_THING,
+    SENSES,
     STUCK,
     TALK,
     WAYS,
@@ -84,8 +86,8 @@ class Turn:
         moved = self.go_or_answer(st, verb, intent)
         if moved is not None:
             return moved
-        if verb == "search" and not intent.get("object"):
-            intent = {**intent, "object": st.place}  # « je cherche partout »: here
+        if verb in ("search", *SENSES) and not intent.get("object"):
+            intent = {**intent, "object": st.place}  # « je cherche partout », « j'écoute »: here
         return self.on_things(st, verb, intent)
 
     def special(self, st: State, verb: str, intent: dict) -> dict | None:
@@ -148,6 +150,9 @@ class Turn:
         """Words that name nothing in reach: in a closed container, the decor, imagination, seen but
         out of reach, or absent."""
         w = self.w
+        if w.dark(st) and (verb in NEEDS_A_THING or verb in LOOK_AT or verb in TALK or verb in ("touch", "climb")):
+            return {"outcome": "not_yet", "text": w.say("It's too dark to see that: you'd need some light."),
+                    "note": w.lang.dark_note}  # fmt: skip
         if inside := w.builtins.in_closed(st, missing):
             return w.builtins.from_closed(st, verb, *inside)
         if decor := w.builtins.decor(st, missing):  # « je prends un galet » on the beach: there are some

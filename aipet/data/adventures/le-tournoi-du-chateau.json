@@ -61,7 +61,10 @@
      ],
      "blocked": "Le garde croise sa lance : « Halte ! Pas de chevalier sans cheval au tournoi ! » Il faut d'abord faire sortir Caramel de l'écurie."
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Cot-cot, les poules ! Les sabots claquent sur les pavés, et quelqu'un crie : « Vite, vite ! »"
+   }
   },
   {
    "id": "ecurie",
@@ -100,7 +103,11 @@
      "label": "vers la cour",
      "dir": "ouest"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Crounch, crounch… Caramel mâchonne, et le foin craque sous lui : crrr.",
+    "smell": "Mmm, le foin… et un tout petit peu le cheval !"
+   }
   },
   {
    "id": "cuisine",
@@ -123,7 +130,11 @@
      "label": "vers la cour",
      "dir": "est"
     }
-   ]
+   ],
+   "senses": {
+    "smell": "Mmm, la soupe aux poireaux et le pain qui cuit !",
+    "listen": "Bloup, bloup, fait la marmite, et Dame Berthe chantonne."
+   }
   },
   {
    "id": "scriptorium",
@@ -148,7 +159,11 @@
      "label": "par l'escalier vers la cour",
      "dir": "bas"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Chut… on n'entend que la plume de Frère Anselme : scritch, scritch.",
+    "smell": "Ça sent l'encre et le vieux papier."
+   }
   },
   {
    "id": "lice",

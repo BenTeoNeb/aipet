@@ -12,8 +12,8 @@ from dataclasses import dataclass
 from functools import lru_cache
 
 # What an argument names: checked against the adventure by `storyworld.check`.
-ITEM, OPENABLE, CHARACTER, PLACE, STATE, ENDING, FLAG, THING = (
-    "item", "openable", "character", "place", "state", "ending", "flag", "thing",
+ITEM, OPENABLE, USABLE, CHARACTER, PLACE, STATE, ENDING, FLAG, THING = (
+    "item", "openable", "usable", "character", "place", "state", "ending", "flag", "thing",
 )  # fmt: skip
 
 
@@ -37,6 +37,7 @@ CONDITIONS: dict[str, Kind] = {k.name: k for k in (
     Kind("open", (OPENABLE,), "the container or door is open"),
     Kind("locked", (OPENABLE,), "the container or door is locked"),
     Kind("is", (THING, STATE), "the item or character is in that state"),
+    Kind("charged", (USABLE,), "the item has at least one use left"),
 )}  # fmt: skip
 
 EFFECTS: dict[str, Kind] = {k.name: k for k in (
@@ -51,6 +52,8 @@ EFFECTS: dict[str, Kind] = {k.name: k for k in (
     Kind("open", (OPENABLE,), "open (and unlock) a container or door"),
     Kind("unlock", (OPENABLE,), "unlock a container or door"),
     Kind("set", (THING, STATE), "put the item or character in that state"),
+    Kind("spend", (USABLE,), "the item has one use less", monotonic=False),
+    Kind("refill", (USABLE,), "the item has all its uses again", monotonic=False),
 )}  # fmt: skip
 
 

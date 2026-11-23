@@ -22,6 +22,7 @@ from storyworld.verbs import (
     LOOK_AT,
     OPENERS,
     PRESSERS,
+    SENSES,
     SYMMETRIC,
     TALK,
 )
@@ -62,6 +63,10 @@ class Builtins:
         if verb == "drop" and obj in st.inventory:
             # Never needed, and it could strand an object behind a one-way path: the hero keeps it.
             return {"outcome": "impossible", "text": w.say("You'd rather keep it in your bag: it might come in handy!")}
+        if verb == "light" and obj == st.place and w.dark(st):  # « j'allume la lumière » with nothing to light
+            return {"outcome": "not_yet", "text": w.say("It's too dark to see that: you'd need some light.")}
+        if verb in SENSES and obj and (felt := self.sense(st, verb, obj)):
+            return felt
         if verb in LOOK_AT:
             return self.look_at(st, obj)
         if verb in TALK and obj and (said := self.talk(st, obj)):
@@ -193,6 +198,8 @@ class Builtins:
         out: dict = {"outcome": "done", "description": w.text(t.get("description", ""), t.get("details"), st)}
         if st.notes.get(obj):
             out["memories"] = st.notes[obj]
+        if w.max_uses(obj):
+            out["uses_left"] = w.uses_left(st, obj)
         if t.get("openable") or any(at == obj for at in st.items_at.values()):
             inside = [w.name(i, st) for i, at in st.items_at.items() if at == obj]
             out["inside"] = (
@@ -201,6 +208,14 @@ class Builtins:
                 else [w.say("closed")]
             )
         return out
+
+    def sense(self, st: State, verb: str, obj: str) -> dict | None:
+        """Listening, smelling, touching: what the author wrote the hero hears, smells or feels there
+        (`senses`), the narrator says it (None: nothing written, the narrator imagines)."""
+        w = self.w
+        t = w.places.get(obj) if obj == st.place else w.look(obj, st)
+        text = ((t or {}).get("senses") or {}).get(verb)
+        return {"outcome": "done", "description": text} if text else None
 
     def talk(self, st: State, obj: str) -> dict | None:
         """Talking to someone: their riddle first, else what they say (None: not someone to talk to)."""
@@ -215,7 +230,13 @@ class Builtins:
 
     def inventory(self, st: State) -> dict:
         w = self.w
-        return {"outcome": "done", "inventory": [w.name(i, st) for i in st.inventory] or [w.say("nothing")]}
+
+        def named(i: str) -> str:
+            if not w.max_uses(i):
+                return w.name(i, st)
+            return w.say("{thing} ({n} uses left)", thing=w.name(i, st), n=w.uses_left(st, i))
+
+        return {"outcome": "done", "inventory": [named(i) for i in st.inventory] or [w.say("nothing")]}
 
     # ------------------------------------------------------------ code locks, riddles
     def press(self, st: State, button: str) -> dict:

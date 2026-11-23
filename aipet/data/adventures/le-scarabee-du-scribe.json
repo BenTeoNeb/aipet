@@ -74,7 +74,10 @@
      "label": "l'escalier vers l'atelier",
      "dir": "bas"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Rrrr… rrrr… Un gros ronronnement : quelqu'un fait la sieste au soleil !"
+   }
   },
   {
    "id": "marche",
@@ -100,7 +103,11 @@
      "label": "vers le temple",
      "dir": "nord"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Hi-han, fait un âne ! Et les marchands crient : « Des dattes ! Des oignons tout frais ! »",
+    "smell": "Les épices, les dattes… et les poissons de Tante Hénout. Pouah !"
+   }
   },
   {
    "id": "temple",
@@ -121,7 +128,11 @@
      "label": "vers le marché",
      "dir": "sud"
     }
-   ]
+   ],
+   "senses": {
+    "smell": "L'encens sent bon le miel et les fleurs.",
+    "listen": "Des chants tout doux, et des clochettes : ding, ding."
+   }
   },
   {
    "id": "nil",
@@ -145,7 +156,11 @@
      "label": "vers l'atelier des scribes",
      "dir": "est"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Les grands papyrus chuchotent, chhh… et les grenouilles font coâ, coâ.",
+    "smell": "Ça sent la boue et l'eau du fleuve."
+   }
   }
  ],
  "items": [

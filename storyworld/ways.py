@@ -79,11 +79,13 @@ class Ways:
             opened = w.builtins.open(st, door)
             if opened["outcome"] != "done":
                 return opened
-        if w.enter(st, x["to"]):
+        burnt: list[str] = []
+        if w.enter(st, x["to"], burnt):
             st.score += 2
         return {
             "outcome": "done",
             **({"text": opened["text"]} if opened.get("text") else {}),
+            **({"changes": burnt} if burnt else {}),
             "arrival": w.view.describe(st),
         }
 

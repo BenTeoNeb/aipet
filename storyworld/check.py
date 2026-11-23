@@ -16,6 +16,7 @@ from storyworld.model import (
     ANSWER_FIELDS,
     CODE_FIELDS,
     KINDS,
+    SENSE_FIELDS,
     SITUATED,
     STATE_FIELDS,
     TEXT_FIELDS,
@@ -33,6 +34,7 @@ from storyworld.rules import (
     PLACE,
     STATE,
     THING,
+    USABLE,
     args_of,
     parse,
     problem,
@@ -181,6 +183,15 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
             err("door.unused", f"door {i['id']} closes no exit (name it in an exit's door)")
         for k in set(i.get("texts") or {}) - TEXT_FIELDS:
             err("item.texts", f"item {i['id']}: texts.{k} is not one of {sorted(TEXT_FIELDS)}")
+        if "uses" in i and not w.max_uses(i["id"]) > 0:
+            err("item.uses", f"item {i['id']}: uses is a number of times, 1 or more")
+        if (i.get("texts") or {}).get("empty") and not w.max_uses(i["id"]):
+            warn("item.empty_text", f"item {i['id']}: texts.empty is told when it has no use left, and it has no uses")
+    for t in [*w.places.values(), *w.items.values()]:
+        for k in set(t.get("senses") or {}) - SENSE_FIELDS:
+            err("senses.field", f"{t['id']}: senses.{k} is not one of {sorted(SENSE_FIELDS)}")
+    if any(p.get("dark") for p in w.places.values()) and not w.lights:
+        err("dark.no_light", "a place is dark, and no item gives light (light)")
     for conflict in w.mirrored:
         err("door.conflict", f"two doors on one way: {conflict}")
     for i in w.items.values():
@@ -230,6 +241,7 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
     def ids_for(what: str, prev: str) -> bool | set[str]:
         """The ids an argument may name (True: anything, a flag)."""
         table: dict[str, bool | set[str]] = {ITEM: set(w.items), OPENABLE: openable, CHARACTER: set(w.chars), PLACE: set(w.places),
+                USABLE: {i for i in w.items if w.max_uses(i)},
                 ENDING: set(w.endings), THING: set(w.items) | set(w.chars), FLAG: True,
                 STATE: set(w.thing(prev).get("states") or {})}  # fmt: skip
         return table[what]
@@ -262,6 +274,9 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
             rules(f"exit {p['id']}->{x.get('to')}", x.get("when", []))
         for v in p.get("variants", []):
             rules(f"variant of {p['id']}", v.get("when", []))
+    for i in w.lights:
+        if isinstance(w.items[i]["light"], list):
+            rules(f"light of {i}", w.items[i]["light"])
     for t in [*w.places.values(), *w.items.values(), *w.chars.values()]:
         for d in t.get("details", []):
             rules(f"detail of {t['id']}", d.get("when", []))

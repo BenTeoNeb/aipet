@@ -34,8 +34,11 @@ class View:
         """What the hero sees here (for the narrator)."""
         w = self.w
         p = w.places.get(st.place, {})
+        dark = w.dark(st)
         return {
             "place": p.get("name", st.place),
+            **({"in_the_dark": w.lang.dark_note} if dark else {}),
+            **({"senses": list(p["senses"].values())} if dark and p.get("senses") else {}),
             "description": self.place_text(st),
             "here": [w.name(i, st) for i in w.visible_items(st)],
             "people": [w.name(c, st) for c in w.chars_here(st)],
@@ -48,7 +51,7 @@ class View:
                 }
                 for x in w.exits(st)
             ],  # fmt: skip
-            **({"decor": p["decor"]} if p.get("decor") else {}),
+            **({"decor": p["decor"]} if p.get("decor") and not dark else {}),
             **({"memories": notes} if (notes := self.notes_here(st)) else {}),
             "in_reach": self.in_reach(st),
             **({"worth_exploring": explore} if (explore := self.worth_exploring(st)) else {}),
@@ -59,6 +62,8 @@ class View:
         here (things never moved, people) — Inform's room description."""
         w = self.w
         p = w.places.get(st.place, {})
+        if w.dark(st):  # Inform's « Darkness »: what the author says is felt there, nothing seen
+            return p["dark"] if isinstance(p.get("dark"), str) else w.say("It's dark here.")
         text = p.get("description", "")
         for v in p.get("variants", []):  # version 1: whole descriptions
             if w.holds(st, v.get("when")):

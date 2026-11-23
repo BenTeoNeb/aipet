@@ -566,7 +566,8 @@ def test_red_herrings_are_told_as_story():
 def test_walking_to_something_here_is_never_a_ride():
     w = World(LIB["Le miroir du phare d'Alexandrie"])
     donkey = next(c for c, ch in w.chars.items() if "ane" in " ".join(ch.get("aliases", [])) or "âne" in ch["name"])
-    st = at(w, w.chars[donkey]["at"])
+    st = at(w, w.chars[donkey]["at"], ["lampe"])
+    w.apply(st, ["set:lampe:allumee"])  # the ramp is dark: the little lamp lit shows the donkey
     res = w.act(st, {"verb": "go", "to": "voir l'âne"})
     assert res["outcome"] == "done" and "juste à côté" in res["text"] and not st.ending
 

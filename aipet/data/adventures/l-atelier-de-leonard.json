@@ -52,7 +52,11 @@
      "label": "par l'escalier vers la chambre du maître",
      "dir": "haut"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Cric, crac… les drôles de machines grincent toutes seules, et le vent siffle contre la fenêtre : fffou !",
+    "smell": "Ça sent la peinture, la cire des bougies et les copeaux de bois."
+   }
   },
   {
    "id": "cuisine",
@@ -74,7 +78,11 @@
      "label": "vers l'atelier",
      "dir": "est"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Mamma Rosa chante, la sauce fait bloup, bloup… et quand tu frôles l'étagère, un pot fait tchic-tchic tout doucement.",
+    "smell": "Le pain chaud, la sauce tomate… et une pincée de basilic !"
+   }
   },
   {
    "id": "cour",
@@ -98,7 +106,11 @@
      "label": "dans l'atelier",
      "dir": "dedans"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Bzzz, les abeilles dans les citronniers… et ploc ! une goutte tombe au fond du puits.",
+    "smell": "Mmm, les citrons !"
+   }
   },
   {
    "id": "chambre",
@@ -266,9 +278,28 @@
     "grains",
     "sachet"
    ],
-   "at": "cuisine",
-   "initial": "Un sachet de graines de millet traîne au bord de l'étagère.",
+   "at": "",
+   "initial": "Le sachet de graines de millet, sorti de son pot, attend au bord de l'étagère.",
    "description": "Un petit sachet de graines de millet, toutes petites et toutes rondes."
+  },
+  {
+   "id": "etagere",
+   "kind": "scenery",
+   "name": "l'étagère à provisions",
+   "aliases": [
+    "etagere",
+    "etagere a provisions",
+    "pots",
+    "pot",
+    "provisions",
+    "bocaux"
+   ],
+   "at": "cuisine",
+   "fixed": "Elle est bien trop lourde, et pleine de pots !",
+   "description": "Une grande étagère pleine de pots en terre tout pareils, bien fermés. Qu'est-ce qu'il y a dedans ? On ne voit rien… mais quand on les secoue, chacun fait son petit bruit.",
+   "senses": {
+    "touch": "Des pots en terre, tout ronds et un peu frais."
+   }
   },
   {
    "id": "puits",
@@ -280,7 +311,10 @@
    "at": "cour",
    "fixed": "Un puits, ça ne se déplace pas !",
    "sturdy": "Un puits en grosses pierres : impossible de le casser !",
-   "description": "Un vieux puits en pierre. Tout au fond, ton écho répète : « …ou… ou… »"
+   "description": "Un vieux puits en pierre. Tout au fond, ton écho répète : « …ou… ou… »",
+   "senses": {
+    "listen": "« Ouh-ouh ! » répond l'écho, tout au fond."
+   }
   },
   {
    "id": "seau",
@@ -569,6 +603,29 @@
    "hint": "Colombo adore les graines. Il y en a peut-être à la cuisine ?"
   },
   {
+   "id": "ecouter_pots",
+   "triggers": [
+    {
+     "verb": "listen",
+     "object": "etagere"
+    },
+    {
+     "verb": "push",
+     "object": "etagere"
+    }
+   ],
+   "when": [
+    "!flag:graines_trouvees"
+   ],
+   "effects": [
+    "reveal:graines",
+    "flag:graines_trouvees"
+   ],
+   "points": 5,
+   "text": "Tu secoues les pots un par un, l'oreille tout contre… Floc : de l'huile. Fff : de la farine. Tchic-tchic-tchic, comme une petite pluie : des graines ! Dans ce pot-là, il y a un sachet de graines de millet.",
+   "hint": "Sur l'étagère, les pots sont tous pareils… Secoue-les et écoute bien : lequel fait tchic-tchic, comme des graines ?"
+  },
+  {
    "id": "attraper_pigeon",
    "triggers": [
     {
@@ -786,6 +843,14 @@
     "colombo"
    ],
    "clue_in": "colombo"
+  },
+  {
+   "goal": "Trouver les graines en secouant les pots",
+   "action": "ecouter_pots",
+   "needs": [
+    "etagere"
+   ],
+   "clue_in": "etagere"
   },
   {
    "goal": "Ou faire planer la machine aux ailes de soie",

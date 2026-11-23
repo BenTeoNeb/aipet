@@ -117,6 +117,8 @@ class Actions:
                 return False
             if kind == "set" and w.prop(st, arg, "state") != r.last:
                 return False
+            if kind == "refill" and w.uses_left(st, arg) < w.max_uses(arg):
+                return False
         return True
 
     def risky(self, a: dict) -> bool:
@@ -240,6 +242,18 @@ class Actions:
             out["arrival"] = w.view.describe(st)
         return out
 
+    def _empty(self, st: State, real: list[dict]) -> str:
+        """An action that would run but for a thing with no use left: what that thing says when empty."""
+        w = self.w
+        for a in real:
+            failing = [r for r in parse_all(a.get("when")) if not w.holds(st, [str(r)])]
+            if failing and all(r.kind == "charged" and not r.negated for r in failing):
+                x = failing[0].arg
+                return w.items[x].get("texts", {}).get("empty") or w.say(
+                    "{Name} is empty.", Name=w.lang.cap(w.name(x, st))
+                )
+        return ""
+
     def _not_now(self, st: State, fresh: list[Match]) -> dict:
         """Nothing can run now: a clue told as story, or the author's nudge (« not yet »)."""
         best = max(m.things for m in fresh)
@@ -250,5 +264,7 @@ class Actions:
             a = clues[0]
             return {"outcome": "clue", "text": (a.get("text") if not a.get("effects") and self.w.holds(st, a.get("when"))
                                                 else a.get("not_yet")) or a.get("text", "")}  # fmt: skip
+        if empty := self._empty(st, real):
+            return {"outcome": "not_yet", "text": empty}
         nudge = next((a.get("not_yet") for a in real if a.get("not_yet")), "")
         return {"outcome": "not_yet", "text": nudge or self.w.say("Not yet… something is missing.")}

@@ -8,8 +8,11 @@ def test_la_grotte_aux_peintures(tmp_path, monkeypatch):
     game = play(tmp_path, monkeypatch, "La grotte aux peintures d'Oukou", [
         ("Bonjour Oukou, qu'est-ce qu'on fait ?", [A("talk", "Oukou")], ["done"]),
         ("Je vais dans la grotte", [G("la grotte")], ["done"]),
-        ("J'entre tout au fond", [G("dedans")], ["not_yet"]),  # too dark: a light is needed
-        ("Je prends le charbon", [A("take", "le charbon")], ["done"]),
+        ("J'entre tout au fond", [G("dedans")], ["done"]),  # a dark place: only the way out is felt
+        ("Je regarde les peintures", [A("examine", "la paroi")], ["not_yet"]),  # too dark: a light is needed
+        ("J'écoute", [A("listen")], ["done"]),  # ploc… ploc…, the bats snoring
+        ("Je ressors et je prends le charbon",
+         [G("dehors"), A("take", "le charbon")], ["done", "done"]),
         ("Je tape sur le tambour !", [A("hit", "le tambour")], ["warning"]),
         ("(il insiste) Oui, je suis sûr !", [A("hit", "le tambour")], ["end"]),  # the bats wake up
         ("Oh non ! On recommence juste avant", RETRY, None),
@@ -61,6 +64,7 @@ def test_le_ballon_de_versailles(tmp_path, monkeypatch):
         ("Lucile, qu'est-ce qui se passe ?", [A("talk", "Lucile")], ["done"]),  # she gives the bell
         ("J'allume le feu !", [A("light", "le feu")], ["not_yet"]),  # no passengers yet
         ("Je vais dans le jardin", [G("le jardin")], ["done"]),
+        ("J'écoute", [A("listen")], ["done"]),  # crunch, crunch: someone is eating tulips
         ("J'attrape le mouton", [A("take", "le mouton")], ["impossible"]),
         ("Je fais sonner la clochette", [A("use", "la clochette")], ["done"]),
         ("Je grimpe sur la statue", [A("climb", "la statue")], ["clue"]),
@@ -84,8 +88,10 @@ def test_le_ballon_de_versailles_brioche(tmp_path, monkeypatch):
     """The other way: the brioche crumbs; the valve is a gentle loss, then a retry."""
     game = play(tmp_path, monkeypatch, "Le ballon de Versailles", [
         ("Lucile, aide-moi", [A("talk", "Lucile")], ["done"]),
-        ("Je vais aux cuisines et je prends la brioche et les grains",
-         [G("les cuisines"), A("take", "la brioche"), A("take", "les grains")], ["done", "done", "done"]),
+        ("Je vais aux cuisines et je prends la brioche",
+         [G("les cuisines"), A("take", "la brioche")], ["done", "absent"]),  # only its smell, for now
+        ("Ça sent bon ! Je renifle", [A("smell")], ["done"]),  # the nose leads to the oven: a brioche
+        ("Je prends la brioche et les grains", [A("take", "la brioche"), A("take", "les grains")], ["done", "done"]),
         ("Je vais au bassin et je tourne la vanne", [G("la cour"), G("le bassin"), A("tourner", "la vanne")],
          ["done", "done", "warning"]),
         ("(il insiste) Oui, je suis sûr !", [A("tourner", "la vanne")], ["end"]),  # everybody gets wet

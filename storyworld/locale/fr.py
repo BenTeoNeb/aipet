@@ -102,14 +102,14 @@ VERBS: dict[str, list[str]] = {
     ],
     "where": ["ou est", "ou sont", "ou se trouve", "ou il est", "ou elle est"],
     "smell": ["sentir", "renifler"],
-    "touch": ["toucher", "caresser", "chatouiller", "gratouiller", "calin"],
+    "touch": ["toucher", "caresser", "chatouiller", "gratouiller", "calin", "tater", "palper"],
     "listen": ["ecouter"],
     "wait": ["attendre"],
     "sit": ["s'asseoir", "asseoir"],
     "sing": ["chanter"],
     "dance": ["danser"],
     "throw": ["lancer", "jeter", "jette", "jettes"],
-    "fill": ["remplir", "verser"],
+    "fill": ["remplir", "verser", "recharger"],
     "help": ["aide", "indice"],
     "other": [],
 }
@@ -135,6 +135,11 @@ ABSENT_NOTE = (
 DESTROY_NOTE = (
     "C'est fait, pour de bon : raconte-le. Si ça empêche de finir la mission, l'enfant s'en rendra compte plus tard "
     "(ne le dis pas maintenant)."
+)
+DARK_NOTE = (
+    "Il fait noir ici : le héros ne voit rien, mais il sent les passages sous ses mains. Ne raconte que ce qu'il "
+    "entend, sent ou touche (« sens »), jamais un objet ni un personnage (aucun n'est à portée) : il lui faut de "
+    "la lumière pour voir."
 )
 
 BAG = {"sac", "sac a dos", "poche", "poches", "cartable", "besace", "mon sac", "ma poche"}  # the hero's bag
@@ -252,6 +257,9 @@ KEYS = {
     "hint_given": "indice",
     "ideas": "idees",
     "bag": "sac",
+    "in_the_dark": "dans_le_noir",
+    "senses": "sens",
+    "uses_left": "utilisations_restantes",
 }
 
 
@@ -266,6 +274,13 @@ MESSAGES: dict[str, str] = {
     "follows you: {who}": "te suit : {who}",
     "inside: {thing}": "dedans : {thing}",
     "gone: {thing}": "disparu : {thing}",
+    "{thing}: {n} left": "{thing} : encore {n} fois",
+    "empty: {thing}": "vide : {thing}",
+    "full again: {thing}": "de nouveau plein : {thing}",
+    "{Name} is empty.": "{Name} est vide.",
+    "{thing} ({n} uses left)": "{thing} (encore {n} fois)",
+    "It's too dark to see that: you'd need some light.": "Il fait trop noir pour voir ça : il te faudrait de la lumière.",
+    "It's dark here.": "Il fait tout noir ici.",
     # what is around
     "{thing} (in your bag)": "{thing} (dans ton sac)",
     "{who} holds {thing}": "{who} tient {thing}",
@@ -410,6 +425,7 @@ FRENCH = Language(
     free_note=FREE_NOTE,
     absent_note=ABSENT_NOTE,
     destroy_note=DESTROY_NOTE,
+    dark_note=DARK_NOTE,
     of=of,
     bare=bare,
     plural=plural,

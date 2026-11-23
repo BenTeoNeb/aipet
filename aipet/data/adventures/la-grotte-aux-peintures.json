@@ -125,7 +125,7 @@
      "when": [
       "!is:torche:allumee"
      ],
-     "text": "Il fait tout noir, là-dedans…"
+     "text": "Dedans, il fait tout noir… Avec de la lumière, on y verrait mieux."
     }
    ],
    "decor": [
@@ -138,19 +138,18 @@
     {
      "to": "fond",
      "label": "dans la grotte",
-     "dir": "dedans",
-     "when": [
-      "has:torche",
-      "is:torche:allumee"
-     ],
-     "blocked": "Il fait tout noir là-dedans, on ne voit même pas le bout de son nez ! Il te faudrait de la lumière."
+     "dir": "dedans"
     },
     {
      "to": "campement",
      "label": "vers le campement",
      "dir": "sud"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Tu fais « Hou hou ! » vers la grotte… et l'écho répond : « hou… hou… hou… » Et puis, tout au fond, de petits couinements.",
+    "smell": "Ça sent la pierre mouillée et la vieille cendre."
+   }
   },
   {
    "id": "fond",
@@ -174,7 +173,13 @@
      "label": "vers la sortie",
      "dir": "dehors"
     }
-   ]
+   ],
+   "dark": "Il fait noir comme dans le ventre d'un mammouth ! Ploc… ploc… de l'eau goutte quelque part. Et tout là-haut, ça couine et ça ronfle tout doucement. Avec ta torche allumée, tu verrais tout !",
+   "senses": {
+    "listen": "Ploc… ploc… des gouttes tombent dans les flaques. Et au plafond, de tout petits ronflements : rrr… couic… rrr…",
+    "smell": "Ça sent la pierre mouillée, comme après la pluie.",
+    "touch": "La pierre est froide et un peu humide sous tes doigts."
+   }
   }
  ],
  "items": [
@@ -190,7 +195,11 @@
    "at": "campement",
    "fixed": "Aïe, ça brûle ! Le feu reste au milieu du campement.",
    "initial": "Un grand feu crépite, crac crac !",
-   "description": "Un grand feu qui crépite. Parfait pour allumer une torche !"
+   "description": "Un grand feu qui crépite. Parfait pour allumer une torche !",
+   "senses": {
+    "listen": "Crac ! Crac ! Pfff… le feu chante.",
+    "smell": "Mmm, ça sent la fumée et le bois grillé."
+   }
   },
   {
    "id": "torche",
@@ -216,6 +225,9 @@
      ],
      "description": "La torche brûle bien et fait danser des ombres partout."
     }
+   ],
+   "light": [
+    "is:torche:allumee"
    ]
   },
   {
@@ -326,7 +338,10 @@
    "fixed": "Il est bien trop gros, et il est pour le festin de ce soir !",
    "sturdy": "C'est le tambour du festin, en bonne peau bien tendue : on n'y touche pas !",
    "initial": "Le grand tambour du festin est rangé ici : pas question de taper dessus, ça réveillerait les chauves-souris qui dorment dans la grotte !",
-   "description": "Un énorme tambour en peau. Oukou a bien dit : pas de bruit près de la grotte, les chauves-souris dorment !"
+   "description": "Un énorme tambour en peau. Oukou a bien dit : pas de bruit près de la grotte, les chauves-souris dorment !",
+   "senses": {
+    "touch": "La peau est toute tendue, comme un ventre de bébé mammouth. Mais chut, on ne tape pas !"
+   }
   },
   {
    "id": "paroi",
@@ -375,7 +390,10 @@
    "at": "fond",
    "fixed": "Chut, elles dorment ! Laisse-les tranquilles.",
    "initial": "Au plafond, les chauves-souris dorment, la tête en bas.",
-   "description": "Des dizaines de petites chauves-souris endormies, la tête en bas, enroulées dans leurs ailes."
+   "description": "Des dizaines de petites chauves-souris endormies, la tête en bas, enroulées dans leurs ailes.",
+   "senses": {
+    "listen": "Couic… rrr… couic… Les chauves-souris ronflent tout doucement. Chut !"
+   }
   }
  ],
  "characters": [

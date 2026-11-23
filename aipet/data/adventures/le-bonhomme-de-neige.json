@@ -59,7 +59,11 @@
      ],
      "text": "Le bonhomme porte fièrement sa chaussette géante autour du cou."
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Crounch, crounch, la neige sous tes bottes… et vrrrr, les petites ailes de Plumette qui bourdonnent !",
+    "smell": "Ça sent le froid tout propre et le sapin."
+   }
   },
   {
    "id": "cuisine",
@@ -91,7 +95,11 @@
      "label": "vers le jardin",
      "dir": "sud"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "La marmite fait blop-blop, et le gros poêle ronronne comme un chat.",
+    "smell": "Mmm, la soupe aux poireaux qui mijote !"
+   }
   },
   {
    "id": "remise",
@@ -114,7 +122,11 @@
      "label": "vers le jardin",
      "dir": "ouest"
     }
-   ]
+   ],
+   "senses": {
+    "smell": "Ça sent le vieux bois et la poussière… atchoum !",
+    "listen": "Cric… crac… les planches craquent dans le froid."
+   }
   },
   {
    "id": "cabane",
