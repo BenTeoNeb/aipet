@@ -420,6 +420,7 @@
    ],
    "at": "cuisine",
    "description": "Une cuisinière joyeuse, toujours en train de chanter.",
+   "persona": "Parle fort en chantant, roule les « r » à l'italienne et appelle tout le monde « mon petit », en ponctuant de « Mamma mia ! ». Joyeuse et généreuse, elle adore nourrir les gens et ne supporte pas qu'on ait faim. Elle veut que le petit apprenti réussisse pour le maître et l'encourage comme une grand-mère fière.",
    "initial": "Mamma Rosa, la cuisinière, roule des pâtes en chantant.",
    "says": "De la colle ? Facile, mon petit ! De la farine et de l'eau, tu mélanges, et ça colle comme du miel. L'eau, il y a un seau plein près du puits, dans la cour. Et le plan du maître… il écrit tout à l'envers, ce génie ! Il faut un miroir pour le lire."
   },
@@ -433,6 +434,7 @@
    ],
    "at": "chambre",
    "description": "Un gros chat roux qui dort tout le temps… sauf quand quelque chose roule devant lui.",
+   "persona": "Ne parle qu'en miaulements, bâillements et ronrons « rrrrr… », avec des soupirs de gros paresseux. Il adore dormir au chaud et ne s'anime que pour ce qui roule devant lui. Il se moque bien de la machine volante : le héros le dérange, et il le regarde d'un œil à moitié ouvert, sans méchanceté.",
    "initial": "Mascarpone, le gros chat roux, dort roulé en boule sur quelque chose de doux et brillant.",
    "says": "Miaou… rrrrr… (Mascarpone ronronne. Ce chat ne bouge que pour jouer avec ce qui roule !)",
    "states": [
@@ -457,6 +459,7 @@
    ],
    "at": "terrasse",
    "description": "Un pigeon gris tout dodu, qui gonfle son jabot.",
+   "persona": "Roucoule « rou-rou » au début et à la fin de ses phrases, en gonflant son jabot comme un monsieur important. Gourmand et un peu vantard, il est très fier que le maître dessine ses machines en le regardant voler. Il accueille le héros en bavard curieux, et devient tout câlin quand on est gentil avec lui.",
    "initial": "Colombo le pigeon roucoule sur le rebord, et des plumes volent un peu quand il bat des ailes.",
    "says": "Rou-rou ! Le maître me regarde voler pendant des heures, pour dessiner ses machines. Et moi, ce que je préfère au monde, ce sont les graines ! Rou-rou…",
    "states": [

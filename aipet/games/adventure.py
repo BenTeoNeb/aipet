@@ -114,7 +114,8 @@ le monde, en JSON, qu'un programme fera tourner.
    "is:lampe:allumee" ; une lumière avec uses en perd une en sortant d'un lieu noir). senses = ce qu'on
    entend, sent ou touche (listen, smell, touch).
 5. characters : 1 à 3 personnages (id, name, aliases, description, at, says = ce qu'il dit quand on lui
-   parle, qui donne un indice ou le but ; initial = ce qu'il fait quand on arrive ; states comme les
+   parle, qui donne un indice ou le but ; persona = pour que le conteur le joue en improvisant : sa voix, une
+   manie ou une expression, ce qu'il aime ou craint, comment il réagit au héros, sans indice en plus ; initial = ce qu'il fait quand on arrive ; states comme les
    objets, avec says et initial, ex. « grognon » puis « content »).
 6. places : les lieux (id court sans espace, name avec l'article, aliases = autres mots que l'enfant pourrait
    dire, description = 1 ou 2 phrases de ce qui ne change jamais : ne cite pas les objets à prendre ni les
@@ -332,6 +333,10 @@ GRAPH_SCHEMA = {
                     "description": {"type": "string"},
                     "at": {"type": "string"},
                     "says": {"type": "string"},
+                    "persona": {
+                        "type": "string",
+                        "description": "sa voix, ses manies, ce qu'il veut, comment il réagit",
+                    },
                     "initial": {"type": "string"},
                     "states": _STATES,
                     "answer": _ANSWER,
@@ -464,7 +469,7 @@ def _clean(graph: dict, difficulty: str) -> dict:
             t["locked"] = True
             if t.get("kind") not in ("container", "door"):
                 t["kind"] = "container"
-        _drop_empty(t, "fixed", "sturdy", "fragile", "initial", "key", "states", "aliases", "uses")
+        _drop_empty(t, "fixed", "sturdy", "fragile", "initial", "key", "states", "aliases", "uses", "persona")
         light, when = t.pop("light", None), t.pop("light_when", None) or []
         if light:
             t["light"] = when or True
@@ -790,7 +795,7 @@ class AdventureGame(Activity):
         self.world = World(self.adventure["graph"])
         self.state = state or self.world.start()
         if state is None:
-            self.adventure["checkpoints_left"] = self.world.spec["checkpoints"]
+            self.adventure["checkpoints_left"] = self.world.policy["checkpoints"]
             self.adventure["checkpoint"] = None
         self.adventure["runs"].append({"started": now().isoformat(timespec="minutes"), "outcome": None,
                                        **({"from": note} if note else {})})  # fmt: skip
@@ -1099,6 +1104,10 @@ def register_tools(llm, game: AdventureGame) -> list:
                                 "answer : sa réponse",
                             },
                             "target": {"type": "string", "description": "sur quoi / à qui : un id, ou vide"},
+                            "step": {
+                                "type": "string",
+                                "description": "pour improvise : l'étape de « écran_mj » que son idée accomplit",
+                            },
                             "to": {
                                 "type": "string",
                                 "description": "pour go : l'id du lieu (« → » dans « à_portée ») "

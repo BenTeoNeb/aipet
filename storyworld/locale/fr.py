@@ -11,7 +11,8 @@ from storyworld.locale import Language, cap
 
 def normalize_text(s: str) -> str:
     """Lower case, without accents."""
-    s = unicodedata.normalize("NFKD", (s or "").lower())
+    s = (s or "").lower().replace("œ", "oe").replace("æ", "ae")  # œuf, cœur: not decomposed by NFKD
+    s = unicodedata.normalize("NFKD", s)
     return "".join(c for c in s if not unicodedata.combining(c))
 
 
@@ -73,6 +74,7 @@ VERBS: dict[str, list[str]] = {
     "close": ["fermer"],
     "talk": ["parler", "dire", "discuter", "appeler", "saluer", "reveiller"],
     "answer": ["repondre", "reponds", "repond", "deviner", "devine"],
+    "improvise": ["improviser"],
     "ask": ["demander"],
     "eat": ["manger", "croquer", "gouter"],
     "drink": ["boire", "bois", "boit"],
@@ -135,6 +137,21 @@ ABSENT_NOTE = (
 DESTROY_NOTE = (
     "C'est fait, pour de bon : raconte-le. Si ça empêche de finir la mission, l'enfant s'en rendra compte plus tard "
     "(ne le dis pas maintenant)."
+)
+THINK_TWICE_NOTE = (
+    "Ce geste rendrait la mission impossible : ne le dis surtout pas comme ça. Fais-le sentir dans l'histoire, "
+    "avec subtilité, comme un maître du jeu : « témoin » réagit (il ouvre de grands yeux, il retient son souffle), "
+    "ou la chose semble précieuse (elle brille, elle a l'air de servir à quelque chose), ou le héros hésite une "
+    "seconde… puis demande-lui, toujours dans l'histoire, s'il le fait quand même. S'il insiste, renvoie la même "
+    "action : elle aura lieu."
+)
+IMPROVISE_NOTE = (
+    "Son idée marche : c'est ta trouvaille de maître du jeu. Raconte-la avec SES mots et SON idée (pas le "
+    "texte prévu tel quel), en gardant ce qui change (« changes ») : c'est vrai maintenant."
+)
+IMPROVISE_NO_NOTE = (
+    "Cette idée ne fait pas avancer l'aventure pour l'instant (aucune étape prête ne lui correspond, ou elle ne "
+    "nomme pas ce qu'il faut) : joue-la comme un moment libre, sans que ça change le jeu."
 )
 DARK_NOTE = (
     "Il fait noir ici : le héros ne voit rien, mais il sent les passages sous ses mains. Ne raconte que ce qu'il "
@@ -260,6 +277,13 @@ KEYS = {
     "in_the_dark": "dans_le_noir",
     "senses": "sens",
     "uses_left": "utilisations_restantes",
+    "precious": "précieux",
+    "witness": "témoin",
+    "gm_screen": "écran_mj",
+    "then": "ensuite",
+    "step": "étape",
+    "goal": "but",
+    "with": "avec",
 }
 
 
@@ -426,6 +450,17 @@ FRENCH = Language(
     absent_note=ABSENT_NOTE,
     destroy_note=DESTROY_NOTE,
     dark_note=DARK_NOTE,
+    think_twice_note=THINK_TWICE_NOTE,
+    improvise_note=IMPROVISE_NOTE,
+    improvise_no_note=IMPROVISE_NO_NOTE,
+    norm=_norm,
+    norm_keep=_norm_keep,
+    stems=_stems,
+    way=_way,
+    canonical_verb=canonical_verb,
+    bag=frozenset(BAG),
+    leave_words=frozenset({"sortir", "dehors", "partir"}),
+    locked_words=LOCKED_WORDS,
     of=of,
     bare=bare,
     plural=plural,

@@ -6,9 +6,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from storyworld.locale.fr import (
-    _stems,
-)
 from storyworld.model import (
     State,
 )
@@ -52,6 +49,8 @@ class View:
                 for x in w.exits(st)
             ],  # fmt: skip
             **({"decor": p["decor"]} if p.get("decor") and not dark else {}),
+            **({"personas": personas} if (personas := self.personas(st)) else {}),
+            **({"gm_screen": screen} if (screen := self.gm_screen(st)) else {}),
             **({"memories": notes} if (notes := self.notes_here(st)) else {}),
             "in_reach": self.in_reach(st),
             **({"worth_exploring": explore} if (explore := self.worth_exploring(st)) else {}),
@@ -80,6 +79,26 @@ class View:
         ]  # a companion is with you
         return " ".join(x for x in parts if x)
 
+    def gm_screen(self, st: State) -> list[dict]:
+        """The game master's screen: the steps the hero is ready for here (their conditions hold, their
+        things are in reach), each with what it achieves. The narrator never tells them; a creative idea
+        of the child that achieves one of them may be played as that step (`improvise`)."""
+        w = self.w
+        goals = {z.get("action"): z.get("goal", "") for z in w.g.get("puzzles", []) if isinstance(z, dict)}
+        scope = set(w.scope(st))
+        out: dict[str, dict] = {}
+        for a in w.rules:
+            if a["id"] in out or (a.get("place") and a["place"] != st.place):
+                continue
+            things = [x for x in (a.get("object"), a.get("target")) if x]
+            if not things or not all(x in scope for x in things) or not w.holds(st, a.get("when")):
+                continue
+            if w.scripts.risky(a) or w.scripts.red_herring(a) or not w.scripts.again(a, st):
+                continue
+            goal = goals.get(a["id"]) or a.get("hint") or ""
+            out[a["id"]] = {"step": a["id"], "goal": goal, "with": [w.name(x, st) for x in things]}
+        return list(out.values())
+
     def blocked(self, st: State, x: dict) -> str:
         """Why a way out is shut (its door, or the author's words)."""
         w = self.w
@@ -90,6 +109,11 @@ class View:
             closed = "{Name} is locked." if locked else "{Name} is closed."
             return texts.get("locked" if locked else "closed") or w.say(closed, Name=w.lang.cap(w.name(door, st)))
         return x.get("blocked") or w.say("blocked")
+
+    def personas(self, st: State) -> dict[str, str]:
+        """How the people here are played (their `persona`), for the narrator's improvisation."""
+        w = self.w
+        return {w.name(c, st): p for c in w.chars_here(st) if (p := w.look(c, st).get("persona"))}
 
     def worth_exploring(self, st: State) -> list[str]:
         """Things here that something can be done with (an action, a pickup, a character to talk to):
@@ -128,12 +152,14 @@ class View:
             if a.get("place") == st.place or {a.get("object"), a.get("target")} & here - {None, st.place}:
                 coming |= args_of(a.get("effects"), "reveal", "gain")
         coming = {i for i in coming if i in w.items and st.items_at.get(i) == ""}
-        shown = _stems(
+        shown = self.w.lang.stems(
             self.describe(st)["description"] + " " + " ".join(w.look(t, st).get("description", "") for t in here)
         )
         for m in said:
             found, _ = w.names.resolve(m, sorted(coming))
-            if found and any(_stems(label) and _stems(label) <= shown for label in w.names.labels(found)):
+            if found and any(
+                self.w.lang.stems(label) and self.w.lang.stems(label) <= shown for label in w.names.labels(found)
+            ):
                 return found  # named in what he sees here: « tu le vois » (not for a secret under the hay)
         return None
 

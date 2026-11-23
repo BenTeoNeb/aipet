@@ -48,7 +48,12 @@ from storyworld.world import World as _World
 
 
 class World(_World):
-    """The library's world, answering the narrator with French keys (« lieu », « à_portée »)."""
+    """The library's world with the pet's policy (its difficulty's profile), answering the narrator
+    with French keys (« lieu », « à_portée »)."""
+
+    def __init__(self, graph: dict, lang=None, policy: dict | None = None):
+        level = graph.get("difficulty") if isinstance(graph, dict) else None
+        super().__init__(graph, lang, policy or DIFFICULTIES.get(level or "", DIFFICULTIES["facile"]))
 
     def act(self, st: State, intent: dict) -> dict:  # noqa: F405
         return localize(super().act(st, intent), KEYS)

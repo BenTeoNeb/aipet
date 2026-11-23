@@ -407,6 +407,7 @@
    ],
    "at": "campement",
    "description": "Un petit garçon avec une tunique en peau et des cheveux tout ébouriffés.",
+   "persona": "Parle vite, en sautillant, avec plein de « vite, vite ! » et des petits cris de joie « hou-hou ! ». Impatient et plein d'énergie, il adore les grandes peintures du clan mais a un peu peur du noir de la grotte. Il voit son grand cousin comme un héros et le suit des yeux avec admiration.",
    "initial": "Oukou sautille d'impatience.",
    "says": [
     {
@@ -432,6 +433,7 @@
    ],
    "at": "riviere",
    "description": "Un bébé mammouth tout poilu, avec une petite trompe et de toutes petites oreilles poilues.",
+   "persona": "Fait « pouet ! » avec sa trompe à chaque phrase, parle comme un tout-petit gourmand qui se lèche la trompe. Doux et câlin, il adore les framboises mais déteste que le buisson lui pique la trompe. Il regarde le héros avec de grands yeux pleins d'espoir, et devient le meilleur ami du monde quand il est content.",
    "states": [
     {
      "id": "assis",
@@ -457,6 +459,7 @@
    ],
    "at": "bois",
    "description": "Un louveteau tout gris aux grandes oreilles. Il adore courir après tout ce qu'on lance.",
+   "persona": "Ne parle qu'en « wouf ! wouf ! » et en petits jappements, la queue qui remue à toute vitesse. Joueur et fou de courses, il adore courir après tout ce qu'on lance et ne tient pas en place. Il prend le héros pour un copain de jeu et lui fait la fête dès qu'il approche.",
    "states": [
     {
      "id": "machouille",

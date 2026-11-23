@@ -26,8 +26,8 @@ def act(aid, triggers, effects, when=(), **kw):
             "when": list(when), "effects": effects, "text": f"{aid} !", **kw}  # fmt: skip
 
 
-def adventure(places, items, characters, actions, start="a", loses=()):
-    return {"title": "patron", "difficulty": "facile", "format": 2, "start": {"place": start, "inventory": []},
+def adventure(places, items, characters, actions, start="a", loses=(), **extra):
+    return {**extra, "title": "patron", "difficulty": "facile", "format": 2, "start": {"place": start, "inventory": []},
             "places": places, "items": items, "characters": characters, "actions": actions,
             "endings": [{"id": "gagne", "kind": "win", "text": "Gagné !"},
                         *({"id": x, "kind": "lose", "text": "Perdu."} for x in loses)]}  # fmt: skip
@@ -299,6 +299,7 @@ PATTERNS = {
             ],
             [],
             [act("fin", [("use", "tresor")], ["end:gagne"], ["has:tresor"])],
+            puzzles=[{"goal": "ouvrir la boîte", "action": "boite", "needs": [], "clue_in": "a"}],
         ),
         [
             ("go", "est"),
@@ -328,6 +329,7 @@ PATTERNS = {
             ],
             [],
             [act("fin", [("use", "tresor")], ["end:gagne"], ["has:tresor"])],
+            puzzles=[{"goal": "passer la porte", "action": "porte", "needs": [], "clue_in": "porte"}],
         ),
         [
             ("answer", "une brosse", "la porte"),
@@ -489,6 +491,45 @@ PATTERNS = {
             ("go", "ouest"),
             ("give", "la bague", "à la reine"),
         ],
+    ),
+    # A reaction after a built-in step (Inform's after rules): taking the egg wakes the dragon.
+    "after_take": (
+        adventure(
+            AB,
+            [
+                thing(
+                    "oeuf",
+                    "b",
+                    aliases=["oeuf", "œuf"],
+                    after={
+                        "take": {
+                            "effects": ["set:dragon:reveille"],
+                            "text": "Le dragon ouvre un œil… puis deux ! « Mon œuf ! »",
+                        }
+                    },
+                )
+            ],
+            [
+                person(
+                    "dragon",
+                    "b",
+                    states=[
+                        {"id": "endormi", "name": "le dragon endormi"},
+                        {"id": "reveille", "name": "le dragon réveillé"},
+                    ],
+                )
+            ],
+            [
+                act(
+                    "rendre",
+                    [("give", "oeuf", "dragon")],
+                    ["lose:oeuf", "end:gagne"],
+                    ["has:oeuf", "is:dragon:reveille"],
+                    not_yet="Il dort à poings fermés…",
+                )
+            ],
+        ),
+        [("go", "est"), ("take", "l'œuf"), ("give", "l'œuf", "au dragon")],
     ),
     # A choice that closes another way, and a folly announced before it loses.
     "choice_and_folly": (

@@ -418,6 +418,7 @@
    ],
    "at": "cour",
    "description": "Un chevalier dans une armure qui brille, si distrait qu'il a mis son casque à l'envers.",
+   "persona": "Parle d'une voix de chevalier théâtral, avec des « mon brave écuyer ! » et des « euh… » quand il oublie quelque chose, son armure faisant cling-clang. Gentil et terriblement distrait, il adore les tournois et rêve d'y briller. Il compte sur son écuyer pour tout et le remercie avec de grandes révérences.",
    "initial": [
     {
      "when": [
@@ -458,6 +459,7 @@
    ],
    "at": "ecurie",
    "description": "Un gros cheval couleur caramel, à la crinière dorée, gourmand comme pas deux.",
+   "persona": "Ne parle qu'en « hiii-hiii ! », en s'ébrouant et en secouant sa crinière dorée. Gourmand comme pas deux et un peu boudeur, il préfère rester couché dans son foin. Il ignore le héros d'un air paresseux, puis piaffe de joie quand il est content.",
    "initial": "Caramel, le cheval de Sire Bertrand, est couché dans un gros tas de foin et ne veut pas se lever.",
    "says": "Hiii-hiii ! (Caramel renifle tes poches en se léchant les babines : ce gourmand rêve toujours de quelque chose de croquant…)",
    "states": [
@@ -480,6 +482,7 @@
    ],
    "at": "cour",
    "description": "Une grosse oie blanche, avec de magnifiques plumes, qui pince tout ce qui bouge.",
+   "persona": "Ne parle qu'en « cacaaarde ! », en se dandinant et en fixant les poches de ses petits yeux ronds. Gourmande et chipie, elle pince tout ce qui bouge et a toujours faim. Elle se méfie du héros et le suit en cacardant, sans jamais être méchante.",
    "initial": "Agathe l'oie se dandine près du puits en cacardant.",
    "says": "Cacaaarde ! (Agathe fixe tes poches avec ses petits yeux ronds. Elle a l'air d'avoir très faim.)",
    "states": [
@@ -502,6 +505,7 @@
    ],
    "at": "cuisine",
    "description": "Une cuisinière toute ronde, avec de la farine jusqu'aux coudes.",
+   "persona": "Parle en chantonnant, les mains pleines de farine, avec des « mon petit » et des « je parie ! » rieurs. Généreuse et gourmande, elle adore nourrir tout le château et connaît les goûts de chaque animal. Elle accueille le héros comme un petit-fils et lui ouvre volontiers sa cuisine.",
    "initial": "Dame Berthe, la cuisinière, pétrit la pâte en chantonnant.",
    "says": "Sers-toi sur la table, mon petit ! Le pain, Agathe l'oie l'adore. Et la pomme… Caramel ferait n'importe quoi pour une pomme ! Et ma soupe aux poireaux, tout le monde l'adore… même les oies, je parie !"
   },
@@ -516,6 +520,7 @@
    ],
    "at": "scriptorium",
    "description": "Un vieux moine aux doigts tachés d'encre, qui copie les livres à la main.",
+   "persona": "Parle tout bas en commençant par « Chut… », lentement, en trempant sa plume lettre après lettre. Patient et très minutieux, il aime les beaux livres et les grandes lettres dorées. Il est bienveillant avec le héros, comme un vieux maître qui n'aime pas être pressé.",
    "initial": "Frère Anselme copie un gros livre à la main, lettre après lettre, et peint une grande lettre dorée au début de la page. Sur sa table, une bannière toute blanche attend son blason.",
    "says": "Chut… Je copie ce livre à la main, ça prend des mois ! La bannière de Sire Bertrand ? Je veux bien la finir, mais il me faut deux choses : une plume neuve, la mienne est toute usée… les meilleures, ce sont les plumes d'oie. Et le modèle du blason, qui est peint sur son bouclier !",
    "states": [
@@ -539,6 +544,7 @@
    ],
    "at": "lice",
    "description": "Un monsieur en habit à rayures, avec une voix qui porte jusqu'au bout du royaume.",
+   "persona": "Parle d'une voix qui porte jusqu'au bout du royaume, en annonçant tout comme un grand événement : « Oyez, oyez ! ». Fier et cérémonieux, il adore annoncer les chevaliers et garde sa trompette comme un trésor. Il traite le héros avec pompe et amitié, et l'appelle « noble écuyer ».",
    "initial": "Le héraut garde sa grande trompette : « Pas touche ! Un seul coup de trompette, et le tournoi commence ! »",
    "says": "C'est moi qui annonce les chevaliers ! Mais sous l'armure, comment les reconnaître ? Grâce à leur blason, sur leur bouclier et sur leur bannière, bien haut au bout d'une perche ! Et surtout, ne touche pas à ma trompette : un seul coup, et le tournoi commence !"
   }

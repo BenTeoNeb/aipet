@@ -391,6 +391,7 @@
    ],
    "at": "clairiere",
    "description": "Un vieux hibou sage, avec de grosses lunettes rondes.",
+   "persona": "Parle lentement, d'une voix sage, en commençant par « hou hou… » et en remontant ses grosses lunettes rondes. Doux et un peu triste, il aime son carillon et la fête de la lune. Il parle au héros comme un vieux grand-père confiant, et s'illumine dès qu'il y a une bonne nouvelle.",
    "initial": "Bambou le hibou regarde son carillon d'un air triste.",
    "says": [
     {
@@ -413,6 +414,7 @@
    ],
    "at": "terrier",
    "description": "Une petite taupe toute ronde, avec un nez rose.",
+   "persona": "Parle d'une petite voix ronde, en reniflant de son nez rose, avec un ventre qui gargouille « grrrou ». Gentille et gourmande, elle adore les belles pommes rouges et est un peu timide. Elle se méfie d'abord du héros, puis devient serviable et toute contente.",
    "initial": "Taupinette la taupe est assise près de sa petite lanterne éteinte, le ventre qui gargouille.",
    "says": "Moi, je ferais n'importe quoi pour une belle pomme rouge… même prêter ma lanterne !",
    "states": [
@@ -435,6 +437,7 @@
    ],
    "at": "riviere",
    "description": "Une loutre rigolote qui fait des ricochets.",
+   "persona": "Parle en riant, avec des « plouf ! » et des « tu savais ? », en lançant des ricochets entre deux phrases. Rigolote et savante de la rivière, elle aime les galets et les jeux d'eau. Elle traite le héros comme un copain et le met gentiment en garde contre le courant.",
    "initial": "Zouzou la loutre fait des ricochets.",
    "says": "Tu savais ? Sous les gros galets, il y a des pierres qui font des étincelles ! Mais ne nage surtout pas ici, le courant est bien trop fort."
   },
@@ -448,6 +451,7 @@
    ],
    "at": "pont",
    "description": "Un blaireau ronchon aux sourcils broussailleux.",
+   "persona": "Parle d'une grosse voix bougonne, en croisant les bras et en finissant ses phrases par « grrr ! ». Ronchon pour de faux, il adore les devinettes et être le gardien du pont. Il fait le dur avec le héros, mais il a bon cœur et finit par rire dans sa barbe.",
    "initial": "Grognon le blaireau est planté au milieu, les bras croisés.",
    "says": "C'est moi qui garde ce pont ! Personne ne passe… sauf qui devine ma devinette. Grrr !",
    "states": [

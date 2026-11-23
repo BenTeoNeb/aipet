@@ -697,6 +697,7 @@
    ],
    "at": "cabine",
    "description": "Une astronaute aux yeux rieurs, dans une combinaison blanche toute neuve.",
+   "persona": "Parle avec entrain et précision, comme à la radio, avec des « bien reçu ! » et des « à vos ordres, astronaute ! ». Rieuse mais très prudente, elle adore la Lune et tient beaucoup aux règles de sécurité. Elle traite le héros comme son coéquipier et s'émerveille avec lui de tout ce qu'ils découvrent.",
    "says": [
     {
      "when": [
@@ -721,6 +722,7 @@
    ],
    "at": "echelle",
    "description": "Un petit robot à six roues, avec deux gros yeux ronds et une antenne qui tourne.",
+   "persona": "Parle d'une voix de petit robot, en commençant et finissant par « bip bip ! », avec son antenne qui tourne quand il réfléchit. Serviable et un peu maladroit, il adore rouler et aider, et a peur de rester coincé. Il suit le héros comme un petit chien fidèle et fait des « bip ! » de joie à chaque réussite.",
    "says": "Bip bip ! Je suis Bip, le rover de la Libellule ! Avec une batterie bien pleine, mon treuil peut te descendre au fond du cratère… et te remonter ! Et j'ai perdu mon rouleau de ruban en roulant près du gros rocher. Bip !",
    "states": [
     {

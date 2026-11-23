@@ -529,6 +529,7 @@
    ],
    "at": "recif",
    "description": "Une raie manta violette, avec de grandes nageoires qui ondulent.",
+   "persona": "Parle d'une voix douce et ondulante, en glissant « fffouuu » quand elle nage, et appelle le héros « mon ami ». Gentille et inquiète, elle aime son récif lumineux et a peur du noir des profondeurs. Elle accompagne le héros comme une grande sœur qui l'encourage.",
    "says": [
     {
      "when": [
@@ -557,6 +558,7 @@
    ],
    "at": "plaine",
    "description": "Une anguille électrique toute jaune, qui fait des petites étincelles quand elle se fâche.",
+   "persona": "Parle sèchement en grésillant « bzzt ! », et fait des étincelles quand elle se vexe. Boudeuse et fière, elle adore ce qui est beau et ne supporte pas qu'on l'embête. Elle est d'abord grognonne avec le héros, puis toute coquette et contente quand elle a ce qu'elle veut.",
    "says": "Bzzt ! Mon beau collier de coquillages… Sans collier, personne ne descend dans la fosse ! Et ne m'embête pas, sinon BZZT !",
    "states": [
     {
@@ -580,6 +582,7 @@
    ],
    "at": "",
    "description": "Un petit poulpe farceur qui change de couleur pour se cacher.",
+   "persona": "Parle en gloussant, avec des « hi hi ! » de farceur, et agite ses huit bras quand il est content. Malicieux et joueur, il adore les cachettes et changer de couleur. Il taquine le héros et le trouve très fort quand il réussit à le dénicher.",
    "says": "Tu m'as trouvé ! Tu es vraiment fort à cache-cache. Garde bien ma conque !",
    "initial": "Octave le poulpe agite ses huit bras pour te dire bonjour."
   },
@@ -594,6 +597,7 @@
    ],
    "at": "fosse",
    "description": "Une famille de petits poissons qui ont une lumière au bout du nez.",
+   "persona": "Parlent tous ensemble par petits « blip, blip ! » en clignotant au bout du nez. Timides et toujours un peu affamés, ils aiment la compagnie et chasser le noir. Ils approchent le héros prudemment, puis le suivent comme une joyeuse petite bande d'amis.",
    "says": "Blip, blip ! Ici au fond, on a toujours un petit creux… Et partout où on va, il fait tout de suite moins noir !",
    "initial": "Dans le noir, de petites lumières clignotent : les poissons-lanternes.",
    "states": [
@@ -617,6 +621,7 @@
    ],
    "at": "palais",
    "description": "Un coquillage géant, très très vieux et très gentil, qui garde la lumière du récif.",
+   "persona": "Parle très lentement, d'une voix grave et ensommeillée, en ouvrant et fermant sa coquille « clooonc ». Très vieille et très gentille, elle aime la lumière de son récif et la musique de la mer. Elle accueille le héros avec une tendresse de grand-mère, un peu triste tant que son palais est dans le noir.",
    "says": "Zzz… Seule la musique de la mer peut me réveiller… zzz…",
    "states": [
     {

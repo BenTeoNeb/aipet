@@ -53,12 +53,26 @@ outcome = world.act(state, {"verb": "give", "object": "algue", "target": "pinces
 
 ## Guarantees and tests
 
-- Deterministic: no randomness, ordered iteration.
-- Never raises on odd input: a graph too broken to check is reported, an odd intent is told.
-- Tested as properties (`tests/test_storyworld_properties.py`): every solver edge equals the turn,
-  the solver's reduction keeps the verdict, no crash on fuzzed graphs and intents, states round-trip
-  through JSON, migration is stable; and on a catalogue of puzzle patterns
-  (`aipet/games/adventure_patterns.py`) and a reference adventure.
+What `validate` proves, by exploring every reachable state (up to 60,000):
+
+- a win can be reached, every ending can be reached, and the hero can never get stuck as written;
+- a code or a riddle is played only once its clue (`puzzles[].clue_in`) has been met: winnable
+  means winnable by a child who doesn't know the answer beforehand;
+- every move the solver counts on is what the turn does (`disagreements`).
+
+What is not proven, and how it is tested instead:
+
+- that the turn never leads outside the solver's states: tested as a property on the patterns, the
+  reference adventure and a sample of states of the easy bank adventures, with every verb on every
+  thing in reach (`test_the_turn_never_leaves_the_solvers_states`);
+- that the solver's take-first reduction keeps the verdict: argued in `World._eager_ok`, tested on
+  the corpus and on random worlds with dark places, lights and uses;
+- the player's `destroy`: outside the proof; the engine checks after it whether a win is still
+  reachable, and makes the hero think twice, in the story, before one that would not (SPEC 7.9).
+
+Also: deterministic (no randomness, ordered iteration); never raises on odd input (a graph too
+broken to check is reported, an odd intent is told); states round-trip through JSON; migration is
+stable. The derived puzzle chart (`chart.py`: depth, width) is in the report.
 
 ## References
 

@@ -88,6 +88,7 @@ def _all_conditions(graph: dict) -> list[str]:
     out += [r for p in graph.get("places", []) for x in p.get("exits", []) for r in x.get("when") or []]
     for t in [*graph.get("places", []), *graph.get("items", []), *graph.get("characters", [])]:
         out += [r for d in t.get("details") or [] for r in d.get("when") or []]
+    out += [r for i in graph.get("items", []) if isinstance(i.get("light"), list) for r in i["light"]]
     return [r for r in out if isinstance(r, str)]
 
 
@@ -108,6 +109,8 @@ class State:
     chars_at: dict[str, str] = field(default_factory=dict)
     visited: list[str] = field(default_factory=list)
     seen: list[str] = field(default_factory=list)  # places seen lit (a dark place visited blind is not)
+    known: list[str] = field(default_factory=list)  # clues met (`puzzles[].clue_in` of codes and riddles)
+    tried: list[str] = field(default_factory=list)  # the things of the last tries that led nowhere (for hints)
     ending: str | None = None
     turns: int = 0
     stalled: int = 0  # turns without progress (for the reminders and hints)

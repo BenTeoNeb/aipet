@@ -234,7 +234,8 @@ class Actions:
     def do(self, st: State, a: dict) -> dict:
         """Do an action: its effects, its points, its text (and the arrival when it moves the hero)."""
         w = self.w
-        changes = w.apply(st, a.get("effects", []))
+        taken = w.builtins.take_for(st, a["id"])
+        changes = [w.say("gained: {thing}", thing=w.name(i, st)) for i in taken] + w.apply(st, a.get("effects", []))
         st.done_actions.append(a["id"])
         st.score += int(a.get("points", 5))
         out: dict = {"outcome": "done", "text": a.get("text", ""), "changes": changes}

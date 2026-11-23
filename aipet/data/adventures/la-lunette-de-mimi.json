@@ -617,6 +617,7 @@
    ],
    "at": "place",
    "description": "Une petite souris astronome avec un bonnet pointu plein d'étoiles.",
+   "persona": "Parle d'une petite voix pressée, en couinant « hiii ! » quand elle s'agite, et en citant les étoiles comme de vieilles amies. Passionnée et un peu désespérée, elle adore le ciel de nuit et a peur de rater la pluie d'étoiles filantes. Elle compte sur le héros comme sur un sauveur et le remercie à chaque petit progrès.",
    "says": [
     {
      "when": [
@@ -659,6 +660,7 @@
    ],
    "at": "boulangerie",
    "description": "Un écureuil boulanger avec un tablier plein de farine.",
+   "persona": "Parle vite, en riant « hi hi », avec un nuage de farine à chaque geste et des comparaisons de boulanger. Blagueur et travailleur, il adore ses croissants dorés et n'aime pas qu'on bouscule son tonneau. Il est commerçant avec le héros, mais toujours gentil et de bon conseil.",
    "says": "Un croissant ? C'est une pièce d'or, petit ! Et pousse-toi de mon tonneau, il n'aime pas qu'on le bouscule… hi hi. Et si un jour tu descends dans ma cave, prends ma bougie : il y fait noir comme dans un four éteint !",
    "initial": "Choco l'écureuil, le boulanger, range des croissants dorés."
   },
@@ -671,6 +673,7 @@
    ],
    "at": "cave",
    "description": "Un rat gourmand aux longues moustaches, avec un gros ventre.",
+   "persona": "Parle la bouche pleine, avec un ventre qui gargouille et des « miam » gourmands. Grincheux quand il a faim, il ne pense qu'aux croissants et serre fort son verre brillant. Il se méfie d'abord du héros, puis devient tout aimable et bavard une fois rassasié.",
    "says": "Ce verre brillant, je ne le lâche que pour un croissant tout chaud ! Le drap ? Prends-le, il gratte. Et ne bois surtout pas mes potions : c'est de la potion de grenouille !",
    "initial": "Grignote le rat est assis sur un sac, le ventre qui gargouille : il serre contre lui un disque de verre tout brillant.",
    "states": [
@@ -694,6 +697,7 @@
    ],
    "at": "jardin",
    "description": "Un renard roux qui dort en ronflant doucement.",
+   "persona": "Parle en dormant, par petits morceaux entrecoupés de « zzz… », comme dans un rêve. Paisible et rêveur, il aime les étoiles et les longues siestes au jardin. Il ne se réveille pas vraiment : au héros, il murmure seulement des bribes, sans jamais se fâcher.",
    "says": "Zzz… les étoiles filantes… zzz… il faut les voir de très haut… zzz…",
    "initial": "Néro le renard dort sur un banc, près de la haie."
   }

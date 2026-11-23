@@ -11,9 +11,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from storyworld.locale.fr import (
-    canonical_verb,
-)
 from storyworld.model import (
     State,
 )
@@ -45,16 +42,24 @@ class Turn:
         if st.ending:
             return self.over(st)
         intent = self.coerce(intent)
-        verb = canonical_verb(intent.get("verb", ""))
+        verb = self.w.lang.canonical_verb(intent.get("verb", ""))
         before_all = st.to_dict() if verb == "destroy" else None
         before = self.progress_mark(st)
         st.turns += 1
+        if verb == "destroy" and (pause := self.think_twice(st, intent)):
+            return pause
+        before_play = State.from_dict(st.to_dict())
         res = self.play(st, verb, intent)
-        self.count_progress(st, res, before)
+        texts, changes = self.w.react(before_play, st)
+        if texts or changes:
+            res["then"] = texts
+            res["changes"] = [*res.get("changes", []), *changes]
+        self.count_progress(st, res, before, intent)
         place = self.w.places.get(st.place, {}).get("name", st.place)
         res.setdefault("you_are", place)  # the narrator never loses track
         if st.place not in st.seen and not self.w.dark(st):
             st.seen.append(st.place)
+        self.w.learn(st)
         self.detect_doom(st, res, before_all)
         self.end_if_doomed(st, verb, res)
         self.tell_ending(st, res)
@@ -107,12 +112,28 @@ class Turn:
             return {"outcome": "hint", "hint": w.hint(st, force=True) or w.say("Take a good look around you.")}
         if verb == "where":
             return w.ways.where(st, intent.get("object") or intent.get("to") or "")
+        if verb == "improvise":
+            return self.improvise(st, intent)
         if w.builtins.bag(intent.get("object"), st):  # « j'ouvre mon sac », « je pose mon sac »
             if verb in ("drop", "throw", "destroy", "give"):
                 return {"outcome": "impossible",
                         "text": w.say("You'd rather keep your bag on your back: it might still come in handy!")}  # fmt: skip
             return w.builtins.inventory(st)
         return None
+
+    def improvise(self, st: State, intent: dict) -> dict:
+        """A creative idea of the child (« je fais un lasso avec la ficelle »), played as a step of the
+        game master's screen it achieves: only a step ready now, and only when the idea names one of
+        its things (the child did the work; the narrator chose the words). The solver's step is the
+        same, so the adventure stays as proven."""
+        w = self.w
+        step = intent.get("step", "")
+        ready = {s["step"] for s in w.view.gm_screen(st)}
+        rule = next((a for a in w.rules if a["id"] == step), None)
+        named = {w.names.find(intent.get(k), st)[0] for k in ("object", "target") if intent.get(k)} - {None}
+        if not rule or step not in ready or not named & {rule.get("object"), rule.get("target")}:
+            return {**w.builtins.free(intent.get("object"), intent.get("target")), "note": w.lang.improvise_no_note}
+        return {**w.scripts.do(st, rule), "note": w.lang.improvise_note}
 
     def into_bag(self, st: State, verb: str, intent: dict) -> tuple[str, dict]:
         """« je mets l'algue dans mon sac »: taking it."""
@@ -195,12 +216,36 @@ class Turn:
         return res
 
     # ------------------------------------------------------------ bookkeeping
-    def count_progress(self, st: State, res: dict, before: tuple) -> None:
-        """Progress resets the hints; a try that didn't work (not a chat, a look or imagination) counts."""
+    def count_progress(self, st: State, res: dict, before: tuple, intent: dict | None = None) -> None:
+        """Progress resets the hints; a try that didn't work (not a chat, a look or imagination) counts,
+        and what it was about is kept: the hint goes to the puzzle the child is on."""
         if self.progress_mark(st) != before:
-            st.stalled, st.hint_level, st.reminded = 0, 0, False
+            st.stalled, st.hint_level, st.reminded, st.tried = 0, 0, False, []
         elif res.get("outcome") in FAILED:
             st.stalled += 1
+            for k in ("object", "target"):
+                found = self.w.names.find((intent or {}).get(k), st)[0] if (intent or {}).get(k) else None
+                if found and found != st.place:
+                    st.tried = [*(x for x in st.tried if x != found), found][-4:]
+
+    def think_twice(self, st: State, intent: dict) -> dict | None:
+        """Before a destroy that would make the mission impossible: once, the story makes the hero
+        think twice (a character reacts, the thing seems precious), never a « game over » warning;
+        if the child does it again, it happens (Nelson: an irrevocable act needs due warning)."""
+        w = self.w
+        trial = State.from_dict(st.to_dict())
+        res = self.play(trial, "destroy", intent)
+        lost = res.get("lost")
+        if not lost or f"destroy:{lost}" in st.warned:
+            return None
+        found = solve(w, trial, first_path=True)
+        if found.get("path") or not found.get("complete"):
+            return None
+        st.warned.append(f"destroy:{lost}")
+        witness = next(iter(w.chars_here(st)), "")
+        return {"outcome": "warning", "precious": w.name(lost, st),
+                **({"witness": w.name(witness, st)} if witness else {}),
+                "note": w.lang.think_twice_note}  # fmt: skip
 
     def detect_doom(self, st: State, res: dict, before_all: dict | None) -> None:
         """After a destroy, is the adventure still winnable? (`lost` never reaches the narrator.)"""
@@ -224,10 +269,10 @@ class Turn:
         are left before a hint."""
         failed = res.get("outcome") in FAILED
         runs_into_it = failed or res.get("outcome") == "absent" or verb == "help"
-        if st.doomed and not st.ending and (runs_into_it or st.stalled >= self.w.spec["hint_after"]):
+        if st.doomed and not st.ending and (runs_into_it or st.stalled >= self.w.policy["hint_after"]):
             st.ending = STUCK  # he runs into it now: the mission stops here
         elif failed and not st.ending:
-            res["tries_before_hint"] = max(0, self.w.spec["hint_after"] - st.stalled)
+            res["tries_before_hint"] = max(0, self.w.policy["hint_after"] - st.stalled)
 
     def tell_ending(self, st: State, res: dict) -> None:
         """The ending reached, if any (a win scores)."""

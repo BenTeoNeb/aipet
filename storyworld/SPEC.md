@@ -106,6 +106,7 @@ shortest win, number of puzzles and lose endings, how soon hints come, how many 
 | `exits` | Exit[] | The ways out. | `[]` |
 | `dark` | boolean \| string | Dark: without a light, nothing is seen here but the ways out (7.12). A string is what the hero feels there in the dark. | `false` |
 | `senses` | Senses | What is heard, smelled, felt here (7.14). | none |
+| `after` | `{enter: Reaction}` | What happens after the hero enters, once (7.15). | none |
 | `variants` | `{when, description}`[] | Deprecated: version 1 whole descriptions. | — |
 
 **Exit**:
@@ -143,6 +144,7 @@ Exits are one-way: a way back is a separate exit on the destination (generators 
 | `uses` | integer ≥ 1 | How many times it can be used before it is refilled (7.13). | none |
 | `light` | boolean \| Conditions | Gives light in dark places: always, or while the conditions hold (7.12). | none |
 | `senses` | Senses | What is heard, smelled, felt about it (7.14). | none |
+| `after` | `{take, open: Reaction}` | What happens after it is taken or opened, once (7.15). | none |
 | `states` | State[] | Value states (4.6). | none |
 | `code` | Code | A code lock that opens it (7.6). | none |
 | `answer` | Answer | A riddle or password it asks (7.7). | none |
@@ -171,6 +173,7 @@ A `key`, `locked: true` or a `code` requires kind `container` or `door` (the sch
 | `details` | Detail[] | Situation-dependent sentences about them. | `[]` |
 | `at` | place id or `""` | Where they start (`""`: nowhere until `move`d). | `""` |
 | `says` | situated text | What they say when talked to. | `"…"` |
+| `persona` | string | For the narrator's improvisation: voice, manner, what they want and fear, how they react to the hero. It colours what they say, never adds a clue. | none |
 | `initial` | situated text | A sentence in the place's description while they are there and not following the hero. | none |
 | `states` | State[] | Value states (4.6). | none |
 | `answer` | Answer | A riddle or password they ask (7.7). | none |
@@ -408,8 +411,11 @@ or opening it gives the inventory; putting something in it takes that thing.
   text as the reason when it is a string); a thing a character holds answers `not_yet`.
 
 Losing a needed thing is allowed: "never stuck" is a promise about the adventure as written, not a
-ban on the player. After a destroy the engine checks whether a win is still reachable. If not, the
-game is *doomed* (Sierra's "walking dead") but says nothing yet; it ends with the built-in lose
+ban on the player, but it is never a trap (Nelson: an irrevocable act needs due warning). Before a
+destroy that would leave no win, the engine answers once `warning` with `precious` (the thing) and
+`witness` (someone here), and a note: the narrator makes the hero think twice *in the story* (a
+character reacts, the thing looks precious), never a "game over" warning. Sent again, it happens.
+The game is then *doomed* and says nothing more; it ends with the built-in lose
 ending `_coince` ("Sans X, impossible d'aller plus loin…") when the player runs into it: a failed
 try, a request for help, or several turns without progress. Applications may offer to resume from
 just before the destroy.
@@ -455,6 +461,15 @@ the place's senses are given to the narrator with the `dark` text: what the hero
 there. A sense puzzle is an action triggered by `listen`, `smell` or `touch` ("écouter le mur" → a
 hiding place).
 
+### 7.15 Reactions after a built-in step (Inform's « after » rules)
+
+Taking, opening and going are built in; `after` adds what the world does once they are done
+("prendre l'œuf réveille le dragon", "ouvrir le coffre libère des papillons", "entrer dans la
+salle fait sonner une cloche"). A Reaction is `{when, effects, text}`: after the step, once, if
+`when` holds, its effects are applied and its text told (`then`). It never loses (a loss needs the
+warning of an action). The solver plays reactions on its own steps the same way, and an item that
+reacts to being taken is never taken ahead by the solver's reduction.
+
 ## 8. What a valid adventure guarantees
 
 Validity has three layers. Tools MUST apply the first two; the engine's checker applies the third.
@@ -478,7 +493,9 @@ condition and effect syntax, no unknown fields except `x-`).
   or only re-does a built-in opening; an action's `place` is a place;
 - a code has at least two scenery buttons, each in one code only; a riddle has a question and
   accepted answers;
-- puzzles name an action, a coded item or a riddle's asker; `needs` and `clue_in` are ids;
+- puzzles name an action, a coded item or a riddle's asker; `needs` and `clue_in` are ids; every
+  code and riddle has its puzzle, with `clue_in`;
+- `after` has only its own kinds (`take`, `open` on items; `enter` on places), and never loses;
 - every ending's kind is `win` or `lose`.
 
 **3. Playability**: the checker explores the whole state space from the start (bounded; an
@@ -487,17 +504,34 @@ adventure too big to explore is rejected) and proves that:
 - at least one win ending is reachable, and every ending (win or lose) is reachable;
 - the hero can never get stuck: from every reachable state that has not ended, a win is still
   reachable (losing is allowed; a lose ending is an end, not a trap);
+- **fair play**: a code is pressed and a riddle answered only once its `clue_in` has been met (a
+  place seen lit, a thing or someone in reach), so a win never needs an answer the child could not
+  know (Gilbert's information dependencies);
 - **the solver and the turn agree**: every move the solver counts on is replayed through the turn
   engine with the words a player would use, and must change the world the same way (so a scripted
   action can never shadow a built-in behaviour the solver relied on).
 
 An unreachable ending is reported with its reason ("action X needs has:Y, and no effect ever makes
 it true"). Warnings, not errors: actions that can never happen, a `clue_in` whose texts name none of
-what the puzzle needs, texts that would lie (a place's lasting text naming a character who moves; a
+what the puzzle needs, a flag that nothing sets and is close to one that is set (a typo), the
+derived puzzle chart a single corridor of five puzzles or more, texts that would lie (a place's lasting text naming a character who moves; a
 "locked" sentence told while the key may be in hand).
 
 Applications add their own policy on top (for example, per `difficulty`: the number of places and
 lose endings, the length and number of puzzles of the shortest win).
+
+## 8.1 The narrator as game master
+
+The engine holds the plot; the narrator plays it like a game master or an improv actor. What the
+engine gives it for that, and how it stays within the proof:
+
+- `persona` (characters): how to play them live; it never adds a clue.
+- `gm_screen` (in a place's description): the steps the hero is ready for here and what each
+  achieves (the puzzle's `goal`, else the action's `hint`). Never told to the player.
+- `improvise` (verb), with `step`: a creative idea of the player that achieves one of those steps
+  ("je fais un lasso avec la ficelle") is played as that step, only if it is ready now and the
+  intent names one of its things. The world changes exactly as the solver's step does.
+- A destroy that would leave no win is felt in the story first (7.9); the player decides.
 
 ## 9. Minimal example
 

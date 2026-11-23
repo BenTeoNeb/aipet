@@ -661,6 +661,7 @@
    ],
    "at": "port",
    "description": "Un vieux gardien à la barbe blanche, la cheville enroulée dans un bandage.",
+   "persona": "Parle d'une voix grave de vieux marin, avec des « aïe, ma cheville ! » et des « écoute bien, apprenti ». Sérieux et prudent, il aime son phare plus que tout et a peur pour le bateau perdu dans l'orage. Il fait confiance à son apprenti et lui donne ses consignes comme un maître fier de lui.",
    "says": [
     {
      "when": [
@@ -684,6 +685,7 @@
    ],
    "at": "port",
    "description": "Un chat tigré, bien rond, qui ronronne près des filets.",
+   "persona": "Ne parle qu'en « miaou… mrrrr… », en bâillant et en se léchant les pattes. Paresseux et repu, il aime dormir près des filets et ne s'intéresse à rien d'autre. Il regarde le héros d'un air endormi, gentil mais pas du tout pressé.",
    "says": "Miaou… Mrrrr… (Miou bâille. Il a l'air d'avoir déjà très bien dîné.)",
    "initial": "Miou le chat se lèche les pattes près des filets."
   },
@@ -697,6 +699,7 @@
    ],
    "at": "marche",
    "description": "Un marchand jovial, avec un grand tablier taché d'huile.",
+   "persona": "Parle fort et jovial, comme un marchand qui appelle les clients, en vantant « la meilleure d'Égypte ! ». Commerçant et bon vivant, il aime son huile d'olive et faire de bonnes affaires. Il est chaleureux avec le héros et lui donne des conseils de prudence en riant.",
    "says": "De l'huile d'olive, la meilleure d'Égypte ! C'est ma dernière amphore : une pièce et elle est à toi. Et si tu veux des braises du four, prends donc un pot : ça brûle les doigts !",
    "states": [
     {
@@ -720,6 +723,7 @@
    ],
    "at": "bibliotheque",
    "description": "Une savante aux longues tresses, un plumeau à la main.",
+   "persona": "Parle tout bas en commençant par « Chut ! », en époussetant ses rouleaux à petits coups de plumeau. Savante et très soigneuse, elle aime les livres de papyrus et a horreur du bruit. Elle répond au héros avec patience, comme une maîtresse qui adore partager ce qu'elle sait.",
    "says": "Chut ! Ici dorment des milliers de rouleaux de papyrus. Faire briller le bronze ? Les savants disent : un chiffon et du sable fin, et on frotte, on frotte ! Quant à Bec-Long, cet ibis gourmand ne lâche rien… sauf pour un poisson.",
    "initial": "Kallia la bibliothécaire époussette les rouleaux un par un."
   },
@@ -734,6 +738,7 @@
    ],
    "at": "bibliotheque",
    "description": "Un grand oiseau blanc à tête noire, avec un long bec tout courbé.",
+   "persona": "Ne parle qu'en « couic ! » malins, en claquant son long bec courbé. Chapardeur et gourmand, il aime ce qui brille et surtout ce qui se mange. Il nargue le héros du haut de sa statue, sans méchanceté, comme un petit voleur farceur.",
    "says": "Couic ! (Bec-Long regarde tes poches, l'air gourmand. Un ibis, ça raffole du poisson.)",
    "states": [
     {
@@ -758,6 +763,7 @@
    ],
    "at": "rampe",
    "description": "Un petit âne gris aux grandes oreilles. C'est lui qui monte l'huile tout en haut du phare.",
+   "persona": "Ne parle qu'en « hi-han ! », en remuant ses grandes oreilles et en reniflant les poches. Têtu mais doux, il rêve de choses sucrées et de son écurie. Il reste planté devant le héros d'un air buté, puis devient tout gentil quand on le gâte.",
    "says": "Hi-han ! (Pistache renifle tes poches. Il rêve de quelque chose de sucré.)",
    "states": [
     {
@@ -781,6 +787,7 @@
    ],
    "at": "jetee",
    "description": "Un vieux marin au visage tout ridé par le soleil, enroulé dans un manteau de laine.",
+   "persona": "Parle d'une voix rauque de vieux loup de mer, avec des « Ohé, petit ! » et des histoires de vagues. Bourru mais protecteur, il aime la mer et a peur des tempêtes de nuit. Il veille sur le héros comme un vieil oncle et s'inquiète pour le bateau au large.",
    "says": "Ohé, petit ! Surtout, ne va jamais nager dans la mer cette nuit : avec l'orage, les vagues t'emporteraient ! Ce bateau, là-bas, il lui faudrait une lumière pour trouver le port…",
    "initial": "Un vieux marin surveille les vagues, une corde à la main."
   }

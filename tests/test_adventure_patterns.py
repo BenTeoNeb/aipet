@@ -188,3 +188,99 @@ def test_in_the_dark_no_decor_and_burning_a_light_is_no_progress():
     assert st.stalled == 3
     say(w, st, "go", "ouest")
     assert "à_savoir" not in say(w, st, "sing", "un caillou")
+
+
+def test_a_flag_typo_is_reported_and_a_never_flag_is_not():
+    graph, _ = PATTERNS["riddle"]
+    g = json.loads(json.dumps(graph))
+    g["items"][0]["answer"]["effects"] = ["flag:devinette_resolue"]
+    g["actions"][0]["when"].append("flag:devinete_resolue")
+    _, report = check(g)
+    assert any("did you mean devinette_resolue" in x for x in report["warnings"])
+    g["actions"][0]["when"][-1] = "flag:jamais"
+    _, report = check(g)
+    assert not any("did you mean" in x for x in report["warnings"])
+
+
+def test_a_creative_idea_plays_a_ready_step_of_the_game_masters_screen():
+    graph, _ = PATTERNS["recipe_changes_a_thing"]
+    w = World(graph)
+    st = w.start()
+    say(w, st, "go", "est")
+    idea = {"verb": "improvise", "step": "ouvrir_conserve", "object": "conserve"}
+    assert w.act(st, idea)["outcome"] == "free"  # not ready: no can-opener in the bag
+    say(w, st, "go", "ouest")
+    say(w, st, "take", "l'ouvre-boîte")
+    say(w, st, "go", "est")
+    screen = w.describe(st)["écran_mj"]
+    assert [s["étape"] for s in screen] == ["ouvrir_conserve"]
+    assert w.act(st, {"verb": "improvise", "step": "ouvrir_conserve", "object": "chat"})["outcome"] == "free"
+    done = w.act(st, idea)  # « je fais sauter le couvercle avec la pointe de l'ouvre-boîte, comme un pirate »
+    assert done["outcome"] == "done" and w.prop(st, "conserve", "state") == "ouverte" and "SES mots" in done["note"]
+
+
+def test_a_persona_reaches_the_narrator():
+    graph, _ = PATTERNS["companion"]
+    g = json.loads(json.dumps(graph))
+    g["characters"][0]["persona"] = "Grogne doucement, adore les câlins."
+    w = World(g)
+    assert w.describe(w.start())["personas"] == {"Ours": "Grogne doucement, adore les câlins."}
+
+
+def test_the_solver_plays_a_code_only_once_its_clue_is_met():
+    from storyworld import solve
+
+    graph, _ = PATTERNS["code"]
+    g = json.loads(json.dumps(graph))
+    g["start"]["place"] = "b"  # the code's order is drawn on a wall in a
+    w = World(g)
+    path = solve(w)["path"]
+    assert path.index(("go", "a")) < path.index(("press", "lune"))
+    g["puzzles"] = []
+    errors, _ = check(g)
+    assert any("needs its puzzle in `puzzles`, with clue_in" in e for e in errors)
+
+
+def test_the_derived_chart_finds_what_each_puzzle_needs():
+    from storyworld import solve
+    from storyworld.chart import derive
+
+    graph, _ = PATTERNS["recipe_changes_a_thing"]
+    w = World(graph)
+    chart = derive(w, solve(w)["path"])
+    assert chart["needs"] == {"ouvrir_conserve": [], "nourrir_chat": ["ouvrir_conserve"]}
+    assert chart["depth"] == 2 and chart["width"] == 1
+    assert check(graph)[1]["chart"]["puzzles"] == ["ouvrir_conserve", "nourrir_chat"]
+
+
+def test_a_hint_goes_to_the_puzzle_the_child_is_trying():
+    from aipet.games.adventure_patterns import act, adventure, person, place, thing
+
+    g = adventure([place("a", ("b", "est"), ("c", "ouest")), place("b", ("a", "ouest")), place("c", ("a", "est"))],
+                  [thing("pomme", "b"), thing("os", "c"), thing("cle", "", aliases=["clé", "cle"]),
+                   thing("plume", "", aliases=["plume"])],
+                  [person("cheval", "a"), person("chien", "a")],
+                  [act("cheval", [("give", "pomme", "cheval")], ["lose:pomme", "reveal:cle"], ["has:pomme"]),
+                   act("chien", [("give", "os", "chien")], ["lose:os", "reveal:plume"], ["has:os"]),
+                   act("fin", [("combine", "cle", "plume")], ["end:gagne"], ["has:cle", "has:plume"])])  # fmt: skip
+    w = World(g)
+    st = w.start()
+    for _ in range(3):
+        say(w, st, "take", "le chien")  # he keeps trying the dog
+    assert st.tried == ["chien"]
+    st.hint_level = 2
+    assert "c" in w.hint(st, force=True)  # the bone is to the west (c), not the apple to the east
+
+
+def test_taking_the_egg_wakes_the_dragon_once_and_a_reaction_never_loses():
+    graph, _ = PATTERNS["after_take"]
+    w = World(graph)
+    st = w.start()
+    say(w, st, "go", "est")
+    took = say(w, st, "take", "l'œuf")
+    assert took["ensuite"] == ["Le dragon ouvre un œil… puis deux ! « Mon œuf ! »"]
+    assert w.prop(st, "dragon", "state") == "reveille" and "after:take:oeuf" in st.done_actions
+    g = json.loads(json.dumps(graph))
+    g["endings"].append({"id": "mange", "kind": "lose", "text": "Croc."})
+    g["items"][0]["after"]["take"]["effects"].append("end:mange")
+    assert any("a reaction never loses" in e for e in check(g)[0])

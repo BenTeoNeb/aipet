@@ -469,6 +469,7 @@
    ],
    "at": "plage",
    "description": "Une petite Viking aux tresses rousses, avec un casque trop grand pour elle.",
+   "persona": "Parle fort et décidé, les mains sur les hanches, avec des « par Odin ! » en remettant son casque trop grand. Courageuse et un peu cheffe, elle adore son drakkar et veut rentrer au village avant les tempêtes. Elle traite le héros comme son meilleur équipier et le félicite d'une grande tape dans le dos.",
    "initial": "Sigrid t'attend, les mains sur les hanches.",
    "says": [
     {
@@ -494,6 +495,7 @@
    ],
    "at": "cabane",
    "description": "Un vieux Viking à la longue barbe blanche tressée, qui sculpte du bois.",
+   "persona": "Parle d'une voix lente et rieuse, en sculptant son bois, avec des « hé hé, ma mémoire… » quand il cherche ses mots. Malicieux et un peu tête en l'air, il aime les runes, les vieilles histoires et les devinettes. Il est fier du héros comme d'un petit-fils et l'encourage avec tendresse.",
    "says": [
     {
      "when": [
@@ -522,6 +524,7 @@
    ],
    "at": "enclos",
    "description": "Une chèvre grise à barbichette, très grognon, qui mange de tout.",
+   "persona": "Bêle « mèèèh ! » au début et à la fin de ses phrases, en mâchouillant d'un air fâché. La chèvre la plus grognon du Nord, elle mange de tout et adore les bons légumes croquants. Elle est bougonne avec le héros, mais se radoucit vite quand on lui fait plaisir.",
    "initial": "Brunhilde, la chèvre la plus grognon de tout le Nord, est couchée sur une grosse pelote de laine et mâchouille d'un air fâché.",
    "says": "Mèèèh ! Moi, je suis grognon… sauf quand on m'apporte un bon légume tout croquant ! Mèèèh !",
    "states": [
@@ -552,6 +555,7 @@
    ],
    "at": "drakkar",
    "description": "Un grand corbeau tout noir, aux yeux malins.",
+   "persona": "Croasse « croâ ! » entre ses phrases, d'une voix maligne, en penchant la tête de côté. Rusé et fier de savoir toujours où est la terre, il ne fait rien le ventre vide. Il marchande avec le héros d'un air malin, mais c'est un fidèle compagnon de voyage.",
    "initial": "Hugin le corbeau est perché sur la tête de dragon.",
    "says": [
     {

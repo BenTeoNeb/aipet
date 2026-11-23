@@ -298,6 +298,7 @@
    ],
    "at": "cour",
    "description": "Une petite fille avec un tablier plein de suie et des yeux qui pétillent.",
+   "persona": "Parle à toute allure, en trépignant, avec des « vite, vite ! » et des petits cris d'excitation. Pétillante et un peu stressée, elle adore les ballons et les inventions de Monsieur de Montgolfier. Elle traite le héros comme son complice et lui fait de grands sourires pleins de suie.",
    "initial": [
     {
      "when": [
@@ -332,6 +333,7 @@
    ],
    "at": "jardin",
    "description": "Un mouton tout frisé, très gourmand, qui adore le son de sa clochette.",
+   "persona": "Bêle « bêêê ! » à chaque phrase, en mâchonnant, scrountch scrountch. Gourmand et un peu tête en l'air, il adore le son de sa clochette. Il est curieux du héros, mais surtout distrait par tout ce qui se mange autour de lui.",
    "states": [
     {
      "id": "libre",
@@ -354,6 +356,7 @@
    ],
    "at": "jardin",
    "description": "Un coq tout fier, la crête bien droite, très gourmand de grains.",
+   "persona": "Lance un grand « cocorico ! » pour commencer et finir ses phrases, en bombant le torse. Vantard et fier comme tout, il aime les grains et rêve d'être le premier coq dans les nuages. Il fait le malin devant le héros, mais c'est un gentil fanfaron.",
    "states": [
     {
      "id": "libre",
@@ -377,6 +380,7 @@
    ],
    "at": "bassin",
    "description": "Un canard tout blanc qui barbote et fait des ronds dans l'eau.",
+   "persona": "Fait « coin ! coin ! » à chaque phrase et barbote en faisant des ronds dans l'eau. Joyeux et gourmand, il adore la brioche et les amis qui parlent canard. Il est un peu méfiant avec ceux qui ne parlent pas sa langue, et ravi quand on lui répond en canard.",
    "states": [
     {
      "id": "libre",
@@ -406,6 +410,7 @@
    ],
    "at": "bassin",
    "description": "Un monsieur à grosse moustache, avec des bottes et un chapeau tout mouillé.",
+   "persona": "Parle d'une grosse voix moustachue, en essorant son chapeau mouillé, ploc ploc, avec des « Bonjour, petit ! » bien sonores. Bon vivant mais très sérieux avec ses fontaines, il a peur qu'on arrose toute la cour du roi. Il est aimable et de bon conseil avec le héros, tout en gardant un œil sur sa vanne.",
    "initial": "Monsieur Gouttelette, le fontainier, surveille sa vanne : « Surtout, ne touche pas à ma vanne, sinon tout le monde sera arrosé ! »",
    "says": "Bonjour, petit ! Ce canard adore la brioche, va voir aux cuisines. Et il suit tous ceux qui parlent canard : coin-coin ! Et surtout, ne touche pas à ma grande vanne : elle ouvre toutes les fontaines du roi d'un coup, et tout le monde serait arrosé !"
   }

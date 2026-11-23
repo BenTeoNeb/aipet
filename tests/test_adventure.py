@@ -832,7 +832,8 @@ def test_after_the_lost_key_the_sauvegarde_is_before_the_throw(tmp_path):
     game = _draft_game(tmp_path)
     st = game.state
     st.place, st.inventory, st.items_at["cle"] = "pied_phare", ["cle"], "inv"
-    assert game.act([{"verb": "destroy", "object": "la clé"}])["results"][0]["outcome"] == "done"
+    assert game.act([{"verb": "destroy", "object": "la clé"}])["results"][0]["outcome"] == "warning"  # think twice
+    assert game.act([{"verb": "destroy", "object": "la clé"}])["results"][0]["outcome"] == "done"  # he insists
     out = game.act([{"verb": "go", "to": "haut"}])
     assert out["results"][0]["ending"] == "lose" and "from_checkpoint" in out["note"]
     assert game.adventure["checkpoint"]["inventory"] == ["cle"]

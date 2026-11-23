@@ -127,10 +127,53 @@ class Hints:
 
     def __init__(self, world: World) -> None:
         self.w = world
+        self.cache: dict[tuple, list[tuple]] = {}  # a state's way to win, found once (voice latency)
+
+    def way_to_win(self, st: State) -> list[tuple]:
+        from storyworld.solver import _key, solve
+
+        k = _key(st, self.w)
+        if k not in self.cache:
+            if len(self.cache) > 200:
+                self.cache.clear()
+            self.cache[k] = solve(self.w, st, first_path=True, max_states=HINT_STATES).get("path") or []
+        return self.cache[k]
+
+    def towards_tries(self, st: State) -> list[tuple]:
+        """The useful steps towards the puzzle the child is trying (what their last tries were about):
+        the shortest way to a step on those things, if it is on a way to win (InvisiClues answer the
+        question the player has, not the next one on the designer's path)."""
+        from storyworld.solver import _key, _moves
+
+        w = self.w
+        tried = set(st.tried)
+        if not tried:
+            return []
+
+        def about(step: tuple) -> bool:
+            kind, ident = step
+            if kind == "act":
+                return any({r.get("object"), r.get("target")} & tried for r in w.rules if r["id"] == ident)
+            return kind in ("open", "answer") and ident in tried or kind == "press" and w.buttons.get(ident) in tried
+
+        start = State.from_dict(st.to_dict())
+        seen = {_key(start, w)}
+        frontier: list[tuple[State, list[tuple]]] = [(start, [])]
+        while frontier and len(seen) < HINT_STATES // 4:
+            nxt: list[tuple[State, list[tuple]]] = []
+            for s, path in frontier:
+                for step, n in _moves(w, s, reduce=True):
+                    if about(step) and self.way_to_win(n):  # the try leads somewhere that can still win
+                        return useful_steps(w, [*path, step]) or [step]
+                    if (k := _key(n, w)) not in seen and not n.ending:
+                        seen.add(k)
+                        nxt.append((n, [*path, step]))
+            frontier = nxt
+        return []
 
     def nudge(self, st: State) -> dict:
         """After a few tries that lead nowhere: first a reminder of what can be done, then hints."""
-        if st.stalled < self.w.spec["hint_after"]:
+        if st.stalled < self.w.policy["hint_after"]:
             return {}
         if not st.reminded:
             st.reminded, st.stalled = True, 0
@@ -140,13 +183,12 @@ class Hints:
 
     def hint(self, st: State, force: bool = False) -> str:
         """A hint for the next useful step towards a win, stronger each time ("" = none)."""
-        from storyworld.solver import solve  # the solver uses the hints' trigger choice
 
         w = self.w
-        if not force and st.stalled < w.spec["hint_after"]:
+        if not force and st.stalled < w.policy["hint_after"]:
             return ""
         st.stalled = 0  # even without a path: not searched again at every turn
-        path = useful_steps(w, solve(w, st, first_path=True, max_states=HINT_STATES).get("path") or [])
+        path = self.towards_tries(st) or useful_steps(w, self.way_to_win(st))
         if not path:
             return ""
         st.hint_level = min(3, st.hint_level + 1)

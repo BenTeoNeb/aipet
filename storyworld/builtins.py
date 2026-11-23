@@ -7,12 +7,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from storyworld.locale.fr import (
-    BAG,
-    _norm,
-    _norm_keep,
-    _stems,
-)
 from storyworld.model import (
     State,
 )
@@ -128,6 +122,13 @@ class Builtins:
         if x not in st.handled:
             st.handled.append(x)
 
+    def take_for(self, st: State, action: str) -> list[str]:
+        """An action done takes what its triggers hold in hand (each trigger's implicit take), however
+        the child said it: « utiliser l'ouvre-boîte » with the tin on the floor takes the tin too,
+        as the solver does."""
+        return [x for r in self.w.rules if r["id"] == action
+                for x in self.implicit_take(st, r.get("verb", ""), r.get("object"), r.get("target"))]  # fmt: skip
+
     def implicit_take(self, st: State, verb: str, obj: str | None, tgt: str | None) -> list[str]:
         """Giving, using or throwing a thing that lies here takes it first (Inform's implicit taking):
         « je donne l'algue au crabe » with the seaweed at his feet."""
@@ -226,7 +227,12 @@ class Builtins:
                     "question": w.thing(obj)["answer"].get("question", ""),
                     "note": w.say("A riddle: ask the question, and pass the answer with the verb answer.")}  # fmt: skip
         if obj in w.chars:
-            return {"outcome": "done", "says": w.look(obj, st).get("says", "…")}
+            persona = w.look(obj, st).get("persona")
+            return {
+                "outcome": "done",
+                "says": w.look(obj, st).get("says", "…"),
+                **({"persona": persona} if persona else {}),
+            }
         return None
 
     def inventory(self, st: State) -> dict:
@@ -272,8 +278,11 @@ class Builtins:
 
     def right_answer(self, who: str, said: str) -> bool:
         """Is what the child said one of the accepted answers (« un peigne », « c'est le peigne ! »)?"""
-        words = _stems(said)
-        return any(_stems(a) and _stems(a) <= words for a in self.w.thing(who)["answer"].get("accept", []))
+        words = self.w.lang.stems(said)
+        return any(
+            self.w.lang.stems(a) and self.w.lang.stems(a) <= words
+            for a in self.w.thing(who)["answer"].get("accept", [])
+        )
 
     def solve_riddle(self, st: State, who: str) -> dict:
         w = self.w
@@ -305,7 +314,9 @@ class Builtins:
     def bag(self, said: str | None, st: State) -> bool:
         """The hero's own bag (« mon sac », « ma poche »), unless a thing of the adventure is meant (the
         pockets of the coat)."""
-        if not said or (_norm(said) not in BAG and _norm_keep(said) not in BAG):
+        if not said or (
+            self.w.lang.norm(said) not in self.w.lang.bag and self.w.lang.norm_keep(said) not in self.w.lang.bag
+        ):
             return False
         found, amb = self.w.names.find(said, st)
         return not found and not amb
@@ -313,8 +324,8 @@ class Builtins:
     def decor(self, st: State, said: list[str]) -> str:
         """The decor of the place a word names (« un gros caillou » → « cailloux »), or ""."""
         w = self.w
-        words = _stems(" ".join(said))
+        words = self.w.lang.stems(" ".join(said))
         for d in w.places.get(st.place, {}).get("decor", []):
-            if _stems(d) & words:
+            if self.w.lang.stems(d) & words:
                 return w.lang.bare(d)
         return ""

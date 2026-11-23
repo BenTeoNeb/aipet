@@ -46,6 +46,7 @@ NEVER_SCRIPTED = {
     "help",
     "other",
     "where",
+    "improvise",
 }  # built in: scripts can't use them
 # The verb carries little once two things are named (a child over speech recognition: « j'attrape les
 # lucioles avec le bocal » is « remplir le bocal de lucioles »): such an action is found by its things,

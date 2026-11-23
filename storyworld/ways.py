@@ -7,10 +7,6 @@ from __future__ import annotations
 from collections import deque
 from typing import TYPE_CHECKING
 
-from storyworld.locale.fr import (
-    _norm,
-    _way,
-)
 from storyworld.model import (
     State,
 )
@@ -31,14 +27,16 @@ class Ways:
         exits = w.exits(st)
         if not exits:
             return {"outcome": "no_exit", "text": w.say("There's no way out over there.")}
-        words = _way(to)
-        if len(exits) == 1 and (not words or _norm(to) in ("sortir", "dehors", "partir")):
+        words = self.w.lang.way(to)
+        if len(exits) == 1 and (not words or self.w.lang.norm(to) in self.w.lang.leave_words):
             return self.through(st, exits[0])
 
         def names(x: dict) -> list[str]:  # an exit is named by its destination, its label or its direction
             return [x.get("to", ""), x.get("label", ""), x.get("dir", ""), *w.names.labels(x.get("to", ""))]
 
-        scored = [(int(to == x.get("to") or any(lw and lw == words for lw in map(_way, names(x)))), x) for x in exits]
+        scored = [
+            (int(to == x.get("to") or any(lw and lw == words for lw in map(w.lang.way, names(x)))), x) for x in exits
+        ]
         top = max(sc for sc, _ in scored)
         if not top:  # « chez la taupe », « vers le levier »: where someone or something is
             return self._towards(st, to, words, exits)

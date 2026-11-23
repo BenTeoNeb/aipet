@@ -27,18 +27,19 @@ from storyworld.locale import Language
 from storyworld.locale.fr import FRENCH
 from storyworld.model import SITUATED, State, _all_conditions, _normalized, exit_rules, migrate
 from storyworld.names import Names
-from storyworld.profiles import DIFFICULTIES
 from storyworld.rules import args_of, of_kind, parse_all
 from storyworld.turn import Turn
 from storyworld.verbs import STUCK
 from storyworld.view import View
 from storyworld.ways import Ways
 
+HINT_AFTER = 3  # tries that lead nowhere before a reminder, then hints (when no policy says)
+
 
 class World:
     """An adventure: what is true in a state, and what is around the hero (see the module)."""
 
-    def __init__(self, graph: dict, lang: Language | None = None):
+    def __init__(self, graph: dict, lang: Language | None = None, policy: dict | None = None):
         self.names = Names(self)
         self.scripts = Actions(self)  # `actions` is the author's list
         self.builtins = Builtins(self)
@@ -67,7 +68,8 @@ class World:
                       for a in self.actions for t in (a.get("triggers") or [{}])]  # fmt: skip
         self.endings = {e["id"]: e for e in graph.get("endings", [])}
         self.difficulty = graph.get("difficulty", "facile")
-        self.spec = DIFFICULTIES.get(self.difficulty, DIFFICULTIES["facile"])
+        # An application's policy (`profiles.py` has the pet's): only `hint_after` is read while playing.
+        self.policy = {"hint_after": HINT_AFTER, **(policy or {})}
         self.uses_visited = any(r.kind == "visited" for t in _all_conditions(graph) for r in parse_all([t]))
         self.doors: dict[str, list[str]] = {}  # place → the doors of its exits (seen from both sides)
         for p in self.places.values():
@@ -75,14 +77,27 @@ class World:
                 if x.get("door") in self.items:
                     self.doors.setdefault(p["id"], []).append(x["door"])
         rules = [r for a in self.actions for r in a.get("when", [])]
+        rules += [r for i in self.items.values() if isinstance(i.get("light"), list) for r in i["light"]]
         rules += [r for p in self.places.values() for x in p.get("exits", []) for r in exit_rules(x)]
-        effects = [a.get("effects") for a in self.actions] + [
-            self.thing(r)["answer"].get("effects") for r in self.riddles
-        ]
+        # Reactions after a built-in step (`after`), as written: {(take|open|enter, id): reaction}.
+        self.reactions = {(k, t["id"]): r for t in [*self.items.values(), *self.places.values()]
+                          if isinstance(t.get("after"), dict) for k, r in t["after"].items() if isinstance(r, dict)}  # fmt: skip
+        effects = (
+            [a.get("effects") for a in self.actions]
+            + [self.thing(r)["answer"].get("effects") for r in self.riddles]
+            + [r.get("effects") for r in self.reactions.values()]
+        )
         self.settable = {f for e in effects for f in args_of(e, "flag")}
         self.idempotent_ids = {a["id"] for a in self.actions if self.idempotent(a)}
         self.eager_ok = self._eager_ok(rules)
         self.lights = [i for i, it in self.items.items() if it.get("light")]
+        # What a child must have met to know a code or a riddle's answer (Gilbert's information
+        # dependencies): the clue of its puzzle. The solver plays them only once it is known.
+        chart: dict[str, str] = {str(z.get("action")): z["clue_in"] for z in graph.get("puzzles", [])
+                                 if isinstance(z, dict) and isinstance(z.get("clue_in"), str)}  # fmt: skip
+        gated = [i for i, it in self.items.items() if it.get("code")] + self.riddles
+        self.clue_of: dict[str, str] = {x: chart[x] for x in gated if chart.get(x)}
+        self.clues = set(self.clue_of.values())
 
     @staticmethod
     def _needs_a_use(a: dict) -> dict:
@@ -118,6 +133,7 @@ class World:
         hidden, in a world where the hero can always walk back (every exit has a way back that needs
         no object, and nothing teleports or closes again)."""
         effects = [e for a in self.actions for e in a.get("effects", [])]
+        effects += [e for r in self.reactions.values() for e in r.get("effects") or []]
         if of_kind(effects, "goto"):
             return set()
         every = [r for p in self.places.values() for x in p.get("exits", []) for r in exit_rules(x)]
@@ -130,7 +146,9 @@ class World:
                 known = set(exit_rules(x)) | sure[p["id"]]  # flags never unset: still true on the way back
                 if not any(set(exit_rules(b)) <= known for b in back):
                     return set()
-        return set(self.items) - args_of(rules, "has", negated=True) - self._maybe_in_the_dark()
+        reacting = {i for k, i in self.reactions if k == "take"}  # taking it changes the world: not first
+        rules += [r for x in self.reactions.values() for r in x.get("when") or []]
+        return set(self.items) - args_of(rules, "has", negated=True) - self._maybe_in_the_dark() - reacting
 
     def _maybe_in_the_dark(self) -> set[str]:
         """Items that may lie in a dark place: seen there by a light, they may be unseen later (the
@@ -204,6 +222,15 @@ class World:
         return self.thing(ident).get(key, "" if key == "state" else False)
 
     def set_prop(self, st: State, ident: str, key: str, value):
+        """Change a property; set back to what is written, it is forgotten (one state, one key)."""
+        written = self.thing(ident).get(key, "" if key == "state" else False)
+        if key == "uses":
+            written = self.max_uses(ident)
+        if value == written and type(value) is type(written) or key == "pressed" and not value:
+            st.props.get(ident, {}).pop(key, None)
+            if not st.props.get(ident, True):
+                del st.props[ident]
+            return
         st.props.setdefault(ident, {})[key] = value
 
     def look(self, ident: str, st: State | None = None) -> dict:
@@ -245,7 +272,43 @@ class World:
         st.chars_at = {c: ch.get("at", "") for c, ch in self.chars.items()}
         st.visited = [st.place]
         st.seen = [] if self.dark(st) else [st.place]
+        self.learn(st)
         return st
+
+    def learn(self, st: State) -> None:
+        """Clues met: a place seen lit, a thing or someone in reach (the drawing in the sand, the
+        character who asks). Once met, known for good."""
+        if not self.clues:
+            return
+        around = set(self.scope(st)) - ({st.place} if self.dark(st) else set())
+        for c in sorted(self.clues & around - set(st.known)):
+            st.known.append(c)
+
+    def react(self, before: State, st: State) -> tuple[list[str], list[str]]:
+        """What the world does after a built-in step (Inform's « after » rules): taking a thing, opening
+        it, entering a place may have a reaction (`after: {take|open|enter: {when, effects, text}}`),
+        once. Played by the turn and by the solver alike, on what changed. Returns (texts, changes)."""
+        happened = [("take", i) for i in st.inventory if i not in before.inventory]
+        happened += [("open", i) for i in self.items if self.prop(st, i, "open") and not self.prop(before, i, "open")]
+        if st.place != before.place:
+            happened.append(("enter", st.place))
+        texts: list[str] = []
+        changes: list[str] = []
+        for kind, ident in happened:
+            r = self.reactions.get((kind, ident))
+            mark = f"after:{kind}:{ident}"
+            if not isinstance(r, dict) or mark in st.done_actions or not self.holds(st, r.get("when")):
+                continue
+            st.done_actions.append(mark)
+            changes += self.apply(st, r.get("effects") or [])
+            if r.get("text"):
+                texts.append(r["text"])
+        return texts, changes
+
+    def knows(self, st: State, puzzle: str) -> bool:
+        """Has the hero met what tells the code or the answer (no clue written: yes)?"""
+        clue = self.clue_of.get(puzzle)
+        return not clue or clue in st.known
 
     # ------------------------------------------------------------ conditions / effects
     def holds(self, st: State, rules: list[str] | None) -> bool:
@@ -332,7 +395,7 @@ class World:
     def uses_left(self, st: State, ident: str) -> int:
         """How many times it can still be used (a watering can, a lantern's oil); 0 when it has no uses."""
         n = st.props.get(ident, {}).get("uses")
-        return n if isinstance(n, int) else self.max_uses(ident)
+        return n if isinstance(n, int) and not isinstance(n, bool) else self.max_uses(ident)
 
     def spend(self, st: State, ident: str) -> list[str]:
         """One use less; what changed, in words (empty: its `texts.empty`)."""

@@ -508,7 +508,7 @@ def describe(graph: dict, source: str, records: list[dict], games: list[dict]) -
         "report": {
             k: (sorted(v) if isinstance(v, set) else v)
             for k, v in report.items()
-            if k in ("wins", "loses", "states", "complete", "shortest", "puzzles", "warnings")
+            if k in ("wins", "loses", "states", "complete", "shortest", "puzzles", "warnings", "chart")
         },  # fmt: skip
         "explore": ex,
         "roads": roads,

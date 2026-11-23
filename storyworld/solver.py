@@ -20,9 +20,18 @@ MAX_STATES = 60_000  # a bigger adventure is refused (« too big to check »)
 
 
 # ---- solver -------------------------------------------------------------------------------------
-def _moves(w: World, st: State, reduce: bool):
-    """Every useful thing the hero can do from `st`: (step, next state). With `reduce`, an object
-    that can safely be taken is taken first, without exploring the other orders."""
+def _moves(w: World, st: State, reduce: bool, fair: bool = True):
+    """Every useful thing the hero can do from `st`: (step, next state), with the clues met there.
+    With `reduce`, an object that can safely be taken is taken first, without exploring the other
+    orders. `fair`: a code or a riddle is played only once its clue is known (a child doesn't know
+    the answer before meeting it)."""
+    for step, n in _all_moves(w, st, reduce, fair):
+        w.react(st, n)
+        w.learn(n)
+        yield step, n
+
+
+def _all_moves(w: World, st: State, reduce: bool, fair: bool):
     takeable = [i for i in w.visible_items(st) if w.items[i].get("takeable", True)]
     eager = [i for i in takeable if i in w.eager_ok] if reduce else []
     for i in eager[:1] or takeable:
@@ -55,11 +64,14 @@ def _moves(w: World, st: State, reduce: bool):
             yield ("open", i), n
     for b in w.visible_items(st):  # the next button of a code (a wrong one only starts it again)
         box = w.buttons.get(b)
-        if box and not w.prop(st, box, "open") and w.items[box]["code"]["press"][w.prop(st, box, "pressed") or 0] == b:
+        if (box and not w.prop(st, box, "open") and (not fair or w.knows(st, box))
+                and w.items[box]["code"]["press"][w.prop(st, box, "pressed") or 0] == b):  # fmt: skip
             n = State.from_dict(st.to_dict())
             w.press(n, b)
             yield ("press", b), n
     for r in w.riddles_here(st):  # the right answer (a wrong one changes nothing)
+        if fair and not w.knows(st, r):
+            continue
         n = State.from_dict(st.to_dict())
         w.solve_riddle(n, r)
         yield ("answer", r), n
@@ -76,8 +88,7 @@ def _moves(w: World, st: State, reduce: bool):
             continue
         tried.add(a["id"])
         n = State.from_dict(st.to_dict())
-        t = _trigger_for(w, a["id"], st)  # the words a narrator sends (`intent_for`): the turn takes what they name
-        w.builtins.implicit_take(n, t.get("verb", ""), t.get("object"), t.get("target"))
+        w.builtins.take_for(n, a["id"])  # what the turn takes when it does the action, however it is said
         w.apply(n, a.get("effects", []))
         n.done_actions.append(a["id"])
         yield ("act", a["id"]), n
@@ -87,7 +98,7 @@ def _key(st: State, w: World) -> tuple:
     """Done actions matter only when doing them again would change something (gains, losses); the
     others are skipped once their effects hold (`World.achieved`), whichever variant did it."""
     done = frozenset(a for a in st.done_actions if a not in w.idempotent_ids)
-    return (*st.key(), done, frozenset(st.visited) if w.uses_visited else None)
+    return (*st.key(), done, frozenset(st.visited) if w.uses_visited else None, frozenset(st.known))
 
 
 def solve(w: World, start: State | None = None, first_path: bool = False, max_states: int = MAX_STATES) -> dict:
