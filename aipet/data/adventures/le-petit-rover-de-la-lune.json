@@ -1,1214 +1,1237 @@
 {
-  "title": "Le petit rover de la Lune",
-  "difficulty": "difficile",
-  "intro": "Juillet 1969 : pour la première fois, des humains marchent sur la Lune, et toute la Terre regarde la télévision ! Tout près, ton petit module, la Libellule, vient de se poser avec la capitaine Lou et Bip, le petit robot rover. Mais votre antenne de télé est repliée : sur Terre, l'écran reste tout gris…",
-  "goal": "Montrer la Lune aux gens de la Terre à la télévision, ou rapporter un trésor de la Lune.",
-  "tags": [
-    "espace",
-    "lune",
-    "fusee",
-    "astronaute",
-    "robot",
-    "rover",
-    "etoiles",
-    "1969"
-  ],
-  "fact": "Le 21 juillet 1969, à l'heure française, des humains ont marché sur la Lune pour la première fois : des millions de gens l'ont regardé à la télé, et les astronautes ont rapporté des pierres de Lune !",
-  "start": {
-    "place": "cabine",
-    "inventory": []
+ "title": "Le petit rover de la Lune",
+ "difficulty": "difficile",
+ "intro": "Juillet 1969 : pour la première fois, des humains marchent sur la Lune, et toute la Terre regarde la télévision ! Tout près, ton petit module, la Libellule, vient de se poser avec la capitaine Lou et Bip, le petit robot rover. Mais votre antenne de télé est repliée : sur Terre, l'écran reste tout gris…",
+ "goal": "Montrer la Lune aux gens de la Terre à la télévision, ou rapporter un trésor de la Lune.",
+ "tags": [
+  "espace",
+  "lune",
+  "fusee",
+  "astronaute",
+  "robot",
+  "rover",
+  "etoiles",
+  "1969"
+ ],
+ "fact": "Le 21 juillet 1969, à l'heure française, des humains ont marché sur la Lune pour la première fois : des millions de gens l'ont regardé à la télé, et les astronautes ont rapporté des pierres de Lune !",
+ "start": {
+  "place": "cabine",
+  "inventory": []
+ },
+ "places": [
+  {
+   "id": "cabine",
+   "name": "la cabine du module",
+   "aliases": [
+    "cabine",
+    "module",
+    "libellule",
+    "vaisseau"
+   ],
+   "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent de toutes les couleurs. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre !",
+   "exits": [
+    {
+     "to": "echelle",
+     "label": "la trappe",
+     "dir": "dehors",
+     "when": [
+      "flag:trappe_ouverte"
+     ],
+     "blocked": "La trappe est fermée. Et on ne sort jamais sans son casque !"
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "flag:trappe_ouverte"
+     ],
+     "text": "La trappe est ouverte sur la Lune toute grise.",
+     "else": "La trappe de sortie est fermée."
+    }
+   ],
+   "decor": [
+    "hublot",
+    "sièges",
+    "câbles",
+    "manettes",
+    "écran radar"
+   ]
   },
-  "places": [
+  {
+   "id": "echelle",
+   "name": "le pied de l'échelle",
+   "aliases": [
+    "echelle",
+    "pied de l'echelle",
+    "pied du module",
+    "dehors"
+   ],
+   "description": "Au pied de l'échelle, la poussière de Lune est toute douce, pouf ! Tes traces de pas vont rester là très longtemps.",
+   "exits": [
     {
-      "id": "cabine",
-      "name": "la cabine du module",
-      "aliases": [
-        "cabine",
-        "module",
-        "libellule",
-        "vaisseau"
-      ],
-      "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Un casque de scaphandre est accroché au mur, à côté d'une batterie de rechange. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe de sortie est fermée.",
-      "variants": [
-        {
-          "when": [
-            "!has:casque",
-            "!flag:casque_mis",
-            "has:batterie",
-            "!flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Un casque de scaphandre est accroché au mur. Le crochet de la batterie est vide. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe de sortie est fermée."
-        },
-        {
-          "when": [
-            "!has:casque",
-            "!flag:casque_mis",
-            "flag:treuil",
-            "!flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Un casque de scaphandre est accroché au mur. Le crochet de la batterie est vide. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe de sortie est fermée."
-        },
-        {
-          "when": [
-            "!has:casque",
-            "!flag:casque_mis",
-            "flag:camera_ok",
-            "!flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Un casque de scaphandre est accroché au mur. Le crochet de la batterie est vide. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe de sortie est fermée."
-        },
-        {
-          "when": [
-            "has:casque",
-            "!has:batterie",
-            "!flag:treuil",
-            "!flag:camera_ok",
-            "!flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, une batterie de rechange attend à côté d'un crochet vide. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe de sortie est fermée."
-        },
-        {
-          "when": [
-            "flag:casque_mis",
-            "!has:batterie",
-            "!flag:treuil",
-            "!flag:camera_ok",
-            "!flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, une batterie de rechange attend à côté d'un crochet vide. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe de sortie est fermée."
-        },
-        {
-          "when": [
-            "has:casque",
-            "!has:batterie",
-            "!flag:treuil",
-            "!flag:camera_ok",
-            "flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, une batterie de rechange attend à côté d'un crochet vide. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe est ouverte sur la Lune toute grise."
-        },
-        {
-          "when": [
-            "flag:casque_mis",
-            "!has:batterie",
-            "!flag:treuil",
-            "!flag:camera_ok",
-            "flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, une batterie de rechange attend à côté d'un crochet vide. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe est ouverte sur la Lune toute grise."
-        },
-        {
-          "when": [
-            "has:casque",
-            "has:batterie",
-            "!flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, les crochets du matériel sont vides. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe de sortie est fermée."
-        },
-        {
-          "when": [
-            "has:casque",
-            "flag:treuil",
-            "!flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, les crochets du matériel sont vides. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe de sortie est fermée."
-        },
-        {
-          "when": [
-            "has:casque",
-            "flag:camera_ok",
-            "!flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, les crochets du matériel sont vides. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe de sortie est fermée."
-        },
-        {
-          "when": [
-            "flag:casque_mis",
-            "has:batterie",
-            "!flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, les crochets du matériel sont vides. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe de sortie est fermée."
-        },
-        {
-          "when": [
-            "flag:casque_mis",
-            "flag:treuil",
-            "!flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, les crochets du matériel sont vides. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe de sortie est fermée."
-        },
-        {
-          "when": [
-            "flag:casque_mis",
-            "flag:camera_ok",
-            "!flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, les crochets du matériel sont vides. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe de sortie est fermée."
-        },
-        {
-          "when": [
-            "has:casque",
-            "has:batterie",
-            "flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, les crochets du matériel sont vides. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe est ouverte sur la Lune toute grise."
-        },
-        {
-          "when": [
-            "has:casque",
-            "flag:treuil",
-            "flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, les crochets du matériel sont vides. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe est ouverte sur la Lune toute grise."
-        },
-        {
-          "when": [
-            "has:casque",
-            "flag:camera_ok",
-            "flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, les crochets du matériel sont vides. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe est ouverte sur la Lune toute grise."
-        },
-        {
-          "when": [
-            "flag:casque_mis",
-            "has:batterie",
-            "flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, les crochets du matériel sont vides. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe est ouverte sur la Lune toute grise."
-        },
-        {
-          "when": [
-            "flag:casque_mis",
-            "flag:treuil",
-            "flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, les crochets du matériel sont vides. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe est ouverte sur la Lune toute grise."
-        },
-        {
-          "when": [
-            "flag:casque_mis",
-            "flag:camera_ok",
-            "flag:trappe_ouverte"
-          ],
-          "description": "La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent, bip, bip. La capitaine Lou regarde par le hublot. Au mur, les crochets du matériel sont vides. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe est ouverte sur la Lune toute grise."
-        }
-      ],
-      "exits": [
-        {
-          "to": "echelle",
-          "label": "la trappe",
-          "dir": "dehors",
-          "when": [
-            "flag:trappe_ouverte"
-          ],
-          "blocked": "La trappe est fermée. Et on ne sort jamais sans son casque !"
-        }
-      ]
+     "to": "cabine",
+     "label": "monter dans le module",
+     "dir": "haut"
     },
     {
-      "id": "echelle",
-      "name": "le pied de l'échelle",
-      "aliases": [
-        "echelle",
-        "pied de l'echelle",
-        "pied du module",
-        "dehors"
-      ],
-      "description": "Au pied de l'échelle, la poussière de Lune est toute douce, pouf ! Tes traces de pas vont rester là très longtemps. Bip, le petit rover à six roues, a les roues enfoncées dans la poussière. Sur le flanc du module, une soute est fermée.",
-      "variants": [
-        {
-          "when": [
-            "!flag:bip_libre",
-            "flag:soute_ouverte"
-          ],
-          "description": "Au pied de l'échelle, la poussière de Lune est toute douce, pouf ! Tes traces de pas vont rester là très longtemps. Bip, le petit rover à six roues, a les roues enfoncées dans la poussière. Sur le flanc du module, la soute est grande ouverte."
-        },
-        {
-          "when": [
-            "flag:bip_libre",
-            "!flag:treuil",
-            "!flag:soute_ouverte"
-          ],
-          "description": "Au pied de l'échelle, la poussière de Lune est toute douce, pouf ! Tes traces de pas vont rester là très longtemps. Bip, le petit rover à six roues, tourne en rond, tout content d'être libre. Sur le flanc du module, une soute est fermée."
-        },
-        {
-          "when": [
-            "flag:bip_libre",
-            "!flag:treuil",
-            "flag:soute_ouverte"
-          ],
-          "description": "Au pied de l'échelle, la poussière de Lune est toute douce, pouf ! Tes traces de pas vont rester là très longtemps. Bip, le petit rover à six roues, tourne en rond, tout content d'être libre. Sur le flanc du module, la soute est grande ouverte."
-        },
-        {
-          "when": [
-            "flag:treuil",
-            "!flag:soute_ouverte"
-          ],
-          "description": "Au pied de l'échelle, la poussière de Lune est toute douce, pouf ! Tes traces de pas vont rester là très longtemps. Les traces de Bip partent vers la plaine. Sur le flanc du module, une soute est fermée."
-        },
-        {
-          "when": [
-            "flag:treuil",
-            "flag:soute_ouverte"
-          ],
-          "description": "Au pied de l'échelle, la poussière de Lune est toute douce, pouf ! Tes traces de pas vont rester là très longtemps. Les traces de Bip partent vers la plaine. Sur le flanc du module, la soute est grande ouverte."
-        }
-      ],
-      "exits": [
-        {
-          "to": "cabine",
-          "label": "monter dans le module",
-          "dir": "haut"
-        },
-        {
-          "to": "plaine",
-          "label": "vers la grande plaine",
-          "dir": "est"
-        },
-        {
-          "to": "rocher",
-          "label": "vers le gros rocher",
-          "dir": "nord"
-        }
-      ]
+     "to": "plaine",
+     "label": "vers la grande plaine",
+     "dir": "est"
     },
     {
-      "id": "plaine",
-      "name": "la mer de la Tranquillité",
-      "aliases": [
-        "mer de la tranquillite",
-        "plaine",
-        "grande plaine"
-      ],
-      "description": "Une immense plaine grise et plate : c'est la mer de la Tranquillité… une mer sans une goutte d'eau ! Le sol est parfait pour planter quelque chose. Au nord, l'antenne et la caméra de télé ; à l'est, le bord d'un cratère.",
-      "variants": [
-        {
-          "when": [
-            "flag:drapeau_plante"
-          ],
-          "description": "Une immense plaine grise et plate : la mer de la Tranquillité. Ton drapeau est planté au milieu, tout fier. Au nord, l'antenne et la caméra de télé ; à l'est, le bord d'un cratère."
-        }
-      ],
-      "exits": [
-        {
-          "to": "echelle",
-          "label": "vers le module",
-          "dir": "ouest"
-        },
-        {
-          "to": "antenne_coin",
-          "label": "vers l'antenne",
-          "dir": "nord"
-        },
-        {
-          "to": "bord",
-          "label": "vers le cratère",
-          "dir": "est"
-        }
-      ]
-    },
-    {
-      "id": "antenne_coin",
-      "name": "le coin de l'antenne",
-      "aliases": [
-        "coin de l'antenne",
-        "antenne de tele"
-      ],
-      "description": "Ici, la grande antenne en forme de parapluie est toute repliée, et son câble pendouille, coupé net. À côté, la caméra de télé est tournée vers la plaine. Son compartiment à batterie est vide. Sur le côté de la caméra, un bouton marqué « Marche ».",
-      "exits": [
-        {
-          "to": "plaine",
-          "label": "vers la grande plaine",
-          "dir": "sud"
-        }
-      ],
-      "variants": [
-        {
-          "when": [
-            "!flag:antenne_depliee",
-            "flag:camera_ok"
-          ],
-          "description": "Ici, la grande antenne en forme de parapluie est toute repliée, et son câble pendouille, coupé net. À côté, la caméra de télé est tournée vers la plaine, et une petite lumière verte brille sur le côté : elle est prête ! Sur le côté de la caméra, un bouton marqué « Marche »."
-        },
-        {
-          "when": [
-            "flag:antenne_depliee",
-            "!flag:antenne_ok",
-            "!flag:camera_ok"
-          ],
-          "description": "Ici, la grande antenne est dépliée comme un parapluie, mais son câble pendouille, coupé net. À côté, la caméra de télé est tournée vers la plaine. Son compartiment à batterie est vide. Sur le côté de la caméra, un bouton marqué « Marche »."
-        },
-        {
-          "when": [
-            "flag:antenne_depliee",
-            "!flag:antenne_ok",
-            "flag:camera_ok"
-          ],
-          "description": "Ici, la grande antenne est dépliée comme un parapluie, mais son câble pendouille, coupé net. À côté, la caméra de télé est tournée vers la plaine, et une petite lumière verte brille sur le côté : elle est prête ! Sur le côté de la caméra, un bouton marqué « Marche »."
-        },
-        {
-          "when": [
-            "flag:antenne_ok",
-            "!flag:camera_ok"
-          ],
-          "description": "Ici, la grande antenne est dépliée comme un parapluie, et son câble est bien réparé. À côté, la caméra de télé est tournée vers la plaine. Son compartiment à batterie est vide. Sur le côté de la caméra, un bouton marqué « Marche »."
-        },
-        {
-          "when": [
-            "flag:antenne_ok",
-            "flag:camera_ok"
-          ],
-          "description": "Ici, la grande antenne est dépliée comme un parapluie, et son câble est bien réparé. À côté, la caméra de télé est tournée vers la plaine, et une petite lumière verte brille sur le côté : elle est prête ! Sur le côté de la caméra, un bouton marqué « Marche »."
-        }
-      ]
-    },
-    {
-      "id": "rocher",
-      "name": "le gros rocher",
-      "aliases": [
-        "rocher",
-        "gros rocher",
-        "colline"
-      ],
-      "description": "Un rocher grand comme une maison. Dans le ciel tout noir, la Terre brille, bleue et blanche, comme une bille. Tout autour, des traces de petites roues, et un tas de poussière au pied du rocher, avec quelque chose d'enfoui dedans. Attention : la capitaine Lou l'a dit, jamais de grand saut du haut du rocher !",
-      "exits": [
-        {
-          "to": "echelle",
-          "label": "vers le module",
-          "dir": "sud"
-        }
-      ],
-      "variants": [
-        {
-          "when": [
-            "flag:ruban_trouve"
-          ],
-          "description": "Un rocher grand comme une maison. Dans le ciel tout noir, la Terre brille, bleue et blanche, comme une bille. Au pied du rocher, le tas de poussière est tout éparpillé. Attention : la capitaine Lou l'a dit, jamais de grand saut du haut du rocher !"
-        }
-      ]
-    },
-    {
-      "id": "bord",
-      "name": "le bord du cratère",
-      "aliases": [
-        "bord du cratere",
-        "bord",
-        "cratere"
-      ],
-      "description": "Le bord d'un grand cratère tout rond, comme si un géant avait posé son doigt dans la Lune. La pente est raide et glissante. Tout au fond, quelque chose scintille.",
-      "variants": [
-        {
-          "when": [
-            "flag:treuil"
-          ],
-          "description": "Le bord d'un grand cratère tout rond. Bip est garé tout au bord, et le câble de son treuil descend jusqu'au fond, où quelque chose scintille."
-        },
-        {
-          "when": [
-            "flag:treuil",
-            "has:pierre"
-          ],
-          "description": "Le bord d'un grand cratère tout rond. Bip est garé tout au bord, et le câble de son treuil descend jusqu'au fond du cratère."
-        }
-      ],
-      "exits": [
-        {
-          "to": "plaine",
-          "label": "vers la grande plaine",
-          "dir": "ouest"
-        },
-        {
-          "to": "fond",
-          "label": "descendre dans le cratère",
-          "dir": "bas",
-          "when": [
-            "flag:treuil"
-          ],
-          "blocked": "La pente est trop glissante : tu descendrais comme sur un toboggan… mais tu ne pourrais plus remonter ! Il faudrait quelqu'un pour te tenir avec un câble."
-        }
-      ]
-    },
-    {
-      "id": "fond",
-      "name": "le fond du cratère",
-      "aliases": [
-        "fond du cratere",
-        "fond",
-        "trou"
-      ],
-      "description": "Au fond du cratère, des cailloux gris partout. Et là, coincée tout au fond d'une fente, une pierre qui brille d'un éclat bleuté !",
-      "exits": [
-        {
-          "to": "bord",
-          "label": "remonter avec le câble de Bip",
-          "dir": "haut"
-        }
-      ],
-      "variants": [
-        {
-          "when": [
-            "has:pierre"
-          ],
-          "description": "Au fond du cratère, des cailloux gris partout, et une fente étroite, toute vide maintenant : la pierre bleue est dans ton sac !"
-        }
-      ]
+     "to": "rocher",
+     "label": "vers le gros rocher",
+     "dir": "nord"
     }
-  ],
-  "items": [
+   ],
+   "details": [
     {
-      "id": "casque",
-      "name": "un casque de scaphandre",
-      "aliases": [
-        "casque",
-        "scaphandre",
-        "casque d'astronaute"
-      ],
-      "at": "cabine",
-      "takeable": true,
-      "description": "Un grand casque tout rond, avec une vitre dorée pour se protéger du soleil."
+     "when": [
+      "open:soute"
+     ],
+     "text": "Sur le flanc du module, la soute est grande ouverte.",
+     "else": "Sur le flanc du module, une soute est fermée."
     },
     {
-      "id": "batterie",
-      "name": "une batterie de rechange",
-      "aliases": [
-        "batterie",
-        "pile",
-        "batterie de rechange"
-      ],
-      "at": "cabine",
-      "takeable": true,
-      "description": "Une grosse batterie, bien chargée. Il n'y en a qu'une : la caméra en a besoin, et Bip aussi !"
-    },
-    {
-      "id": "gros_bouton_rouge",
-      "name": "le gros bouton rouge",
-      "aliases": [
-        "bouton rouge",
-        "gros bouton",
-        "gros bouton rouge",
-        "bouton d'alarme",
-        "alarme"
-      ],
-      "at": "cabine",
-      "takeable": false,
-      "fixed": "Il est vissé dans le tableau de bord !",
-      "description": "Un gros bouton rouge. Dessous, c'est écrit : « Alarme : retour immédiat sur Terre ». La capitaine Lou a dit de ne jamais y toucher !"
-    },
-    {
-      "id": "boutons",
-      "name": "les petits boutons qui clignotent",
-      "aliases": [
-        "bouton",
-        "boutons",
-        "petits boutons",
-        "tableau de bord",
-        "tableau"
-      ],
-      "at": "cabine",
-      "takeable": false,
-      "fixed": "Ils sont fixés dans le tableau de bord !",
-      "description": "Des dizaines de petits boutons qui clignotent, bip, bip : ils surveillent l'air, la chaleur et la radio du module."
-    },
-    {
-      "id": "trappe",
-      "name": "la trappe",
-      "aliases": [
-        "trappe",
-        "porte",
-        "sortie",
-        "trappe de sortie"
-      ],
-      "at": "cabine",
-      "takeable": false,
-      "fixed": "Une trappe, ça reste sur le module, sinon gare aux courants d'air !",
-      "description": "Une trappe ronde, avec une grosse poignée."
-    },
-    {
-      "id": "soute",
-      "name": "la soute",
-      "aliases": [
-        "soute",
-        "coffre",
-        "casier",
-        "boite"
-      ],
-      "at": "echelle",
-      "takeable": false,
-      "fixed": "Elle est fixée au module avec de gros boulons.",
-      "description": "Une soute en métal brillant, sur le côté du module. Elle est fermée par un loquet."
-    },
-    {
-      "id": "drapeau",
-      "name": "un drapeau plié",
-      "aliases": [
-        "drapeau",
-        "drapeau plie"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Un drapeau tout plié. Pour qu'il tienne debout, il lui faudrait un mât."
-    },
-    {
-      "id": "mat",
-      "name": "un mât en métal",
-      "aliases": [
-        "mat",
-        "mat du drapeau",
-        "poteau",
-        "tige"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Un long mât en métal, léger comme tout ici, avec un petit crochet en haut."
-    },
-    {
-      "id": "pince",
-      "name": "une petite pince",
-      "aliases": [
-        "pince",
-        "pincette",
-        "petite pince"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Une pince à cailloux pour les astronautes. Elle est un peu courte…"
-    },
-    {
-      "id": "manche",
-      "name": "un manche télescopique",
-      "aliases": [
-        "manche",
-        "rallonge",
-        "baton telescopique",
-        "manche telescopique"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Un manche qui s'allonge, clic, clic, clic ! On peut y fixer un outil au bout."
-    },
-    {
-      "id": "drapeau_mat",
-      "name": "le drapeau sur son mât",
-      "aliases": [
-        "drapeau",
-        "drapeau sur son mat"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Le drapeau accroché à son mât, prêt à être planté."
-    },
-    {
-      "id": "longue_pince",
-      "name": "une longue pince",
-      "aliases": [
-        "pince",
-        "longue pince"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "La pince au bout du manche télescopique : elle attrape tout, même au fond d'un trou !"
-    },
-    {
-      "id": "poussiere",
-      "name": "le tas de poussière",
-      "aliases": [
-        "poussiere",
-        "tas",
-        "tas de poussiere"
-      ],
-      "at": "rocher",
-      "takeable": false,
-      "fixed": "La poussière file entre tes gants, pfff !",
-      "description": "Un petit tas de poussière grise, au pied du rocher."
-    },
-    {
-      "id": "ruban",
-      "name": "un rouleau de ruban adhésif",
-      "aliases": [
-        "ruban",
-        "scotch",
-        "ruban adhesif",
-        "rouleau",
-        "adhesif"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Un gros rouleau de ruban adhésif gris. Avec ça, on répare tout !"
-    },
-    {
-      "id": "antenne",
-      "name": "la grande antenne",
-      "aliases": [
-        "antenne",
-        "grande antenne",
-        "parapluie",
-        "cable",
-        "fil"
-      ],
-      "at": "antenne_coin",
-      "takeable": false,
-      "fixed": "Elle est fixée sur son pied, et elle est bien trop grande !",
-      "description": "Une antenne en forme de parapluie, pour envoyer les images de la caméra jusqu'à la Terre."
-    },
-    {
-      "id": "camera",
-      "name": "la caméra de télé",
-      "aliases": [
-        "camera",
-        "camera de tele",
-        "tele",
-        "television"
-      ],
-      "at": "antenne_coin",
-      "takeable": false,
-      "fixed": "Elle est vissée sur son trépied, et bien tournée vers la plaine !",
-      "description": "Une caméra de télé sur trois pieds, tournée vers la plaine. Sur le côté, un bouton marqué « Marche »."
-    },
-    {
-      "id": "fente",
-      "name": "la fente",
-      "aliases": [
-        "fente",
-        "fissure",
-        "crevasse"
-      ],
-      "at": "fond",
-      "takeable": false,
-      "fixed": "Une fente, ça ne s'emporte pas !",
-      "description": "Une fente étroite et profonde. Ta main est bien trop grosse pour y passer !"
-    },
-    {
-      "id": "cailloux",
-      "name": "les cailloux gris",
-      "aliases": [
-        "cailloux",
-        "caillou",
-        "cailloux gris"
-      ],
-      "at": "fond",
-      "takeable": false,
-      "fixed": "Ces cailloux-là sont tout ordinaires. La pierre qui brille, elle, est bien plus belle !",
-      "description": "Des cailloux gris, tout ordinaires."
-    },
-    {
-      "id": "pierre",
-      "name": "la pierre bleue",
-      "aliases": [
-        "pierre",
-        "pierre bleue",
-        "pierre de lune",
-        "tresor"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Une pierre de Lune qui brille d'un éclat bleuté. Un vrai trésor pour les savants !"
-    },
-    {
-      "id": "bouton_marche",
-      "name": "le bouton Marche de la caméra",
-      "aliases": [
-        "bouton marche",
-        "bouton",
-        "marche",
-        "bouton de la camera"
-      ],
-      "at": "antenne_coin",
-      "takeable": false,
-      "fixed": "Il fait partie de la caméra !",
-      "description": "Un bouton vert marqué « Marche », sur le côté de la caméra."
-    },
-    {
-      "id": "drapeau_plante",
-      "name": "ton drapeau planté",
-      "aliases": [
-        "drapeau",
-        "drapeau plante",
-        "mat"
-      ],
-      "at": "",
-      "takeable": false,
-      "fixed": "Il est bien planté : laisse-le flotter devant la caméra !",
-      "description": "Ton drapeau, bien planté dans la poussière de Lune, tout fier."
+     "when": [
+      "flag:treuil"
+     ],
+     "text": "Les traces de Bip partent vers la plaine."
     }
-  ],
-  "characters": [
+   ],
+   "decor": [
+    "échelle",
+    "pieds du module",
+    "traces de pas",
+    "poussière"
+   ]
+  },
+  {
+   "id": "plaine",
+   "name": "la mer de la Tranquillité",
+   "aliases": [
+    "mer de la tranquillite",
+    "plaine",
+    "grande plaine"
+   ],
+   "description": "Une immense plaine grise et plate : c'est la mer de la Tranquillité… une mer sans une goutte d'eau ! Au nord, l'antenne et la caméra de télé ; à l'est, le bord d'un cratère.",
+   "exits": [
     {
-      "id": "lou",
-      "name": "la capitaine Lou",
-      "aliases": [
-        "lou",
-        "capitaine",
-        "capitaine lou",
-        "astronaute"
-      ],
-      "at": "cabine",
-      "description": "Une astronaute aux yeux rieurs, dans une combinaison blanche toute neuve.",
-      "says": "Bienvenue sur la Lune ! Sur Terre, tout le monde attend devant la télé : il faut que notre antenne soit dépliée et son câble réparé, avec du ruban, une batterie dans la caméra, et un beau drapeau planté devant ! Attention, on n'a qu'une batterie de rechange, et Bip la réclame pour son treuil… Les savants rêvent aussi d'une pierre bleue, au fond du cratère. Deux règles d'astronaute : ne touche jamais au gros bouton rouge, c'est l'alarme qui nous renvoie sur Terre ! Et ici, on est six fois plus léger : jamais de grand saut du haut du rocher ! Ah, et on ne sort pas sans son casque."
+     "to": "echelle",
+     "label": "vers le module",
+     "dir": "ouest"
     },
     {
-      "id": "bip",
-      "name": "Bip le petit rover",
-      "aliases": [
-        "bip",
-        "rover",
-        "robot",
-        "petit rover"
-      ],
-      "at": "echelle",
-      "description": "Un petit robot à six roues, avec deux gros yeux ronds et une antenne qui tourne.",
-      "says": "Bip bip ! Je suis Bip, le rover de la Libellule ! Avec une batterie bien pleine, mon treuil peut te descendre au fond du cratère… et te remonter ! Et j'ai perdu mon rouleau de ruban en roulant près du gros rocher. Bip !"
+     "to": "antenne_coin",
+     "label": "vers l'antenne",
+     "dir": "nord"
+    },
+    {
+     "to": "bord",
+     "label": "vers le cratère",
+     "dir": "est"
     }
-  ],
-  "actions": [
+   ],
+   "details": [
     {
-      "id": "mettre_casque",
-      "verb": "wear",
-      "object": "casque",
-      "when": [
-        "has:casque"
-      ],
-      "effects": [
-        "lose:casque",
-        "flag:casque_mis"
-      ],
-      "points": 5,
-      "text": "Tu enfiles le grand casque, clic ! Pschhh, l'air arrive. Te voilà un vrai astronaute !"
-    },
-    {
-      "id": "ouvrir_trappe",
-      "verb": "open",
-      "object": "trappe",
-      "when": [
-        "flag:casque_mis"
-      ],
-      "effects": [
-        "flag:trappe_ouverte"
-      ],
-      "points": 10,
-      "not_yet": "Sans casque, pas d'air dehors ! La capitaine Lou t'arrête : « D'abord le casque ! »",
-      "text": "Tu tournes la grosse poignée… pschhhhh ! La trappe s'ouvre sur la Lune toute grise."
-    },
-    {
-      "id": "ouvrir_soute",
-      "verb": "open",
-      "object": "soute",
-      "when": [
-        "!flag:soute_ouverte"
-      ],
-      "effects": [
-        "reveal:drapeau",
-        "reveal:mat",
-        "reveal:pince",
-        "reveal:manche",
-        "flag:soute_ouverte"
-      ],
-      "points": 5,
-      "not_yet": "La soute est déjà grande ouverte !",
-      "text": "Tu tires le loquet, clac ! Dans la soute : un drapeau plié, un mât, une petite pince et un manche télescopique."
-    },
-    {
-      "id": "fouiller_soute",
-      "verb": "search",
-      "object": "soute",
-      "when": [
-        "!flag:soute_ouverte"
-      ],
-      "effects": [
-        "reveal:drapeau",
-        "reveal:mat",
-        "reveal:pince",
-        "reveal:manche",
-        "flag:soute_ouverte"
-      ],
-      "points": 5,
-      "not_yet": "La soute est déjà grande ouverte !",
-      "text": "Tu tires le loquet, clac ! Dans la soute : un drapeau plié, un mât, une petite pince et un manche télescopique."
-    },
-    {
-      "id": "pousser_bip",
-      "verb": "push",
-      "object": "bip",
-      "when": [
-        "!flag:bip_libre"
-      ],
-      "effects": [
-        "flag:bip_libre"
-      ],
-      "points": 10,
-      "not_yet": "Bip est déjà libre ! Il tourne en rond, tout content.",
-      "text": "Tu pousses Bip de toutes tes forces… hop ! Ses roues sortent de la poussière. « Bip bip ! Merci ! »"
-    },
-    {
-      "id": "tirer_bip",
-      "verb": "pull",
-      "object": "bip",
-      "when": [
-        "!flag:bip_libre"
-      ],
-      "effects": [
-        "flag:bip_libre"
-      ],
-      "points": 10,
-      "not_yet": "Bip est déjà libre ! Il tourne en rond, tout content.",
-      "text": "Tu tires Bip de toutes tes forces… hop ! Ses roues sortent de la poussière. « Bip bip ! Merci ! »"
-    },
-    {
-      "id": "batterie_bip",
-      "verb": "give",
-      "object": "batterie",
-      "target": "bip",
-      "when": [
-        "has:batterie",
-        "flag:bip_libre"
-      ],
-      "effects": [
-        "lose:batterie",
-        "flag:treuil",
-        "move:bip:bord"
-      ],
-      "points": 10,
-      "not_yet": "Bip a les roues coincées dans la poussière : il faut d'abord le dégager !",
-      "text": "Bip avale la batterie, cronch ! Ses yeux s'allument : « Bip bip, batterie pleine ! » Il file vers le cratère en déroulant le câble de son treuil."
-    },
-    {
-      "id": "fouiller_poussiere",
-      "verb": "search",
-      "object": "poussiere",
-      "effects": [
-        "reveal:ruban",
-        "flag:ruban_trouve"
-      ],
-      "points": 5,
-      "text": "Tu creuses dans la poussière, pfff, pfff… et tu trouves un gros rouleau de ruban adhésif !"
-    },
-    {
-      "id": "faire_drapeau",
-      "verb": "combine",
-      "object": "drapeau",
-      "target": "mat",
-      "when": [
-        "has:drapeau",
-        "has:mat"
-      ],
-      "effects": [
-        "lose:drapeau",
-        "lose:mat",
-        "gain:drapeau_mat"
-      ],
-      "points": 10,
-      "text": "Tu accroches le drapeau en haut du mât, clic ! Il est prêt à être planté."
-    },
-    {
-      "id": "planter_drapeau_seul",
-      "verb": "use",
-      "object": "drapeau",
-      "when": [
-        "flag:jamais"
-      ],
-      "effects": [],
-      "points": 0,
-      "not_yet": "Un drapeau tout seul, ça tombe par terre, flop ! Il faudrait l'accrocher à un mât.",
-      "text": ""
-    },
-    {
-      "id": "planter_drapeau",
-      "verb": "use",
-      "object": "drapeau_mat",
-      "place": "plaine",
-      "when": [
-        "has:drapeau_mat"
-      ],
-      "effects": [
-        "lose:drapeau_mat",
-        "flag:drapeau_plante",
-        "reveal:drapeau_plante"
-      ],
-      "points": 10,
-      "text": "Tu enfonces le mât dans la poussière, tchouk ! Le drapeau se déplie, tout fier, devant la caméra."
-    },
-    {
-      "id": "planter_drapeau_2",
-      "verb": "push",
-      "object": "drapeau_mat",
-      "place": "plaine",
-      "when": [
-        "has:drapeau_mat"
-      ],
-      "effects": [
-        "lose:drapeau_mat",
-        "flag:drapeau_plante",
-        "reveal:drapeau_plante"
-      ],
-      "points": 10,
-      "text": "Tu enfonces le mât dans la poussière, tchouk ! Le drapeau se déplie, tout fier, devant la caméra."
-    },
-    {
-      "id": "planter_ailleurs",
-      "verb": "use",
-      "object": "drapeau_mat",
-      "when": [
-        "flag:jamais"
-      ],
-      "effects": [],
-      "points": 0,
-      "not_yet": "Ici ? La caméra ne le verrait pas. Elle est tournée vers la grande plaine…",
-      "text": ""
-    },
-    {
-      "id": "deplier_antenne",
-      "verb": "open",
-      "object": "antenne",
-      "when": [
-        "!flag:antenne_depliee"
-      ],
-      "effects": [
-        "flag:antenne_depliee"
-      ],
-      "points": 10,
-      "not_yet": "L'antenne est déjà dépliée, grande ouverte comme un parapluie !",
-      "text": "Tu déplies l'antenne, clic, clic, clic… elle s'ouvre comme un grand parapluie !"
-    },
-    {
-      "id": "deplier_antenne_2",
-      "verb": "pull",
-      "object": "antenne",
-      "when": [
-        "!flag:antenne_depliee"
-      ],
-      "effects": [
-        "flag:antenne_depliee"
-      ],
-      "points": 10,
-      "not_yet": "L'antenne est déjà dépliée, grande ouverte comme un parapluie !",
-      "text": "Tu déplies l'antenne, clic, clic, clic… elle s'ouvre comme un grand parapluie !"
-    },
-    {
-      "id": "deplier_antenne_3",
-      "verb": "use",
-      "object": "antenne",
-      "when": [
-        "!flag:antenne_depliee"
-      ],
-      "effects": [
-        "flag:antenne_depliee"
-      ],
-      "points": 10,
-      "not_yet": "L'antenne est déjà dépliée, grande ouverte comme un parapluie !",
-      "text": "Tu déplies l'antenne, clic, clic, clic… elle s'ouvre comme un grand parapluie !"
-    },
-    {
-      "id": "reparer_antenne",
-      "verb": "use",
-      "object": "ruban",
-      "target": "antenne",
-      "when": [
-        "has:ruban",
-        "flag:antenne_depliee"
-      ],
-      "effects": [
-        "lose:ruban",
-        "flag:antenne_ok"
-      ],
-      "points": 10,
-      "not_yet": "L'antenne est toute repliée : déplie-la d'abord, sinon tu vas tout scotcher de travers !",
-      "text": "Tu enroules le ruban autour du câble coupé, scrouitch, scrouitch ! Le câble est réparé."
-    },
-    {
-      "id": "batterie_camera",
-      "verb": "use",
-      "object": "batterie",
-      "target": "camera",
-      "when": [
-        "has:batterie"
-      ],
-      "effects": [
-        "lose:batterie",
-        "flag:camera_ok"
-      ],
-      "points": 10,
-      "text": "Tu glisses la batterie dans la caméra, clac ! Une petite lumière verte s'allume."
-    },
-    {
-      "id": "allumer_camera",
-      "verb": "push",
-      "object": "camera",
-      "when": [
-        "flag:camera_ok",
-        "flag:antenne_ok",
-        "flag:drapeau_plante"
-      ],
-      "effects": [
-        "end:tele"
-      ],
-      "points": 10,
-      "not_yet": "Rien ne se passe. Il faut une batterie dans la caméra, une antenne réparée… et quelque chose de beau à filmer dans la plaine, comme un drapeau !",
-      "text": "Tu appuies sur le bouton « Marche »… bzzzt ! La caméra se met à filmer."
-    },
-    {
-      "id": "allumer_camera_2",
-      "verb": "light",
-      "object": "camera",
-      "when": [
-        "flag:camera_ok",
-        "flag:antenne_ok",
-        "flag:drapeau_plante"
-      ],
-      "effects": [
-        "end:tele"
-      ],
-      "points": 10,
-      "not_yet": "Rien ne se passe. Il faut une batterie dans la caméra, une antenne réparée… et quelque chose de beau à filmer dans la plaine, comme un drapeau !",
-      "text": "Tu appuies sur le bouton « Marche »… bzzzt ! La caméra se met à filmer."
-    },
-    {
-      "id": "allumer_camera_3",
-      "verb": "use",
-      "object": "camera",
-      "when": [
-        "flag:camera_ok",
-        "flag:antenne_ok",
-        "flag:drapeau_plante"
-      ],
-      "effects": [
-        "end:tele"
-      ],
-      "points": 10,
-      "not_yet": "Rien ne se passe. Il faut une batterie dans la caméra, une antenne réparée… et quelque chose de beau à filmer dans la plaine, comme un drapeau !",
-      "text": "Tu appuies sur le bouton « Marche »… bzzzt ! La caméra se met à filmer."
-    },
-    {
-      "id": "allumer_camera_4",
-      "verb": "push",
-      "object": "bouton_marche",
-      "when": [
-        "flag:camera_ok",
-        "flag:antenne_ok",
-        "flag:drapeau_plante"
-      ],
-      "effects": [
-        "end:tele"
-      ],
-      "points": 10,
-      "not_yet": "Rien ne se passe. Il faut une batterie dans la caméra, une antenne réparée… et quelque chose de beau à filmer dans la plaine, comme un drapeau !",
-      "text": "Tu appuies sur le bouton « Marche »… bzzzt ! La caméra se met à filmer."
-    },
-    {
-      "id": "faire_longue_pince",
-      "verb": "combine",
-      "object": "pince",
-      "target": "manche",
-      "when": [
-        "has:pince",
-        "has:manche"
-      ],
-      "effects": [
-        "lose:pince",
-        "lose:manche",
-        "gain:longue_pince"
-      ],
-      "points": 10,
-      "text": "Tu fixes la petite pince au bout du manche, clic ! Clic, clic, clic, le manche s'allonge : voilà une longue pince."
-    },
-    {
-      "id": "pince_courte",
-      "verb": "use",
-      "object": "pince",
-      "target": "fente",
-      "when": [
-        "flag:jamais"
-      ],
-      "effects": [],
-      "points": 0,
-      "not_yet": "Tu glisses la petite pince dans la fente… elle est trop courte ! Il faudrait l'allonger.",
-      "text": ""
-    },
-    {
-      "id": "attraper_pierre",
-      "verb": "use",
-      "object": "longue_pince",
-      "target": "fente",
-      "when": [
-        "has:longue_pince"
-      ],
-      "effects": [
-        "gain:pierre"
-      ],
-      "points": 10,
-      "text": "Tu glisses la longue pince tout au fond de la fente… cric, crac… tu tiens la pierre bleue !"
-    },
-    {
-      "id": "donner_pierre",
-      "verb": "give",
-      "object": "pierre",
-      "target": "lou",
-      "when": [
-        "has:pierre"
-      ],
-      "effects": [
-        "end:pierre"
-      ],
-      "points": 10,
-      "text": "Tu tends la pierre bleue à la capitaine Lou. Elle brille dans la cabine comme une petite étoile !"
-    },
-    {
-      "id": "bouton_rouge",
-      "verb": "push",
-      "object": "gros_bouton_rouge",
-      "effects": [
-        "end:alarme"
-      ],
-      "points": 0,
-      "text": "Tu appuies sur le gros bouton rouge…"
-    },
-    {
-      "id": "sauter_rocher",
-      "verb": "jump",
-      "place": "rocher",
-      "effects": [
-        "end:envol"
-      ],
-      "points": 0,
-      "text": "Tu sautes du haut du rocher de toutes tes forces… BOING !",
-      "object": "rocher"
-    },
-    {
-      "id": "petits_boutons",
-      "verb": "push",
-      "object": "boutons",
-      "effects": [],
-      "points": 0,
-      "text": "Tu appuies sur un petit bouton… bip ! Une lumière verte clignote, puis une jaune. Rien de grave : ces petits boutons surveillent le module. Mais le gros bouton rouge, lui, on n'y touche jamais !"
-    },
-    {
-      "id": "petit_saut",
-      "verb": "jump",
-      "place": "rocher",
-      "effects": [],
-      "points": 0,
-      "text": "Tu fais un petit bond… et tu redescends tout doucement, comme une plume. Rigolo ! Mais jamais de grand saut du haut du rocher : la capitaine Lou l'a bien dit."
+     "when": [
+      "flag:drapeau_plante"
+     ],
+     "text": "Ton drapeau est planté au milieu, tout fier.",
+     "else": "Le sol est parfait pour planter quelque chose."
     }
-  ],
-  "endings": [
+   ],
+   "decor": [
+    "poussière grise",
+    "petits cratères",
+    "étoiles",
+    "la Terre"
+   ]
+  },
+  {
+   "id": "antenne_coin",
+   "name": "le coin de l'antenne",
+   "aliases": [
+    "coin de l'antenne",
+    "antenne de tele"
+   ],
+   "description": "Ici se dressent la grande antenne en forme de parapluie et, à côté, la caméra de télé, tournée vers la plaine. Sur le côté de la caméra, un bouton marqué « Marche ».",
+   "exits": [
     {
-      "id": "tele",
-      "kind": "win",
-      "text": "Sur Terre, dans des millions de maisons, l'écran gris s'allume : on voit la Lune, ton drapeau qui brille, et toi qui fais coucou ! Toute la Terre applaudit. Bip fait des tours de roue de joie : « Bip bip, hourra ! »"
-    },
-    {
-      "id": "pierre",
-      "kind": "win",
-      "text": "La capitaine Lou ouvre de grands yeux : « Une pierre de Lune bleue ! Les savants de la Terre vont l'étudier pendant des années ! » Vous la rangez dans une boîte spéciale, et la Libellule repart vers la Terre avec ton trésor."
-    },
-    {
-      "id": "alarme",
-      "kind": "lose",
-      "text": "POUET, POUET, POUET ! C'est l'alarme de retour. Sur Terre, le chef de mission crie : « Tout le monde rentre ! » C'était une fausse alerte, et tout le monde rigole… mais la Libellule décolle déjà vers la maison, sans avoir fini sa mission."
-    },
-    {
-      "id": "envol",
-      "kind": "lose",
-      "text": "Avec la petite pesanteur, tu montes, tu montes… et tu redescends tout doucement, comme une plume, dans un trou plein de poussière. La capitaine Lou vient te repêcher avec une corde en riant, mais c'est déjà l'heure de repartir : la mission est finie !"
+     "to": "plaine",
+     "label": "vers la grande plaine",
+     "dir": "sud"
     }
-  ]
+   ],
+   "details": [
+    {
+     "when": [
+      "is:antenne:repliee"
+     ],
+     "text": "L'antenne est toute repliée, et son câble pendouille, coupé net."
+    },
+    {
+     "when": [
+      "is:antenne:depliee"
+     ],
+     "text": "L'antenne est dépliée comme un parapluie, mais son câble pendouille, coupé net."
+    },
+    {
+     "when": [
+      "is:antenne:reparee"
+     ],
+     "text": "L'antenne est dépliée comme un parapluie, et son câble est bien réparé."
+    },
+    {
+     "when": [
+      "is:camera:prete"
+     ],
+     "text": "Une petite lumière verte brille sur la caméra : elle est prête !",
+     "else": "Le compartiment à batterie de la caméra est vide."
+    }
+   ],
+   "decor": [
+    "trépied",
+    "câble",
+    "cailloux",
+    "traces de pas"
+   ]
+  },
+  {
+   "id": "rocher",
+   "name": "le gros rocher",
+   "aliases": [
+    "rocher",
+    "gros rocher",
+    "colline"
+   ],
+   "description": "Un rocher grand comme une maison. Dans le ciel tout noir, la Terre brille, bleue et blanche, comme une bille. Attention : la capitaine Lou l'a dit, jamais de grand saut du haut du rocher !",
+   "exits": [
+    {
+     "to": "echelle",
+     "label": "vers le module",
+     "dir": "sud"
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "flag:ruban_trouve"
+     ],
+     "text": "Au pied du rocher, le tas de poussière est tout éparpillé.",
+     "else": "Tout autour, des traces de petites roues, et un tas de poussière au pied du rocher, avec quelque chose d'enfoui dedans."
+    }
+   ],
+   "decor": [
+    "traces de roues",
+    "cailloux",
+    "la Terre",
+    "ombre du rocher"
+   ]
+  },
+  {
+   "id": "bord",
+   "name": "le bord du cratère",
+   "aliases": [
+    "bord du cratere",
+    "bord",
+    "cratere"
+   ],
+   "description": "Le bord d'un grand cratère tout rond, comme si un géant avait posé son doigt dans la Lune.",
+   "exits": [
+    {
+     "to": "plaine",
+     "label": "vers la grande plaine",
+     "dir": "ouest"
+    },
+    {
+     "to": "fond",
+     "label": "descendre dans le cratère",
+     "dir": "bas",
+     "when": [
+      "flag:treuil"
+     ],
+     "blocked": "La pente est trop glissante : tu descendrais comme sur un toboggan… mais tu ne pourrais plus remonter ! Il faudrait quelqu'un pour te tenir avec un câble."
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "!flag:treuil"
+     ],
+     "text": "La pente est raide et glissante."
+    },
+    {
+     "when": [
+      "!flag:pierre_prise"
+     ],
+     "text": "Tout au fond, quelque chose scintille."
+    }
+   ],
+   "decor": [
+    "pente",
+    "cailloux",
+    "poussière",
+    "ombre"
+   ]
+  },
+  {
+   "id": "fond",
+   "name": "le fond du cratère",
+   "aliases": [
+    "fond du cratere",
+    "fond",
+    "trou"
+   ],
+   "description": "Au fond du cratère, des cailloux gris partout, et une fente étroite.",
+   "exits": [
+    {
+     "to": "bord",
+     "label": "remonter avec le câble de Bip",
+     "dir": "haut"
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "flag:pierre_prise"
+     ],
+     "text": "La fente est toute vide, maintenant.",
+     "else": "Et là, coincée tout au fond de la fente, une pierre qui brille d'un éclat bleuté !"
+    }
+   ],
+   "decor": [
+    "parois du cratère",
+    "poussière",
+    "câble de Bip",
+    "étoiles"
+   ]
+  }
+ ],
+ "items": [
+  {
+   "id": "casque",
+   "name": "un casque de scaphandre",
+   "aliases": [
+    "casque",
+    "scaphandre",
+    "casque d'astronaute"
+   ],
+   "at": "cabine",
+   "description": "Un grand casque tout rond, avec une vitre dorée pour se protéger du soleil.",
+   "kind": "thing",
+   "initial": "Un casque de scaphandre est accroché au mur.",
+   "states": [
+    {
+     "id": "au_mur"
+    },
+    {
+     "id": "sur_la_tete",
+     "name": "ton casque de scaphandre",
+     "description": "Le grand casque tout rond est sur ta tête, bien fermé : pschhh, l'air arrive."
+    }
+   ]
+  },
+  {
+   "id": "batterie",
+   "name": "une batterie de rechange",
+   "aliases": [
+    "batterie",
+    "pile",
+    "batterie de rechange"
+   ],
+   "at": "cabine",
+   "description": "Une grosse batterie, bien chargée. Il n'y en a qu'une : la caméra en a besoin, et Bip aussi !",
+   "kind": "thing",
+   "initial": "Au mur, une batterie de rechange attend sur son crochet."
+  },
+  {
+   "id": "gros_bouton_rouge",
+   "name": "le gros bouton rouge",
+   "aliases": [
+    "bouton rouge",
+    "gros bouton",
+    "gros bouton rouge",
+    "bouton d'alarme",
+    "alarme"
+   ],
+   "at": "cabine",
+   "fixed": "Il est vissé dans le tableau de bord !",
+   "description": "Un gros bouton rouge. Dessous, c'est écrit : « Alarme : retour immédiat sur Terre ». La capitaine Lou a dit de ne jamais y toucher !",
+   "kind": "scenery",
+   "sturdy": "Il est vissé dans le tableau de bord. Et on n'y touche pas !"
+  },
+  {
+   "id": "boutons",
+   "name": "les petits boutons qui clignotent",
+   "aliases": [
+    "bouton",
+    "boutons",
+    "petits boutons",
+    "tableau de bord",
+    "tableau"
+   ],
+   "at": "cabine",
+   "fixed": "Ils sont fixés dans le tableau de bord !",
+   "description": "Des dizaines de petits boutons qui clignotent, bip, bip : ils surveillent l'air, la chaleur et la radio du module.",
+   "kind": "scenery",
+   "sturdy": "Ils sont fixés dans le tableau de bord, et ils surveillent le module !"
+  },
+  {
+   "id": "trappe",
+   "name": "la trappe",
+   "aliases": [
+    "trappe",
+    "porte",
+    "sortie",
+    "trappe de sortie"
+   ],
+   "at": "cabine",
+   "fixed": "Une trappe, ça reste sur le module, sinon gare aux courants d'air !",
+   "description": "Une trappe ronde, avec une grosse poignée.",
+   "kind": "scenery",
+   "sturdy": "Une trappe de module spatial, c'est fait pour résister à tout !",
+   "details": [
+    {
+     "when": [
+      "flag:trappe_ouverte"
+     ],
+     "text": "Elle est grande ouverte sur la Lune toute grise.",
+     "else": "Elle est fermée."
+    }
+   ]
+  },
+  {
+   "id": "soute",
+   "name": "la soute",
+   "aliases": [
+    "soute",
+    "coffre",
+    "casier",
+    "boite"
+   ],
+   "at": "echelle",
+   "fixed": "Elle est fixée au module avec de gros boulons.",
+   "description": "Une soute en métal brillant, sur le côté du module, fermée par un loquet.",
+   "kind": "container",
+   "texts": {
+    "open": "Tu tires le loquet, clac ! Dans la soute : un drapeau plié, un mât, une petite pince et un manche télescopique."
+   }
+  },
+  {
+   "id": "drapeau",
+   "name": "un drapeau plié",
+   "aliases": [
+    "drapeau",
+    "drapeau plie"
+   ],
+   "at": "soute",
+   "description": "Un drapeau tout plié. Pour qu'il tienne debout, il lui faudrait un mât.",
+   "kind": "thing",
+   "states": [
+    {
+     "id": "plie"
+    },
+    {
+     "id": "sur_mat",
+     "name": "le drapeau sur son mât",
+     "aliases": [
+      "drapeau sur son mat"
+     ],
+     "description": "Le drapeau accroché à son mât, prêt à être planté."
+    }
+   ]
+  },
+  {
+   "id": "mat",
+   "name": "un mât en métal",
+   "aliases": [
+    "mat",
+    "mat du drapeau",
+    "poteau",
+    "tige"
+   ],
+   "at": "soute",
+   "description": "Un long mât en métal, léger comme tout ici, avec un petit crochet en haut.",
+   "kind": "thing"
+  },
+  {
+   "id": "pince",
+   "name": "une petite pince",
+   "aliases": [
+    "pince",
+    "pincette",
+    "petite pince"
+   ],
+   "at": "soute",
+   "description": "Une pince à cailloux pour les astronautes. Elle est un peu courte…",
+   "kind": "thing",
+   "states": [
+    {
+     "id": "courte"
+    },
+    {
+     "id": "longue",
+     "name": "une longue pince",
+     "aliases": [
+      "longue pince"
+     ],
+     "description": "La pince au bout du manche télescopique : elle attrape tout, même au fond d'un trou !"
+    }
+   ]
+  },
+  {
+   "id": "manche",
+   "name": "un manche télescopique",
+   "aliases": [
+    "manche",
+    "rallonge",
+    "baton telescopique",
+    "manche telescopique"
+   ],
+   "at": "soute",
+   "description": "Un manche qui s'allonge, clic, clic, clic ! On peut y fixer un outil au bout.",
+   "kind": "thing"
+  },
+  {
+   "id": "poussiere",
+   "name": "le tas de poussière",
+   "aliases": [
+    "poussiere",
+    "tas",
+    "tas de poussiere"
+   ],
+   "at": "rocher",
+   "fixed": "La poussière file entre tes gants, pfff !",
+   "description": "Un petit tas de poussière grise, au pied du rocher.",
+   "kind": "scenery",
+   "sturdy": "La poussière file entre tes gants, pfff ! Il n'y a rien à casser."
+  },
+  {
+   "id": "ruban",
+   "name": "un rouleau de ruban adhésif",
+   "aliases": [
+    "ruban",
+    "scotch",
+    "ruban adhesif",
+    "rouleau",
+    "adhesif"
+   ],
+   "at": "",
+   "description": "Un gros rouleau de ruban adhésif gris. Avec ça, on répare tout !",
+   "kind": "thing"
+  },
+  {
+   "id": "antenne",
+   "name": "la grande antenne",
+   "aliases": [
+    "antenne",
+    "grande antenne",
+    "parapluie",
+    "cable",
+    "fil"
+   ],
+   "at": "antenne_coin",
+   "fixed": "Elle est fixée sur son pied, et elle est bien trop grande !",
+   "description": "Une antenne en forme de parapluie, pour envoyer les images de la caméra jusqu'à la Terre.",
+   "kind": "scenery",
+   "sturdy": "L'antenne doit envoyer les images jusqu'à la Terre : on y fait bien attention !",
+   "states": [
+    {
+     "id": "repliee"
+    },
+    {
+     "id": "depliee",
+     "description": "Une antenne en forme de parapluie, toute dépliée. Mais son câble pendouille, coupé net."
+    },
+    {
+     "id": "reparee",
+     "description": "Une antenne en forme de parapluie, toute dépliée, avec son câble bien réparé au ruban."
+    }
+   ]
+  },
+  {
+   "id": "camera",
+   "name": "la caméra de télé",
+   "aliases": [
+    "camera",
+    "camera de tele",
+    "tele",
+    "television"
+   ],
+   "at": "antenne_coin",
+   "fixed": "Elle est vissée sur son trépied, et bien tournée vers la plaine !",
+   "description": "Une caméra de télé sur trois pieds, tournée vers la plaine. Sur le côté, un bouton marqué « Marche ».",
+   "kind": "scenery",
+   "sturdy": "Une caméra de télé, c'est précieux : toute la Terre attend ses images !",
+   "states": [
+    {
+     "id": "sans_batterie"
+    },
+    {
+     "id": "prete",
+     "description": "Une caméra de télé sur trois pieds, tournée vers la plaine. Une petite lumière verte brille : elle est prête ! Sur le côté, un bouton marqué « Marche »."
+    }
+   ]
+  },
+  {
+   "id": "fente",
+   "name": "la fente",
+   "aliases": [
+    "fente",
+    "fissure",
+    "crevasse"
+   ],
+   "at": "fond",
+   "fixed": "Une fente, ça ne s'emporte pas !",
+   "description": "Une fente étroite et profonde. Ta main est bien trop grosse pour y passer !",
+   "kind": "scenery",
+   "sturdy": "C'est une fente dans la roche de la Lune : rien à casser !"
+  },
+  {
+   "id": "cailloux",
+   "name": "les cailloux gris",
+   "aliases": [
+    "cailloux",
+    "caillou",
+    "cailloux gris"
+   ],
+   "at": "fond",
+   "fixed": "Ces cailloux-là sont tout ordinaires. La pierre qui brille, elle, est bien plus belle !",
+   "description": "Des cailloux gris, tout ordinaires.",
+   "kind": "scenery",
+   "sturdy": "Des cailloux de Lune, durs comme tout !"
+  },
+  {
+   "id": "pierre",
+   "name": "la pierre bleue",
+   "aliases": [
+    "pierre",
+    "pierre bleue",
+    "pierre de lune",
+    "tresor"
+   ],
+   "at": "",
+   "description": "Une pierre de Lune qui brille d'un éclat bleuté. Un vrai trésor pour les savants !",
+   "kind": "thing"
+  },
+  {
+   "id": "bouton_marche",
+   "name": "le bouton Marche de la caméra",
+   "aliases": [
+    "bouton marche",
+    "bouton",
+    "marche",
+    "bouton de la camera"
+   ],
+   "at": "antenne_coin",
+   "fixed": "Il fait partie de la caméra !",
+   "description": "Un bouton vert marqué « Marche », sur le côté de la caméra.",
+   "kind": "scenery",
+   "sturdy": "Il fait partie de la caméra : on appuie dessus, on ne le casse pas !"
+  },
+  {
+   "id": "drapeau_plante",
+   "name": "ton drapeau planté",
+   "aliases": [
+    "drapeau",
+    "drapeau plante",
+    "mat"
+   ],
+   "at": "",
+   "fixed": "Il est bien planté : laisse-le flotter devant la caméra !",
+   "description": "Ton drapeau, bien planté dans la poussière de Lune, tout fier.",
+   "kind": "scenery",
+   "sturdy": "Ton beau drapeau ? Laisse-le flotter devant la caméra !"
+  }
+ ],
+ "characters": [
+  {
+   "id": "lou",
+   "name": "la capitaine Lou",
+   "aliases": [
+    "lou",
+    "capitaine",
+    "capitaine lou",
+    "astronaute"
+   ],
+   "at": "cabine",
+   "description": "Une astronaute aux yeux rieurs, dans une combinaison blanche toute neuve.",
+   "says": [
+    {
+     "when": [
+      "has:pierre"
+     ],
+     "text": "C'est… une pierre de Lune bleue ? Montre-la-moi vite, que je la range dans une boîte spéciale !"
+    },
+    {
+     "text": "Bienvenue sur la Lune ! Sur Terre, tout le monde attend devant la télé : il faut que notre antenne soit dépliée et son câble réparé, avec du ruban, une batterie dans la caméra, et un beau drapeau planté devant ! Attention, on n'a qu'une batterie de rechange, et Bip la réclame pour son treuil… Les savants rêvent aussi d'une pierre bleue, au fond du cratère. Deux règles d'astronaute : ne touche jamais au gros bouton rouge, c'est l'alarme qui nous renvoie sur Terre ! Et ici, on est six fois plus léger : jamais de grand saut du haut du rocher ! Ah, et on ne sort pas sans son casque."
+    }
+   ],
+   "initial": "La capitaine Lou regarde par le hublot."
+  },
+  {
+   "id": "bip",
+   "name": "Bip le petit rover",
+   "aliases": [
+    "bip",
+    "rover",
+    "robot",
+    "petit rover"
+   ],
+   "at": "echelle",
+   "description": "Un petit robot à six roues, avec deux gros yeux ronds et une antenne qui tourne.",
+   "says": "Bip bip ! Je suis Bip, le rover de la Libellule ! Avec une batterie bien pleine, mon treuil peut te descendre au fond du cratère… et te remonter ! Et j'ai perdu mon rouleau de ruban en roulant près du gros rocher. Bip !",
+   "states": [
+    {
+     "id": "coince",
+     "initial": "Bip, le petit rover à six roues, a les roues enfoncées dans la poussière."
+    },
+    {
+     "id": "libre",
+     "initial": "Bip, le petit rover à six roues, tourne en rond, tout content d'être libre."
+    },
+    {
+     "id": "treuil",
+     "initial": "Bip est garé tout au bord, et le câble de son treuil descend jusqu'au fond du cratère.",
+     "says": "Bip bip ! Accroche-toi à mon câble : je te descends au fond du cratère… et je te remonte ! Bip !"
+    }
+   ]
+  }
+ ],
+ "actions": [
+  {
+   "id": "mettre_casque",
+   "when": [
+    "has:casque",
+    "is:casque:au_mur"
+   ],
+   "effects": [
+    "set:casque:sur_la_tete"
+   ],
+   "points": 5,
+   "text": "Tu enfiles le grand casque, clic ! Pschhh, l'air arrive. Te voilà un vrai astronaute !",
+   "triggers": [
+    {
+     "verb": "wear",
+     "object": "casque"
+    }
+   ],
+   "hint": "La capitaine Lou l'a dit : on ne sort jamais sans son casque. Il est accroché au mur…"
+  },
+  {
+   "id": "ouvrir_trappe",
+   "when": [
+    "is:casque:sur_la_tete"
+   ],
+   "effects": [
+    "flag:trappe_ouverte"
+   ],
+   "points": 10,
+   "not_yet": "Sans casque, pas d'air dehors ! La capitaine Lou t'arrête : « D'abord le casque ! »",
+   "text": "Tu tournes la grosse poignée… pschhhhh ! La trappe s'ouvre sur la Lune toute grise.",
+   "triggers": [
+    {
+     "verb": "open",
+     "object": "trappe"
+    }
+   ],
+   "hint": "Ton casque est bien mis : il n'y a plus qu'à ouvrir la trappe pour sortir !"
+  },
+  {
+   "id": "pousser_bip",
+   "when": [
+    "is:bip:coince"
+   ],
+   "effects": [
+    "set:bip:libre"
+   ],
+   "points": 10,
+   "text": "Tu pousses Bip de toutes tes forces… hop ! Ses roues sortent de la poussière. « Bip bip ! Merci ! »",
+   "triggers": [
+    {
+     "verb": "push",
+     "object": "bip"
+    },
+    {
+     "verb": "pull",
+     "object": "bip"
+    }
+   ],
+   "hint": "Bip a les roues enfoncées dans la poussière. Un petit coup de main, en le poussant ?"
+  },
+  {
+   "id": "batterie_bip",
+   "when": [
+    "has:batterie",
+    "is:bip:libre"
+   ],
+   "effects": [
+    "lose:batterie",
+    "flag:treuil",
+    "set:bip:treuil",
+    "move:bip:bord"
+   ],
+   "points": 10,
+   "not_yet": "Bip a les roues coincées dans la poussière : il faut d'abord le dégager !",
+   "text": "Bip avale la batterie, cronch ! Ses yeux s'allument : « Bip bip, batterie pleine ! » Il file vers le cratère en déroulant le câble de son treuil.",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "batterie",
+     "target": "bip"
+    }
+   ],
+   "hint": "Bip a dit qu'avec une batterie pleine, son treuil pourrait te descendre au fond du cratère."
+  },
+  {
+   "id": "fouiller_poussiere",
+   "effects": [
+    "reveal:ruban",
+    "flag:ruban_trouve"
+   ],
+   "points": 5,
+   "text": "Tu creuses dans la poussière, pfff, pfff… et tu trouves un gros rouleau de ruban adhésif !",
+   "triggers": [
+    {
+     "verb": "search",
+     "object": "poussiere"
+    }
+   ],
+   "hint": "Bip a perdu son rouleau de ruban près du gros rocher… Et ce tas de poussière ?"
+  },
+  {
+   "id": "faire_drapeau",
+   "when": [
+    "has:drapeau",
+    "has:mat",
+    "is:drapeau:plie"
+   ],
+   "effects": [
+    "lose:mat",
+    "set:drapeau:sur_mat"
+   ],
+   "points": 10,
+   "text": "Tu accroches le drapeau en haut du mât, clic ! Il est prêt à être planté.",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "drapeau",
+     "target": "mat"
+    }
+   ],
+   "hint": "Un drapeau tout plié ne tient pas debout. Il lui faudrait un mât !"
+  },
+  {
+   "id": "planter_drapeau",
+   "place": "plaine",
+   "when": [
+    "has:drapeau",
+    "is:drapeau:sur_mat"
+   ],
+   "effects": [
+    "lose:drapeau",
+    "flag:drapeau_plante",
+    "reveal:drapeau_plante"
+   ],
+   "points": 10,
+   "text": "Tu enfonces le mât dans la poussière, tchouk ! Le drapeau se déplie, tout fier, devant la caméra.",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "drapeau"
+    },
+    {
+     "verb": "push",
+     "object": "drapeau"
+    }
+   ],
+   "not_yet": "Un drapeau tout seul, ça tombe par terre, flop ! Il faudrait l'accrocher à un mât.",
+   "hint": "La caméra est tournée vers la grande plaine. Ton drapeau, sur son mât, y serait parfait !"
+  },
+  {
+   "id": "planter_ailleurs",
+   "when": [
+    "flag:jamais"
+   ],
+   "effects": [],
+   "points": 0,
+   "not_yet": "Ici ? La caméra ne le verrait pas. Elle est tournée vers la grande plaine…",
+   "text": "",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "drapeau"
+    }
+   ]
+  },
+  {
+   "id": "deplier_antenne",
+   "when": [
+    "is:antenne:repliee"
+   ],
+   "effects": [
+    "set:antenne:depliee"
+   ],
+   "points": 10,
+   "text": "Tu déplies l'antenne, clic, clic, clic… elle s'ouvre comme un grand parapluie !",
+   "triggers": [
+    {
+     "verb": "open",
+     "object": "antenne"
+    },
+    {
+     "verb": "pull",
+     "object": "antenne"
+    },
+    {
+     "verb": "use",
+     "object": "antenne"
+    }
+   ],
+   "hint": "L'antenne est toute repliée, comme un parapluie fermé. Et si tu l'ouvrais ?"
+  },
+  {
+   "id": "reparer_antenne",
+   "when": [
+    "has:ruban",
+    "is:antenne:depliee"
+   ],
+   "effects": [
+    "lose:ruban",
+    "set:antenne:reparee"
+   ],
+   "points": 10,
+   "not_yet": "L'antenne est toute repliée : déplie-la d'abord, sinon tu vas tout scotcher de travers !",
+   "text": "Tu enroules le ruban autour du câble coupé, scrouitch, scrouitch ! Le câble est réparé.",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "ruban",
+     "target": "antenne"
+    }
+   ],
+   "hint": "Le câble de l'antenne est coupé net. Avec du ruban adhésif, on répare tout !"
+  },
+  {
+   "id": "batterie_camera",
+   "when": [
+    "has:batterie",
+    "is:camera:sans_batterie"
+   ],
+   "effects": [
+    "lose:batterie",
+    "set:camera:prete"
+   ],
+   "points": 10,
+   "text": "Tu glisses la batterie dans la caméra, clac ! Une petite lumière verte s'allume.",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "batterie",
+     "target": "camera"
+    }
+   ],
+   "hint": "Le compartiment à batterie de la caméra est vide… Tu n'as pas une batterie ?"
+  },
+  {
+   "id": "allumer_camera",
+   "when": [
+    "is:camera:prete",
+    "is:antenne:reparee",
+    "flag:drapeau_plante"
+   ],
+   "effects": [
+    "end:tele"
+   ],
+   "points": 10,
+   "not_yet": "Rien ne se passe. Il faut une batterie dans la caméra, une antenne réparée… et quelque chose de beau à filmer dans la plaine, comme un drapeau !",
+   "text": "Tu appuies sur le bouton « Marche »… bzzzt ! La caméra se met à filmer.",
+   "triggers": [
+    {
+     "verb": "push",
+     "object": "camera"
+    },
+    {
+     "verb": "light",
+     "object": "camera"
+    },
+    {
+     "verb": "use",
+     "object": "camera"
+    },
+    {
+     "verb": "push",
+     "object": "bouton_marche"
+    }
+   ],
+   "hint": "Tout est prêt : la batterie, l'antenne, le drapeau. Il ne reste qu'à appuyer sur « Marche » !"
+  },
+  {
+   "id": "faire_longue_pince",
+   "when": [
+    "has:pince",
+    "has:manche",
+    "is:pince:courte"
+   ],
+   "effects": [
+    "lose:manche",
+    "set:pince:longue"
+   ],
+   "points": 10,
+   "text": "Tu fixes la petite pince au bout du manche, clic ! Clic, clic, clic, le manche s'allonge : voilà une longue pince.",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "pince",
+     "target": "manche"
+    }
+   ],
+   "hint": "La petite pince est trop courte… Le manche télescopique s'allonge, clic, clic, clic !"
+  },
+  {
+   "id": "attraper_pierre",
+   "when": [
+    "has:pince",
+    "is:pince:longue"
+   ],
+   "effects": [
+    "gain:pierre",
+    "flag:pierre_prise"
+   ],
+   "points": 10,
+   "text": "Tu glisses la longue pince tout au fond de la fente… cric, crac… tu tiens la pierre bleue !",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "pince",
+     "target": "fente"
+    }
+   ],
+   "not_yet": "Tu glisses la petite pince dans la fente… elle est trop courte ! Il faudrait l'allonger.",
+   "hint": "La pierre est tout au fond de la fente, bien trop loin pour ta main. Il te faudrait une longue pince."
+  },
+  {
+   "id": "donner_pierre",
+   "when": [
+    "has:pierre"
+   ],
+   "effects": [
+    "end:pierre"
+   ],
+   "points": 10,
+   "text": "Tu tends la pierre bleue à la capitaine Lou. Elle brille dans la cabine comme une petite étoile !",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "pierre",
+     "target": "lou"
+    }
+   ],
+   "hint": "Les savants rêvent d'une pierre bleue… La capitaine Lou t'attend dans le module !"
+  },
+  {
+   "id": "bouton_rouge",
+   "effects": [
+    "end:alarme"
+   ],
+   "points": 0,
+   "text": "Tu appuies sur le gros bouton rouge…",
+   "triggers": [
+    {
+     "verb": "push",
+     "object": "gros_bouton_rouge"
+    }
+   ]
+  },
+  {
+   "id": "sauter_rocher",
+   "place": "rocher",
+   "effects": [
+    "end:envol"
+   ],
+   "points": 0,
+   "text": "Tu sautes du haut du rocher de toutes tes forces… BOING !",
+   "triggers": [
+    {
+     "verb": "jump",
+     "object": "rocher"
+    }
+   ]
+  },
+  {
+   "id": "petits_boutons",
+   "effects": [],
+   "points": 0,
+   "text": "Tu appuies sur un petit bouton… bip ! Une lumière verte clignote, puis une jaune. Rien de grave : ces petits boutons surveillent le module. Mais le gros bouton rouge, lui, on n'y touche jamais !",
+   "triggers": [
+    {
+     "verb": "push",
+     "object": "boutons"
+    }
+   ]
+  },
+  {
+   "id": "petit_saut",
+   "place": "rocher",
+   "effects": [],
+   "points": 0,
+   "text": "Tu fais un petit bond… et tu redescends tout doucement, comme une plume. Rigolo ! Mais jamais de grand saut du haut du rocher : la capitaine Lou l'a bien dit.",
+   "triggers": [
+    {
+     "verb": "jump"
+    }
+   ]
+  }
+ ],
+ "endings": [
+  {
+   "id": "tele",
+   "kind": "win",
+   "text": "Sur Terre, dans des millions de maisons, l'écran gris s'allume : on voit la Lune, ton drapeau qui brille, et toi qui fais coucou ! Toute la Terre applaudit. Bip fait des tours de roue de joie : « Bip bip, hourra ! »",
+   "fact": "Le 21 juillet 1969, à l'heure française, des humains ont marché sur la Lune pour la première fois : des millions de gens l'ont regardé à la télé, et les astronautes ont rapporté des pierres de Lune !"
+  },
+  {
+   "id": "pierre",
+   "kind": "win",
+   "text": "La capitaine Lou ouvre de grands yeux : « Une pierre de Lune bleue ! Les savants de la Terre vont l'étudier pendant des années ! » Vous la rangez dans une boîte spéciale, et la Libellule repart vers la Terre avec ton trésor.",
+   "fact": "Les astronautes des missions Apollo ont rapporté sur Terre près de 400 kilos de pierres et de poussière de Lune, que les savants étudient encore aujourd'hui !"
+  },
+  {
+   "id": "alarme",
+   "kind": "lose",
+   "text": "POUET, POUET, POUET ! C'est l'alarme de retour. Sur Terre, le chef de mission crie : « Tout le monde rentre ! » C'était une fausse alerte, et tout le monde rigole… mais la Libellule décolle déjà vers la maison, sans avoir fini sa mission."
+  },
+  {
+   "id": "envol",
+   "kind": "lose",
+   "text": "Avec la petite pesanteur, tu montes, tu montes… et tu redescends tout doucement, comme une plume, dans un trou plein de poussière. La capitaine Lou vient te repêcher avec une corde en riant, mais c'est déjà l'heure de repartir : la mission est finie !"
+  }
+ ],
+ "format": 2,
+ "puzzles": [
+  {
+   "goal": "Filmer la Lune pour la télé",
+   "action": "allumer_camera",
+   "needs": [
+    "camera",
+    "antenne",
+    "drapeau"
+   ],
+   "clue_in": "lou"
+  },
+  {
+   "goal": "Mettre la batterie dans la caméra",
+   "action": "batterie_camera",
+   "needs": [
+    "batterie",
+    "camera"
+   ],
+   "clue_in": "lou"
+  },
+  {
+   "goal": "Réparer le câble de l'antenne",
+   "action": "reparer_antenne",
+   "needs": [
+    "ruban",
+    "antenne"
+   ],
+   "clue_in": "lou"
+  },
+  {
+   "goal": "Déplier l'antenne",
+   "action": "deplier_antenne",
+   "needs": [
+    "antenne"
+   ],
+   "clue_in": "lou"
+  },
+  {
+   "goal": "Trouver le ruban de Bip",
+   "action": "fouiller_poussiere",
+   "needs": [
+    "poussiere"
+   ],
+   "clue_in": "rocher"
+  },
+  {
+   "goal": "Planter le drapeau devant la caméra",
+   "action": "planter_drapeau",
+   "needs": [
+    "drapeau",
+    "plaine"
+   ],
+   "clue_in": "lou"
+  },
+  {
+   "goal": "Accrocher le drapeau à son mât",
+   "action": "faire_drapeau",
+   "needs": [
+    "drapeau",
+    "mat"
+   ],
+   "clue_in": "drapeau"
+  },
+  {
+   "goal": "Ou rapporter la pierre bleue à la capitaine",
+   "action": "donner_pierre",
+   "needs": [
+    "pierre",
+    "lou"
+   ],
+   "clue_in": "lou"
+  },
+  {
+   "goal": "Attraper la pierre au fond de la fente",
+   "action": "attraper_pierre",
+   "needs": [
+    "pince",
+    "fente"
+   ],
+   "clue_in": "fente"
+  },
+  {
+   "goal": "Allonger la pince",
+   "action": "faire_longue_pince",
+   "needs": [
+    "pince",
+    "manche"
+   ],
+   "clue_in": "manche"
+  },
+  {
+   "goal": "Descendre dans le cratère avec le treuil de Bip",
+   "action": "batterie_bip",
+   "needs": [
+    "batterie",
+    "bip"
+   ],
+   "clue_in": "bip"
+  },
+  {
+   "goal": "Dégager les roues de Bip",
+   "action": "pousser_bip",
+   "needs": [
+    "bip"
+   ],
+   "clue_in": "echelle"
+  },
+  {
+   "goal": "Ouvrir la trappe pour sortir",
+   "action": "ouvrir_trappe",
+   "needs": [
+    "trappe",
+    "casque"
+   ],
+   "clue_in": "lou"
+  },
+  {
+   "goal": "Mettre son casque",
+   "action": "mettre_casque",
+   "needs": [
+    "casque"
+   ],
+   "clue_in": "lou"
+  }
+ ]
 }

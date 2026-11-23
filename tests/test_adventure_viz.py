@@ -47,9 +47,10 @@ def test_the_chain_of_piko():
     ch = viz.chain(World(PIKO))
     edges = {(e["from"], e["to"]): e["alt"] for e in ch["edges"]}
     assert ("act:nourrir_crabe", "take:cle") in edges  # the key appears when the crab eats
-    assert ("take:cle", "act:ouvrir_porte") in edges
+    assert ("take:cle", "open:porte") in edges and ("open:porte", "reach:sommet") in edges  # the key opens the door
     assert ("act:embeter_crabe", "end:pince") in edges
-    assert edges[("act:fouiller_tiroir", "take:allumettes")]  # version 1: two actions, two ways
+    assert ("code:tiroir", "open:tiroir") in edges  # the shells' code opens the drawer: one way, no action
+    assert not edges[("open:tiroir", "take:allumettes")]
 
 
 def test_the_page_shows_the_model_as_it_is():
@@ -65,7 +66,15 @@ def test_the_page_shows_the_model_as_it_is():
     assert ("take:cle", "open:porte") in edges and ("open:porte", "reach:sommet") in edges
     assert ("open:tiroir", "take:allumettes") in edges and ("code:tiroir", "open:tiroir") in edges
     assert {s["kind"] for s in d["roads"]["feu"]} >= {"press", "act"}
-    v1 = viz.describe(PIKO, "banque", [], [])
+    old = {  # a version 1 graph (stored adventures may still be): shown migrated, one trigger per action
+        "title": "v1", "difficulty": "facile", "start": {"place": "a", "inventory": []},
+        "places": [{"id": "a", "name": "la salle", "description": ".", "exits": []}],
+        "items": [{"id": "z", "name": "le levier", "at": "a", "takeable": False, "description": "."}],
+        "actions": [{"id": "tirer", "verb": "pull", "object": "z", "effects": ["end:w"], "text": "."},
+                    {"id": "pousser", "verb": "push", "object": "z", "effects": ["end:w"], "text": "."}],
+        "endings": [{"id": "w", "kind": "win", "text": "."}],
+    }  # fmt: skip
+    v1 = viz.describe(old, "banque", [], [])
     assert v1["model"] == 1 and all(len(a["triggers"]) == 1 for a in v1["graph"]["actions"])
 
 

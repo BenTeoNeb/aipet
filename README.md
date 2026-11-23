@@ -43,6 +43,12 @@ bedtime, and who never pretends to be alive. aipet is that friend, designed with
 - **Games refereed by code, not by the model:** quiz, *ni oui ni non*, *devine à quoi je pense*,
   interactive stories with recurring characters, and short discovery lessons adapted to the child's
   school level, with scores and records per child.
+- **Adventures where the child is the hero:** places to explore, things to find and combine,
+  characters to help, codes, riddles, companions, several ways to win and a few to lose. The model
+  narrates and understands the child; the world is run by [`storyworld`](storyworld/), a library
+  that proves every adventure can be won and never leaves the hero stuck. A bank of hand-written
+  adventures, new ones invented on the child's idea, three difficulties, and every adventure kept to
+  be played again.
 - **A sense of time.** The pet knows the time of day, school days and school holidays, gets tired
   after a while, naps, and sleeps at night. It hangs up when it falls asleep or when the child says
   goodbye, so the conversation really ends.
@@ -154,6 +160,14 @@ Built on [Pipecat](https://github.com/pipecat-ai/pipecat). The main pieces:
 - **Games** ([`aipet/games/`](aipet/games/)): scores, question counts, story plans and records are
   kept by code, so the model cannot claim a win it did not earn. Preparing a story, quiz or lesson
   runs in the background: a child talking meanwhile gets an answer instead of cancelling it.
+- **Adventures** ([`storyworld/`](storyworld/), [`aipet/games/adventure.py`](aipet/games/adventure.py)):
+  an adventure is a JSON world graph (format: [`storyworld/SPEC.md`](storyworld/SPEC.md), with its
+  JSON Schema). The narrator turns what the child says into intents that name things by id; the
+  engine plays each one and returns an outcome to tell (done, not yet, imagination…). A checker and
+  a solver prove each adventure before it is played: winnable, never stuck, and the turn doing what
+  the solver counts on. `/adventures` explores them (map, puzzle chain, data, games played) and
+  `pet-playtest` lets a simulated child play one against the real narrator. Design notes:
+  [`docs/adventure/`](docs/adventure/).
 - **Turn-taking** ([`aipet/turns.py`](aipet/turns.py)): while the pet is silent, the child's turn
   starts on voice and Pipecat's Smart Turn model decides when the sentence is finished; while it
   speaks, interrupting it takes a few words, so noise never cuts it off.
@@ -181,7 +195,11 @@ aipet/
   engines.py, openrouter_tts.py speech recognition, models and voice providers
   memory/                       store (Memory), cards (file format), short_cards, updates, forget,
                                 repo (git), condensation (keeper), tools, speakers, « Ma vie » moments
-  games/                        quiz, yes/no, guess, story, learn (common.py: Activity, Host)
+  games/                        quiz, yes/no, guess, story, learn (common.py: Activity, Host);
+                                adventure (the activity, generator, bank), adventure_engine (the
+                                pet's facade of storyworld), adventure_viz, adventure_playtest,
+                                adventure_patterns
+  data/adventures/              the bank of hand-written adventures
   skills.py, builtin_skills/    SKILL.md activities
   rhythm.py, energy.py          time, school calendar, tiredness
   turns.py, cleanup.py          turn-taking, transcript and spoken-text filters
@@ -191,6 +209,8 @@ aipet/
   parents.py                    parents' space
   web.py, static/               web server, pet page, parents' page
   headless.py                   Raspberry Pi entry point
+storyworld/                     the adventure engine as a library (no import of aipet): model, rules,
+                                world and its turn, solver, check, hints, schema/, locale/, SPEC.md
 characters/                     the pets
 frontend/                       source of the bundled Pipecat JS client
 deploy/                         Raspberry Pi deploy script and systemd unit
@@ -252,10 +272,12 @@ on the device: use a key with a spending limit), and installs the `aipet` system
 
 ```bash
 uv sync
-uv run pytest                                   # ~20 s, no network access, with coverage
+uv run pytest                                   # ~3 min, no network access, with coverage
 uv run ruff check . && uv run ruff format --check .
 uv run mypy                                     # type check
 cd frontend && npm ci && npm run build          # only when updating the Pipecat JS client
+uv run pet-adventures                           # writes the adventure explorer page (also at /adventures)
+uv run pet-playtest "Le phare de Piko"          # a simulated child plays an adventure (real model calls)
 ```
 
 Tests fake every model and audio service, and fail on any non-local connection, so running them never
@@ -277,6 +299,8 @@ Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).
   pack, and the household's country (school system, holidays) kept separate.
 - **Custom wake words** (« hey Flocon »), and echo cancellation on the Pi so children can interrupt.
 - **Parents' space on the home network**, protected by a parent code.
+- **Adventures:** rewrite the bank in the current format; publish `storyworld` on its own (its own
+  package and licence, an immutable state for a faster solver, a second language).
 
 ## License
 

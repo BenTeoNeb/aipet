@@ -1,137 +1,698 @@
 {
-  "title": "Le ballon de Versailles",
-  "difficulty": "facile",
-  "tags": ["montgolfiere", "ballon", "versailles", "roi", "mouton", "canard", "coq", "chateau"],
-  "fact": "Le 19 septembre 1783, à Versailles, devant le roi Louis XVI, un ballon gonflé à l'air chaud a emporté un mouton appelé Montauciel, un canard et un coq : ils ont volé environ huit minutes avant de se poser dans un bois, et ce sont les premiers passagers d'un ballon !",
-  "intro": "Nous sommes le 19 septembre 1783, dans la grande cour du château de Versailles. Un énorme ballon bleu et doré va s'envoler devant le roi, avec trois passagers : un mouton, un canard et un coq. Mais juste avant le départ… les trois animaux se sont échappés !",
-  "goal": "Ramener le mouton, le canard et le coq dans le panier du ballon, puis le faire s'envoler.",
-  "start": {"place": "cour", "inventory": []},
-  "places": [
-    {"id": "cour", "name": "la cour du château", "aliases": ["cour", "chateau", "cour du chateau", "depart"],
-     "description": "La grande cour du château, pleine de dames et de messieurs en perruques poudrées. Au milieu, un immense ballon bleu et doré, tenu par des cordes. Dessous, un grand panier d'osier pour les passagers, à côté d'un tas de paille prêt pour le feu, que Monsieur de Montgolfier, l'inventeur, allumera. Lucile, la petite apprentie, se ronge les ongles en tenant une clochette. Au balcon, le roi Louis XVI attend.",
-     "variants": [{"when": ["has:clochette"], "description": "La grande cour du château, pleine de dames et de messieurs en perruques poudrées. Au milieu, un immense ballon bleu et doré, tenu par des cordes. Dessous, un grand panier d'osier pour les passagers, à côté d'un tas de paille prêt pour le feu, que Monsieur de Montgolfier, l'inventeur, allumera. Lucile, la petite apprentie, trépigne d'impatience. Au balcon, le roi Louis XVI attend."}],
-     "exits": [
-       {"to": "jardin", "label": "vers les jardins", "dir": "nord"},
-       {"to": "cuisines", "label": "vers les cuisines", "dir": "ouest"},
-       {"to": "bassin", "label": "vers le grand bassin", "dir": "est"}]},
-    {"id": "jardin", "name": "les jardins du roi", "aliases": ["jardins", "jardin", "parterre"],
-     "description": "Des jardins magnifiques, avec des fleurs bien rangées. Le mouton Montauciel croque les tulipes du roi, scrountch scrountch ! Et tout en haut d'une statue, un coq fait le fier.",
-     "variants": [
-       {"when": ["flag:mouton"], "description": "Des jardins magnifiques, avec des fleurs bien rangées… et quelques tulipes croquées. Tout en haut d'une statue, un coq fait le fier."},
-       {"when": ["flag:coq"], "description": "Des jardins magnifiques, avec des fleurs bien rangées. Le mouton Montauciel croque les tulipes du roi, scrountch scrountch ! La statue est toute seule, maintenant."},
-       {"when": ["flag:mouton", "flag:coq"], "description": "Des jardins magnifiques et bien calmes. Il manque juste quelques tulipes croquées par un certain mouton…"}],
-     "exits": [{"to": "cour", "label": "vers la cour du château", "dir": "sud"}]},
-    {"id": "cuisines", "name": "les cuisines du château", "aliases": ["cuisines", "cuisine"],
-     "description": "Les cuisines du château, où ça sent bon le pain chaud. Sur la table, une brioche toute dorée. Dans un coin, des grains de blé pour les poules.",
-     "variants": [
-       {"when": ["has:brioche"], "description": "Les cuisines du château, où ça sent bon le pain chaud. Dans un coin, des grains de blé pour les poules."},
-       {"when": ["flag:brioche_donnee"], "description": "Les cuisines du château, où ça sent bon le pain chaud. Dans un coin, des grains de blé pour les poules."},
-       {"when": ["has:grains"], "description": "Les cuisines du château, où ça sent bon le pain chaud. Sur la table, une brioche toute dorée."},
-       {"when": ["flag:coq"], "description": "Les cuisines du château, où ça sent bon le pain chaud. Sur la table, une brioche toute dorée."},
-       {"when": ["has:brioche", "has:grains"], "description": "Les cuisines du château, où ça sent bon le pain chaud. Les cuisiniers préparent le goûter du roi."},
-       {"when": ["has:brioche", "flag:coq"], "description": "Les cuisines du château, où ça sent bon le pain chaud. Les cuisiniers préparent le goûter du roi."},
-       {"when": ["flag:brioche_donnee", "has:grains"], "description": "Les cuisines du château, où ça sent bon le pain chaud. Les cuisiniers préparent le goûter du roi."},
-       {"when": ["flag:brioche_donnee", "flag:coq"], "description": "Les cuisines du château, où ça sent bon le pain chaud. Les cuisiniers préparent le goûter du roi."}],
-     "exits": [{"to": "cour", "label": "vers la cour du château", "dir": "est"}]},
-    {"id": "bassin", "name": "le grand bassin", "aliases": ["bassin", "grand bassin", "fontaine", "fontaines", "eau"],
-     "description": "Un grand bassin plein d'eau, avec des fontaines endormies. Le canard Barbotte nage au milieu en faisant coin-coin. Au bord, il y a une grosse vanne en fer, et Monsieur Gouttelette, le fontainier, qui la surveille : « Surtout, ne touche pas à ma vanne, sinon tout le monde sera arrosé ! »",
-     "variants": [{"when": ["flag:canard"], "description": "Un grand bassin tout calme, avec des fontaines endormies. Au bord, la grosse vanne en fer, et Monsieur Gouttelette le fontainier qui la surveille : « Surtout, ne touche pas à ma vanne, sinon tout le monde sera arrosé ! »"}],
-     "exits": [{"to": "cour", "label": "vers la cour du château", "dir": "ouest"}]}
-  ],
-  "items": [
-    {"id": "clochette", "name": "la clochette de Montauciel", "aliases": ["clochette", "cloche", "grelot"], "at": "", "takeable": true,
-     "description": "Une petite clochette en cuivre, ding ding. Lucile dit que Montauciel la suit partout."},
-    {"id": "ballon", "name": "le grand ballon", "aliases": ["ballon", "montgolfiere", "ballon bleu"], "at": "cour", "takeable": false,
-     "fixed": "Il est grand comme une maison !", "description": "Un ballon immense, en toile et en papier, bleu avec des dessins dorés. Pour s'envoler, il faut le remplir d'air chaud."},
-    {"id": "panier", "name": "le panier d'osier", "aliases": ["panier", "nacelle", "cage", "osier"], "at": "cour", "takeable": false,
-     "fixed": "Il est attaché sous le ballon.", "description": "Un grand panier d'osier, accroché sous le ballon, pour les passagers à plumes et à laine."},
-    {"id": "paille", "name": "le tas de paille", "aliases": ["paille", "feu", "tas de paille", "foyer"], "at": "cour", "takeable": false,
-     "fixed": "C'est la paille pour le feu qui gonfle le ballon : elle reste sous le ballon !",
-     "description": "Un tas de paille et de laine. Quand on l'allume, l'air chaud monte dans le ballon et le fait s'envoler. C'est Monsieur de Montgolfier, l'inventeur, qui l'allumera avec sa chandelle : le feu, c'est pour les grands !"},
-    {"id": "tulipes", "name": "les tulipes du roi", "aliases": ["tulipes", "tulipe", "fleurs", "fleur"], "at": "jardin", "takeable": false,
-     "fixed": "Ce sont les fleurs du roi ! Le jardinier ne serait pas content.", "description": "De belles tulipes rouges et jaunes… enfin, celles que le mouton n'a pas encore croquées."},
-    {"id": "statue", "name": "la statue", "aliases": ["statue", "sculpture"], "at": "jardin", "takeable": false,
-     "fixed": "Une statue en marbre, c'est plus lourd qu'un éléphant !", "description": "Une grande statue en marbre blanc, très haute."},
-    {"id": "brioche", "name": "une brioche", "aliases": ["brioche", "gateau", "miettes"], "at": "cuisines", "takeable": true,
-     "description": "Une brioche toute dorée et toute moelleuse. Miam !"},
-    {"id": "grains", "name": "des grains de blé", "aliases": ["grains", "graines", "ble", "grains de ble"], "at": "cuisines", "takeable": true,
-     "description": "Une poignée de grains de blé, ce que les coqs et les poules préfèrent."},
-    {"id": "vanne", "name": "la grande vanne", "aliases": ["vanne", "roue", "robinet", "manivelle"], "at": "bassin", "takeable": false,
-     "fixed": "Elle est vissée au sol, et très lourde.", "description": "Une grosse roue en fer qui commande toutes les fontaines du château. Un petit écriteau dit : « Défense de toucher ! »"}
-  ],
-  "characters": [
-    {"id": "lucile", "name": "Lucile l'apprentie", "aliases": ["lucile", "apprentie", "petite apprentie"], "at": "cour",
-     "description": "Une petite fille avec un tablier plein de suie et des yeux qui pétillent.",
-     "says": "Vite ! Il faut ramener nos trois passagers dans le panier. Montauciel le mouton suit toujours sa clochette. Le coq adore les grains, et pour le canard, demande au fontainier. Quand ils seront tous là, Monsieur de Montgolfier allumera le feu sous le ballon !"},
-    {"id": "montauciel", "name": "Montauciel le mouton", "aliases": ["montauciel", "mouton", "agneau", "brebis"], "at": "jardin",
-     "description": "Un mouton tout frisé, très gourmand, qui adore le son de sa clochette.",
-     "says": "Bêêê ! Les tulipes, c'est délicieux… mais ce que j'aime le plus au monde, c'est le son de ma clochette, bêêê !"},
-    {"id": "coq", "name": "Fanfaron le coq", "aliases": ["fanfaron", "coq"], "at": "jardin",
-     "description": "Un coq tout fier, la crête bien droite, très gourmand de grains.",
-     "says": "Cocorico ! Un bon petit repas de grains, voilà ce que j'aime ! Cocorico !"},
-    {"id": "canard", "name": "Barbotte le canard", "aliases": ["barbotte", "canard", "cane"], "at": "bassin",
-     "description": "Un canard tout blanc qui barbote et fait des ronds dans l'eau.",
-     "says": "Coin ! Coin ! J'adore les miettes de brioche… et les amis qui parlent canard ! Coin !"},
-    {"id": "gouttelette", "name": "Monsieur Gouttelette le fontainier", "aliases": ["gouttelette", "fontainier", "monsieur gouttelette", "monsieur"], "at": "bassin",
-     "description": "Un monsieur à grosse moustache, avec des bottes et un chapeau tout mouillé.",
-     "says": "Bonjour, petit ! Ce canard adore la brioche, va voir aux cuisines. Et il suit tous ceux qui parlent canard : coin-coin ! Et surtout, ne touche pas à ma grande vanne : elle ouvre toutes les fontaines du roi d'un coup, et tout le monde serait arrosé !"}
-  ],
-  "actions": [
-    {"id": "parler_lucile", "verb": "talk", "object": "lucile", "repeatable": true, "when": ["!has:clochette"], "effects": ["gain:clochette"], "points": 5,
-     "not_yet": "Lucile sautille : « Vite ! Montauciel suit sa clochette, le coq adore les grains, et pour le canard, demande au fontainier ! Quand ils seront tous dans le panier, Monsieur de Montgolfier allumera le feu. »",
-     "text": "Lucile sautille : « Vite ! Il faut ramener nos trois passagers dans le panier. Montauciel le mouton suit toujours sa clochette : tiens, prends-la ! Le coq adore les grains, et pour le canard, demande au fontainier. Quand ils seront tous là, Monsieur de Montgolfier allumera le feu sous le ballon ! »"},
-    {"id": "sonner_clochette", "verb": "use", "object": "clochette", "target": "montauciel", "when": ["has:clochette", "!flag:mouton"],
-     "effects": ["flag:mouton", "move:montauciel:cour"], "points": 10,
-     "not_yet": "Montauciel est déjà dans le panier : il agite la tête, ding, bêêê !",
-     "text": "Ding, ding, ding ! Montauciel dresse les oreilles, avale sa dernière tulipe et trotte vers la cour… Hop, il saute tout seul dans le panier du ballon ! Bêêê !"},
-    {"id": "grains_coq", "verb": "give", "object": "grains", "target": "coq", "when": ["has:grains", "!flag:coq"],
-     "effects": ["lose:grains", "flag:coq", "move:coq:cour"], "points": 10,
-     "text": "Tu fais une petite traînée de grains jusqu'à la cour. Le coq descend de la statue en battant des ailes, picore, picore… et suit les grains jusque dans le panier du ballon ! Cocorico !"},
-    {"id": "grimper_statue", "verb": "climb", "object": "statue", "when": ["flag:statue_interdite"], "effects": [], "points": 0,
-     "not_yet": "Un jardinier lève les bras : « On ne grimpe pas sur les statues du roi : c'est bien trop haut et bien trop glissant ! »",
-     "text": ""},
-    {"id": "brioche_canard", "verb": "give", "object": "brioche", "target": "canard", "when": ["has:brioche", "!flag:canard"],
-     "effects": ["lose:brioche", "flag:canard", "flag:brioche_donnee", "move:canard:cour"], "points": 10,
-     "not_yet": "Barbotte est déjà dans le panier, coin ! Garde ta brioche pour le goûter.",
-     "text": "Tu émiettes la brioche, et Barbotte sort de l'eau en se dandinant : miam, miam, coin ! Tu sèmes les miettes jusqu'à la cour, et hop, le canard saute dans le panier du ballon !"},
-    {"id": "imiter_canard", "verb": "sing", "object": "canard", "when": ["!flag:canard"],
-     "effects": ["flag:canard", "flag:coincoin", "move:canard:cour"], "points": 10,
-     "not_yet": "Barbotte te répond depuis le panier : « Coin ! Coin ! »",
-     "text": "Tu fais « Coin ! Coin ! Coin ! » en battant des bras comme des ailes. Barbotte sort de l'eau, tout content d'avoir trouvé un ami canard, et te suit en se dandinant, coin-coin, jusque dans le panier du ballon !"},
-    {"id": "danser_canard", "verb": "dance", "object": "canard", "when": ["!flag:canard"],
-     "effects": ["flag:canard", "flag:coincoin", "move:canard:cour"], "points": 10,
-     "not_yet": "Barbotte te répond depuis le panier : « Coin ! Coin ! »",
-     "text": "Tu marches en te dandinant comme un canard, en criant « Coin ! Coin ! ». Barbotte sort de l'eau, tout content d'avoir trouvé un ami canard, et te suit, coin-coin, jusque dans le panier du ballon !"},
-    {"id": "sauter_bassin", "verb": "jump", "object": "bassin", "effects": [], "points": 0,
-     "text": "Monsieur Gouttelette t'arrête tout de suite : « Holà ! On ne saute jamais dans un bassin, c'est profond et l'eau est froide ! Barbotte, lui, aime la brioche… et les amis qui parlent canard. »"},
-    {"id": "nager_bassin", "verb": "swim", "object": "bassin", "effects": [], "points": 0,
-     "text": "Monsieur Gouttelette t'arrête tout de suite : « Holà ! On ne nage pas dans le bassin du roi, c'est profond et l'eau est froide ! Barbotte, lui, aime la brioche… et les amis qui parlent canard. »"},
-    {"id": "toucher_vanne", "verb": "touch", "object": "vanne", "effects": [], "points": 0,
-     "text": "Monsieur Gouttelette fronce ses gros sourcils : « Pas touche ! Si quelqu'un tourne cette vanne, toutes les fontaines arrosent le château ! »"},
-    {"id": "tourner_vanne", "verb": "use", "object": "vanne", "effects": ["end:arrose"], "points": 0,
-     "text": "Tu tournes la grande vanne… grrrrr… et PSCHIIIT !"},
-    {"id": "ouvrir_vanne", "verb": "open", "object": "vanne", "effects": ["end:arrose"], "points": 0,
-     "text": "Tu ouvres la grande vanne… grrrrr… et PSCHIIIT !"},
-    {"id": "tirer_vanne", "verb": "pull", "object": "vanne", "effects": ["end:arrose"], "points": 0,
-     "text": "Tu tires sur la grande vanne… grrrrr… et PSCHIIIT !"},
-    {"id": "pousser_vanne", "verb": "push", "object": "vanne", "effects": ["end:arrose"], "points": 0,
-     "text": "Tu pousses la grande vanne… grrrrr… et PSCHIIIT !"},
-    {"id": "feu_envol", "verb": "light", "object": "paille", "when": ["flag:mouton", "flag:canard", "flag:coq", "!flag:coincoin"], "effects": ["end:envol"], "points": 20,
-     "not_yet": "Lucile t'arrête : « Pas encore ! Il manque des passagers dans le panier ! »",
-     "text": "Tu cries : « Ils sont tous là ! » Monsieur de Montgolfier, l'inventeur, allume la paille avec sa chandelle. Fchhhh ! L'air chaud gonfle le ballon… et il décolle !"},
-    {"id": "feu_coincoin", "verb": "light", "object": "paille", "when": ["flag:mouton", "flag:canard", "flag:coq", "flag:coincoin"], "effects": ["end:coincoin"], "points": 20,
-     "not_yet": "Lucile t'arrête : « Pas encore ! Il manque des passagers dans le panier ! »",
-     "text": "Tu cries : « Ils sont tous là ! » Monsieur de Montgolfier, l'inventeur, allume la paille avec sa chandelle. Fchhhh ! L'air chaud gonfle le ballon… et il décolle !"},
-    {"id": "ballon_envol", "verb": "light", "object": "ballon", "when": ["flag:mouton", "flag:canard", "flag:coq", "!flag:coincoin"], "effects": ["end:envol"], "points": 20,
-     "not_yet": "Lucile t'arrête : « Pas encore ! Il manque des passagers dans le panier ! »",
-     "text": "Tu cries : « Ils sont tous là ! » Monsieur de Montgolfier, l'inventeur, allume la paille sous le ballon. Fchhhh ! L'air chaud le gonfle… et il décolle !"},
-    {"id": "ballon_coincoin", "verb": "light", "object": "ballon", "when": ["flag:mouton", "flag:canard", "flag:coq", "flag:coincoin"], "effects": ["end:coincoin"], "points": 20,
-     "not_yet": "Lucile t'arrête : « Pas encore ! Il manque des passagers dans le panier ! »",
-     "text": "Tu cries : « Ils sont tous là ! » Monsieur de Montgolfier, l'inventeur, allume la paille sous le ballon. Fchhhh ! L'air chaud le gonfle… et il décolle !"}
-  ],
-  "endings": [
-    {"id": "envol", "kind": "win", "text": "Le ballon monte, monte dans le ciel bleu, avec Montauciel, Barbotte et Fanfaron dans le panier : bêêê, coin-coin, cocorico ! Toute la foule applaudit, et même le roi Louis XVI lève son chapeau. Grâce à toi, ce sont les tout premiers passagers d'un ballon !"},
-    {"id": "coincoin", "kind": "win", "text": "Le ballon s'envole avec Montauciel, Barbotte et Fanfaron : bêêê, coin-coin, cocorico ! Tout là-haut, Barbotte se penche et appelle son nouvel ami : « Coin ! Coin ! » Tu lui réponds « Coin ! Coin ! »… et toute la foule se met à faire coin-coin avec toi, même le roi Louis XVI ! Lucile pouffe : « Tu es le meilleur canard de tout Versailles ! »"},
-    {"id": "arrose", "kind": "lose", "text": "Toutes les fontaines du château s'allument d'un coup ! Les dames, les messieurs, les perruques poudrées : tout le monde est arrosé ! Le ballon en papier est tout mouillé, et le départ est remis à un autre jour. Seul Barbotte le canard est ravi : coin-coin !"}
-  ]
+ "format": 2,
+ "title": "Le ballon de Versailles",
+ "difficulty": "facile",
+ "tags": [
+  "montgolfiere",
+  "ballon",
+  "versailles",
+  "roi",
+  "mouton",
+  "canard",
+  "coq",
+  "chateau"
+ ],
+ "fact": "Le 19 septembre 1783, à Versailles, devant le roi Louis XVI, un ballon gonflé à l'air chaud a emporté un mouton appelé Montauciel, un canard et un coq : ils ont volé environ huit minutes avant de se poser dans un bois, et ce sont les premiers passagers d'un ballon !",
+ "intro": "Nous sommes le 19 septembre 1783, dans la grande cour du château de Versailles. Un énorme ballon bleu et doré va s'envoler devant le roi, avec trois passagers : un mouton, un canard et un coq. Mais juste avant le départ… les trois animaux se sont échappés !",
+ "goal": "Ramener le mouton, le canard et le coq dans le panier du ballon, puis le faire s'envoler.",
+ "start": {
+  "place": "cour",
+  "inventory": []
+ },
+ "places": [
+  {
+   "id": "cour",
+   "name": "la cour du château",
+   "aliases": [
+    "cour",
+    "chateau",
+    "cour du chateau",
+    "depart"
+   ],
+   "description": "La grande cour du château, pleine de dames et de messieurs en perruques poudrées. Au milieu, un immense ballon bleu et doré, tenu par des cordes. Dessous, un grand panier d'osier pour les passagers, à côté d'un tas de paille prêt pour le feu, que Monsieur de Montgolfier, l'inventeur, allumera. Au balcon, le roi Louis XVI attend.",
+   "decor": [
+    "perruques",
+    "cordes",
+    "pavés",
+    "carrosses",
+    "balcon"
+   ],
+   "exits": [
+    {
+     "to": "jardin",
+     "label": "vers les jardins",
+     "dir": "nord"
+    },
+    {
+     "to": "cuisines",
+     "label": "vers les cuisines",
+     "dir": "ouest"
+    },
+    {
+     "to": "bassin",
+     "label": "vers le grand bassin",
+     "dir": "est"
+    }
+   ]
+  },
+  {
+   "id": "jardin",
+   "name": "les jardins du roi",
+   "aliases": [
+    "jardins",
+    "jardin",
+    "parterre"
+   ],
+   "description": "Des jardins magnifiques, avec des fleurs bien rangées.",
+   "details": [
+    {
+     "when": [
+      "!is:montauciel:libre"
+     ],
+     "text": "Il manque juste quelques tulipes, croquées par un certain mouton…"
+    }
+   ],
+   "decor": [
+    "allées",
+    "buissons taillés",
+    "papillons",
+    "bancs"
+   ],
+   "exits": [
+    {
+     "to": "cour",
+     "label": "vers la cour du château",
+     "dir": "sud"
+    }
+   ]
+  },
+  {
+   "id": "cuisines",
+   "name": "les cuisines du château",
+   "aliases": [
+    "cuisines",
+    "cuisine"
+   ],
+   "description": "Les cuisines du château, où ça sent bon le pain chaud. Les cuisiniers préparent le goûter du roi.",
+   "decor": [
+    "casseroles",
+    "fourneaux",
+    "farine",
+    "tabliers"
+   ],
+   "exits": [
+    {
+     "to": "cour",
+     "label": "vers la cour du château",
+     "dir": "est"
+    }
+   ]
+  },
+  {
+   "id": "bassin",
+   "name": "le grand bassin",
+   "aliases": [
+    "bassin",
+    "grand bassin",
+    "fontaine",
+    "fontaines",
+    "eau"
+   ],
+   "description": "Un grand bassin plein d'eau, avec des fontaines endormies.",
+   "decor": [
+    "jets d'eau",
+    "nénuphars",
+    "grenouilles",
+    "margelle"
+   ],
+   "exits": [
+    {
+     "to": "cour",
+     "label": "vers la cour du château",
+     "dir": "ouest"
+    }
+   ]
+  }
+ ],
+ "items": [
+  {
+   "id": "clochette",
+   "kind": "thing",
+   "name": "la clochette de Montauciel",
+   "aliases": [
+    "clochette",
+    "cloche",
+    "grelot"
+   ],
+   "at": "lucile",
+   "description": "Une petite clochette en cuivre, ding ding. Lucile dit que Montauciel la suit partout."
+  },
+  {
+   "id": "ballon",
+   "kind": "scenery",
+   "name": "le grand ballon",
+   "aliases": [
+    "ballon",
+    "montgolfiere",
+    "ballon bleu"
+   ],
+   "at": "cour",
+   "fixed": "Il est grand comme une maison !",
+   "sturdy": "Surtout pas ! Le ballon de Monsieur de Montgolfier doit s'envoler devant le roi.",
+   "description": "Un ballon immense, en toile et en papier, bleu avec des dessins dorés. Pour s'envoler, il faut le remplir d'air chaud."
+  },
+  {
+   "id": "panier",
+   "kind": "scenery",
+   "name": "le panier d'osier",
+   "aliases": [
+    "panier",
+    "nacelle",
+    "cage",
+    "osier"
+   ],
+   "at": "cour",
+   "fixed": "Il est attaché sous le ballon.",
+   "description": "Un grand panier d'osier, accroché sous le ballon, pour les passagers à plumes et à laine."
+  },
+  {
+   "id": "paille",
+   "kind": "scenery",
+   "name": "le tas de paille",
+   "aliases": [
+    "paille",
+    "feu",
+    "tas de paille",
+    "foyer"
+   ],
+   "at": "cour",
+   "fixed": "C'est la paille pour le feu qui gonfle le ballon : elle reste sous le ballon !",
+   "description": "Un tas de paille et de laine. Quand on l'allume, l'air chaud monte dans le ballon et le fait s'envoler. C'est Monsieur de Montgolfier, l'inventeur, qui l'allumera avec sa chandelle : le feu, c'est pour les grands !"
+  },
+  {
+   "id": "tulipes",
+   "kind": "scenery",
+   "name": "les tulipes du roi",
+   "aliases": [
+    "tulipes",
+    "tulipe",
+    "fleurs",
+    "fleur"
+   ],
+   "at": "jardin",
+   "fixed": "Ce sont les fleurs du roi ! Le jardinier ne serait pas content.",
+   "fragile": true,
+   "description": "De belles tulipes rouges et jaunes… enfin, celles que le mouton n'a pas encore croquées."
+  },
+  {
+   "id": "statue",
+   "kind": "scenery",
+   "name": "la statue",
+   "aliases": [
+    "statue",
+    "sculpture"
+   ],
+   "at": "jardin",
+   "fixed": "Une statue en marbre, c'est plus lourd qu'un éléphant !",
+   "sturdy": "Une statue en marbre, c'est bien trop solide !",
+   "initial": "Au milieu des fleurs se dresse une grande statue de marbre blanc.",
+   "description": "Une grande statue en marbre blanc, très haute."
+  },
+  {
+   "id": "brioche",
+   "kind": "thing",
+   "name": "une brioche",
+   "aliases": [
+    "brioche",
+    "gateau",
+    "miettes"
+   ],
+   "at": "cuisines",
+   "initial": "Sur la table, une brioche toute dorée.",
+   "description": "Une brioche toute dorée et toute moelleuse. Miam !"
+  },
+  {
+   "id": "grains",
+   "kind": "thing",
+   "name": "des grains de blé",
+   "aliases": [
+    "grains",
+    "graines",
+    "ble",
+    "grains de ble"
+   ],
+   "at": "cuisines",
+   "initial": "Dans un coin, des grains de blé pour les poules.",
+   "description": "Une poignée de grains de blé, ce que les coqs et les poules préfèrent."
+  },
+  {
+   "id": "vanne",
+   "kind": "scenery",
+   "name": "la grande vanne",
+   "aliases": [
+    "vanne",
+    "roue",
+    "robinet",
+    "manivelle"
+   ],
+   "at": "bassin",
+   "fixed": "Elle est vissée au sol, et très lourde.",
+   "sturdy": "Une grosse vanne en fer : bien trop solide !",
+   "initial": "Au bord, il y a une grosse vanne en fer.",
+   "description": "Une grosse roue en fer qui commande toutes les fontaines du château. Un petit écriteau dit : « Défense de toucher ! »"
+  }
+ ],
+ "characters": [
+  {
+   "id": "lucile",
+   "name": "Lucile l'apprentie",
+   "aliases": [
+    "lucile",
+    "apprentie",
+    "petite apprentie"
+   ],
+   "at": "cour",
+   "description": "Une petite fille avec un tablier plein de suie et des yeux qui pétillent.",
+   "initial": [
+    {
+     "when": [
+      "has:clochette"
+     ],
+     "text": "Lucile, la petite apprentie, trépigne d'impatience."
+    },
+    {
+     "text": "Lucile, la petite apprentie, se ronge les ongles."
+    }
+   ],
+   "says": [
+    {
+     "when": [
+      "has:clochette"
+     ],
+     "text": "Vite ! Montauciel suit sa clochette, le coq adore les grains, et pour le canard, demande au fontainier ! Quand ils seront tous dans le panier, Monsieur de Montgolfier allumera le feu."
+    },
+    {
+     "text": "Vite ! Il faut ramener nos trois passagers dans le panier. Montauciel le mouton suit toujours sa clochette. Le coq adore les grains, et pour le canard, demande au fontainier. Quand ils seront tous là, Monsieur de Montgolfier allumera le feu sous le ballon !"
+    }
+   ]
+  },
+  {
+   "id": "montauciel",
+   "name": "Montauciel le mouton",
+   "aliases": [
+    "montauciel",
+    "mouton",
+    "agneau",
+    "brebis"
+   ],
+   "at": "jardin",
+   "description": "Un mouton tout frisé, très gourmand, qui adore le son de sa clochette.",
+   "states": [
+    {
+     "id": "libre",
+     "initial": "Le mouton Montauciel croque les tulipes du roi, scrountch scrountch !",
+     "says": "Bêêê ! Les tulipes, c'est délicieux… mais ce que j'aime le plus au monde, c'est le son de ma clochette, bêêê !"
+    },
+    {
+     "id": "panier",
+     "initial": "Montauciel le mouton attend dans le panier du ballon : bêêê !",
+     "says": "Bêêê ! Quand est-ce qu'on s'envole ? Bêêê !"
+    }
+   ]
+  },
+  {
+   "id": "coq",
+   "name": "Fanfaron le coq",
+   "aliases": [
+    "fanfaron",
+    "coq"
+   ],
+   "at": "jardin",
+   "description": "Un coq tout fier, la crête bien droite, très gourmand de grains.",
+   "states": [
+    {
+     "id": "libre",
+     "initial": "Tout en haut de la statue, un coq fait le fier.",
+     "says": "Cocorico ! Un bon petit repas de grains, voilà ce que j'aime ! Cocorico !"
+    },
+    {
+     "id": "panier",
+     "initial": "Fanfaron le coq se pavane dans le panier du ballon : cocorico !",
+     "says": "Cocorico ! Le premier coq dans les nuages, ce sera moi ! Cocorico !"
+    }
+   ]
+  },
+  {
+   "id": "canard",
+   "name": "Barbotte le canard",
+   "aliases": [
+    "barbotte",
+    "canard",
+    "cane"
+   ],
+   "at": "bassin",
+   "description": "Un canard tout blanc qui barbote et fait des ronds dans l'eau.",
+   "states": [
+    {
+     "id": "libre",
+     "initial": "Le canard Barbotte nage au milieu en faisant coin-coin.",
+     "says": "Coin ! Coin ! J'adore les miettes de brioche… et les amis qui parlent canard ! Coin !"
+    },
+    {
+     "id": "panier",
+     "initial": "Barbotte le canard picore les dernières miettes de brioche, dans le panier du ballon.",
+     "says": "Coin ! Miam, la brioche du roi ! Coin !"
+    },
+    {
+     "id": "ami",
+     "initial": "Barbotte le canard te fait coin-coin depuis le panier du ballon.",
+     "says": "Coin ! Coin ! (Barbotte te répond comme à son meilleur ami canard.)"
+    }
+   ]
+  },
+  {
+   "id": "gouttelette",
+   "name": "Monsieur Gouttelette le fontainier",
+   "aliases": [
+    "gouttelette",
+    "fontainier",
+    "monsieur gouttelette",
+    "monsieur"
+   ],
+   "at": "bassin",
+   "description": "Un monsieur à grosse moustache, avec des bottes et un chapeau tout mouillé.",
+   "initial": "Monsieur Gouttelette, le fontainier, surveille sa vanne : « Surtout, ne touche pas à ma vanne, sinon tout le monde sera arrosé ! »",
+   "says": "Bonjour, petit ! Ce canard adore la brioche, va voir aux cuisines. Et il suit tous ceux qui parlent canard : coin-coin ! Et surtout, ne touche pas à ma grande vanne : elle ouvre toutes les fontaines du roi d'un coup, et tout le monde serait arrosé !"
+  }
+ ],
+ "actions": [
+  {
+   "id": "parler_lucile",
+   "triggers": [
+    {
+     "verb": "talk",
+     "object": "lucile"
+    }
+   ],
+   "repeatable": true,
+   "when": [
+    "!has:clochette"
+   ],
+   "effects": [
+    "gain:clochette"
+   ],
+   "points": 5,
+   "not_yet": "Lucile sautille : « Vite ! Montauciel suit sa clochette, le coq adore les grains, et pour le canard, demande au fontainier ! Quand ils seront tous dans le panier, Monsieur de Montgolfier allumera le feu. »",
+   "text": "Lucile sautille : « Vite ! Il faut ramener nos trois passagers dans le panier. Montauciel le mouton suit toujours sa clochette : tiens, prends-la ! Le coq adore les grains, et pour le canard, demande au fontainier. Quand ils seront tous là, Monsieur de Montgolfier allumera le feu sous le ballon ! »",
+   "hint": "Lucile a l'air de savoir comment faire… et elle tient quelque chose qui pourrait t'aider. Parle-lui !"
+  },
+  {
+   "id": "sonner_clochette",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "clochette",
+     "target": "montauciel"
+    },
+    {
+     "verb": "use",
+     "object": "clochette"
+    }
+   ],
+   "place": "jardin",
+   "when": [
+    "has:clochette",
+    "is:montauciel:libre"
+   ],
+   "effects": [
+    "set:montauciel:panier",
+    "move:montauciel:cour"
+   ],
+   "points": 10,
+   "not_yet": "Montauciel est déjà dans le panier : il agite la tête, ding, bêêê !",
+   "text": "Ding, ding, ding ! Montauciel dresse les oreilles, avale sa dernière tulipe et trotte vers la cour… Hop, il saute tout seul dans le panier du ballon ! Bêêê !",
+   "hint": "Montauciel adore un petit bruit, ding ding… Tu as ce qu'il faut ?"
+  },
+  {
+   "id": "grains_coq",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "grains",
+     "target": "coq"
+    }
+   ],
+   "when": [
+    "has:grains",
+    "is:coq:libre"
+   ],
+   "effects": [
+    "lose:grains",
+    "set:coq:panier",
+    "move:coq:cour"
+   ],
+   "points": 10,
+   "text": "Tu fais une petite traînée de grains jusqu'à la cour. Le coq descend de la statue en battant des ailes, picore, picore… et suit les grains jusque dans le panier du ballon ! Cocorico !",
+   "hint": "Le coq ne descendra pas de sa statue pour rien… Qu'est-ce qu'un coq aime picorer ?"
+  },
+  {
+   "id": "grimper_statue",
+   "triggers": [
+    {
+     "verb": "climb",
+     "object": "statue"
+    }
+   ],
+   "effects": [],
+   "points": 0,
+   "text": "Un jardinier lève les bras : « On ne grimpe pas sur les statues du roi : c'est bien trop haut et bien trop glissant ! »"
+  },
+  {
+   "id": "brioche_canard",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "brioche",
+     "target": "canard"
+    }
+   ],
+   "when": [
+    "has:brioche",
+    "is:canard:libre"
+   ],
+   "effects": [
+    "lose:brioche",
+    "set:canard:panier",
+    "move:canard:cour"
+   ],
+   "points": 10,
+   "not_yet": "Barbotte est déjà dans le panier, coin ! Garde ta brioche pour le goûter.",
+   "text": "Tu émiettes la brioche, et Barbotte sort de l'eau en se dandinant : miam, miam, coin ! Tu sèmes les miettes jusqu'à la cour, et hop, le canard saute dans le panier du ballon !",
+   "hint": "Barbotte adore une gourmandise toute dorée, qu'on trouve aux cuisines…"
+  },
+  {
+   "id": "imiter_canard",
+   "triggers": [
+    {
+     "verb": "sing",
+     "object": "canard"
+    },
+    {
+     "verb": "dance",
+     "object": "canard"
+    }
+   ],
+   "when": [
+    "is:canard:libre"
+   ],
+   "effects": [
+    "set:canard:ami",
+    "move:canard:cour"
+   ],
+   "points": 10,
+   "not_yet": "Barbotte te répond depuis le panier : « Coin ! Coin ! »",
+   "text": "Tu fais « Coin ! Coin ! Coin ! » en te dandinant et en battant des bras comme des ailes. Barbotte sort de l'eau, tout content d'avoir trouvé un ami canard, et te suit, coin-coin, jusque dans le panier du ballon !",
+   "hint": "Barbotte suit tous ceux qui parlent sa langue… Comment fait le canard ?"
+  },
+  {
+   "id": "sauter_bassin",
+   "triggers": [
+    {
+     "verb": "jump",
+     "object": "bassin"
+    },
+    {
+     "verb": "swim",
+     "object": "bassin"
+    }
+   ],
+   "effects": [],
+   "points": 0,
+   "text": "Monsieur Gouttelette t'arrête tout de suite : « Holà ! On ne va jamais dans le bassin du roi, c'est profond et l'eau est froide ! Barbotte, lui, aime la brioche… et les amis qui parlent canard. »"
+  },
+  {
+   "id": "toucher_vanne",
+   "triggers": [
+    {
+     "verb": "touch",
+     "object": "vanne"
+    }
+   ],
+   "effects": [],
+   "points": 0,
+   "text": "Monsieur Gouttelette fronce ses gros sourcils : « Pas touche ! Si quelqu'un tourne cette vanne, toutes les fontaines arrosent le château ! »"
+  },
+  {
+   "id": "tourner_vanne",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "vanne"
+    },
+    {
+     "verb": "open",
+     "object": "vanne"
+    },
+    {
+     "verb": "pull",
+     "object": "vanne"
+    },
+    {
+     "verb": "push",
+     "object": "vanne"
+    }
+   ],
+   "effects": [
+    "end:arrose"
+   ],
+   "points": 0,
+   "warning": "Monsieur Gouttelette lève les bras : « Non ! Si tu tournes ma vanne, toutes les fontaines arrosent le château ! » Tu es sûr ?",
+   "text": "Tu tournes la grande vanne… grrrrr… et PSCHIIIT !"
+  },
+  {
+   "id": "feu_envol",
+   "triggers": [
+    {
+     "verb": "light",
+     "object": "paille"
+    },
+    {
+     "verb": "light",
+     "object": "ballon"
+    }
+   ],
+   "when": [
+    "is:montauciel:panier",
+    "is:coq:panier",
+    "is:canard:panier"
+   ],
+   "effects": [
+    "end:envol"
+   ],
+   "points": 20,
+   "not_yet": "Lucile t'arrête : « Pas encore ! Il manque des passagers dans le panier ! »",
+   "text": "Tu cries : « Ils sont tous là ! » Monsieur de Montgolfier, l'inventeur, allume la paille avec sa chandelle. Fchhhh ! L'air chaud gonfle le ballon… et il décolle !",
+   "hint": "Les trois passagers sont dans le panier : il est temps de demander le feu !"
+  },
+  {
+   "id": "feu_coincoin",
+   "triggers": [
+    {
+     "verb": "light",
+     "object": "paille"
+    },
+    {
+     "verb": "light",
+     "object": "ballon"
+    }
+   ],
+   "when": [
+    "is:montauciel:panier",
+    "is:coq:panier",
+    "is:canard:ami"
+   ],
+   "effects": [
+    "end:coincoin"
+   ],
+   "points": 20,
+   "not_yet": "Lucile t'arrête : « Pas encore ! Il manque des passagers dans le panier ! »",
+   "text": "Tu cries : « Ils sont tous là ! » Monsieur de Montgolfier, l'inventeur, allume la paille avec sa chandelle. Fchhhh ! L'air chaud gonfle le ballon… et il décolle !",
+   "hint": "Les trois passagers sont dans le panier : il est temps de demander le feu !"
+  }
+ ],
+ "endings": [
+  {
+   "id": "envol",
+   "kind": "win",
+   "text": "Le ballon monte, monte dans le ciel bleu, avec Montauciel, Barbotte et Fanfaron dans le panier : bêêê, coin-coin, cocorico ! Toute la foule applaudit, et même le roi Louis XVI lève son chapeau. Grâce à toi, ce sont les tout premiers passagers d'un ballon !",
+   "fact": "Les ballons à air chaud ont été inventés par deux frères, Joseph et Étienne de Montgolfier : c'est pour ça qu'on les appelle des montgolfières !"
+  },
+  {
+   "id": "coincoin",
+   "kind": "win",
+   "text": "Le ballon s'envole avec Montauciel, Barbotte et Fanfaron : bêêê, coin-coin, cocorico ! Tout là-haut, Barbotte se penche et appelle son nouvel ami : « Coin ! Coin ! » Tu lui réponds « Coin ! Coin ! »… et toute la foule se met à faire coin-coin avec toi, même le roi Louis XVI ! Lucile pouffe : « Tu es le meilleur canard de tout Versailles ! »",
+   "fact": "Chez les canards, c'est surtout la maman, la cane, qui fait « coin-coin » bien fort ; le papa canard a une petite voix toute enrouée !"
+  },
+  {
+   "id": "arrose",
+   "kind": "lose",
+   "text": "Toutes les fontaines du château s'allument d'un coup ! Les dames, les messieurs, les perruques poudrées : tout le monde est arrosé ! Le ballon en papier est tout mouillé, et le départ est remis à un autre jour. Seul Barbotte le canard est ravi : coin-coin !"
+  }
+ ],
+ "puzzles": [
+  {
+   "goal": "Faire s'envoler le ballon avec ses trois passagers",
+   "action": "feu_envol",
+   "needs": [
+    "montauciel",
+    "coq",
+    "canard",
+    "paille"
+   ],
+   "clue_in": "lucile"
+  },
+  {
+   "goal": "Ramener le canard avec de la brioche",
+   "action": "brioche_canard",
+   "needs": [
+    "brioche",
+    "canard"
+   ],
+   "clue_in": "gouttelette"
+  },
+  {
+   "goal": "Ou parler canard avec Barbotte",
+   "action": "imiter_canard",
+   "needs": [
+    "canard"
+   ],
+   "clue_in": "gouttelette"
+  },
+  {
+   "goal": "Ramener le coq avec des grains",
+   "action": "grains_coq",
+   "needs": [
+    "grains",
+    "coq"
+   ],
+   "clue_in": "lucile"
+  },
+  {
+   "goal": "Ramener Montauciel avec sa clochette",
+   "action": "sonner_clochette",
+   "needs": [
+    "clochette",
+    "montauciel"
+   ],
+   "clue_in": "lucile"
+  },
+  {
+   "goal": "Avoir la clochette de Montauciel",
+   "action": "parler_lucile",
+   "needs": [
+    "lucile"
+   ],
+   "clue_in": "lucile"
+  }
+ ]
 }

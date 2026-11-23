@@ -1,1188 +1,1434 @@
 {
-  "title": "La lanterne de la Grande Muraille",
-  "difficulty": "difficile",
-  "intro": "Il y a très longtemps, en Chine. Ce soir, c'est la fête des lanternes ! Mais la fête ne peut commencer que si le message du village arrive à la tour lointaine, tout là-bas sur la Grande Muraille. Et la lune va bientôt se lever…",
-  "goal": "Faire arriver le message du village jusqu'à la tour lointaine de la Grande Muraille avant le lever de la lune.",
-  "tags": [
-    "chine",
-    "muraille",
-    "lanterne",
-    "cerf-volant",
-    "chameau",
-    "fete",
-    "papier",
-    "dragon"
-  ],
-  "fact": "Sur la Grande Muraille de Chine, les soldats s'envoyaient des messages de tour en tour : avec de la fumée le jour, et avec du feu la nuit !",
-  "start": {
-    "place": "village",
-    "inventory": []
+ "title": "La lanterne de la Grande Muraille",
+ "difficulty": "difficile",
+ "intro": "Il y a très longtemps, en Chine. Ce soir, c'est la fête des lanternes ! Mais la fête ne peut commencer que si le message du village arrive à la tour lointaine, tout là-bas sur la Grande Muraille. Et la lune va bientôt se lever…",
+ "goal": "Faire arriver le message du village jusqu'à la tour lointaine de la Grande Muraille avant le lever de la lune.",
+ "tags": [
+  "chine",
+  "muraille",
+  "lanterne",
+  "cerf-volant",
+  "chameau",
+  "fete",
+  "papier",
+  "dragon"
+ ],
+ "fact": "Sur la Grande Muraille de Chine, les soldats s'envoyaient des messages de tour en tour : avec de la fumée le jour, et avec du feu la nuit !",
+ "start": {
+  "place": "village",
+  "inventory": []
+ },
+ "places": [
+  {
+   "id": "village",
+   "name": "la place du village",
+   "aliases": [
+    "village",
+    "place",
+    "place du village"
+   ],
+   "description": "La place du village, toute décorée pour la fête. Un grand dragon de papier attend le défilé.",
+   "exits": [
+    {
+     "to": "maison_the",
+     "label": "vers la maison de thé",
+     "dir": "est"
+    },
+    {
+     "to": "pont",
+     "label": "vers le pont de pierre",
+     "dir": "ouest"
+    },
+    {
+     "to": "bambous",
+     "label": "vers la forêt de bambous",
+     "dir": "nord"
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "!open:dragon"
+     ],
+     "text": "Quelque chose tinte dans sa gueule."
+    }
+   ],
+   "decor": [
+    "lampions rouges",
+    "banc",
+    "guirlandes",
+    "pavés",
+    "puits"
+   ]
   },
-  "places": [
+  {
+   "id": "maison_the",
+   "name": "la maison de thé",
+   "aliases": [
+    "maison de the",
+    "salon de the",
+    "maison du the"
+   ],
+   "description": "Une maison de thé toute chaude, qui sent le jasmin. Sur le comptoir, la théière du thé du soir fume à côté d'un panier de petits pains.",
+   "exits": [
     {
-      "id": "village",
-      "name": "la place du village",
-      "aliases": [
-        "village",
-        "place",
-        "place du village"
-      ],
-      "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé : quelque chose tinte dans sa gueule. Sur un banc, une lanterne de papier pas encore allumée et un foulard de soie rouge.",
-      "exits": [
-        {
-          "to": "maison_the",
-          "label": "vers la maison de thé",
-          "dir": "est"
-        },
-        {
-          "to": "pont",
-          "label": "vers le pont de pierre",
-          "dir": "ouest"
-        },
-        {
-          "to": "bambous",
-          "label": "vers la forêt de bambous",
-          "dir": "nord"
-        }
-      ],
-      "variants": [
-        {
-          "when": [
-            "!flag:piece_trouvee",
-            "!has:lanterne",
-            "has:foulard"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé : quelque chose tinte dans sa gueule. Sur un banc, une lanterne de papier pas encore allumée."
-        },
-        {
-          "when": [
-            "!flag:piece_trouvee",
-            "!has:lanterne",
-            "has:cerf_volant"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé : quelque chose tinte dans sa gueule. Sur un banc, une lanterne de papier pas encore allumée."
-        },
-        {
-          "when": [
-            "!flag:piece_trouvee",
-            "!has:lanterne",
-            "has:cerf_volant_msg"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé : quelque chose tinte dans sa gueule. Sur un banc, une lanterne de papier pas encore allumée."
-        },
-        {
-          "when": [
-            "!flag:piece_trouvee",
-            "has:lanterne",
-            "!has:foulard",
-            "!has:cerf_volant",
-            "!has:cerf_volant_msg"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé : quelque chose tinte dans sa gueule. Sur un banc, un foulard de soie rouge."
-        },
-        {
-          "when": [
-            "!flag:piece_trouvee",
-            "has:lanterne",
-            "has:foulard"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé : quelque chose tinte dans sa gueule."
-        },
-        {
-          "when": [
-            "!flag:piece_trouvee",
-            "has:lanterne",
-            "has:cerf_volant"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé : quelque chose tinte dans sa gueule."
-        },
-        {
-          "when": [
-            "!flag:piece_trouvee",
-            "has:lanterne",
-            "has:cerf_volant_msg"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé : quelque chose tinte dans sa gueule."
-        },
-        {
-          "when": [
-            "flag:piece_trouvee",
-            "!has:lanterne",
-            "!has:foulard",
-            "!has:cerf_volant",
-            "!has:cerf_volant_msg"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé. Sur un banc, une lanterne de papier pas encore allumée et un foulard de soie rouge."
-        },
-        {
-          "when": [
-            "flag:piece_trouvee",
-            "!has:lanterne",
-            "has:foulard"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé. Sur un banc, une lanterne de papier pas encore allumée."
-        },
-        {
-          "when": [
-            "flag:piece_trouvee",
-            "!has:lanterne",
-            "has:cerf_volant"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé. Sur un banc, une lanterne de papier pas encore allumée."
-        },
-        {
-          "when": [
-            "flag:piece_trouvee",
-            "!has:lanterne",
-            "has:cerf_volant_msg"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé. Sur un banc, une lanterne de papier pas encore allumée."
-        },
-        {
-          "when": [
-            "flag:piece_trouvee",
-            "has:lanterne",
-            "!has:foulard",
-            "!has:cerf_volant",
-            "!has:cerf_volant_msg"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé. Sur un banc, un foulard de soie rouge."
-        },
-        {
-          "when": [
-            "flag:piece_trouvee",
-            "has:lanterne",
-            "has:foulard"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé."
-        },
-        {
-          "when": [
-            "flag:piece_trouvee",
-            "has:lanterne",
-            "has:cerf_volant"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé."
-        },
-        {
-          "when": [
-            "flag:piece_trouvee",
-            "has:lanterne",
-            "has:cerf_volant_msg"
-          ],
-          "description": "La place du village, toute décorée pour la fête. Grand-mère Mei accroche des lampions rouges. Un grand dragon de papier attend le défilé."
-        }
-      ]
-    },
-    {
-      "id": "maison_the",
-      "name": "la maison de thé",
-      "aliases": [
-        "maison de the",
-        "salon de the",
-        "maison du the"
-      ],
-      "description": "Une maison de thé toute chaude, qui sent le jasmin. Madame Hua fait chauffer l'eau sur un petit réchaud, pschhh. Dans un coin, Maître Wen, le vieux savant, trempe son pinceau dans l'encre. Sur le comptoir, la théière du thé du soir fume à côté d'un panier de petits pains. « Pas touche à mon thé du soir, prévient Madame Hua : une gorgée, et on dort jusqu'au matin ! »",
-      "exits": [
-        {
-          "to": "village",
-          "label": "vers la place du village",
-          "dir": "ouest"
-        }
-      ]
-    },
-    {
-      "id": "pont",
-      "name": "le pont de pierre",
-      "aliases": [
-        "pont",
-        "pont de pierre",
-        "vieux pont"
-      ],
-      "description": "Un vieux pont de pierre tout rond, au-dessus d'une rivière qui chante, glouglou. Des carpes dorées font des ronds dans l'eau. Ici, on ne saute pas et on ne nage pas : l'eau est profonde et froide, et le courant tire fort !",
-      "exits": [
-        {
-          "to": "village",
-          "label": "vers la place du village",
-          "dir": "est"
-        },
-        {
-          "to": "atelier",
-          "label": "vers l'atelier de papier",
-          "dir": "ouest"
-        }
-      ]
-    },
-    {
-      "id": "atelier",
-      "name": "l'atelier de papier",
-      "aliases": [
-        "atelier",
-        "atelier de papier",
-        "papeterie"
-      ],
-      "description": "Dans l'atelier, ça sent le bois mouillé. Petit Lu, l'apprenti, écrase de l'écorce dans un grand bac de pâte. Sur un séchoir, des feuilles toutes neuves pendent comme du linge : il y en a peut-être une bien sèche, si on cherche bien.",
-      "exits": [
-        {
-          "to": "pont",
-          "label": "vers le pont de pierre",
-          "dir": "est"
-        }
-      ],
-      "variants": [
-        {
-          "when": [
-            "flag:feuille_trouvee"
-          ],
-          "description": "Dans l'atelier, ça sent le bois mouillé. Petit Lu, l'apprenti, écrase de l'écorce dans un grand bac de pâte. Sur un séchoir, des feuilles toutes neuves pendent comme du linge, encore toutes mouillées."
-        }
-      ]
-    },
-    {
-      "id": "bambous",
-      "name": "la forêt de bambous",
-      "aliases": [
-        "foret",
-        "bambouseraie",
-        "foret de bambous"
-      ],
-      "description": "Une forêt de bambous si hauts qu'ils chatouillent le ciel, crrr, crrr ! Dodu, un grand chameau à deux bosses échappé d'une caravane de la route de la Soie, est couché au beau milieu du sentier, sur un tas de bambous secs, et il ne veut pas se relever.",
-      "variants": [
-        {
-          "when": [
-            "flag:panda_parti"
-          ],
-          "description": "Une forêt de bambous si hauts qu'ils chatouillent le ciel, crrr, crrr ! Dodu le chameau s'est relevé, le ventre plein, et rumine au bord du sentier. Le sentier vers la Muraille est libre !"
-        }
-      ],
-      "exits": [
-        {
-          "to": "village",
-          "label": "vers la place du village",
-          "dir": "sud"
-        },
-        {
-          "to": "pied",
-          "label": "vers la Grande Muraille",
-          "dir": "nord",
-          "when": [
-            "flag:panda_parti"
-          ],
-          "blocked": "Dodu le chameau est couché en plein milieu du sentier. Un chameau couché, c'est bien trop lourd à pousser !"
-        }
-      ]
-    },
-    {
-      "id": "pied",
-      "name": "le pied de la Muraille",
-      "aliases": [
-        "pied de la muraille",
-        "bas de la muraille",
-        "grande muraille"
-      ],
-      "description": "Te voilà au pied de la Grande Muraille ! Elle serpente sur les montagnes comme un dragon de pierre, si longue qu'on n'en voit pas le bout. Plume Blanche la grue se tient sur une patte près d'un grand escalier.",
-      "exits": [
-        {
-          "to": "bambous",
-          "label": "vers la forêt de bambous",
-          "dir": "sud"
-        },
-        {
-          "to": "rempart",
-          "label": "le grand escalier",
-          "dir": "haut"
-        }
-      ]
-    },
-    {
-      "id": "rempart",
-      "name": "le chemin de ronde",
-      "aliases": [
-        "chemin de ronde",
-        "rempart",
-        "haut de la muraille",
-        "muraille"
-      ],
-      "description": "En haut de la Muraille, le vent souffle fort, whooo ! Parfait pour faire voler quelque chose. Au loin, sur la montagne, on devine la tour lointaine, toute noire. Devant la porte de la tour de guet, Ah-Fu le garde ronfle, assis contre un grand gong.",
-      "variants": [
-        {
-          "when": [
-            "flag:garde_reveille"
-          ],
-          "description": "En haut de la Muraille, le vent souffle fort, whooo ! Au loin, on devine la tour lointaine, toute noire. Ah-Fu le garde se frotte les yeux près de la porte ouverte de la tour de guet."
-        }
-      ],
-      "exits": [
-        {
-          "to": "pied",
-          "label": "le grand escalier",
-          "dir": "bas"
-        },
-        {
-          "to": "tour",
-          "label": "la tour de guet",
-          "dir": "est",
-          "when": [
-            "flag:garde_reveille"
-          ],
-          "blocked": "La porte de la tour de guet est fermée. La clé pend à la ceinture d'Ah-Fu… qui ronfle !"
-        }
-      ]
-    },
-    {
-      "id": "tour",
-      "name": "la tour de guet",
-      "aliases": [
-        "tour de guet",
-        "tour",
-        "guet"
-      ],
-      "description": "Le haut de la tour de guet. Au milieu, un foyer de pierre tout noirci, vide et froid. Par les créneaux, on voit la tour lointaine, de l'autre côté de la vallée : ils attendent un signal !",
-      "variants": [
-        {
-          "when": [
-            "flag:foyer_bambou"
-          ],
-          "description": "Le haut de la tour de guet. Le foyer de pierre est rempli de bambou sec, prêt à brûler. Par les créneaux, on voit la tour lointaine : ils attendent un signal !"
-        }
-      ],
-      "exits": [
-        {
-          "to": "rempart",
-          "label": "vers le chemin de ronde",
-          "dir": "ouest"
-        }
-      ]
+     "to": "village",
+     "label": "vers la place du village",
+     "dir": "ouest"
     }
-  ],
-  "items": [
+   ],
+   "decor": [
+    "tasses",
+    "coussins",
+    "tables basses",
+    "encre",
+    "pinceaux"
+   ]
+  },
+  {
+   "id": "pont",
+   "name": "le pont de pierre",
+   "aliases": [
+    "pont",
+    "pont de pierre",
+    "vieux pont"
+   ],
+   "description": "Un vieux pont de pierre tout rond, au-dessus d'une rivière qui chante, glouglou. Des carpes dorées font des ronds dans l'eau. Ici, on ne saute pas et on ne nage pas : l'eau est profonde et froide, et le courant tire fort !",
+   "exits": [
     {
-      "id": "dragon",
-      "name": "le dragon de papier",
-      "aliases": [
-        "dragon",
-        "dragon de papier",
-        "gueule"
-      ],
-      "at": "village",
-      "takeable": false,
-      "fixed": "Il est bien trop long : il faut dix personnes pour le porter !",
-      "description": "Un long dragon de papier rouge et or, avec de gros yeux ronds et une grande gueule ouverte."
+     "to": "village",
+     "label": "vers la place du village",
+     "dir": "est"
     },
     {
-      "id": "piece",
-      "name": "une pièce trouée",
-      "aliases": [
-        "piece",
-        "piece trouee",
-        "sou",
-        "monnaie"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Une pièce de bronze ronde, avec un trou carré au milieu : on les enfilait sur une ficelle !"
-    },
-    {
-      "id": "lanterne",
-      "name": "une lanterne de papier",
-      "aliases": [
-        "lanterne",
-        "lanterne rouge",
-        "lanterne de papier"
-      ],
-      "at": "village",
-      "takeable": true,
-      "description": "Une jolie lanterne de papier rouge, avec une petite bougie dedans."
-    },
-    {
-      "id": "foulard",
-      "name": "un foulard de soie",
-      "aliases": [
-        "foulard",
-        "soie",
-        "foulard rouge",
-        "tissu"
-      ],
-      "at": "village",
-      "takeable": true,
-      "description": "Un foulard de soie rouge, léger comme une plume. Le vent adore jouer avec."
-    },
-    {
-      "id": "theiere",
-      "name": "la théière",
-      "aliases": [
-        "theiere",
-        "the",
-        "the du soir"
-      ],
-      "at": "maison_the",
-      "takeable": false,
-      "fixed": "Madame Hua y tient comme à la prunelle de ses yeux !",
-      "description": "Une théière en porcelaine bleue. Une petite étiquette dit : « Thé du soir, pour bien dormir »."
-    },
-    {
-      "id": "rechaud",
-      "name": "le petit réchaud",
-      "aliases": [
-        "rechaud",
-        "flamme",
-        "petit rechaud"
-      ],
-      "at": "maison_the",
-      "takeable": false,
-      "fixed": "Il est brûlant ! Mieux vaut le laisser où il est.",
-      "description": "Un petit réchaud où danse une flamme bleue. Parfait pour allumer une bougie."
-    },
-    {
-      "id": "panier_pains",
-      "name": "le panier de petits pains",
-      "aliases": [
-        "panier",
-        "panier de petits pains",
-        "petits pains",
-        "pain"
-      ],
-      "at": "maison_the",
-      "takeable": false,
-      "fixed": "Madame Hua surveille son panier du coin de l'œil : un petit pain, c'est une pièce !",
-      "description": "Un panier en bambou plein de petits pains à la vapeur, tout blancs, tout moelleux."
-    },
-    {
-      "id": "baozi",
-      "name": "un petit pain tout chaud",
-      "aliases": [
-        "petit pain",
-        "pain",
-        "brioche",
-        "baozi",
-        "petits pains"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Un petit pain cuit à la vapeur, tout blanc, tout moelleux, qui sent si bon !"
-    },
-    {
-      "id": "sechoir",
-      "name": "le séchoir à papier",
-      "aliases": [
-        "sechoir",
-        "sechoir a papier",
-        "linge"
-      ],
-      "at": "atelier",
-      "takeable": false,
-      "fixed": "Le séchoir est cloué au mur. Et une feuille mouillée, ça se déchire !",
-      "description": "Un grand séchoir de bois, où les feuilles de papier pendent comme du linge."
-    },
-    {
-      "id": "bac",
-      "name": "le bac de pâte",
-      "aliases": [
-        "bac",
-        "pate",
-        "pate a papier",
-        "ecorce"
-      ],
-      "at": "atelier",
-      "takeable": false,
-      "fixed": "Un bac plein de pâte gluante ? Tu en mettrais partout !",
-      "description": "Un grand bac plein d'une pâte blanche et gluante : de l'écorce écrasée dans de l'eau. Ça deviendra du papier !"
-    },
-    {
-      "id": "papier",
-      "name": "une feuille de papier",
-      "aliases": [
-        "feuille",
-        "papier",
-        "feuille blanche",
-        "feuille de papier"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Une feuille de papier toute neuve, bien sèche, douce comme une joue."
-    },
-    {
-      "id": "message",
-      "name": "le message écrit",
-      "aliases": [
-        "message",
-        "lettre",
-        "mot",
-        "feuille ecrite"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "La feuille couverte de beaux caractères noirs. Maître Wen dit qu'on y lit : « La fête peut commencer ! »"
-    },
-    {
-      "id": "tas",
-      "name": "le tas de bambous",
-      "aliases": [
-        "tas",
-        "tas de bambous",
-        "bambous secs"
-      ],
-      "at": "bambous",
-      "takeable": false,
-      "fixed": "Tout le tas ? C'est le lit de Dodu, il y tient ! Une petite botte de tiges suffirait.",
-      "description": "Un gros tas de bambous secs, tout doux pour se coucher. C'est le lit préféré de Dodu."
-    },
-    {
-      "id": "bambou",
-      "name": "des tiges de bambou",
-      "aliases": [
-        "bambou",
-        "bambous",
-        "tiges",
-        "tiges de bambou",
-        "botte"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Une botte de tiges de bambou bien sèches, légères et solides."
-    },
-    {
-      "id": "cerf_volant",
-      "name": "un cerf-volant",
-      "aliases": [
-        "cerf-volant",
-        "cerf volant"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Un cerf-volant en soie rouge et en bambou, comme ceux qu'on a inventés en Chine il y a très longtemps !"
-    },
-    {
-      "id": "cerf_volant_msg",
-      "name": "un cerf-volant avec le message",
-      "aliases": [
-        "cerf-volant",
-        "cerf volant"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Le cerf-volant de soie rouge, avec le message bien attaché à sa queue."
-    },
-    {
-      "id": "gong",
-      "name": "le grand gong",
-      "aliases": [
-        "gong",
-        "gong de bronze",
-        "cloche"
-      ],
-      "at": "rempart",
-      "takeable": false,
-      "fixed": "Il est bien trop lourd, et il est accroché à un poteau.",
-      "description": "Un énorme gong de bronze. Un seul coup, et on l'entend jusqu'au village !"
-    },
-    {
-      "id": "foyer",
-      "name": "le foyer à signaux",
-      "aliases": [
-        "foyer",
-        "feu",
-        "signal",
-        "feu de signal"
-      ],
-      "at": "tour",
-      "takeable": false,
-      "fixed": "C'est un foyer de pierre, il fait partie de la tour !",
-      "description": "Un foyer de pierre tout noir de suie. C'est ici qu'on allume les feux pour parler aux autres tours."
-    },
-    {
-      "id": "riviere",
-      "name": "la rivière",
-      "aliases": [
-        "riviere",
-        "eau",
-        "courant"
-      ],
-      "at": "pont",
-      "takeable": false,
-      "fixed": "Une rivière, ça ne tient pas dans un sac !",
-      "description": "Une rivière profonde et froide, avec un courant qui tire fort. On la regarde de loin !"
-    },
-    {
-      "id": "carpes",
-      "name": "les carpes dorées",
-      "aliases": [
-        "carpes",
-        "carpe",
-        "carpe doree",
-        "poissons",
-        "poisson"
-      ],
-      "at": "pont",
-      "takeable": false,
-      "fixed": "Les carpes sont tout en bas, dans l'eau : elles sont bien mieux dans leur rivière !",
-      "description": "De grosses carpes dorées qui ouvrent et ferment la bouche, bloup, bloup. En Chine, elles portent bonheur !"
-    },
-    {
-      "id": "cle",
-      "name": "la clé de la tour",
-      "aliases": [
-        "cle",
-        "clef",
-        "cle de la tour"
-      ],
-      "at": "",
-      "takeable": true,
-      "description": "Une grosse clé de fer, accrochée à la ceinture d'Ah-Fu."
-    },
-    {
-      "id": "bambou_foyer",
-      "name": "le bambou dans le foyer",
-      "aliases": [
-        "bambou",
-        "bambous",
-        "bambou sec",
-        "tiges"
-      ],
-      "at": "",
-      "takeable": false,
-      "fixed": "Il est bien rangé dans le foyer, prêt à brûler : laisse-le là !",
-      "description": "Des tiges de bambou sec, bien serrées dans le foyer."
+     "to": "atelier",
+     "label": "vers l'atelier de papier",
+     "dir": "ouest"
     }
-  ],
-  "characters": [
+   ],
+   "decor": [
+    "pierres moussues",
+    "saule",
+    "nénuphars",
+    "libellules"
+   ]
+  },
+  {
+   "id": "atelier",
+   "name": "l'atelier de papier",
+   "aliases": [
+    "atelier",
+    "atelier de papier",
+    "papeterie"
+   ],
+   "description": "Dans l'atelier, ça sent le bois mouillé. Il y a un grand bac de pâte, et un séchoir où des feuilles toutes neuves pendent comme du linge.",
+   "exits": [
     {
-      "id": "mei",
-      "name": "Grand-mère Mei",
-      "aliases": [
-        "mei",
-        "grand-mere",
-        "grand mere",
-        "mamie"
-      ],
-      "at": "village",
-      "description": "Une grand-mère toute ridée et toute souriante, les bras pleins de lampions.",
-      "says": "Ah, te voilà ! La tour lointaine doit recevoir notre message avant le lever de la lune, sinon pas de fête ! Autrefois, les soldats de la Muraille se parlaient de tour en tour : avec de la fumée le jour, du feu la nuit. Maître Wen, à la maison de thé, écrit aussi de très beaux messages… Prends ma lanterne et mon foulard de soie, s'ils peuvent t'aider. Et sur le vieux pont, sois sage : on ne saute pas et on ne nage pas dans la rivière, l'eau est froide et le courant tire fort !"
-    },
-    {
-      "id": "hua",
-      "name": "Madame Hua",
-      "aliases": [
-        "hua",
-        "madame hua",
-        "patronne",
-        "dame"
-      ],
-      "at": "maison_the",
-      "description": "La patronne de la maison de thé, avec un grand tablier fleuri.",
-      "says": "Bienvenue ! Un petit pain à la vapeur ? C'est une pièce, mon petit. Mais ne touche pas à ma théière : c'est mon thé du soir. Une gorgée, et on dort jusqu'au matin !"
-    },
-    {
-      "id": "wen",
-      "name": "Maître Wen",
-      "aliases": [
-        "wen",
-        "maitre wen",
-        "savant",
-        "vieux savant"
-      ],
-      "at": "maison_the",
-      "description": "Un vieux savant à la longue barbe blanche, un pinceau à la main.",
-      "says": "Un message pour la tour lointaine ? Je l'écrirai de mon plus beau pinceau… si tu m'apportes une feuille de papier. Le meilleur papier se fait à l'atelier, de l'autre côté du pont."
-    },
-    {
-      "id": "lu",
-      "name": "Petit Lu",
-      "aliases": [
-        "lu",
-        "petit lu",
-        "apprenti"
-      ],
-      "at": "atelier",
-      "description": "Un garçon aux manches retroussées, couvert de pâte à papier jusqu'aux coudes.",
-      "says": "Ici, on fait le papier avec de l'écorce écrasée dans l'eau, puis séchée. C'est en Chine qu'on l'a inventé ! Tu veux une feuille ? Cherche une feuille bien sèche sur le séchoir."
-    },
-    {
-      "id": "dodu",
-      "name": "Dodu le chameau",
-      "aliases": [
-        "dodu",
-        "chameau",
-        "dromadaire"
-      ],
-      "at": "bambous",
-      "description": "Un grand chameau à deux bosses, tout poilu, échappé d'une caravane de la route de la Soie. Il mâchonne un bambou d'un air ennuyé.",
-      "says": "Mmmh… des bambous, encore des bambous… Ce dont je rêve, moi, c'est d'un petit pain tout chaud de la maison de thé ! Pour un petit pain, je me relèverais tout de suite."
-    },
-    {
-      "id": "grue",
-      "name": "Plume Blanche la grue",
-      "aliases": [
-        "plume blanche",
-        "grue",
-        "oiseau"
-      ],
-      "at": "pied",
-      "description": "Un grand oiseau blanc, élégant, avec une tache rouge sur la tête.",
-      "says": "Krouuu ! Là-haut, sur le rempart, le vent file tout droit vers la tour lointaine. Un cerf-volant y arriverait en un battement d'ailes… s'il portait un message !"
-    },
-    {
-      "id": "ahfu",
-      "name": "Ah-Fu le garde",
-      "aliases": [
-        "ah-fu",
-        "ah fu",
-        "garde",
-        "soldat"
-      ],
-      "at": "rempart",
-      "description": "Un soldat au gros ventre, avec un casque de travers et une clé à la ceinture.",
-      "says": "Le signal ? Du bambou bien sec dans le foyer de la tour, et une flamme. La fumée montera, et la tour lointaine allumera ses lanternes !"
+     "to": "pont",
+     "label": "vers le pont de pierre",
+     "dir": "est"
     }
-  ],
-  "actions": [
+   ],
+   "details": [
     {
-      "id": "fouiller_dragon",
-      "verb": "search",
-      "object": "dragon",
-      "when": [
-        "!flag:piece_trouvee"
-      ],
-      "effects": [
-        "reveal:piece",
-        "flag:piece_trouvee"
-      ],
-      "points": 5,
-      "not_yet": "La gueule du dragon est vide, maintenant. Plus rien ne tinte !",
-      "text": "Tu glisses la main dans la gueule du dragon… cling ! Une pièce trouée !"
-    },
-    {
-      "id": "ouvrir_dragon",
-      "verb": "open",
-      "object": "dragon",
-      "when": [
-        "!flag:piece_trouvee"
-      ],
-      "effects": [
-        "reveal:piece",
-        "flag:piece_trouvee"
-      ],
-      "points": 5,
-      "not_yet": "La gueule du dragon est vide, maintenant. Plus rien ne tinte !",
-      "text": "Tu ouvres la gueule du dragon, crrr… cling ! Une pièce trouée tombe par terre."
-    },
-    {
-      "id": "acheter_pain",
-      "verb": "give",
-      "object": "piece",
-      "target": "hua",
-      "when": [
-        "has:piece"
-      ],
-      "effects": [
-        "lose:piece",
-        "gain:baozi"
-      ],
-      "points": 10,
-      "text": "Madame Hua enfile la pièce sur sa ficelle et te tend un petit pain à la vapeur, tout chaud, tout moelleux."
-    },
-    {
-      "id": "manger_pain",
-      "verb": "eat",
-      "object": "baozi",
-      "when": [
-        "flag:jamais"
-      ],
-      "effects": [],
-      "points": 0,
-      "not_yet": "Il sent si bon… mais tu te retiens : quelqu'un, dans la forêt, en rêve encore plus que toi !",
-      "text": ""
-    },
-    {
-      "id": "pain_wen",
-      "verb": "give",
-      "object": "baozi",
-      "target": "wen",
-      "when": [
-        "flag:jamais"
-      ],
-      "effects": [],
-      "points": 0,
-      "not_yet": "Maître Wen sourit : « Merci, mais j'ai déjà mangé quatre petits pains ! Garde-le pour quelqu'un qui a très faim. »",
-      "text": ""
-    },
-    {
-      "id": "nourrir_panda",
-      "verb": "give",
-      "object": "baozi",
-      "target": "dodu",
-      "when": [
-        "has:baozi"
-      ],
-      "effects": [
-        "lose:baozi",
-        "flag:panda_parti",
-        "reveal:bambou"
-      ],
-      "points": 10,
-      "text": "Dodu gobe le petit pain, miam ! Il se relève en se dandinant, d'abord les pattes de derrière, puis celles de devant… et laisse sur le sentier une botte de tiges de bambou bien sèches."
-    },
-    {
-      "id": "allumer_lanterne",
-      "verb": "light",
-      "object": "lanterne",
-      "place": "maison_the",
-      "when": [
-        "has:lanterne"
-      ],
-      "effects": [
-        "flag:lanterne_allumee"
-      ],
-      "points": 10,
-      "repeatable": true,
-      "text": "Tu tends la lanterne vers le réchaud. Fffout ! La petite bougie s'allume, et la lanterne devient toute rouge et dorée."
-    },
-    {
-      "id": "lanterne_rechaud",
-      "verb": "use",
-      "object": "lanterne",
-      "target": "rechaud",
-      "when": [
-        "has:lanterne"
-      ],
-      "effects": [
-        "flag:lanterne_allumee"
-      ],
-      "points": 10,
-      "repeatable": true,
-      "text": "Tu tends la lanterne vers le réchaud. Fffout ! La petite bougie s'allume, et la lanterne devient toute rouge et dorée."
-    },
-    {
-      "id": "lanterne_deja",
-      "verb": "light",
-      "object": "lanterne",
-      "when": [
-        "flag:lanterne_allumee"
-      ],
-      "effects": [],
-      "points": 0,
-      "not_yet": "Il te faudrait une flamme pour allumer la bougie… Madame Hua a un petit réchaud, à la maison de thé.",
-      "repeatable": true,
-      "text": "Ta lanterne brille déjà, toute rouge et dorée !"
-    },
-    {
-      "id": "chercher_feuille",
-      "verb": "search",
-      "object": "sechoir",
-      "effects": [
-        "reveal:papier",
-        "flag:feuille_trouvee"
-      ],
-      "points": 5,
-      "text": "Tu touches les feuilles une à une… mouillée, mouillée… celle-là est toute sèche ! Tu la décroches."
-    },
-    {
-      "id": "ecrire_message",
-      "verb": "give",
-      "object": "papier",
-      "target": "wen",
-      "when": [
-        "has:papier"
-      ],
-      "effects": [
-        "lose:papier",
-        "gain:message"
-      ],
-      "points": 10,
-      "text": "Maître Wen trempe son pinceau, et hop, hop, hop : de beaux caractères noirs dansent sur la feuille. « Voilà : la fête peut commencer ! »"
-    },
-    {
-      "id": "faire_cerf_volant",
-      "verb": "combine",
-      "object": "bambou",
-      "target": "foulard",
-      "when": [
-        "has:bambou",
-        "has:foulard"
-      ],
-      "effects": [
-        "lose:bambou",
-        "lose:foulard",
-        "gain:cerf_volant"
-      ],
-      "points": 10,
-      "text": "Tu croises deux tiges de bambou et tu tends le foulard de soie dessus. Voilà un cerf-volant tout rouge !"
-    },
-    {
-      "id": "attacher_message",
-      "verb": "combine",
-      "object": "message",
-      "target": "cerf_volant",
-      "when": [
-        "has:message",
-        "has:cerf_volant"
-      ],
-      "effects": [
-        "lose:message",
-        "lose:cerf_volant",
-        "gain:cerf_volant_msg"
-      ],
-      "points": 10,
-      "text": "Tu attaches le message à la queue du cerf-volant, avec un joli nœud."
-    },
-    {
-      "id": "faire_voler",
-      "verb": "throw",
-      "object": "cerf_volant_msg",
-      "place": "rempart",
-      "when": [
-        "has:cerf_volant_msg"
-      ],
-      "effects": [
-        "end:cerf_volant"
-      ],
-      "points": 10,
-      "text": "Tu lâches le cerf-volant dans le vent. Whoosh ! Il monte, il monte, et file tout droit vers la tour lointaine !"
-    },
-    {
-      "id": "faire_voler_2",
-      "verb": "use",
-      "object": "cerf_volant_msg",
-      "place": "rempart",
-      "when": [
-        "has:cerf_volant_msg"
-      ],
-      "effects": [
-        "end:cerf_volant"
-      ],
-      "points": 10,
-      "text": "Tu lâches le cerf-volant dans le vent. Whoosh ! Il monte, il monte, et file tout droit vers la tour lointaine !"
-    },
-    {
-      "id": "voler_ailleurs",
-      "verb": "throw",
-      "object": "cerf_volant_msg",
-      "when": [
-        "flag:jamais"
-      ],
-      "effects": [],
-      "points": 0,
-      "not_yet": "Ici, il n'y a pas assez de vent : le cerf-volant retombe, flop. Plume Blanche parlait du vent, là-haut sur le rempart…",
-      "text": ""
-    },
-    {
-      "id": "voler_ailleurs_2",
-      "verb": "use",
-      "object": "cerf_volant_msg",
-      "when": [
-        "flag:jamais"
-      ],
-      "effects": [],
-      "points": 0,
-      "not_yet": "Ici, il n'y a pas assez de vent : le cerf-volant retombe, flop. Plume Blanche parlait du vent, là-haut sur le rempart…",
-      "text": ""
-    },
-    {
-      "id": "voler_sans_message",
-      "verb": "throw",
-      "object": "cerf_volant",
-      "when": [
-        "flag:jamais"
-      ],
-      "effects": [],
-      "points": 0,
-      "not_yet": "Le cerf-volant danse dans le vent… mais sans message, la tour lointaine ne saura rien ! Il faudrait lui attacher un message.",
-      "text": ""
-    },
-    {
-      "id": "voler_sans_message_2",
-      "verb": "use",
-      "object": "cerf_volant",
-      "when": [
-        "flag:jamais"
-      ],
-      "effects": [],
-      "points": 0,
-      "not_yet": "Le cerf-volant danse dans le vent… mais sans message, la tour lointaine ne saura rien ! Il faudrait lui attacher un message.",
-      "text": ""
-    },
-    {
-      "id": "parler_garde",
-      "verb": "talk",
-      "object": "ahfu",
-      "when": [
-        "flag:garde_reveille"
-      ],
-      "effects": [],
-      "points": 0,
-      "not_yet": "Rrrr… zzz… Ah-Fu ronfle comme un dragon, même quand tu lui chatouilles le nez ! Il faudrait un bruit énorme pour le réveiller.",
-      "repeatable": true,
-      "text": "« Hein ? Quoi ? Ah, c'est toi ! Le signal ? Du bambou bien sec dans le foyer de la tour, et une flamme. La fumée montera, et la tour lointaine allumera ses lanternes ! »"
-    },
-    {
-      "id": "frapper_gong",
-      "verb": "hit",
-      "object": "gong",
-      "effects": [
-        "flag:garde_reveille"
-      ],
-      "points": 10,
-      "text": "BOOOONG ! Ah-Fu saute en l'air : « Hein ? La fête ? J'arrive ! » En bâillant, il ouvre la porte de la tour de guet."
-    },
-    {
-      "id": "sonner_gong",
-      "verb": "use",
-      "object": "gong",
-      "effects": [
-        "flag:garde_reveille"
-      ],
-      "points": 10,
-      "text": "BOOOONG ! Ah-Fu saute en l'air : « Hein ? La fête ? J'arrive ! » En bâillant, il ouvre la porte de la tour de guet."
-    },
-    {
-      "id": "mettre_bambou",
-      "verb": "use",
-      "object": "bambou",
-      "target": "foyer",
-      "when": [
-        "has:bambou"
-      ],
-      "effects": [
-        "lose:bambou",
-        "flag:foyer_bambou",
-        "reveal:bambou_foyer"
-      ],
-      "points": 10,
-      "text": "Tu ranges les tiges de bambou sec dans le foyer, bien serrées."
-    },
-    {
-      "id": "jeter_bambou",
-      "verb": "throw",
-      "object": "bambou",
-      "target": "foyer",
-      "when": [
-        "has:bambou"
-      ],
-      "effects": [
-        "lose:bambou",
-        "flag:foyer_bambou",
-        "reveal:bambou_foyer"
-      ],
-      "points": 10,
-      "text": "Tu jettes les tiges de bambou sec dans le foyer, bien serrées."
-    },
-    {
-      "id": "allumer_signal",
-      "verb": "light",
-      "object": "foyer",
-      "when": [
-        "has:lanterne",
-        "flag:lanterne_allumee",
-        "flag:foyer_bambou"
-      ],
-      "effects": [
-        "end:fumee"
-      ],
-      "points": 10,
-      "not_yet": "Pour un signal, il faut du bois bien sec dans le foyer… et une flamme pour l'allumer !",
-      "text": "Tu approches la flamme de ta lanterne… le bambou crépite, crac, crac, et une grande fumée blanche monte dans le ciel !"
-    },
-    {
-      "id": "lanterne_foyer",
-      "verb": "use",
-      "object": "lanterne",
-      "target": "foyer",
-      "when": [
-        "has:lanterne",
-        "flag:lanterne_allumee",
-        "flag:foyer_bambou"
-      ],
-      "effects": [
-        "end:fumee"
-      ],
-      "points": 10,
-      "not_yet": "Pour un signal, il faut du bois bien sec dans le foyer… et une lanterne allumée !",
-      "text": "Tu approches la flamme de ta lanterne… le bambou crépite, crac, crac, et une grande fumée blanche monte dans le ciel !"
-    },
-    {
-      "id": "boire_the",
-      "verb": "drink",
-      "object": "theiere",
-      "effects": [
-        "end:dodo"
-      ],
-      "points": 0,
-      "text": "Tu bois une gorgée du thé du soir… Mmmh, c'est doux… tu bâilles… tes yeux se ferment…"
-    },
-    {
-      "id": "nager",
-      "verb": "swim",
-      "place": "pont",
-      "effects": [
-        "end:plouf"
-      ],
-      "points": 0,
-      "text": "Tu descends au bord de l'eau et tu te jettes dans la rivière… brrr, elle est glacée, et le courant tire fort ! Un vieux pêcheur te repêche vite avec sa perche.",
-      "object": "riviere"
-    },
-    {
-      "id": "sauter",
-      "verb": "jump",
-      "place": "pont",
-      "effects": [
-        "end:plouf"
-      ],
-      "points": 0,
-      "text": "Tu grimpes sur le bord du pont pour sauter… ton pied glisse, et SPLASH, te voilà dans l'eau glacée ! Un vieux pêcheur te repêche vite avec sa perche.",
-      "object": "riviere"
-    },
-    {
-      "id": "sauter_non",
-      "verb": "jump",
-      "place": "pont",
-      "effects": [],
-      "points": 0,
-      "text": "Tu fais un petit saut sur le pont, hop ! Mais pas plus : sauter dans la rivière, c'est jamais, l'eau est bien trop froide et profonde."
-    },
-    {
-      "id": "nager_non",
-      "verb": "swim",
-      "place": "pont",
-      "effects": [],
-      "points": 0,
-      "text": "Nager ici ? Brrr ! La rivière est profonde, froide, et le courant tire fort : on la regarde du haut du pont, c'est tout !"
-    },
-    {
-      "id": "cle_ahfu",
-      "verb": "ask",
-      "object": "ahfu",
-      "place": "rempart",
-      "when": [
-        "flag:jamais"
-      ],
-      "effects": [
-        "gain:cle"
-      ],
-      "points": 0,
-      "text": "",
-      "not_yet": "La clé pend à la ceinture d'Ah-Fu, bien accrochée. Il ne la prête à personne : c'est lui qui ouvre la tour de guet… quand il est réveillé !"
+     "when": [
+      "flag:feuille_trouvee"
+     ],
+     "text": "Les feuilles qui restent sont encore toutes mouillées.",
+     "else": "Il y en a peut-être une bien sèche, si on cherche bien."
     }
-  ],
-  "endings": [
+   ],
+   "decor": [
+    "écorce",
+    "tamis",
+    "seaux d'eau",
+    "copeaux",
+    "lanterne à devinette"
+   ]
+  },
+  {
+   "id": "bambous",
+   "name": "la forêt de bambous",
+   "aliases": [
+    "foret",
+    "bambouseraie",
+    "foret de bambous"
+   ],
+   "description": "Une forêt de bambous si hauts qu'ils chatouillent le ciel, crrr, crrr !",
+   "exits": [
     {
-      "id": "fumee",
-      "kind": "win",
-      "text": "Une grande fumée blanche monte de la tour de guet, puis une flamme orange ! Là-bas, la tour lointaine répond : une flamme, puis une autre, et encore une autre… De tour en tour, toute la Muraille s'illumine ! Au village, on allume les lanternes : la fête commence !"
+     "to": "village",
+     "label": "vers la place du village",
+     "dir": "sud"
     },
     {
-      "id": "cerf_volant",
-      "kind": "win",
-      "text": "Ton cerf-volant file dans le vent jusqu'à la tour lointaine. Là-bas, un soldat l'attrape et lit le message : « La fête peut commencer ! » Il allume sa lanterne… et bientôt, des milliers de lanternes brillent dans la nuit. Bravo !"
-    },
-    {
-      "id": "plouf",
-      "kind": "lose",
-      "text": "Tout trempé et grelottant, Grand-mère Mei t'enroule dans une couverture et te ramène à la maison pour te sécher près du poêle. Atchoum ! Le temps de te réchauffer, la lune est déjà levée : la tour lointaine n'a pas reçu le message à temps. Une rivière, ça se regarde du haut du pont !"
-    },
-    {
-      "id": "dodo",
-      "kind": "lose",
-      "text": "Tu t'endors sur un coussin, ronpshhh… Quand tu te réveilles, la lune est déjà haute et le message n'est jamais parti. Madame Hua te borde en souriant : « Je t'avais prévenu ! »"
+     "to": "pied",
+     "label": "vers la Grande Muraille",
+     "dir": "nord",
+     "when": [
+      "flag:panda_parti"
+     ],
+     "blocked": "Dodu le chameau est couché en plein milieu du sentier. Un chameau couché, c'est bien trop lourd à pousser !"
     }
-  ]
+   ],
+   "decor": [
+    "feuilles de bambou",
+    "pousses",
+    "papillons",
+    "sentier"
+   ]
+  },
+  {
+   "id": "pied",
+   "name": "le pied de la Muraille",
+   "aliases": [
+    "pied de la muraille",
+    "bas de la muraille",
+    "grande muraille"
+   ],
+   "description": "Te voilà au pied de la Grande Muraille ! Elle serpente sur les montagnes comme un dragon de pierre, si longue qu'on n'en voit pas le bout. Un grand escalier monte vers le rempart.",
+   "exits": [
+    {
+     "to": "bambous",
+     "label": "vers la forêt de bambous",
+     "dir": "sud"
+    },
+    {
+     "to": "rempart",
+     "label": "le grand escalier",
+     "dir": "haut"
+    }
+   ],
+   "decor": [
+    "grosses pierres",
+    "montagnes",
+    "herbes folles",
+    "nuages"
+   ]
+  },
+  {
+   "id": "rempart",
+   "name": "le chemin de ronde",
+   "aliases": [
+    "chemin de ronde",
+    "rempart",
+    "haut de la muraille",
+    "muraille"
+   ],
+   "description": "En haut de la Muraille, le vent souffle fort, whooo ! Parfait pour faire voler quelque chose. Au loin, sur la montagne, on devine la tour lointaine, toute noire.",
+   "exits": [
+    {
+     "to": "pied",
+     "label": "le grand escalier",
+     "dir": "bas"
+    },
+    {
+     "to": "tour",
+     "label": "la tour de guet",
+     "dir": "est",
+     "door": "porte_guet"
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "open:porte_guet"
+     ],
+     "text": "La porte de la tour de guet est grande ouverte.",
+     "else": "La porte de la tour de guet est fermée."
+    }
+   ],
+   "decor": [
+    "créneaux",
+    "drapeaux",
+    "vent",
+    "dalles de pierre"
+   ]
+  },
+  {
+   "id": "tour",
+   "name": "la tour de guet",
+   "aliases": [
+    "tour de guet",
+    "tour",
+    "guet"
+   ],
+   "description": "Le haut de la tour de guet. Par les créneaux, on voit la tour lointaine, de l'autre côté de la vallée : ils attendent un signal !",
+   "exits": [
+    {
+     "to": "rempart",
+     "label": "vers le chemin de ronde",
+     "dir": "ouest"
+    }
+   ],
+   "details": [
+    {
+     "when": [
+      "is:foyer:charge"
+     ],
+     "text": "Le foyer de pierre est rempli de bambou sec, prêt à brûler.",
+     "else": "Au milieu, un foyer de pierre tout noirci, vide et froid."
+    }
+   ],
+   "decor": [
+    "créneaux",
+    "suie",
+    "vallée",
+    "étoiles"
+   ]
+  }
+ ],
+ "items": [
+  {
+   "id": "dragon",
+   "name": "le dragon de papier",
+   "aliases": [
+    "dragon",
+    "dragon de papier",
+    "gueule"
+   ],
+   "at": "village",
+   "fixed": "Il est bien trop long : il faut dix personnes pour le porter !",
+   "description": "Un long dragon de papier rouge et or, avec de gros yeux ronds et une grande gueule ouverte.",
+   "kind": "container",
+   "texts": {
+    "open": "Tu glisses la main dans la gueule du dragon… cling ! Une pièce trouée !"
+   },
+   "details": [
+    {
+     "when": [
+      "!open:dragon"
+     ],
+     "text": "Quelque chose tinte dans sa gueule."
+    }
+   ]
+  },
+  {
+   "id": "piece",
+   "name": "une pièce trouée",
+   "aliases": [
+    "piece",
+    "piece trouee",
+    "sou",
+    "monnaie"
+   ],
+   "at": "dragon",
+   "description": "Une pièce de bronze ronde, avec un trou carré au milieu : on les enfilait sur une ficelle !",
+   "kind": "thing"
+  },
+  {
+   "id": "lanterne",
+   "name": "une lanterne de papier",
+   "aliases": [
+    "lanterne",
+    "lanterne rouge",
+    "lanterne de papier"
+   ],
+   "at": "village",
+   "description": "Une jolie lanterne de papier rouge, avec une petite bougie dedans.",
+   "kind": "thing",
+   "initial": "Sur un banc, une lanterne de papier pas encore allumée.",
+   "states": [
+    {
+     "id": "eteinte"
+    },
+    {
+     "id": "allumee",
+     "name": "une lanterne allumée",
+     "aliases": [
+      "lanterne allumee"
+     ],
+     "description": "La lanterne de papier brille, toute rouge et dorée : la petite bougie danse dedans."
+    }
+   ]
+  },
+  {
+   "id": "foulard",
+   "name": "un foulard de soie",
+   "aliases": [
+    "foulard",
+    "soie",
+    "foulard rouge",
+    "tissu"
+   ],
+   "at": "village",
+   "description": "Un foulard de soie rouge, léger comme une plume. Le vent adore jouer avec.",
+   "kind": "thing",
+   "initial": "À côté, sur le banc, un foulard de soie rouge.",
+   "states": [
+    {
+     "id": "propre"
+    },
+    {
+     "id": "poivre",
+     "name": "un foulard plein de poivre",
+     "aliases": [
+      "foulard poivre",
+      "foulard qui pique"
+     ],
+     "description": "Le foulard de soie rouge, tout plein de poivre du Sichuan. Rien qu'à l'approcher, ça chatouille le nez… aaa… tchoum !"
+    }
+   ]
+  },
+  {
+   "id": "theiere",
+   "name": "la théière",
+   "aliases": [
+    "theiere",
+    "the",
+    "the du soir"
+   ],
+   "at": "maison_the",
+   "fixed": "Madame Hua y tient comme à la prunelle de ses yeux !",
+   "description": "Une théière en porcelaine bleue. Une petite étiquette dit : « Thé du soir, pour bien dormir ».",
+   "kind": "scenery",
+   "sturdy": "Une théière en porcelaine ? Madame Hua y tient comme à la prunelle de ses yeux !"
+  },
+  {
+   "id": "rechaud",
+   "name": "le petit réchaud",
+   "aliases": [
+    "rechaud",
+    "flamme",
+    "petit rechaud"
+   ],
+   "at": "maison_the",
+   "fixed": "Il est brûlant ! Mieux vaut le laisser où il est.",
+   "description": "Un petit réchaud où danse une flamme bleue. Parfait pour allumer une bougie.",
+   "kind": "scenery",
+   "sturdy": "Il est brûlant ! On n'y touche pas."
+  },
+  {
+   "id": "panier_pains",
+   "name": "le panier de petits pains",
+   "aliases": [
+    "panier",
+    "panier de petits pains",
+    "petits pains",
+    "pain"
+   ],
+   "at": "maison_the",
+   "fixed": "Madame Hua surveille son panier du coin de l'œil : un petit pain, c'est une pièce !",
+   "description": "Un panier en bambou plein de petits pains à la vapeur, tout blancs, tout moelleux.",
+   "kind": "scenery",
+   "sturdy": "Madame Hua surveille son panier : pas touche !"
+  },
+  {
+   "id": "poivre",
+   "kind": "scenery",
+   "name": "le pot de poivre du Sichuan",
+   "aliases": [
+    "poivre",
+    "pot de poivre",
+    "poivre du sichuan",
+    "epices",
+    "pot"
+   ],
+   "at": "maison_the",
+   "fixed": "Madame Hua lève un doigt : « Le pot reste sur mon comptoir ! Mais une pincée, si tu veux. »",
+   "sturdy": "Madame Hua attrape son pot : « Pas touche, c'est mon meilleur poivre ! »",
+   "initial": "Au bout du comptoir, un petit pot de poivre du Sichuan, celui qui pique le nez et fait éternuer.",
+   "description": "Un petit pot plein de grains de poivre du Sichuan, tout rouges. Rien qu'en le sentant, ça pique le nez… Une pincée sur un mouchoir ou un foulard, et tout le monde éternue !"
+  },
+  {
+   "id": "baozi",
+   "name": "un petit pain tout chaud",
+   "aliases": [
+    "petit pain",
+    "pain",
+    "brioche",
+    "baozi",
+    "petits pains"
+   ],
+   "at": "",
+   "description": "Un petit pain cuit à la vapeur, tout blanc, tout moelleux, qui sent si bon !",
+   "kind": "thing"
+  },
+  {
+   "id": "sechoir",
+   "name": "le séchoir à papier",
+   "aliases": [
+    "sechoir",
+    "sechoir a papier",
+    "linge"
+   ],
+   "at": "atelier",
+   "fixed": "Le séchoir est cloué au mur. Et une feuille mouillée, ça se déchire !",
+   "description": "Un grand séchoir de bois, où les feuilles de papier pendent comme du linge.",
+   "kind": "scenery",
+   "sturdy": "Le séchoir est cloué au mur, et les feuilles mouillées sont à Petit Lu !"
+  },
+  {
+   "id": "bac",
+   "name": "le bac de pâte",
+   "aliases": [
+    "bac",
+    "pate",
+    "pate a papier",
+    "ecorce"
+   ],
+   "at": "atelier",
+   "fixed": "Un bac plein de pâte gluante ? Tu en mettrais partout !",
+   "description": "Un grand bac plein d'une pâte blanche et gluante : de l'écorce écrasée dans de l'eau. Ça deviendra du papier !",
+   "kind": "scenery",
+   "sturdy": "Un bac plein de pâte gluante ? Tu en mettrais partout !"
+  },
+  {
+   "id": "papier",
+   "name": "une feuille de papier",
+   "aliases": [
+    "feuille",
+    "papier",
+    "feuille blanche",
+    "feuille de papier"
+   ],
+   "at": "",
+   "description": "Une feuille de papier toute neuve, bien sèche, douce comme une joue.",
+   "kind": "thing",
+   "states": [
+    {
+     "id": "blanche"
+    },
+    {
+     "id": "ecrite",
+     "name": "le message écrit",
+     "aliases": [
+      "message",
+      "lettre",
+      "mot",
+      "feuille ecrite"
+     ],
+     "description": "La feuille couverte de beaux caractères noirs. Maître Wen dit qu'on y lit : « La fête peut commencer ! »"
+    }
+   ]
+  },
+  {
+   "id": "tas",
+   "name": "le tas de bambous",
+   "aliases": [
+    "tas",
+    "tas de bambous",
+    "bambous secs"
+   ],
+   "at": "bambous",
+   "fixed": "Tout le tas ? C'est le lit de Dodu, il y tient ! Une petite botte de tiges suffirait.",
+   "description": "Un gros tas de bambous secs, tout doux pour se coucher. C'est le lit préféré de Dodu.",
+   "kind": "scenery",
+   "sturdy": "C'est le lit de Dodu : on ne l'abîme pas !"
+  },
+  {
+   "id": "bambou",
+   "name": "des tiges de bambou",
+   "aliases": [
+    "bambou",
+    "bambous",
+    "tiges",
+    "tiges de bambou",
+    "botte"
+   ],
+   "at": "",
+   "description": "Une botte de tiges de bambou bien sèches, légères et solides.",
+   "kind": "thing"
+  },
+  {
+   "id": "cerf_volant",
+   "name": "un cerf-volant",
+   "aliases": [
+    "cerf-volant",
+    "cerf volant"
+   ],
+   "at": "",
+   "description": "Un cerf-volant en soie rouge et en bambou, comme ceux qu'on a inventés en Chine il y a très longtemps !",
+   "kind": "thing",
+   "states": [
+    {
+     "id": "sans_message"
+    },
+    {
+     "id": "avec_message",
+     "name": "un cerf-volant avec le message",
+     "description": "Le cerf-volant de soie rouge, avec le message bien attaché à sa queue."
+    }
+   ]
+  },
+  {
+   "id": "gong",
+   "name": "le grand gong",
+   "aliases": [
+    "gong",
+    "gong de bronze",
+    "cloche"
+   ],
+   "at": "rempart",
+   "fixed": "Il est bien trop lourd, et il est accroché à un poteau.",
+   "description": "Un énorme gong de bronze. Un seul coup, et on l'entend jusqu'au village !",
+   "kind": "scenery",
+   "sturdy": "Un gong de bronze, c'est fait pour qu'on tape dessus, pas pour être cassé !"
+  },
+  {
+   "id": "foyer",
+   "name": "le foyer à signaux",
+   "aliases": [
+    "foyer",
+    "feu",
+    "signal",
+    "feu de signal"
+   ],
+   "at": "tour",
+   "fixed": "C'est un foyer de pierre, il fait partie de la tour !",
+   "description": "Un foyer de pierre tout noir de suie. C'est ici qu'on allume les feux pour parler aux autres tours.",
+   "kind": "scenery",
+   "sturdy": "C'est un foyer de pierre, il fait partie de la tour !",
+   "states": [
+    {
+     "id": "vide"
+    },
+    {
+     "id": "charge",
+     "aliases": [
+      "bambou sec",
+      "bambou dans le foyer"
+     ],
+     "description": "Le foyer de pierre, rempli de tiges de bambou sec bien serrées, prêt à brûler."
+    }
+   ]
+  },
+  {
+   "id": "riviere",
+   "name": "la rivière",
+   "aliases": [
+    "riviere",
+    "eau",
+    "courant"
+   ],
+   "at": "pont",
+   "fixed": "Une rivière, ça ne tient pas dans un sac !",
+   "description": "Une rivière profonde et froide, avec un courant qui tire fort. On la regarde de loin !",
+   "kind": "scenery",
+   "sturdy": "Une rivière, ça ne se casse pas !"
+  },
+  {
+   "id": "carpes",
+   "name": "les carpes dorées",
+   "aliases": [
+    "carpes",
+    "carpe",
+    "carpe doree",
+    "poissons",
+    "poisson"
+   ],
+   "at": "pont",
+   "fixed": "Les carpes sont tout en bas, dans l'eau : elles sont bien mieux dans leur rivière !",
+   "description": "De grosses carpes dorées qui ouvrent et ferment la bouche, bloup, bloup. En Chine, elles portent bonheur !",
+   "kind": "scenery",
+   "sturdy": "Les carpes portent bonheur : on les laisse tranquilles !"
+  },
+  {
+   "id": "cle",
+   "name": "la clé de la tour",
+   "aliases": [
+    "cle",
+    "clef",
+    "cle de la tour"
+   ],
+   "at": "ahfu",
+   "description": "Une grosse clé de fer, accrochée à la ceinture d'Ah-Fu.",
+   "kind": "thing"
+  },
+  {
+   "id": "porte_guet",
+   "kind": "door",
+   "name": "la porte de la tour de guet",
+   "aliases": [
+    "porte",
+    "porte de la tour",
+    "porte de la tour de guet"
+   ],
+   "description": "Une lourde porte de bois clouté, au pied de la tour de guet.",
+   "fixed": "Une porte de la Grande Muraille ? Elle est bien trop lourde !",
+   "locked": true,
+   "key": "cle",
+   "texts": {
+    "locked": "La porte de la tour de guet est fermée. La clé pend à la ceinture d'Ah-Fu… qui ronfle !"
+   }
+  }
+ ],
+ "characters": [
+  {
+   "id": "mei",
+   "name": "Grand-mère Mei",
+   "aliases": [
+    "mei",
+    "grand-mere",
+    "grand mere",
+    "mamie"
+   ],
+   "at": "village",
+   "description": "Une grand-mère toute ridée et toute souriante, les bras pleins de lampions.",
+   "says": "Ah, te voilà ! La tour lointaine doit recevoir notre message avant le lever de la lune, sinon pas de fête ! Autrefois, les soldats de la Muraille se parlaient de tour en tour : avec de la fumée le jour, du feu la nuit. Maître Wen, à la maison de thé, écrit aussi de très beaux messages… Prends ma lanterne et mon foulard de soie, s'ils peuvent t'aider. Et sur le vieux pont, sois sage : on ne saute pas et on ne nage pas dans la rivière, l'eau est froide et le courant tire fort !",
+   "initial": "Grand-mère Mei accroche des lampions rouges."
+  },
+  {
+   "id": "hua",
+   "name": "Madame Hua",
+   "aliases": [
+    "hua",
+    "madame hua",
+    "patronne",
+    "dame"
+   ],
+   "at": "maison_the",
+   "description": "La patronne de la maison de thé, avec un grand tablier fleuri.",
+   "says": "Bienvenue ! Un petit pain à la vapeur ? C'est une pièce, mon petit. Mais ne touche pas à ma théière : c'est mon thé du soir. Une gorgée, et on dort jusqu'au matin ! Et attention à mon poivre du Sichuan : une pincée sous le nez, et atchoum !",
+   "initial": "Madame Hua fait chauffer l'eau sur un petit réchaud, pschhh. « Pas touche à mon thé du soir, prévient-elle : une gorgée, et on dort jusqu'au matin ! »"
+  },
+  {
+   "id": "wen",
+   "name": "Maître Wen",
+   "aliases": [
+    "wen",
+    "maitre wen",
+    "savant",
+    "vieux savant"
+   ],
+   "at": "maison_the",
+   "description": "Un vieux savant à la longue barbe blanche, un pinceau à la main.",
+   "says": [
+    {
+     "when": [
+      "is:papier:ecrite"
+     ],
+     "text": "Ton message est prêt : « La fête peut commencer ! » Maintenant, il faut qu'il arrive jusqu'à la tour lointaine…"
+    },
+    {
+     "when": [
+      "is:cerf_volant:avec_message"
+     ],
+     "text": "Mon message, attaché à un cerf-volant ? Quelle belle idée ! Il lui faut du vent, beaucoup de vent."
+    },
+    {
+     "text": "Un message pour la tour lointaine ? Je l'écrirai de mon plus beau pinceau… si tu m'apportes une feuille de papier. Le meilleur papier se fait à l'atelier, de l'autre côté du pont."
+    }
+   ],
+   "initial": "Dans un coin, Maître Wen, le vieux savant, trempe son pinceau dans l'encre."
+  },
+  {
+   "id": "lu",
+   "name": "Petit Lu",
+   "aliases": [
+    "lu",
+    "petit lu",
+    "apprenti"
+   ],
+   "at": "atelier",
+   "description": "Un garçon aux manches retroussées, couvert de pâte à papier jusqu'aux coudes.",
+   "says": "Ici, on fait le papier avec de l'écorce écrasée dans l'eau, puis séchée. C'est en Chine qu'on l'a inventé ! Avec mon papier, on fabrique aussi les lanternes de la fête, et ce soir, on écrit des devinettes dessus ! Tu veux une feuille bien sèche ? Devine d'abord la devinette de ma lanterne.",
+   "initial": "Petit Lu, l'apprenti, écrase de l'écorce dans le grand bac de pâte. Au-dessus de lui pend une lanterne de papier, avec une devinette écrite dessus.",
+   "states": [
+    {
+     "id": "attend"
+    },
+    {
+     "id": "devinee",
+     "says": "Ici, on fait le papier avec de l'écorce écrasée dans l'eau, puis séchée. C'est en Chine qu'on l'a inventé ! Tu veux une feuille ? Cherche une feuille bien sèche sur le séchoir."
+    }
+   ],
+   "answer": {
+    "question": "Je ne sors que la nuit. Parfois je suis toute ronde comme une lanterne, parfois toute fine comme un sourire, et je brille tout là-haut, sans bougie. Qui suis-je ?",
+    "accept": [
+     "lune",
+     "la lune",
+     "pleine lune",
+     "croissant de lune"
+    ],
+    "wrong": "Petit Lu secoue la tête en riant, et un peu de pâte à papier lui tombe du coude, flic ! « Non, ce n'est pas ça ! Écoute encore ma devinette. »",
+    "right": "« Bravo, c'est la lune ! Ce soir, c'est la première pleine lune de l'année : c'est pour elle qu'on allume toutes les lanternes ! Tu as gagné ta feuille : cherche-la bien sèche sur le séchoir. »",
+    "hint": "Pense au ciel de la nuit, quand la fête commence : qu'est-ce qui brille tout là-haut, rond certains soirs et tout fin d'autres soirs ?",
+    "effects": [
+     "set:lu:devinee"
+    ]
+   }
+  },
+  {
+   "id": "dodu",
+   "name": "Dodu le chameau",
+   "aliases": [
+    "dodu",
+    "chameau",
+    "dromadaire"
+   ],
+   "at": "bambous",
+   "description": "Un grand chameau à deux bosses, tout poilu, échappé d'une caravane de la route de la Soie. Il mâchonne un bambou d'un air ennuyé.",
+   "says": "Mmmh… des bambous, encore des bambous… Ce dont je rêve, moi, c'est d'un petit pain tout chaud de la maison de thé ! Pour un petit pain, je me relèverais tout de suite.",
+   "states": [
+    {
+     "id": "couche",
+     "initial": "Dodu, un grand chameau à deux bosses échappé d'une caravane de la route de la Soie, est couché au beau milieu du sentier, sur un tas de bambous secs, et il ne veut pas se relever."
+    },
+    {
+     "id": "debout",
+     "initial": "Dodu le chameau s'est relevé, le ventre plein, et rumine au bord du sentier. Le sentier vers la Muraille est libre !",
+     "says": "Mmmh, ce petit pain ! Merci ! Le sentier est à toi. Et ces bambous secs, prends-les, j'en ai bien assez."
+    }
+   ]
+  },
+  {
+   "id": "grue",
+   "name": "Plume Blanche la grue",
+   "aliases": [
+    "plume blanche",
+    "grue",
+    "oiseau"
+   ],
+   "at": "pied",
+   "description": "Un grand oiseau blanc, élégant, avec une tache rouge sur la tête.",
+   "says": "Krouuu ! Là-haut, sur le rempart, le vent file tout droit vers la tour lointaine. Un cerf-volant y arriverait en un battement d'ailes… s'il portait un message !",
+   "initial": "Plume Blanche la grue se tient sur une patte près du grand escalier."
+  },
+  {
+   "id": "ahfu",
+   "name": "Ah-Fu le garde",
+   "aliases": [
+    "ah-fu",
+    "ah fu",
+    "garde",
+    "soldat"
+   ],
+   "at": "rempart",
+   "description": "Un soldat au gros ventre, avec un casque de travers et une clé à la ceinture.",
+   "says": "Le signal ? Du bambou bien sec dans le foyer de la tour, et une flamme. La fumée montera, et la tour lointaine allumera ses lanternes !",
+   "states": [
+    {
+     "id": "endormi",
+     "initial": "Devant la porte de la tour de guet, Ah-Fu le garde ronfle, assis contre un grand gong. Une clé pend à sa ceinture."
+    },
+    {
+     "id": "reveille",
+     "initial": "Ah-Fu le garde se frotte les yeux près de la porte de la tour de guet.",
+     "description": "Un soldat au gros ventre, avec un casque de travers et une clé à la ceinture. Il bâille, tout juste réveillé."
+    }
+   ]
+  }
+ ],
+ "actions": [
+  {
+   "id": "acheter_pain",
+   "when": [
+    "has:piece"
+   ],
+   "effects": [
+    "lose:piece",
+    "gain:baozi"
+   ],
+   "points": 10,
+   "text": "Madame Hua enfile la pièce sur sa ficelle et te tend un petit pain à la vapeur, tout chaud, tout moelleux.",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "piece",
+     "target": "hua"
+    }
+   ],
+   "hint": "Madame Hua vend ses petits pains. Tu n'aurais pas une pièce, quelque part ?"
+  },
+  {
+   "id": "manger_pain",
+   "when": [
+    "flag:jamais"
+   ],
+   "effects": [],
+   "points": 0,
+   "not_yet": "Il sent si bon… mais tu te retiens : quelqu'un, dans la forêt, en rêve encore plus que toi !",
+   "text": "",
+   "triggers": [
+    {
+     "verb": "eat",
+     "object": "baozi"
+    }
+   ]
+  },
+  {
+   "id": "pain_wen",
+   "when": [
+    "flag:jamais"
+   ],
+   "effects": [],
+   "points": 0,
+   "not_yet": "Maître Wen sourit : « Merci, mais j'ai déjà mangé quatre petits pains ! Garde-le pour quelqu'un qui a très faim. »",
+   "text": "",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "baozi",
+     "target": "wen"
+    }
+   ]
+  },
+  {
+   "id": "nourrir_panda",
+   "when": [
+    "has:baozi"
+   ],
+   "effects": [
+    "lose:baozi",
+    "flag:panda_parti",
+    "set:dodu:debout",
+    "reveal:bambou"
+   ],
+   "points": 10,
+   "text": "Dodu gobe le petit pain, miam ! Il se relève en se dandinant, d'abord les pattes de derrière, puis celles de devant… et laisse sur le sentier une botte de tiges de bambou bien sèches.",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "baozi",
+     "target": "dodu"
+    }
+   ],
+   "hint": "Dodu rêve d'un petit pain tout chaud de la maison de thé…"
+  },
+  {
+   "id": "allumer_lanterne",
+   "place": "maison_the",
+   "when": [
+    "has:lanterne",
+    "is:lanterne:eteinte"
+   ],
+   "effects": [
+    "set:lanterne:allumee"
+   ],
+   "points": 10,
+   "text": "Tu tends la lanterne vers le réchaud. Fffout ! La petite bougie s'allume, et la lanterne devient toute rouge et dorée.",
+   "triggers": [
+    {
+     "verb": "light",
+     "object": "lanterne"
+    },
+    {
+     "verb": "use",
+     "object": "lanterne",
+     "target": "rechaud"
+    }
+   ],
+   "hint": "Ta lanterne a une petite bougie. Où y a-t-il une flamme, pour l'allumer ?"
+  },
+  {
+   "id": "lanterne_deja",
+   "when": [
+    "is:lanterne:allumee"
+   ],
+   "effects": [],
+   "points": 0,
+   "not_yet": "Il te faudrait une flamme pour allumer la bougie… Madame Hua a un petit réchaud, à la maison de thé.",
+   "text": "Ta lanterne brille déjà, toute rouge et dorée !",
+   "triggers": [
+    {
+     "verb": "light",
+     "object": "lanterne"
+    }
+   ]
+  },
+  {
+   "id": "chercher_feuille",
+   "effects": [
+    "reveal:papier",
+    "flag:feuille_trouvee"
+   ],
+   "points": 5,
+   "text": "Tu touches les feuilles une à une… mouillée, mouillée… celle-là est toute sèche ! Tu la décroches.",
+   "triggers": [
+    {
+     "verb": "search",
+     "object": "sechoir"
+    }
+   ],
+   "hint": "Petit Lu l'a dit : il y a peut-être une feuille bien sèche sur le séchoir. Cherche bien !",
+   "when": [
+    "is:lu:devinee"
+   ],
+   "not_yet": "Petit Lu lève le nez de son bac : « Pas si vite ! Ce soir, c'est la fête des lanternes : une feuille, ça se gagne avec une devinette. Parle-moi ! »"
+  },
+  {
+   "id": "ecrire_message",
+   "when": [
+    "has:papier",
+    "is:papier:blanche"
+   ],
+   "effects": [
+    "set:papier:ecrite"
+   ],
+   "points": 10,
+   "text": "Maître Wen trempe son pinceau, et hop, hop, hop : de beaux caractères noirs dansent sur la feuille. « Voilà : la fête peut commencer ! »",
+   "triggers": [
+    {
+     "verb": "give",
+     "object": "papier",
+     "target": "wen"
+    }
+   ],
+   "hint": "Maître Wen écrit de très beaux messages… s'il a une feuille de papier."
+  },
+  {
+   "id": "faire_cerf_volant",
+   "when": [
+    "has:bambou",
+    "has:foulard"
+   ],
+   "effects": [
+    "lose:bambou",
+    "lose:foulard",
+    "gain:cerf_volant"
+   ],
+   "points": 10,
+   "text": "Tu croises deux tiges de bambou et tu tends le foulard de soie dessus. Voilà un cerf-volant tout rouge !",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "bambou",
+     "target": "foulard"
+    }
+   ],
+   "hint": "Un foulard de soie léger, des tiges de bambou… De quoi faire un jouet qui vole !"
+  },
+  {
+   "id": "attacher_message",
+   "when": [
+    "has:papier",
+    "is:papier:ecrite",
+    "has:cerf_volant",
+    "is:cerf_volant:sans_message"
+   ],
+   "effects": [
+    "lose:papier",
+    "set:cerf_volant:avec_message"
+   ],
+   "points": 10,
+   "text": "Tu attaches le message à la queue du cerf-volant, avec un joli nœud.",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "papier",
+     "target": "cerf_volant"
+    }
+   ],
+   "hint": "Plume Blanche l'a dit : un cerf-volant arriverait vite à la tour lointaine… s'il portait un message !"
+  },
+  {
+   "id": "faire_voler",
+   "place": "rempart",
+   "when": [
+    "has:cerf_volant",
+    "is:cerf_volant:avec_message"
+   ],
+   "effects": [
+    "end:cerf_volant"
+   ],
+   "points": 10,
+   "text": "Tu lâches le cerf-volant dans le vent. Whoosh ! Il monte, il monte, et file tout droit vers la tour lointaine !",
+   "triggers": [
+    {
+     "verb": "throw",
+     "object": "cerf_volant"
+    },
+    {
+     "verb": "use",
+     "object": "cerf_volant"
+    }
+   ],
+   "not_yet": "Le cerf-volant danse dans le vent… mais sans message, la tour lointaine ne saura rien ! Il faudrait lui attacher un message.",
+   "hint": "Le vent du rempart file tout droit vers la tour lointaine. Ton cerf-volant n'attend que lui !"
+  },
+  {
+   "id": "voler_ailleurs",
+   "when": [
+    "flag:jamais"
+   ],
+   "effects": [],
+   "points": 0,
+   "not_yet": "Ici, il n'y a pas assez de vent : le cerf-volant retombe, flop. Plume Blanche parlait du vent, là-haut sur le rempart…",
+   "text": "",
+   "triggers": [
+    {
+     "verb": "throw",
+     "object": "cerf_volant"
+    },
+    {
+     "verb": "use",
+     "object": "cerf_volant"
+    }
+   ]
+  },
+  {
+   "id": "parler_garde",
+   "when": [
+    "is:ahfu:reveille"
+   ],
+   "effects": [],
+   "points": 0,
+   "not_yet": "Rrrr… zzz… Ah-Fu ronfle comme un dragon, même quand tu lui parles dans l'oreille ! Il faudrait un bruit énorme pour le réveiller… ou un éternuement géant !",
+   "repeatable": true,
+   "text": "« Hein ? Quoi ? Ah, c'est toi ! Le signal ? Du bambou bien sec dans le foyer de la tour, et une flamme. La fumée montera, et la tour lointaine allumera ses lanternes ! »",
+   "triggers": [
+    {
+     "verb": "talk",
+     "object": "ahfu"
+    }
+   ]
+  },
+  {
+   "id": "frapper_gong",
+   "effects": [
+    "set:ahfu:reveille",
+    "open:porte_guet"
+   ],
+   "points": 10,
+   "text": "BOOOONG ! Ah-Fu saute en l'air : « Hein ? La fête ? J'arrive ! » En bâillant, il ouvre la porte de la tour de guet.",
+   "triggers": [
+    {
+     "verb": "hit",
+     "object": "gong"
+    },
+    {
+     "verb": "use",
+     "object": "gong"
+    }
+   ],
+   "hint": "Ah-Fu ronfle comme un dragon. Il faudrait un bruit énorme… Et ce grand gong, juste à côté ?"
+  },
+  {
+   "id": "poivrer_foulard",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "foulard",
+     "target": "poivre"
+    },
+    {
+     "verb": "use",
+     "object": "poivre",
+     "target": "foulard"
+    }
+   ],
+   "when": [
+    "has:foulard",
+    "is:foulard:propre"
+   ],
+   "effects": [
+    "set:foulard:poivre"
+   ],
+   "points": 5,
+   "not_yet": "Ton foulard est déjà plein de poivre : une pincée de plus, et c'est toi qui éternuerais toute la nuit !",
+   "text": "Tu saupoudres une pincée de poivre du Sichuan sur le foulard… Aaa… aaa… TCHOUM ! Même Madame Hua éternue, et Maître Wen en fait une tache d'encre. Ce foulard-là ferait éternuer un dragon !",
+   "hint": "Ce poivre fait éternuer tout le monde… Si tu en mettais sur quelque chose de léger, à agiter sous un nez qui ronfle ?"
+  },
+  {
+   "id": "eternuer_ahfu",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "foulard",
+     "target": "ahfu"
+    },
+    {
+     "verb": "touch",
+     "object": "ahfu",
+     "target": "foulard"
+    },
+    {
+     "verb": "give",
+     "object": "foulard",
+     "target": "ahfu"
+    }
+   ],
+   "place": "rempart",
+   "when": [
+    "has:foulard",
+    "is:foulard:poivre",
+    "is:ahfu:endormi"
+   ],
+   "effects": [
+    "set:ahfu:reveille",
+    "open:porte_guet"
+   ],
+   "points": 10,
+   "not_yet": "Tu chatouilles le nez d'Ah-Fu avec le foulard… il se gratte, et zzz, il ronfle de plus belle ! Avec quelque chose qui pique le nez, peut-être ?",
+   "text": "Tu agites le foulard poivré sous le nez d'Ah-Fu… Son nez frétille… AAA… AAAA… TCHOUUUM ! L'éternuement est si fort que le gong résonne tout seul, BONG ! Ah-Fu saute en l'air : « Hein ? La fête ? J'arrive ! » En reniflant, il ouvre la porte de la tour de guet.",
+   "hint": "Ah-Fu ronfle comme un dragon… Un foulard qui pique le nez le ferait peut-être éternuer ?"
+  },
+  {
+   "id": "mettre_bambou",
+   "when": [
+    "has:bambou",
+    "is:foyer:vide"
+   ],
+   "effects": [
+    "lose:bambou",
+    "set:foyer:charge"
+   ],
+   "points": 10,
+   "text": "Tu ranges les tiges de bambou sec dans le foyer, bien serrées.",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "bambou",
+     "target": "foyer"
+    },
+    {
+     "verb": "throw",
+     "object": "bambou",
+     "target": "foyer"
+    }
+   ],
+   "hint": "Ah-Fu l'a dit : pour le signal, il faut du bambou bien sec dans le foyer."
+  },
+  {
+   "id": "allumer_signal",
+   "when": [
+    "has:lanterne",
+    "is:lanterne:allumee",
+    "is:foyer:charge"
+   ],
+   "effects": [
+    "end:fumee"
+   ],
+   "points": 10,
+   "not_yet": "Pour un signal, il faut du bois bien sec dans le foyer… et une flamme pour l'allumer !",
+   "text": "Tu approches la flamme de ta lanterne… le bambou crépite, crac, crac, et une grande fumée blanche monte dans le ciel !",
+   "triggers": [
+    {
+     "verb": "light",
+     "object": "foyer"
+    },
+    {
+     "verb": "use",
+     "object": "lanterne",
+     "target": "foyer"
+    }
+   ],
+   "hint": "Le bambou sec est dans le foyer. Il ne manque plus qu'une flamme… celle de ta lanterne ?"
+  },
+  {
+   "id": "boire_the",
+   "effects": [
+    "end:dodo"
+   ],
+   "points": 0,
+   "text": "Tu bois une gorgée du thé du soir… Mmmh, c'est doux… tu bâilles… tes yeux se ferment…",
+   "triggers": [
+    {
+     "verb": "drink",
+     "object": "theiere"
+    }
+   ]
+  },
+  {
+   "id": "sauter",
+   "place": "pont",
+   "effects": [
+    "end:plouf"
+   ],
+   "points": 0,
+   "text": "Tu t'approches du bord pour plonger… ton pied glisse, et SPLASH, te voilà dans l'eau glacée ! Un vieux pêcheur te repêche vite avec sa perche.",
+   "triggers": [
+    {
+     "verb": "jump",
+     "object": "riviere"
+    },
+    {
+     "verb": "swim",
+     "object": "riviere"
+    }
+   ]
+  },
+  {
+   "id": "sauter_non",
+   "place": "pont",
+   "effects": [],
+   "points": 0,
+   "text": "Tu fais un petit saut sur le pont, hop ! Mais pas plus : sauter dans la rivière, c'est jamais, l'eau est bien trop froide et profonde.",
+   "triggers": [
+    {
+     "verb": "jump"
+    }
+   ]
+  },
+  {
+   "id": "nager_non",
+   "place": "pont",
+   "effects": [],
+   "points": 0,
+   "text": "Nager ici ? Brrr ! La rivière est profonde, froide, et le courant tire fort : on la regarde du haut du pont, c'est tout !",
+   "triggers": [
+    {
+     "verb": "swim"
+    }
+   ]
+  },
+  {
+   "id": "cle_ahfu",
+   "place": "rempart",
+   "when": [
+    "flag:jamais"
+   ],
+   "effects": [],
+   "points": 0,
+   "text": "",
+   "not_yet": "La clé pend à la ceinture d'Ah-Fu, bien accrochée. Il ne la prête à personne : c'est lui qui ouvre la tour de guet… quand il est réveillé !",
+   "triggers": [
+    {
+     "verb": "ask",
+     "object": "ahfu"
+    }
+   ]
+  }
+ ],
+ "endings": [
+  {
+   "id": "fumee",
+   "kind": "win",
+   "text": "Une grande fumée blanche monte de la tour de guet, puis une flamme orange ! Là-bas, la tour lointaine répond : une flamme, puis une autre, et encore une autre… De tour en tour, toute la Muraille s'illumine ! Au village, on allume les lanternes : la fête commence !",
+   "fact": "Sur la Grande Muraille de Chine, les soldats s'envoyaient des messages de tour en tour : avec de la fumée le jour, et avec du feu la nuit !"
+  },
+  {
+   "id": "cerf_volant",
+   "kind": "win",
+   "text": "Ton cerf-volant file dans le vent jusqu'à la tour lointaine. Là-bas, un soldat l'attrape et lit le message : « La fête peut commencer ! » Il allume sa lanterne… et bientôt, des milliers de lanternes brillent dans la nuit. Bravo !",
+   "fact": "Le cerf-volant a été inventé en Chine il y a plus de 2 000 ans : les premiers étaient en soie et en bambou, comme le tien ! Et à la fête des lanternes, on écrit des devinettes sur les lanternes : celui qui trouve la réponse gagne un petit cadeau !"
+  },
+  {
+   "id": "plouf",
+   "kind": "lose",
+   "text": "Tout trempé et grelottant, Grand-mère Mei t'enroule dans une couverture et te ramène à la maison pour te sécher près du poêle. Atchoum ! Le temps de te réchauffer, la lune est déjà levée : la tour lointaine n'a pas reçu le message à temps. Une rivière, ça se regarde du haut du pont !"
+  },
+  {
+   "id": "dodo",
+   "kind": "lose",
+   "text": "Tu t'endors sur un coussin, ronpshhh… Quand tu te réveilles, la lune est déjà haute et le message n'est jamais parti. Madame Hua te borde en souriant : « Je t'avais prévenu ! »"
+  }
+ ],
+ "format": 2,
+ "puzzles": [
+  {
+   "goal": "Allumer le feu de signal",
+   "action": "allumer_signal",
+   "needs": [
+    "foyer",
+    "lanterne"
+   ],
+   "clue_in": "ahfu"
+  },
+  {
+   "goal": "Remplir le foyer de bambou sec",
+   "action": "mettre_bambou",
+   "needs": [
+    "bambou",
+    "foyer"
+   ],
+   "clue_in": "ahfu"
+  },
+  {
+   "goal": "Réveiller Ah-Fu, qui ouvre la tour",
+   "action": "frapper_gong",
+   "needs": [
+    "gong"
+   ],
+   "clue_in": "ahfu"
+  },
+  {
+   "goal": "Ou réveiller Ah-Fu d'un éternuement, avec un foulard poivré",
+   "action": "eternuer_ahfu",
+   "needs": [
+    "foulard",
+    "ahfu"
+   ],
+   "clue_in": "ahfu"
+  },
+  {
+   "goal": "Mettre du poivre du Sichuan sur le foulard",
+   "action": "poivrer_foulard",
+   "needs": [
+    "foulard",
+    "poivre"
+   ],
+   "clue_in": "poivre"
+  },
+  {
+   "goal": "Allumer la lanterne",
+   "action": "allumer_lanterne",
+   "needs": [
+    "lanterne",
+    "rechaud"
+   ],
+   "clue_in": "rechaud"
+  },
+  {
+   "goal": "Ou envoyer le message par cerf-volant",
+   "action": "faire_voler",
+   "needs": [
+    "cerf_volant",
+    "rempart"
+   ],
+   "clue_in": "grue"
+  },
+  {
+   "goal": "Attacher le message au cerf-volant",
+   "action": "attacher_message",
+   "needs": [
+    "papier",
+    "cerf_volant"
+   ],
+   "clue_in": "grue"
+  },
+  {
+   "goal": "Faire écrire le message",
+   "action": "ecrire_message",
+   "needs": [
+    "papier",
+    "wen"
+   ],
+   "clue_in": "wen"
+  },
+  {
+   "goal": "Deviner la devinette de la lanterne de Petit Lu",
+   "action": "lu",
+   "needs": [
+    "lu"
+   ],
+   "clue_in": "lu"
+  },
+  {
+   "goal": "Trouver une feuille sèche",
+   "action": "chercher_feuille",
+   "needs": [
+    "sechoir"
+   ],
+   "clue_in": "lu"
+  },
+  {
+   "goal": "Fabriquer un cerf-volant",
+   "action": "faire_cerf_volant",
+   "needs": [
+    "bambou",
+    "foulard"
+   ],
+   "clue_in": "foulard"
+  },
+  {
+   "goal": "Faire lever Dodu (et avoir ses bambous)",
+   "action": "nourrir_panda",
+   "needs": [
+    "baozi",
+    "dodu"
+   ],
+   "clue_in": "dodu"
+  },
+  {
+   "goal": "Acheter un petit pain",
+   "action": "acheter_pain",
+   "needs": [
+    "piece",
+    "hua"
+   ],
+   "clue_in": "hua"
+  }
+ ]
 }

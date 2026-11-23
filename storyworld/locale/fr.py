@@ -68,7 +68,7 @@ VERBS: dict[str, list[str]] = {
         "frotte",
         "essayer",
     ],
-    "combine": ["combiner", "melanger", "assembler", "attacher", "accrocher", "coller"],
+    "combine": ["combiner", "melanger", "assembler", "attacher", "accrocher", "coller", "tremper"],
     "open": ["ouvrir", "deverrouiller", "deverrouille", "deplier", "derouler"],
     "close": ["fermer"],
     "talk": ["parler", "dire", "discuter", "appeler", "saluer", "reveiller"],

@@ -16,6 +16,7 @@ def test_le_tournoi_du_chateau(tmp_path, monkeypatch):
         ("Je vais à la cuisine", [G("la cuisine")], ["done"]),
         ("Je goûte la soupe", [A("eat", "la soupe")], ["clue"]),
         ("Je prends la pomme et le pain", [A("take", "la pomme"), A("take", "le pain")], ["done", "done"]),
+        ("Je trempe le pain dans la soupe", [A("use", "le pain", "la soupe")], ["done"]),  # a soup sandwich
         ("Je retourne dans la cour et je donne le pain à l'oie",
          [G("la cour"), A("give", "le pain", "l'oie")], ["done", "done"]),
         ("Je vais à l'écurie", [G("l'écurie")], ["done"]),
@@ -54,13 +55,19 @@ def test_le_drakkar_de_sigrid(tmp_path, monkeypatch):
         ("Je vais voir la chèvre", [G("la chèvre")], ["done"]),
         ("Je pousse la chèvre", [A("push", "la chèvre")], ["clue"]),
         ("Je prends la laine", [A("take", "la laine")], ["not_yet"]),  # Brunhilde lies on it
-        ("Je donne le navet à la chèvre", [A("give", "le navet", "la chèvre")], ["done"]),
+        ("Je donne la moufle à la chèvre", [A("give", "la moufle", "la chèvre")], ["absent"]),  # still in the chest
+        ("Je retourne prendre la moufle", [G("la cabane"), A("take", "la moufle")], ["done", "done"]),
+        ("Je frotte la moufle avec le poisson", [A("frotter", "la moufle", "le poisson")], ["done"]),  # silly recipe
+        ("Je jette la moufle qui pue sur la chèvre",
+         [G("l'enclos"), A("throw", "la moufle qui pue", "la chèvre")], ["done", "done"]),  # she jumps off the wool
         ("Je prends la pelote et je mets la laine dans l'aiguille",
          [A("take", "la pelote"), A("use", "la laine", "l'aiguille")], ["done", "done"]),
         ("Aide-moi", [A("help")], ["hint"]),
         ("Je vais sur la colline", [G("la cabane"), G("la plage"), G("la colline")], ["done"] * 3),
         ("Je cherche la pierre de soleil près du rocher", [A("search", "le rocher")], ["not_yet"]),  # read first
-        ("Je lis les runes", [A("read", "les runes")], ["done"]),
+        ("Je lis les runes", [A("read", "les runes")], ["done"]),  # a riddle of Olaf's
+        ("Les nuages !", [A("answer", "les nuages", "le rocher")], ["not_yet"]),
+        ("C'est la mer !", [A("answer", "la mer", "le rocher")], ["done"]),  # « sous mon pied dort le soleil »
         ("Je creuse au pied du rocher", [A("creuser", "le rocher")], ["done"]),
         ("Je prends la pierre de soleil", [A("take", "la pierre de soleil")], ["done"]),
         ("Je regarde le ciel avec la pierre", [A("use", "la pierre de soleil")], ["clue"]),  # not at sea yet
@@ -69,6 +76,35 @@ def test_le_drakkar_de_sigrid(tmp_path, monkeypatch):
         ("Je cherche le soleil avec la pierre de soleil", [A("use", "la pierre de soleil")], ["end"]),
     ])  # fmt: skip
     assert game.state.ending == "soleil"
+
+
+def test_le_carillon_de_la_foret(tmp_path, monkeypatch):
+    game = play(tmp_path, monkeypatch, "Le carillon de la forêt", [
+        ("Bambou, qu'est-ce qui se passe ?", [A("talk", "Bambou")], ["done"]),
+        ("Je vais au verger et je secoue le pommier", [G("le verger"), A("push", "le pommier")], ["done", "done"]),
+        ("Je prends la pomme", [A("take", "la pomme")], ["done"]),
+        ("Je vais chez Taupinette", [G("la clairière"), G("le terrier")], ["done", "done"]),
+        ("Je donne la pomme à la taupe", [A("give", "la pomme", "Taupinette")], ["done"]),
+        ("Je vais à la rivière", [G("la clairière"), G("la rivière")], ["done", "done"]),
+        ("Je regarde sous les galets", [A("search", "les galets")], ["done"]),
+        ("Je prends la pierre à étincelles et un roseau", [A("take", "la pierre à étincelles"), A("take", "le roseau")], ["done", "done"]),
+        ("Je fais des trous dans le roseau avec la pierre",
+         [A("use", "la pierre à étincelles", "le roseau")], ["done"]),  # silly recipe: a duck-with-a-cold pipe
+        ("J'allume la lanterne avec la pierre", [A("light", "la lanterne")], ["done"]),
+        ("Je vais sur le pont", [G("le vieux pont")], ["done"]),
+        ("Je passe", [G("la grotte")], ["not_yet"]),  # Grognon bars the way
+        ("Bonjour Grognon !", [A("talk", "Grognon")], ["done"]),  # his riddle
+        ("Je lui chante une chanson", [A("sing", "Grognon")], ["clue"]),  # nice, but the riddle first
+        ("Je joue du pipeau à Grognon", [A("use", "le pipeau", "Grognon")], ["clue"]),  # he laughs, hic!
+        ("La lumière !", [A("answer", "la lumière", "Grognon")], ["not_yet"]),
+        ("C'est le noir !", [A("answer", "le noir", "Grognon")], ["done"]),
+        ("J'entre dans la grotte et je regarde avec la lanterne",
+         [G("la grotte"), A("use", "la lanterne")], ["done", "done"]),
+        ("Je prends le battant", [A("take", "le battant")], ["done"]),
+        ("Je retourne à la clairière", [G("le pont"), G("la rivière"), G("la clairière")], ["done"] * 3),
+        ("Je raccroche le battant au carillon", [A("use", "le battant", "le carillon")], ["end"]),
+    ])  # fmt: skip
+    assert game.state.ending == "fete"
 
 
 def test_l_atelier_de_leonard(tmp_path, monkeypatch):
@@ -100,6 +136,19 @@ def test_l_atelier_de_leonard(tmp_path, monkeypatch):
         ("Je fais voler la maquette", [A("throw", "la maquette")], ["end"]),
     ])  # fmt: skip
     assert game.state.ending == "oiseau"
+
+
+def test_le_tournoi_du_chateau_pomme_au_bout_de_la_perche(tmp_path, monkeypatch):
+    """The silly recipe: the apple dangled at the end of the pole leads Caramel out; the pole stays useful."""
+    game = play(tmp_path, monkeypatch, "Le tournoi du château", [
+        ("Je vais à la cuisine et je prends la pomme", [G("la cuisine"), A("take", "la pomme")], ["done", "done"]),
+        ("Je vais à l'écurie et je prends la perche",
+         [G("la cour"), G("l'écurie"), A("take", "la perche")], ["done", "done", "done"]),
+        ("J'accroche la pomme au bout de la perche", [A("combine", "la pomme", "la perche")], ["done"]),
+        ("Je balance la pomme devant Caramel", [A("use", "la perche", "Caramel")], ["done"]),  # he follows it out
+        ("Je vais au tournoi", [G("la cour"), G("le tournoi")], ["done", "done"]),
+    ])  # fmt: skip
+    assert game.state.place == "lice" and "perche" in game.state.inventory
 
 
 def _graph(title):

@@ -339,8 +339,11 @@ def chain(w: World) -> dict:
             elif item.get("code"):
                 need(nid, [node(f"code:{n['ref']}", kind="code", ref=n["ref"], label=f"le code {of(w.name(n['ref']))}")],
                      "code")  # fmt: skip
-            elif item.get("locked"):
+            elif item.get("locked") and item.get("key"):
                 need(nid, producers(f"has:{item['key']}"), f"has:{item['key']}")
+            elif item.get("locked"):  # no key: an action unlocks or opens it
+                ref = n["ref"]
+                need(nid, acts(lambda e, r=ref: e in (f"unlock:{r}", f"open:{r}")), f"unlock:{ref}")
             doors = {x.get("door") for p in w.places.values() for x in p.get("exits", [])}
             if n["ref"] not in doors:
                 need(nid, present(n["ref"]), f"là : {n['ref']}")

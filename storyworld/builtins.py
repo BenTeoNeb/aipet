@@ -51,6 +51,10 @@ class Builtins:
             openable, keyed = tgt, True
         elif verb in APPLY and tgt and openable and w.items[openable].get("key") == tgt:
             keyed = True
+        elif verb in APPLY and obj and not tgt:  # « utiliser la clé » at the door: what it unlocks here
+            locks = [i for i in w.visible_items(st) if w.items[i].get("key") == obj and not w.prop(st, i, "open")]
+            if len(locks) == 1:
+                openable, keyed = locks[0], True
         if openable and (verb in OPENERS or keyed or verb == "search" and not w.prop(st, openable, "open")):
             return self.open(st, openable)  # fouiller ou tirer un tiroir fermé, c'est l'ouvrir
         if verb == "close" and openable:  # never needed, and it could lock the hero out: it stays open

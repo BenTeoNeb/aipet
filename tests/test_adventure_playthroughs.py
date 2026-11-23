@@ -45,7 +45,8 @@ def test_le_bonhomme_de_neige(tmp_path, monkeypatch):
         ("Bonjour Plumette !", [A("talk", "Plumette")], ["done"]),
         ("Je mets mon doigt pour faire le nez", [A("use", "mon doigt", "le bonhomme")], ["absent"]),  # Flocon plays along
         ("Je vais chez Mamie", [G("chez Mamie")], ["done"]),
-        ("Je demande une carotte à Mamie", [A("ask", "Mamie", "une carotte")], ["not_yet"]),
+        ("Je demande une carotte à Mamie", [A("ask", "Mamie", "une carotte")], ["done"]),  # « ferme la fenêtre »
+        ("Je prends la carotte", [A("take", "la carotte")], ["not_yet"]),  # Mamie holds it
         ("Je ferme la fenêtre", [A("close", "la fenêtre")], ["done"]),
         ("Je prends la carotte et je retourne dehors", [A("take", "la carotte"), G("dehors")], ["done", "done"]),
         ("Je mets la carotte sur le bonhomme", [A("use", "la carotte", "le bonhomme")], ["done"]),
@@ -53,7 +54,10 @@ def test_le_bonhomme_de_neige(tmp_path, monkeypatch):
         ("Je saute pour attraper le chapeau", [A("jump", "le chapeau")], ["free"]),
         ("Je prends le chapeau", [A("take", "le chapeau")], ["not_yet"]),  # seen on its hook: not « absent »
         ("Aide-moi Flocon", [A("help")], ["hint"]),
-        ("Je vais dans la remise", [G("dehors"), G("la remise")], ["done", "done"]),
+        ("Je prends la chaussette géante", [A("take", "la chaussette")], ["done"]),
+        ("Je vais mettre la chaussette au bonhomme", [G("dehors"), A("use", "la chaussette", "le bonhomme")],
+         ["done", "done"]),  # a silly scarf: Plumette loops the loop
+        ("Je vais dans la remise", [G("la remise")], ["done"]),
         ("Je mets le seau sur ma tête", [A("wear", "le seau")], ["free"]),
         ("Je prends le tabouret", [A("take", "le tabouret")], ["done"]),
         ("Je retourne à la cabane", [G("jardin"), G("cabane")], ["done", "done"]),
@@ -121,7 +125,7 @@ def test_raya_et_la_perle_de_lumiere(tmp_path, monkeypatch):
         ("Je prends la perle et je donne les miettes aux poissons",
          [A("take", "la perle"), A("give", "les miettes", "les poissons")], ["done", "done"]),
         ("Je vais vers la lueur et je souffle dans la conque", [G("la lueur dorée"), A("use", "la conque")], ["done", "done"]),
-        ("Je donne la perle à Madame Bénitier", [A("give", "la perle", "Madame Bénitier")], ["clue"]),  # a clue
+        ("Je donne la perle à Madame Bénitier", [A("give", "la perle", "Madame Bénitier")], ["not_yet"]),  # still grey: « elle doit briller »
         ("Je dis à Madame Bénitier que j'ai des amis qui brillent",
          [A("talk", "Madame Bénitier", "mes amis qui brillent")], ["end"]),
     ])  # fmt: skip
@@ -147,6 +151,10 @@ def test_every_object_shown_or_out_of_reach_is_never_absent(graph):
                 w.act(st, G(w.name(ident)))
             elif kind == "take":
                 w.act(st, A("take", w.name(ident)))
+            elif kind in ("press", "open"):  # a code's button, a container or door opened (format 2)
+                w.act(st, A("push" if kind == "press" else "open", w.name(ident)))
+            elif kind == "answer":  # a riddle answered with its first accepted answer
+                w.act(st, A("answer", w.thing(ident)["answer"]["accept"][0], w.name(ident)))
             else:
                 a = next(x for x in w.rules if x["id"] == ident)
                 w.act(st, A(a["verb"], w.name(a.get("object", "")), w.name(a["target"]) if a.get("target") else ""))

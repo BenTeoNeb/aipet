@@ -1,6 +1,8 @@
 """The catalogue of puzzle patterns (aipet/games/adventure_patterns.py): each one is checked and won by
 speaking. A change to the model must keep them all green."""
 
+import json
+
 import pytest
 
 from aipet.games.adventure_engine import World, check
@@ -55,3 +57,12 @@ def test_the_strongest_hint_for_a_riddle_gives_the_answer():
     st = w.start()
     st.stalled, st.hint_level = 99, 2
     assert w.hint(st, force=True) == "Réponds : « peigne »."
+
+
+def test_a_flag_set_by_a_riddle_counts_as_reachable():
+    graph, _ = PATTERNS["riddle"]
+    g = json.loads(json.dumps(graph))
+    g["items"][0]["answer"]["effects"] = ["flag:devine"]
+    g["actions"][0]["when"].append("flag:devine")
+    errors, report = check(g)
+    assert [e for e in errors if not e.startswith("facile:")] == [] and report["wins"]

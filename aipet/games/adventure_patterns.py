@@ -91,6 +91,103 @@ PATTERNS = {
             ("use", "le vert", "la toile"),
         ],
     ),
+    # A recipe that changes a thing: the tool stays, the thing goes to its next state (and shows what it held).
+    "recipe_changes_a_thing": (
+        adventure(
+            AB,
+            [
+                thing("ouvre_boite", "a"),
+                thing(
+                    "conserve",
+                    "b",
+                    states=[
+                        {"id": "fermee", "name": "la conserve fermée"},
+                        {"id": "ouverte", "name": "la conserve ouverte"},
+                    ],
+                ),
+                thing("sardine", "", aliases=["sardine", "poisson"]),
+            ],
+            [person("chat", "b")],
+            [
+                act(
+                    "ouvrir_conserve",
+                    [("combine", "ouvre_boite", "conserve"), ("use", "ouvre_boite", "conserve")],
+                    ["set:conserve:ouverte", "reveal:sardine"],
+                    ["has:ouvre_boite", "is:conserve:fermee"],
+                ),
+                act("nourrir_chat", [("give", "sardine", "chat")], ["lose:sardine", "end:gagne"], ["has:sardine"]),
+            ],
+        ),
+        [
+            ("take", "l'ouvre-boîte"),
+            ("go", "est"),
+            ("use", "l'ouvre-boîte", "la conserve"),
+            ("give", "la sardine", "au chat"),
+        ],
+    ),
+    # A recipe of three: two things are mixed while the third is in the bag (a trigger names two things,
+    # `when` asks for the rest); the result is a new thing.
+    "recipe_of_three": (
+        adventure(
+            AB,
+            [
+                thing("farine", "a"),
+                thing("oeuf", "a"),
+                thing("lait", "b"),
+                thing("pate", ""),
+                thing("four", "b", "scenery"),
+            ],
+            [],
+            [
+                act(
+                    "faire_pate",
+                    [("combine", "farine", "oeuf")],
+                    ["lose:farine", "lose:oeuf", "lose:lait", "gain:pate"],
+                    ["has:farine", "has:oeuf", "has:lait"],
+                    not_yet="Il manque quelque chose de liquide pour la pâte.",
+                ),
+                act("cuire", [("use", "pate", "four")], ["end:gagne"], ["has:pate"]),
+            ],
+        ),
+        [
+            ("take", "la farine"),
+            ("take", "l'oeuf"),
+            ("go", "est"),
+            ("take", "le lait"),
+            ("combine", "la farine", "l'oeuf"),
+            ("use", "la pâte", "le four"),
+        ],
+    ),
+    # A silly recipe (point-and-click humour): an absurd mix is a second way to win, not a trap.
+    "silly_recipe": (
+        adventure(
+            AB,
+            [thing("chaussette", "a"), thing("poivre", "a"), thing("bombe", ""), thing("biscuit", "b")],
+            [person("dragon", "b", says="Grrr ! Personne ne passe !")],
+            [
+                act(
+                    "bombe_qui_pue",
+                    [("combine", "chaussette", "poivre")],
+                    ["lose:chaussette", "lose:poivre", "gain:bombe"],
+                    ["has:chaussette", "has:poivre"],
+                ),
+                act(
+                    "faire_eternuer",
+                    [("throw", "bombe", "dragon"), ("give", "bombe", "dragon")],
+                    ["lose:bombe", "end:gagne"],
+                    ["has:bombe"],
+                ),
+                act("amadouer", [("give", "biscuit", "dragon")], ["lose:biscuit", "end:gagne"], ["has:biscuit"]),
+            ],
+        ),
+        [
+            ("take", "la chaussette"),
+            ("take", "le poivre"),
+            ("combine", "la chaussette", "le poivre"),
+            ("go", "est"),
+            ("throw", "la bombe", "le dragon"),
+        ],
+    ),
     # A trade: someone holds what the hero needs, and lets it go for something else.
     "trade_with_a_holder": (
         adventure(
