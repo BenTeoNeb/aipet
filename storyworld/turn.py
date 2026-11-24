@@ -269,6 +269,8 @@ class Turn:
         if not lost or f"destroy:{lost}" in st.warned or st.doomed:
             return None
         found = solve(w, trial, first_path=True)
+        if w.atlas:
+            w.atlas.compare(trial, "think_twice", found.get("path"), found["complete"])
         if found.get("path") or not found.get("complete"):
             return None
         st.warned.append(f"destroy:{lost}")
@@ -295,6 +297,8 @@ class Turn:
         when the child runs into it (Sierra's « dead man walking », but told then, not later)."""
         w = self.w
         found = solve(w, st, first_path=True)  # rare (after a destroy): the full search, not the hints' quick one
+        if w.atlas:
+            w.atlas.compare(st, "doom", found.get("path"), found["complete"])
         if not found.get("path") and found.get("complete"):
             name = w.name(lost, st)
             st.doomed = {"lost": lost, "before": before,

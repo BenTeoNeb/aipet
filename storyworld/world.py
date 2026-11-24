@@ -21,6 +21,7 @@ from __future__ import annotations
 import copy
 
 from storyworld.actions import Actions
+from storyworld.atlas import Atlas
 from storyworld.builtins import Builtins
 from storyworld.hints import Hints
 from storyworld.locale import Language
@@ -47,6 +48,7 @@ class World:
         self.view = View(self)
         self.turn = Turn(self)
         self.hints = Hints(self)
+        self.atlas: Atlas | None = None  # every reachable state and how far a win is (`build_atlas`)
         self.lang = lang or FRENCH  # every message for the player or the narrator goes through it
         self.g = graph = migrate(graph)
         # The engine reads normalized copies (kinds' properties, states as a map, doors on both sides);

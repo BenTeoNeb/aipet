@@ -20,6 +20,7 @@ from __future__ import annotations
 import json
 import random
 import re
+import threading
 import time
 import uuid
 from collections.abc import Set as AbstractSet
@@ -48,6 +49,7 @@ from aipet.games.common import PREPARING_NOTE, UNKNOWN_PLAYER, Activity, JsonSto
 from aipet.memory.cards import DIR_ADVENTURES, DIR_STORIES, child_level
 from aipet.memory.text import STOPWORDS, normalize_text
 from aipet.timefmt import now
+from storyworld.atlas import Atlas
 
 ADVENTURE_TOOLS = {"adventure_start", "adventure_act", "adventure_end"}
 LIBRARY = Path(__file__).parent.parent / "data" / "adventures"
@@ -56,6 +58,7 @@ FIRST_CALL_SECS = 44  # Gemini 3.8 Flash « medium » took 38–44 s for a world
 TITLE_STOPWORDS = {"aventure", "avec", "dans", "pour", "les", "des", "une", "cette", "celle", "derniere"}
 LITTLE_ONES = {"PS", "MS", "GS", "CP"}
 STT_NAMES = 30
+SHADOW_ATLAS = True  # build each world's atlas in the background and compare it with the searches (tests: off)
 CATALOG_SHOWN = 40  # adventures listed for the narrator while the activity is open (short lines)
 # Verbs the models write instead of the canonical ones.
 ENGLISH_VERBS = {"say": "talk", "speak": "talk", "tell": "talk", "put": "use", "place": "use", "insert": "use",
@@ -794,6 +797,7 @@ class AdventureGame(Activity):
         just before a loss."""
         assert self.adventure is not None
         self.world = World(self.adventure["graph"])
+        self._shadow_atlas()
         self.state = state or self.world.start()
         if state is None:
             self.adventure["checkpoints_left"] = self.world.policy["checkpoints"]
@@ -816,7 +820,27 @@ class AdventureGame(Activity):
             return {"error": "Cette aventure est abîmée : propose d'en commencer une nouvelle."}
         self.adventure = record
         self.world = World(record["graph"])
+        self._shadow_atlas()
         return None
+
+    def _shadow_atlas(self):
+        """Build the atlas of the new world in the background, in the shadow of the searches
+        (`storyworld.atlas`): its answers are only compared and logged, they change nothing yet."""
+        if not SHADOW_ATLAS:
+            return
+        w = self.world
+
+        def build():
+            try:
+                atlas = Atlas(w)
+            except Exception as e:  # noqa: BLE001  the shadow never breaks a game
+                logger.warning(f"🗺️ No atlas: {e!r}")
+                return
+            w.atlas = atlas
+            self._ev("adventure_atlas", states=len(atlas.seen), winnable=len(atlas.dist),
+                     complete=atlas.complete, seconds=round(atlas.seconds, 2))  # fmt: skip
+
+        threading.Thread(target=build, name="adventure-atlas", daemon=True).start()
 
     def _reopen(self, player: str, replay: str, resume: bool, from_checkpoint: bool) -> dict:
         mine = self._mine(player)
@@ -910,7 +934,13 @@ class AdventureGame(Activity):
             )  # fmt: skip
         self._save()
         self._refresh()
-        self._ev("adventure_act", said=said[:120], outcomes=[r.get("outcome") for r in results])
+        atlas = {}
+        if w.atlas:
+            atlas = {"atlas": w.atlas.distance(st)}
+            for d in w.atlas.disagreements:
+                self._ev("adventure_atlas_disagrees", **d)
+            w.atlas.disagreements.clear()
+        self._ev("adventure_act", said=said[:120], outcomes=[r.get("outcome") for r in results], **atlas)
         return out
 
     def _naming(self, intent: dict) -> list[dict]:

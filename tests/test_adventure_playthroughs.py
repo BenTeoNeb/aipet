@@ -176,3 +176,18 @@ def test_how_the_narrator_names_things_is_logged(tmp_path, monkeypatch):
     assert named == [[{"field": "object", "said": "Plumette", "kind": "words"}],
                      [{"field": "object", "said": "mon doigt", "kind": "unknown"},
                       {"field": "target", "said": "le bonhomme", "kind": "words"}]]  # fmt: skip
+
+
+def test_the_atlas_is_built_in_the_shadow_and_logged(tmp_path, monkeypatch):
+    """Built in the background when a world is made; each turn logs how far a win is."""
+    events: list[tuple] = []
+    monkeypatch.setattr(adv, "SHADOW_ATLAS", True)
+    built = []
+    monkeypatch.setattr(adv.threading, "Thread", lambda target, **kw: built.append(target) or type(
+        "T", (), {"start": lambda self: target()})())  # synchronous, for the test
+    game = play(tmp_path, monkeypatch, "Le bonhomme de neige de Plumette", [])
+    monkeypatch.setattr(game, "_ev", lambda type_, **kw: events.append((type_, kw)))
+    assert built and game.world.atlas and game.world.atlas.complete
+    game.act([A("talk", "plumette")], said="Bonjour !")
+    (kw,) = [kw for t, kw in events if t == "adventure_act"]
+    assert kw["atlas"] > 0

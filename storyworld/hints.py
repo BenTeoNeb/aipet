@@ -139,7 +139,10 @@ class Hints:
         if k not in self.cache:
             if len(self.cache) > 200:
                 self.cache.clear()
-            self.cache[k] = solve(self.w, st, first_path=True, max_states=HINT_STATES).get("path") or []
+            found = solve(self.w, st, first_path=True, max_states=HINT_STATES)
+            self.cache[k] = found.get("path") or []
+            if self.w.atlas:
+                self.w.atlas.compare(st, "hint", self.cache[k], found["complete"])
         return self.cache[k]
 
     def towards_tries(self, st: State) -> list[tuple]:

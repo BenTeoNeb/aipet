@@ -55,6 +55,7 @@ outcome = world.act(state, {"verb": "give", "object": "algue", "target": "pinces
 | `verbs.py` | the canonical verbs and their families |
 | `solver.py` | the state space, the ways to win, agreement between solver and turn |
 | `check.py` | `validate`, `Diagnostic`, the format's lints |
+| `atlas.py` | every reachable state and how far a win is, built once: for now in the shadow of the searches |
 | `chart.py` | the puzzle dependency chart derived from a way to win (depth, width) |
 | `hints.py` | hints from the solver's next useful step, or the puzzle the child is trying |
 | `schema/` | the JSON Schema |
