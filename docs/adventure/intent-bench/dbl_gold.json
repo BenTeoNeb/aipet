@@ -1,0 +1,4808 @@
+[
+ {
+  "src": "opus",
+  "title": "Le phare de Piko",
+  "said": "je ramasse des coquillages sur la plage",
+  "before": "",
+  "told": "la plage Une petite plage de sable doré. Au loin, sur la mer, on devine le bateau de Zouzou. Sur le sable mouillé, quelqu'un a dessiné trois coquillages, bien en rang : un bleu, puis un rose, puis un blanc. Piko le hérisson fait les cent pas, tout inquiet.",
+  "state": {
+   "place": "plage",
+   "inventory": [
+    "bocal"
+   ],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "gone",
+    "lucioles": "rochers",
+    "cle": "rochers",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "tiroir",
+    "bocal": "inv",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "rochers",
+    "cabane"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "nourrir_crabe"
+   ],
+   "props": {
+    "pinces": {
+     "state": "content"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 463,
+  "group": "ca29a6017d78",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take"
+    }
+   ],
+   "why": "les coquillages de la plage ne sont qu'un dessin: imaginaire"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Raya et la perle de lumière",
+  "said": "je tire sur le filet pour avoir un bout de fil",
+  "before": "",
+  "told": "l'épave Un vieux bateau couché sur le sable. Un filet de pêche est accroché au mât. Une boîte de biscuits rouillée traîne sur le pont. Un bocal en verre est coincé dans le sable.",
+  "state": {
+   "place": "epave",
+   "inventory": [
+    "ficelle"
+   ],
+   "flags": [],
+   "items_at": {
+    "algue_lumineuse": "algues",
+    "algues_brillantes": "algues",
+    "filet": "epave",
+    "ficelle": "inv",
+    "boite": "epave",
+    "miettes": "boite",
+    "bocal": "epave",
+    "sable": "plaine",
+    "coquillages": "",
+    "collier": "",
+    "perle": "fosse",
+    "corail_soleil": "jardin",
+    "conque": "octave",
+    "gouvernail": "epave",
+    "collier_zigzag": ""
+   },
+   "chars_at": {
+    "raya": "recif",
+    "zigzag": "plaine",
+    "octave": "",
+    "poissons": "fosse",
+    "benitier": "palais"
+   },
+   "visited": [
+    "recif",
+    "epave",
+    "plaine",
+    "jardin"
+   ],
+   "seen": [
+    "recif"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "detacher_ficelle"
+   ],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 573,
+  "group": "59ea7a5740a5",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "pull",
+     "object": "filet"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le phare de Piko",
+  "said": "je prends le bocal et j'appuie sur le coquillage rose",
+  "before": "",
+  "told": "la cabane de Zouzou Une cabane en bois qui sent bon le poisson grillé. Zouzou range ses allumettes dans le tiroir de la commode, mais il est fermé par un drôle de mécanisme : trois coquillages collés dessus. Sur la table, un bocal vide.",
+  "state": {
+   "place": "cabane",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "rochers",
+    "lucioles": "rochers",
+    "cle": "pinces",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "tiroir",
+    "bocal": "cabane",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "cabane",
+    "pied_phare"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {
+    "tiroir": {
+     "pressed": 1
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 476,
+  "group": "b6c86ff399b7",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "bocal"
+    },
+    {
+     "verb": "push",
+     "object": "coquillage_rose"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le phare de Piko",
+  "said": "on retourne dans la cabane de zouzou",
+  "before": "",
+  "told": "la plage Une petite plage de sable doré. Au loin, sur la mer, on devine le bateau de Zouzou. Sur le sable mouillé, quelqu'un a dessiné trois coquillages, bien en rang : un bleu, puis un rose, puis un blanc. Piko le hérisson fait les cent pas, tout inquiet.",
+  "state": {
+   "place": "plage",
+   "inventory": [
+    "bocal"
+   ],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "gone",
+    "lucioles": "rochers",
+    "cle": "rochers",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "tiroir",
+    "bocal": "inv",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "rochers",
+    "cabane"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "nourrir_crabe"
+   ],
+   "props": {
+    "pinces": {
+     "state": "content"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 462,
+  "group": "ca29a6017d78",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "cabane"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le tournoi du château",
+  "said": "je prends le pain",
+  "before": "",
+  "told": "la cuisine Une cuisine immense, avec une cheminée où mijote une grosse marmite de soupe, et une grande table toute blanche de farine. Un quignon de pain croustillant attend sur la table. Dame Berthe, la cuisinière, pétrit la pâte en chantonnant.",
+  "state": {
+   "place": "cuisine",
+   "inventory": [
+    "pomme"
+   ],
+   "flags": [],
+   "items_at": {
+    "foin": "ecurie",
+    "bouclier": "",
+    "perche": "ecurie",
+    "pomme": "inv",
+    "pain": "cuisine",
+    "marmite": "cuisine",
+    "plume": "",
+    "livre": "scriptorium",
+    "banniere": "anselme",
+    "trompette": "lice",
+    "puits": "cour"
+   },
+   "chars_at": {
+    "bertrand": "cour",
+    "caramel": "ecurie",
+    "oie": "cour",
+    "berthe": "cuisine",
+    "anselme": "scriptorium",
+    "heraut": "lice"
+   },
+   "visited": [
+    "cour",
+    "cuisine"
+   ],
+   "seen": [
+    "cour"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 520,
+  "group": "d590ad2d8069",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "pain"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le ballon de Versailles",
+  "said": "on va voir les cuisiniers",
+  "before": "",
+  "told": "la cour du château La grande cour du château, pleine de dames et de messieurs en perruques poudrées. Au milieu, un immense ballon bleu et doré, tenu par des cordes. Dessous, un grand panier d'osier pour les passagers, à côté d'un tas de paille prêt pour le feu, que Monsieur de Montgolfier, l'inventeur, allumera. Au balcon, le roi Louis XVI attend. Lucile, la petite apprentie, se ronge les ongles.",
+  "state": {
+   "place": "cour",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "clochette": "lucile",
+    "ballon": "cour",
+    "panier": "cour",
+    "paille": "cour",
+    "tulipes": "jardin",
+    "statue": "jardin",
+    "brioche": "",
+    "grains": "cuisines",
+    "vanne": "bassin"
+   },
+   "chars_at": {
+    "lucile": "cour",
+    "montauciel": "jardin",
+    "coq": "jardin",
+    "canard": "bassin",
+    "gouttelette": "bassin"
+   },
+   "visited": [
+    "cour",
+    "jardin"
+   ],
+   "seen": [
+    "cour"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 194,
+  "group": "44dd68d73eed",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "cuisines"
+    }
+   ],
+   "why": "les cuisiniers = les cuisines"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le ballon de Versailles",
+  "said": "je mets de la paille dans le panier",
+  "before": "",
+  "told": "la cour du château La grande cour du château, pleine de dames et de messieurs en perruques poudrées. Au milieu, un immense ballon bleu et doré, tenu par des cordes. Dessous, un grand panier d'osier pour les passagers, à côté d'un tas de paille prêt pour le feu, que Monsieur de Montgolfier, l'inventeur, allumera. Au balcon, le roi Louis XVI attend. Lucile, la petite apprentie, trépigne d'impatience.",
+  "state": {
+   "place": "cour",
+   "inventory": [
+    "clochette"
+   ],
+   "flags": [
+    "brioche_trouvee"
+   ],
+   "items_at": {
+    "clochette": "inv",
+    "ballon": "cour",
+    "panier": "cour",
+    "paille": "cour",
+    "tulipes": "jardin",
+    "statue": "jardin",
+    "brioche": "cuisines",
+    "grains": "cuisines",
+    "vanne": "bassin"
+   },
+   "chars_at": {
+    "lucile": "cour",
+    "montauciel": "jardin",
+    "coq": "jardin",
+    "canard": "bassin",
+    "gouttelette": "bassin"
+   },
+   "visited": [
+    "cour",
+    "jardin",
+    "bassin",
+    "cuisines"
+   ],
+   "seen": [
+    "cour"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "parler_lucile",
+    "sentir_brioche"
+   ],
+   "props": {},
+   "handled": [
+    "clochette"
+   ],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 189,
+  "group": "3f95ae534e6c",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "paille",
+     "target": "panier"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le tournoi du château",
+  "said": "je demande à dame berte si elle a besoin d'aide",
+  "before": "",
+  "told": "la cuisine Une cuisine immense, avec une cheminée où mijote une grosse marmite de soupe, et une grande table toute blanche de farine. Un quignon de pain croustillant attend sur la table. Dame Berthe, la cuisinière, pétrit la pâte en chantonnant.",
+  "state": {
+   "place": "cuisine",
+   "inventory": [
+    "pomme"
+   ],
+   "flags": [],
+   "items_at": {
+    "foin": "ecurie",
+    "bouclier": "",
+    "perche": "ecurie",
+    "pomme": "inv",
+    "pain": "cuisine",
+    "marmite": "cuisine",
+    "plume": "",
+    "livre": "scriptorium",
+    "banniere": "anselme",
+    "trompette": "lice",
+    "puits": "cour"
+   },
+   "chars_at": {
+    "bertrand": "cour",
+    "caramel": "ecurie",
+    "oie": "cour",
+    "berthe": "cuisine",
+    "anselme": "scriptorium",
+    "heraut": "lice"
+   },
+   "visited": [
+    "cour",
+    "cuisine"
+   ],
+   "seen": [
+    "cour"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 524,
+  "group": "d590ad2d8069",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "berthe"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le scarabée du scribe",
+  "said": "je lui donne ma plume",
+  "before": "pourquoi il pleure kha",
+  "told": "l'atelier des scribes L'atelier des scribes, frais et calme. Un escalier monte vers la terrasse. Sur la table, il y a aussi un calame, le petit roseau pour écrire. Kha renifle dans un coin.",
+  "state": {
+   "place": "atelier",
+   "inventory": [
+    "plume",
+    "papyrus"
+   ],
+   "flags": [],
+   "items_at": {
+    "papyrus": "inv",
+    "calame": "atelier",
+    "scarabee": "miou",
+    "etal": "marche",
+    "poisson": "henout",
+    "plume": "inv",
+    "barque": "nil",
+    "roseaux": "nil",
+    "souris": ""
+   },
+   "chars_at": {
+    "kha": "atelier",
+    "miou": "terrasse",
+    "henout": "marche",
+    "meryt": "temple",
+    "ibis": "nil"
+   },
+   "visited": [
+    "atelier",
+    "nil"
+   ],
+   "seen": [
+    "atelier"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 487,
+  "group": "376fab382eab",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "plume",
+     "target": "kha"
+    }
+   ],
+   "why": "lui = Kha (dit avant)"
+  }
+ },
+ {
+  "src": "simulé",
+  "title": "Le phare de Piko (nouvelle version)",
+  "said": "Piko, arrête de courir partout, stp, on va t'aider ! Euh... je peux ramasser les coquillages bizarres dessinés sur le sable, ou c'est juste de la peinture ?",
+  "before": "",
+  "told": "ite plage de sable doré. Au loin sur l'eau, on aperçoit le bateau de Zouzou. Sur le sable, trois coquillages sont dessinés en rang : un bleu, un rose et un blanc. Piko le hérisson court dans tous les sens, super inquiet ! \n\nTu peux aller vers les rochers au nord, vers la cabane de Zouzou à l'est, ou vers le phare à l'ouest. Dans une aventure, tu peux tout essayer : regarder, prendre des objets, parler aux personnages ou te déplacer. \n\n[curieux] Qu'est-ce que tu as envie de faire pour commencer ?",
+  "state": {
+   "place": "plage",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "rochers",
+    "lucioles": "rochers",
+    "cle": "pinces",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "tiroir",
+    "bocal": "cabane",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 644,
+  "group": "c1a46f879fc6",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "piko"
+    },
+    {
+     "verb": "take",
+     "object": "dessin"
+    }
+   ],
+   "why": "demande s'il peut ramasser les coquillages dessinés: on essaie"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le ballon de Versailles",
+  "said": "je parle à lucile",
+  "before": "",
+  "told": "la cour du château La grande cour du château, pleine de dames et de messieurs en perruques poudrées. Au milieu, un immense ballon bleu et doré, tenu par des cordes. Dessous, un grand panier d'osier pour les passagers, à côté d'un tas de paille prêt pour le feu, que Monsieur de Montgolfier, l'inventeur, allumera. Au balcon, le roi Louis XVI attend. Lucile, la petite apprentie, se ronge les ongles.",
+  "state": {
+   "place": "cour",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "clochette": "lucile",
+    "ballon": "cour",
+    "panier": "cour",
+    "paille": "cour",
+    "tulipes": "jardin",
+    "statue": "jardin",
+    "brioche": "",
+    "grains": "cuisines",
+    "vanne": "bassin"
+   },
+   "chars_at": {
+    "lucile": "cour",
+    "montauciel": "jardin",
+    "coq": "jardin",
+    "canard": "bassin",
+    "gouttelette": "bassin"
+   },
+   "visited": [
+    "cour",
+    "jardin"
+   ],
+   "seen": [
+    "cour"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 190,
+  "group": "44dd68d73eed",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "lucile"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "La lanterne de la Grande Muraille",
+  "said": "je jette la pièce dans l'eau et je regarde les carpes",
+  "before": "",
+  "told": "le pont de pierre Un vieux pont de pierre tout rond, au-dessus d'une rivière qui chante, glouglou. Des carpes dorées font des ronds dans l'eau. Ici, on ne saute pas et on ne nage pas : l'eau est profonde et froide, et le courant tire fort !",
+  "state": {
+   "place": "pont",
+   "inventory": [
+    "foulard",
+    "piece"
+   ],
+   "flags": [],
+   "items_at": {
+    "dragon": "village",
+    "piece": "inv",
+    "lanterne": "village",
+    "foulard": "inv",
+    "theiere": "maison_the",
+    "rechaud": "maison_the",
+    "panier_pains": "maison_the",
+    "poivre": "maison_the",
+    "baozi": "",
+    "sechoir": "atelier",
+    "bac": "atelier",
+    "papier": "",
+    "tas": "bambous",
+    "bambou": "",
+    "cerf_volant": "",
+    "gong": "rempart",
+    "foyer": "tour",
+    "riviere": "pont",
+    "carpes": "pont",
+    "cle": "ahfu",
+    "porte_guet": "rempart"
+   },
+   "chars_at": {
+    "mei": "village",
+    "hua": "maison_the",
+    "wen": "maison_the",
+    "lu": "atelier",
+    "dodu": "bambous",
+    "grue": "pied",
+    "ahfu": "rempart"
+   },
+   "visited": [
+    "village",
+    "maison_the",
+    "bambous",
+    "pont",
+    "atelier"
+   ],
+   "seen": [
+    "village"
+   ],
+   "known": [
+    "lu"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {
+    "dragon": {
+     "open": true
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 96,
+  "group": "01575ce245c1",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "throw",
+     "object": "piece",
+     "target": "riviere"
+    },
+    {
+     "verb": "examine",
+     "object": "carpes"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le phare de Piko",
+  "said": "je le mets dans mon sac",
+  "before": "c'est quoi sur la table",
+  "told": "la cabane de Zouzou Une cabane en bois qui sent bon le poisson grillé. Zouzou range ses allumettes dans le tiroir de la commode, mais il est fermé par un drôle de mécanisme : trois coquillages collés dessus. Sur la table, un bocal vide.",
+  "state": {
+   "place": "cabane",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "rochers",
+    "lucioles": "rochers",
+    "cle": "pinces",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "tiroir",
+    "bocal": "cabane",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "rochers",
+    "pied_phare",
+    "cabane"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {
+    "tiroir": {
+     "pressed": 1
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 457,
+  "group": "1f6e4900e593",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "bocal"
+    }
+   ],
+   "why": "le = le bocal sur la table"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le drakkar de Sigrid",
+  "said": "je donne le navet à sigrid",
+  "before": "",
+  "told": "la plage Une plage de galets au bord du fjord, sous un ciel tout gris. Le drakkar de la famille de Sigrid est tiré sur les galets, avec sa grande tête de dragon. Brrr, l'eau du fjord est glacée : pas question de s'y baigner ! Sigrid t'attend, les mains sur les hanches.",
+  "state": {
+   "place": "plage",
+   "inventory": [
+    "navet"
+   ],
+   "flags": [
+    "poisson_trouve"
+   ],
+   "items_at": {
+    "fjord": "plage",
+    "voile": "drakkar",
+    "dragon": "drakkar",
+    "coffre": "cabane",
+    "aiguille": "coffre",
+    "navet": "inv",
+    "poisson": "cabane",
+    "laine": "brunhilde",
+    "rocher": "colline",
+    "pierre_soleil": "",
+    "boucliers": "drakkar",
+    "eau_bord": "drakkar",
+    "moufle": "coffre"
+   },
+   "chars_at": {
+    "sigrid": "plage",
+    "olaf": "cabane",
+    "brunhilde": "enclos",
+    "hugin": "drakkar"
+   },
+   "visited": [
+    "plage",
+    "cabane"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [
+    "olaf"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "sentir_poisson"
+   ],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 310,
+  "group": "9823417e34ce",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "navet",
+     "target": "sigrid"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "La lunette de Mimi",
+  "said": "j'allume la bougie",
+  "before": "",
+  "told": "la forêt Une petite forêt de bouleaux. La tour de Mimi s'élève entre les arbres, avec une porte ronde. Un chemin monte vers une colline. Des buissons bordent le sentier. Sous les buissons, il y a plein de petites branches mortes.",
+  "state": {
+   "place": "foret",
+   "inventory": [
+    "piece",
+    "bougie"
+   ],
+   "flags": [
+    "piece_trouvee",
+    "ficelle_trouvee",
+    "trappe"
+   ],
+   "items_at": {
+    "fontaine": "place",
+    "piece": "inv",
+    "croissants_choco": "boulangerie",
+    "croissant": "",
+    "tonneau": "boulangerie",
+    "bougie": "inv",
+    "aimant": "cave",
+    "fiole": "cave",
+    "lentille": "grignote",
+    "haie": "jardin",
+    "ficelle": "jardin",
+    "drap": "cave",
+    "buissons": "foret",
+    "baguettes": "",
+    "canne": "",
+    "cle": "",
+    "cadre": "",
+    "cerf_volant": "",
+    "porte_tour": "foret",
+    "lunette": "observatoire"
+   },
+   "chars_at": {
+    "mimi": "place",
+    "choco": "boulangerie",
+    "grignote": "cave",
+    "nero": "jardin"
+   },
+   "visited": [
+    "place",
+    "jardin",
+    "boulangerie",
+    "puits",
+    "foret",
+    "cave"
+   ],
+   "seen": [
+    "place"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "fouiller_fontaine",
+    "fouiller_haie",
+    "pousser_tonneau"
+   ],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 145,
+  "group": "57fb909b4bd3",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "light",
+     "object": "bougie"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "La lanterne de la Grande Muraille",
+  "said": "je retourne à la forêt de bambous",
+  "before": "",
+  "told": "l'atelier de papier Dans l'atelier, ça sent le bois mouillé. Il y a un grand bac de pâte, et un séchoir où des feuilles toutes neuves pendent comme du linge. Il y en a peut-être une bien sèche, si on cherche bien. Petit Lu, l'apprenti, écrase de l'écorce dans le grand bac de pâte. Au-dessus de lui pend une lanterne de papier, avec une devinette écrite dessus.",
+  "state": {
+   "place": "atelier",
+   "inventory": [
+    "foulard"
+   ],
+   "flags": [],
+   "items_at": {
+    "dragon": "village",
+    "piece": "dragon",
+    "lanterne": "village",
+    "foulard": "inv",
+    "theiere": "maison_the",
+    "rechaud": "maison_the",
+    "panier_pains": "maison_the",
+    "poivre": "maison_the",
+    "baozi": "",
+    "sechoir": "atelier",
+    "bac": "atelier",
+    "papier": "",
+    "tas": "bambous",
+    "bambou": "",
+    "cerf_volant": "",
+    "gong": "rempart",
+    "foyer": "tour",
+    "riviere": "pont",
+    "carpes": "pont",
+    "cle": "ahfu",
+    "porte_guet": "rempart"
+   },
+   "chars_at": {
+    "mei": "village",
+    "hua": "maison_the",
+    "wen": "maison_the",
+    "lu": "atelier",
+    "dodu": "bambous",
+    "grue": "pied",
+    "ahfu": "rempart"
+   },
+   "visited": [
+    "village",
+    "maison_the",
+    "bambous",
+    "pont",
+    "atelier"
+   ],
+   "seen": [
+    "village"
+   ],
+   "known": [
+    "lu"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 92,
+  "group": "9242eb0a3a4b",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "bambous"
+    }
+   ],
+   "why": "lieu lointain déjà vu"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le tournoi du château",
+  "said": "je vais au champ du tournoi",
+  "before": "",
+  "told": "la cour du château La grande cour du château, où tout le monde court dans tous les sens. Sire Bertrand attend dans son armure qui fait cling-clang. Agathe l'oie se dandine près du puits en cacardant.",
+  "state": {
+   "place": "cour",
+   "inventory": [
+    "perche",
+    "bouclier"
+   ],
+   "flags": [
+    "bouclier_trouve"
+   ],
+   "items_at": {
+    "foin": "ecurie",
+    "bouclier": "inv",
+    "perche": "inv",
+    "pomme": "cuisine",
+    "pain": "cuisine",
+    "marmite": "cuisine",
+    "plume": "",
+    "livre": "scriptorium",
+    "banniere": "anselme",
+    "trompette": "lice",
+    "puits": "cour"
+   },
+   "chars_at": {
+    "bertrand": "cour",
+    "caramel": "ecurie",
+    "oie": "cour",
+    "berthe": "cuisine",
+    "anselme": "scriptorium",
+    "heraut": "lice"
+   },
+   "visited": [
+    "cour",
+    "ecurie"
+   ],
+   "seen": [
+    "cour"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "fouiller_foin"
+   ],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 551,
+  "group": "be1c3335443c",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "lice"
+    }
+   ],
+   "why": "champ du tournoi = la lice"
+  }
+ },
+ {
+  "src": "simulé",
+  "title": "Le phare de Piko (nouvelle version)",
+  "said": "Oui, je mets vite la boîte d'allumettes dans mon sac ! Et euh, je prends le bocal vide aussi, et après je vais vite voir les rochers au nord !",
+  "before": "Le rose ! Et après le blanc ! Ça va ouvrir ?",
+  "told": "[joie] *Clic, clic, clac !* Le tiroir de la commode s'ouvre tout seul comme par magie ! À l'intérieur, tu trouves une super boîte d'allumettes de marin.\n\n[curieux] Est-ce que tu prends la boîte d'allumettes dans ton sac ? Et qu'est-ce qu'on fait ensuite ?",
+  "state": {
+   "place": "cabane",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "rochers",
+    "lucioles": "rochers",
+    "cle": "pinces",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "tiroir",
+    "bocal": "cabane",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "cabane"
+   ],
+   "seen": [
+    "plage",
+    "cabane"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 8,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 12,
+   "notes": {},
+   "done_actions": [],
+   "props": {
+    "tiroir": {
+     "open": true,
+     "locked": false
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 649,
+  "group": "678186c93bd6",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "allumettes"
+    },
+    {
+     "verb": "take",
+     "object": "bocal"
+    },
+    {
+     "verb": "go",
+     "to": "rochers"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "La grotte aux peintures d'Oukou",
+  "said": "je lui demande ce qu'on doit faire",
+  "before": "oukou il est content ?",
+  "told": "le campement du clan Le campement du clan, avec ses tentes en peaux de bêtes. Un grand feu crépite, crac crac ! Contre une tente, une torche attend qu'on l'allume. Oukou sautille d'impatience.",
+  "state": {
+   "place": "campement",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "feu": "campement",
+    "torche": "campement",
+    "framboises": "riviere",
+    "buisson": "riviere",
+    "ocre": "",
+    "pomme_de_pin": "bois",
+    "os": "pistache",
+    "charbon": "entree",
+    "foyer": "entree",
+    "tambour": "entree",
+    "paroi": "fond",
+    "chauves_souris": "fond"
+   },
+   "chars_at": {
+    "oukou": "campement",
+    "patapouf": "riviere",
+    "pistache": "bois"
+   },
+   "visited": [
+    "campement",
+    "bois"
+   ],
+   "seen": [
+    "campement"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 42,
+  "group": "87ceb4d17999",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "oukou"
+    }
+   ],
+   "why": "lui = Oukou"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le petit train de Tutu",
+  "said": "bonjour chipie",
+  "before": "",
+  "told": "le château d'eau Une grande tour ronde pleine d'eau pour le train. Tout en haut, il y a un grand nid plein de choses brillantes. Tout en haut, au bord du nid, Chipie la pie fait briller un sifflet argenté.",
+  "state": {
+   "place": "chateau_eau",
+   "inventory": [
+    "pain"
+   ],
+   "flags": [],
+   "items_at": {
+    "locomotive": "gare",
+    "manteau": "salle",
+    "bouton": "salle",
+    "pain": "inv",
+    "sifflet": "chipie",
+    "levier": "maisonnette",
+    "miel": "gone",
+    "buches": "ours",
+    "nid": "chateau_eau"
+   },
+   "chars_at": {
+    "tutu": "gare",
+    "chipie": "chateau_eau",
+    "taupe": "maisonnette",
+    "ours": "foret"
+   },
+   "visited": [
+    "gare",
+    "salle",
+    "maisonnette",
+    "chateau_eau"
+   ],
+   "seen": [
+    "gare"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "fouiller_manteau",
+    "tirer_levier",
+    "faire_tartine"
+   ],
+   "props": {
+    "taupe": {
+     "state": "contente"
+    },
+    "pain": {
+     "state": "tartine"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 405,
+  "group": "44199924ff61",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "chipie"
+    }
+   ]
+  }
+ },
+ {
+  "src": "simulé",
+  "title": "Le phare de Piko (nouvelle version)",
+  "said": "Je cours à l'ouest vers the phare et je donne un grand coup de pied dans la porte d'entrée !",
+  "before": "Flocon aide-moi, je sais plus quoi faire je suis bloqué là !",
+  "told": "[parle:Noam] [calin] Oh, ne t'inquiète pas, c'est pas nul du tout, tu te débrouilles super bien ! On a déjà trouvé les allumettes !\n\n[pensif] Mon petit doigt me dit qu'il faut aller voir un endroit qu'on n'a pas encore exploré. Et si tu ressortais de la cabane pour aller jeter un œil vers le grand phare, tout à l'ouest ? \n\n[curieux] Tu veux qu'on aille voir ce qui se passe là-bas ?",
+  "state": {
+   "place": "cabane",
+   "inventory": [
+    "allumettes",
+    "algue"
+   ],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "inv",
+    "lucioles": "rochers",
+    "cle": "pinces",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "inv",
+    "bocal": "gone",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "cabane",
+    "rochers"
+   ],
+   "seen": [
+    "plage",
+    "cabane",
+    "rochers"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [
+    "lucioles"
+   ],
+   "ending": null,
+   "turns": 23,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 1,
+   "score": 24,
+   "notes": {},
+   "done_actions": [],
+   "props": {
+    "tiroir": {
+     "open": true,
+     "locked": false
+    }
+   },
+   "handled": [
+    "allumettes",
+    "algue"
+   ],
+   "doomed": {},
+   "destroyed": "bocal",
+   "improvised": []
+  },
+  "id": 669,
+  "group": "7515d5cd73d1",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "pied_phare"
+    },
+    {
+     "verb": "hit",
+     "object": "porte"
+    }
+   ],
+   "why": "porte du phare au pied du phare"
+  }
+ },
+ {
+  "src": "simulé",
+  "title": "Le phare de Piko (nouvelle version)",
+  "said": "Je lui fais une grimace et je lui pique sa clé dorée pendant qu'il regarde ailleurs !",
+  "before": "Je sors de la cabane et je vais au nord vers les rochers pour chercher le gros crabe grognon !",
+  "told": " la plage et tu grimpes rapidement sur les rochers mouillés tout au nord ! \n\n[curieux] Ici, il y a de grosses flaques d'eau, des algues vertes qui brillent et des lucioles qui dansent. Et au milieu des rochers, voilà Pinces le crabe ! Il est tout grognon et serre bien fort une petite clé dorée dans sa pince. Mais attention, Piko nous avait dit surtout de ne pas l'embêter parce qu'il pince quand il a faim !\n\nTu peux retourner au sud vers la plage. Qu'est-ce que tu choisis de faire face au crabe ?",
+  "state": {
+   "place": "rochers",
+   "inventory": [
+    "allumettes"
+   ],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "rochers",
+    "lucioles": "rochers",
+    "cle": "pinces",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "inv",
+    "bocal": "gone",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "cabane",
+    "rochers"
+   ],
+   "seen": [
+    "plage",
+    "cabane",
+    "rochers"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 15,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 19,
+   "notes": {},
+   "done_actions": [],
+   "props": {
+    "tiroir": {
+     "open": true,
+     "locked": false
+    }
+   },
+   "handled": [
+    "allumettes"
+   ],
+   "doomed": {},
+   "destroyed": "bocal",
+   "improvised": []
+  },
+  "id": 665,
+  "group": "d91ece2fe326",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "other",
+     "object": "pinces"
+    },
+    {
+     "verb": "take",
+     "object": "cle"
+    }
+   ],
+   "why": "grimace au crabe puis vol de la clé"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le ballon de Versailles",
+  "said": "snif snif je suis la bonne odeur",
+  "before": "",
+  "told": "les cuisines du château Les cuisines du château, où ça sent bon le pain chaud. Les cuisiniers préparent le goûter du roi. Mmm… ça sent le beurre et le sucre, quelque chose de tout chaud et tout doré. Mais d'où vient cette bonne odeur ? Dans un coin, des grains de blé pour les poules.",
+  "state": {
+   "place": "cuisines",
+   "inventory": [
+    "clochette"
+   ],
+   "flags": [],
+   "items_at": {
+    "clochette": "inv",
+    "ballon": "cour",
+    "panier": "cour",
+    "paille": "cour",
+    "tulipes": "jardin",
+    "statue": "jardin",
+    "brioche": "",
+    "grains": "cuisines",
+    "vanne": "bassin"
+   },
+   "chars_at": {
+    "lucile": "cour",
+    "montauciel": "jardin",
+    "coq": "jardin",
+    "canard": "bassin",
+    "gouttelette": "bassin"
+   },
+   "visited": [
+    "cour",
+    "cuisines"
+   ],
+   "seen": [
+    "cour"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "parler_lucile"
+   ],
+   "props": {},
+   "handled": [
+    "clochette"
+   ],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 161,
+  "group": "218a08dfe5bf",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "smell"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "L'atelier de Léonard",
+  "said": "j'ouvre la fenêtre",
+  "before": "",
+  "told": "l'atelier Un grand atelier plein de dessins, de pinceaux et de drôles de machines. La grande fenêtre est fermée, avec un petit mot du maître : « Ne pas ouvrir, mes dessins s'envolent ! » Sur la table, la maquette de la machine volante attend ses ailes.",
+  "state": {
+   "place": "atelier",
+   "inventory": [
+    "plan",
+    "ficelle"
+   ],
+   "flags": [],
+   "items_at": {
+    "maquette": "atelier",
+    "plan": "inv",
+    "ficelle": "inv",
+    "fenetre": "atelier",
+    "farine": "cuisine",
+    "graines": "",
+    "etagere": "cuisine",
+    "puits": "cour",
+    "seau": "cour",
+    "miroir": "chambre",
+    "soie": "",
+    "plumes": "",
+    "dessins": "atelier"
+   },
+   "chars_at": {
+    "rosa": "cuisine",
+    "mascarpone": "chambre",
+    "colombo": "terrasse"
+   },
+   "visited": [
+    "atelier",
+    "chambre"
+   ],
+   "seen": [
+    "atelier"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 15,
+  "group": "d7517511dec8",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "open",
+     "object": "fenetre"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le tournoi du château",
+  "said": "je vais à l'écurie",
+  "before": "",
+  "told": "la cour du château La grande cour du château, où tout le monde court dans tous les sens. Sire Bertrand attend dans son armure qui fait cling-clang. Agathe l'oie se dandine près du puits en cacardant.",
+  "state": {
+   "place": "cour",
+   "inventory": [
+    "pomme"
+   ],
+   "flags": [],
+   "items_at": {
+    "foin": "ecurie",
+    "bouclier": "",
+    "perche": "ecurie",
+    "pomme": "inv",
+    "pain": "cuisine",
+    "marmite": "cuisine",
+    "plume": "",
+    "livre": "scriptorium",
+    "banniere": "anselme",
+    "trompette": "lice",
+    "puits": "cour"
+   },
+   "chars_at": {
+    "bertrand": "cour",
+    "caramel": "ecurie",
+    "oie": "cour",
+    "berthe": "cuisine",
+    "anselme": "scriptorium",
+    "heraut": "lice"
+   },
+   "visited": [
+    "cour",
+    "cuisine",
+    "scriptorium"
+   ],
+   "seen": [
+    "cour"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 541,
+  "group": "b715ecc8e5d5",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "ecurie"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "La grotte aux peintures d'Oukou",
+  "said": "papa pouf pousse-toi s'il te plaît",
+  "before": "",
+  "told": "la rivière Une rivière qui fait glou glou entre les cailloux. Au bord de l'eau pousse un buisson piquant, couvert de framboises bien rouges. Sur la berge, il y a de la terre rouge, l'ocre… mais un bébé mammouth tout poilu est assis dessus ! Il regarde les framboises en se léchant la trompe.",
+  "state": {
+   "place": "riviere",
+   "inventory": [
+    "framboises"
+   ],
+   "flags": [],
+   "items_at": {
+    "feu": "campement",
+    "torche": "campement",
+    "framboises": "inv",
+    "buisson": "riviere",
+    "ocre": "",
+    "pomme_de_pin": "bois",
+    "os": "pistache",
+    "charbon": "entree",
+    "foyer": "entree",
+    "tambour": "entree",
+    "paroi": "fond",
+    "chauves_souris": "fond"
+   },
+   "chars_at": {
+    "oukou": "campement",
+    "patapouf": "riviere",
+    "pistache": "bois"
+   },
+   "visited": [
+    "campement",
+    "riviere"
+   ],
+   "seen": [
+    "campement"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 64,
+  "group": "5858d4c23b61",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "patapouf"
+    }
+   ],
+   "why": "papa pouf = Patapouf (ASR); lui demande de bouger"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "La grotte aux peintures d'Oukou",
+  "said": "je mange une framboise",
+  "before": "",
+  "told": "la rivière Une rivière qui fait glou glou entre les cailloux. Au bord de l'eau pousse un buisson piquant, couvert de framboises bien rouges. Sur la berge, il y a de la terre rouge, l'ocre… mais un bébé mammouth tout poilu est assis dessus ! Il regarde les framboises en se léchant la trompe.",
+  "state": {
+   "place": "riviere",
+   "inventory": [
+    "framboises"
+   ],
+   "flags": [],
+   "items_at": {
+    "feu": "campement",
+    "torche": "campement",
+    "framboises": "inv",
+    "buisson": "riviere",
+    "ocre": "",
+    "pomme_de_pin": "bois",
+    "os": "pistache",
+    "charbon": "entree",
+    "foyer": "entree",
+    "tambour": "entree",
+    "paroi": "fond",
+    "chauves_souris": "fond"
+   },
+   "chars_at": {
+    "oukou": "campement",
+    "patapouf": "riviere",
+    "pistache": "bois"
+   },
+   "visited": [
+    "campement",
+    "riviere"
+   ],
+   "seen": [
+    "campement"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 60,
+  "group": "5858d4c23b61",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "eat",
+     "object": "framboises"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "L'atelier de Léonard",
+  "said": "je bois un peu d'eau et après je rentre",
+  "before": "",
+  "told": "la cour Une petite cour ensoleillée, avec des citronniers et un vieux puits. On entend les abeilles bourdonner dans les citronniers.",
+  "state": {
+   "place": "cour",
+   "inventory": [
+    "seau"
+   ],
+   "flags": [],
+   "items_at": {
+    "maquette": "atelier",
+    "plan": "atelier",
+    "ficelle": "atelier",
+    "fenetre": "atelier",
+    "farine": "cuisine",
+    "graines": "",
+    "etagere": "cuisine",
+    "puits": "cour",
+    "seau": "inv",
+    "miroir": "chambre",
+    "soie": "",
+    "plumes": "",
+    "dessins": "atelier"
+   },
+   "chars_at": {
+    "rosa": "cuisine",
+    "mascarpone": "chambre",
+    "colombo": "terrasse"
+   },
+   "visited": [
+    "atelier",
+    "chambre",
+    "terrasse",
+    "cour"
+   ],
+   "seen": [
+    "atelier"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 36,
+  "group": "8d8d468bca04",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "drink",
+     "object": "seau"
+    },
+    {
+     "verb": "go",
+     "to": "atelier"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le carillon de la forêt",
+  "said": "on rentre voir bambou à la clairière",
+  "before": "j'ai peur il fait tout noir",
+  "told": "la grotte Il fait tout noir : tu ne vois même pas le bout de ton nez ! Plic… ploc… des gouttes tombent. Et de temps en temps, tout au fond : « ding ! »",
+  "state": {
+   "place": "grotte",
+   "inventory": [
+    "roseau"
+   ],
+   "flags": [],
+   "items_at": {
+    "carillon": "clairiere",
+    "pommier": "verger",
+    "pomme": "verger",
+    "champignon": "verger",
+    "lanterne": "taupinette",
+    "galets": "riviere",
+    "silex": "",
+    "cristaux": "grotte",
+    "battant": "",
+    "roseau": "inv",
+    "pipeau": ""
+   },
+   "chars_at": {
+    "bambou": "clairiere",
+    "taupinette": "terrier",
+    "zouzou": "riviere",
+    "grognon": "pont"
+   },
+   "visited": [
+    "clairiere",
+    "verger",
+    "riviere",
+    "terrier",
+    "pont",
+    "grotte"
+   ],
+   "seen": [
+    "clairiere"
+   ],
+   "known": [
+    "grognon"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 10,
+   "notes": {},
+   "done_actions": [
+    "secouer_pommier"
+   ],
+   "props": {
+    "pommier": {
+     "state": "secoue"
+    },
+    "grognon": {
+     "answered": true,
+     "state": "content"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 247,
+  "group": "d9077017abd5",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "clairiere"
+    }
+   ],
+   "why": "lieu lointain déjà vu"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "L'atelier de Léonard",
+  "said": "je caresse mascarpone",
+  "before": "",
+  "told": "la chambre du maître La chambre du maître, en haut de l'escalier. Il y a un grand miroir au mur, et une échelle monte vers la terrasse. Mascarpone, le gros chat roux, dort roulé en boule sur quelque chose de doux et brillant.",
+  "state": {
+   "place": "chambre",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "maquette": "atelier",
+    "plan": "atelier",
+    "ficelle": "atelier",
+    "fenetre": "atelier",
+    "farine": "cuisine",
+    "graines": "",
+    "etagere": "cuisine",
+    "puits": "cour",
+    "seau": "cour",
+    "miroir": "chambre",
+    "soie": "",
+    "plumes": "",
+    "dessins": "atelier"
+   },
+   "chars_at": {
+    "rosa": "cuisine",
+    "mascarpone": "chambre",
+    "colombo": "terrasse"
+   },
+   "visited": [
+    "atelier",
+    "chambre",
+    "terrasse"
+   ],
+   "seen": [
+    "atelier"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 30,
+  "group": "12bd97fa0e5f",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "mascarpone"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le phare de Piko",
+  "said": "j'ouvre le tiroir",
+  "before": "",
+  "told": "la cabane de Zouzou Une cabane en bois qui sent bon le poisson grillé. Zouzou range ses allumettes dans le tiroir de la commode, mais il est fermé par un drôle de mécanisme : trois coquillages collés dessus. Sur la table, un bocal vide.",
+  "state": {
+   "place": "cabane",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "rochers",
+    "lucioles": "rochers",
+    "cle": "pinces",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "tiroir",
+    "bocal": "cabane",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "cabane",
+    "pied_phare"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {
+    "tiroir": {
+     "pressed": 1
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 475,
+  "group": "b6c86ff399b7",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "open",
+     "object": "tiroir"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le miroir du phare d'Alexandrie",
+  "said": "je lance le sable dans les vagues",
+  "before": "",
+  "told": "la grande digue Une longue digue de pierre relie la ville à l'île du phare. Les vagues éclaboussent, splash ! Du sable fin s'est entassé contre le muret. Au nord, la silhouette noire du grand phare. À l'est, une jetée s'avance dans la mer.",
+  "state": {
+   "place": "digue",
+   "inventory": [
+    "sable"
+   ],
+   "flags": [
+    "obole_trouvee"
+   ],
+   "items_at": {
+    "filets": "port",
+    "panier": "port",
+    "obole": "port",
+    "sardine": "",
+    "lampe": "port",
+    "pot": "marche",
+    "figues": "marche",
+    "four": "marche",
+    "amphore": "menes",
+    "rouleaux": "bibliotheque",
+    "cle": "ibis",
+    "chiffon": "bibliotheque",
+    "sable": "inv",
+    "porte": "pied",
+    "foyer": "sommet",
+    "miroir": "sommet"
+   },
+   "chars_at": {
+    "theon": "port",
+    "miou": "port",
+    "menes": "marche",
+    "kallia": "bibliotheque",
+    "ibis": "bibliotheque",
+    "pistache": "rampe",
+    "marin": "jetee"
+   },
+   "visited": [
+    "port",
+    "digue",
+    "pied"
+   ],
+   "seen": [
+    "port"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "fouiller_filets"
+   ],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 334,
+  "group": "c83a31dc3a51",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "throw",
+     "object": "sable"
+    }
+   ],
+   "why": "les vagues ne sont pas un objet"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le phare de Piko",
+  "said": "je parle à piko et après je vais à la cabane",
+  "before": "",
+  "told": "la plage Une petite plage de sable doré. Au loin, sur la mer, on devine le bateau de Zouzou. Sur le sable mouillé, quelqu'un a dessiné trois coquillages, bien en rang : un bleu, puis un rose, puis un blanc. Piko le hérisson fait les cent pas, tout inquiet.",
+  "state": {
+   "place": "plage",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "rochers",
+    "lucioles": "rochers",
+    "cle": "pinces",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "tiroir",
+    "bocal": "cabane",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "rochers",
+    "pied_phare"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 451,
+  "group": "2e865c23021f",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "piko"
+    },
+    {
+     "verb": "go",
+     "to": "cabane"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le bonhomme de neige de Plumette",
+  "said": "je regarde le bonhomme de neige",
+  "before": "",
+  "told": "le jardin enneigé Un jardin tout blanc qui fait crounch sous les pieds. Au milieu, un gros bonhomme de neige, sans nez et sans chapeau. Plumette volette autour du bonhomme : « Attention, il est tout fragile, ne le pousse pas ! »",
+  "state": {
+   "place": "jardin",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "bonhomme": "jardin",
+    "fenetre": "cuisine",
+    "panier": "cuisine",
+    "carotte": "mamie",
+    "seau": "remise",
+    "tabouret": "remise",
+    "chapeau": "",
+    "clou": "cabane",
+    "chaussette": "cabane"
+   },
+   "chars_at": {
+    "plumette": "jardin",
+    "mamie": "cuisine"
+   },
+   "visited": [
+    "jardin",
+    "cuisine"
+   ],
+   "seen": [
+    "jardin"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 200,
+  "group": "524eff744ad9",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "bonhomme"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le tournoi du château",
+  "said": "je goûte la soupe",
+  "before": "",
+  "told": "la cuisine Une cuisine immense, avec une cheminée où mijote une grosse marmite de soupe, et une grande table toute blanche de farine. Dame Berthe, la cuisinière, pétrit la pâte en chantonnant.",
+  "state": {
+   "place": "cuisine",
+   "inventory": [
+    "pain",
+    "pomme"
+   ],
+   "flags": [],
+   "items_at": {
+    "foin": "ecurie",
+    "bouclier": "",
+    "perche": "ecurie",
+    "pomme": "inv",
+    "pain": "inv",
+    "marmite": "cuisine",
+    "plume": "",
+    "livre": "scriptorium",
+    "banniere": "anselme",
+    "trompette": "lice",
+    "puits": "cour"
+   },
+   "chars_at": {
+    "bertrand": "cour",
+    "caramel": "ecurie",
+    "oie": "cour",
+    "berthe": "cuisine",
+    "anselme": "scriptorium",
+    "heraut": "lice"
+   },
+   "visited": [
+    "cour",
+    "scriptorium",
+    "cuisine"
+   ],
+   "seen": [
+    "cour"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 531,
+  "group": "ddaef2081488",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "eat",
+     "object": "marmite"
+    }
+   ],
+   "why": "goûter la soupe"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le bonhomme de neige de Plumette",
+  "said": "est-ce que les colibris ça existe en vrai",
+  "before": "",
+  "told": "le jardin enneigé Un jardin tout blanc qui fait crounch sous les pieds. Au milieu, un gros bonhomme de neige, sans nez et sans chapeau. Plumette volette autour du bonhomme : « Attention, il est tout fragile, ne le pousse pas ! »",
+  "state": {
+   "place": "jardin",
+   "inventory": [
+    "seau",
+    "tabouret",
+    "carotte",
+    "chapeau"
+   ],
+   "flags": [],
+   "items_at": {
+    "bonhomme": "jardin",
+    "fenetre": "cuisine",
+    "panier": "cuisine",
+    "carotte": "inv",
+    "seau": "inv",
+    "tabouret": "inv",
+    "chapeau": "inv",
+    "clou": "cabane",
+    "chaussette": "cabane"
+   },
+   "chars_at": {
+    "plumette": "jardin",
+    "mamie": "cuisine"
+   },
+   "visited": [
+    "jardin",
+    "remise",
+    "cabane",
+    "cuisine"
+   ],
+   "seen": [
+    "jardin"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "fermer_fenetre",
+    "monter_tabouret"
+   ],
+   "props": {
+    "fenetre": {
+     "state": "fermee"
+    },
+    "clou": {
+     "state": "vide"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 239,
+  "group": "eded7de7267d",
+  "split": "test",
+  "gold": {
+   "kind": "hors_jeu",
+   "why": "question sur le monde réel"
+  }
+ },
+ {
+  "src": "simulé",
+  "title": "Le phare de Piko (nouvelle version)",
+  "said": "Oui, je monte tous les escaliers super vite jusqu'en haut pour voir Papy Pic !",
+  "before": "Je mets la clé dorée dans la serrure, je tourne le truc et j'ouvre la grande porte !",
+  "told": "[joie] *Clic !* La clé dorée tourne parfaitement dans la serrure, et la grande porte en bois s'ouvre en grinçant ! Tout en haut, Papy Pic s'écrie avec joie : « Hourra ! Monte vite ! »\n\n[curieux] La voie est libre ! Tu montes l'escalier vers le haut du phare pour rejoindre Papy Pic ?",
+  "state": {
+   "place": "pied_phare",
+   "inventory": [
+    "allumettes",
+    "bocal",
+    "cle"
+   ],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "gone",
+    "lucioles": "rochers",
+    "cle": "inv",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "inv",
+    "bocal": "inv",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "cabane",
+    "rochers",
+    "pied_phare"
+   ],
+   "seen": [
+    "plage",
+    "cabane",
+    "rochers",
+    "pied_phare"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 22,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 61,
+   "notes": {},
+   "done_actions": [
+    "attraper_lucioles",
+    "nourrir_crabe"
+   ],
+   "props": {
+    "tiroir": {
+     "open": true,
+     "locked": false
+    },
+    "bocal": {
+     "state": "plein"
+    },
+    "pinces": {
+     "state": "content"
+    },
+    "porte": {
+     "open": true,
+     "locked": false
+    }
+   },
+   "handled": [
+    "allumettes",
+    "bocal",
+    "algue",
+    "cle"
+   ],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 655,
+  "group": "6c0448719cf9",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "sommet"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le drakkar de Sigrid",
+  "said": "je lis les runes et je dis la réponse c'est la mer",
+  "before": "",
+  "told": "la colline aux runes Une colline couverte de bruyère, balayée par le vent. Au sommet se dresse un grand rocher gravé de runes, les lettres des Vikings, faites de petits traits.",
+  "state": {
+   "place": "colline",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "fjord": "plage",
+    "voile": "drakkar",
+    "dragon": "drakkar",
+    "coffre": "cabane",
+    "aiguille": "coffre",
+    "navet": "cabane",
+    "poisson": "",
+    "laine": "brunhilde",
+    "rocher": "colline",
+    "pierre_soleil": "",
+    "boucliers": "drakkar",
+    "eau_bord": "drakkar",
+    "moufle": "coffre"
+   },
+   "chars_at": {
+    "sigrid": "plage",
+    "olaf": "cabane",
+    "brunhilde": "enclos",
+    "hugin": "drakkar"
+   },
+   "visited": [
+    "plage",
+    "drakkar",
+    "colline"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 301,
+  "group": "b4a087d1b3ec",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "read",
+     "object": "rocher"
+    },
+    {
+     "verb": "answer",
+     "object": "la mer",
+     "target": "rocher"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le scarabée du scribe",
+  "said": "je monte dans la barre",
+  "before": "",
+  "told": "le bord du Nil Le bord du Nil, plein de grands papyrus qui chuchotent dans le vent. Une petite barque en roseaux flotte, attachée à un piquet… sans rame : surtout ne monte pas dedans, le courant l'emporterait ! Sage l'ibis, un grand oiseau au long bec courbé, pêche dans l'eau.",
+  "state": {
+   "place": "nil",
+   "inventory": [
+    "plume"
+   ],
+   "flags": [],
+   "items_at": {
+    "papyrus": "atelier",
+    "calame": "atelier",
+    "scarabee": "miou",
+    "etal": "marche",
+    "poisson": "henout",
+    "plume": "inv",
+    "barque": "nil",
+    "roseaux": "nil",
+    "souris": ""
+   },
+   "chars_at": {
+    "kha": "atelier",
+    "miou": "terrasse",
+    "henout": "marche",
+    "meryt": "temple",
+    "ibis": "nil"
+   },
+   "visited": [
+    "atelier",
+    "nil"
+   ],
+   "seen": [
+    "atelier"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 511,
+  "group": "d03ed16077cd",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "climb",
+     "object": "barque"
+    }
+   ],
+   "why": "barre = barque (ASR)"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "L'atelier de Léonard",
+  "said": "je demande à mama roza comment on fait de la colle",
+  "before": "",
+  "told": "la cuisine Une cuisine qui sent le pain chaud, avec une grande étagère à provisions. Sur l'étagère à provisions, il y a un bol de farine. Mamma Rosa, la cuisinière, roule des pâtes en chantant.",
+  "state": {
+   "place": "cuisine",
+   "inventory": [
+    "plan"
+   ],
+   "flags": [],
+   "items_at": {
+    "maquette": "atelier",
+    "plan": "inv",
+    "ficelle": "atelier",
+    "fenetre": "atelier",
+    "farine": "cuisine",
+    "graines": "",
+    "etagere": "cuisine",
+    "puits": "cour",
+    "seau": "cour",
+    "miroir": "chambre",
+    "soie": "",
+    "plumes": "",
+    "dessins": "atelier"
+   },
+   "chars_at": {
+    "rosa": "cuisine",
+    "mascarpone": "chambre",
+    "colombo": "terrasse"
+   },
+   "visited": [
+    "atelier",
+    "chambre",
+    "cuisine"
+   ],
+   "seen": [
+    "atelier"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 4,
+  "group": "80a5032ae292",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "rosa"
+    }
+   ]
+  }
+ },
+ {
+  "src": "simulé",
+  "title": "Le phare de Piko (nouvelle version)",
+  "said": "Ah oui le dessin avec mes moustaches ! Je dis que la couleur c'est bleu après rose et blanc, et j'attrape le bocal vide !",
+  "before": "Euh c'est trop dur le code ! Je tape fort sur la commode avec mon bâton pour l'casser et je prends le bocal vide !",
+  "told": "[pensif] BAM ! Tu tapes fort sur la commode, mais le bois est bien trop solide pour se casser comme ça ! Le tiroir reste bien fermé. Tu n'as pas encore pu prendre le bocal vide.\n\n[malice] Ne t'inquiète pas pour le code, rappelle-toi du dessin que Piko avait fait sur le sable de la plage... il y avait des coquillages dessinés dans un ordre bien précis ! \n\nVeux-tu réessayer d'appuyer sur les coquillages de la commode, ou attraper le bocal vide ?",
+  "state": {
+   "place": "cabane",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "rochers",
+    "lucioles": "rochers",
+    "cle": "pinces",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "tiroir",
+    "bocal": "cabane",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "cabane"
+   ],
+   "seen": [
+    "plage",
+    "cabane"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [
+    "tiroir"
+   ],
+   "ending": null,
+   "turns": 6,
+   "stalled": 1,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 2,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 678,
+  "group": "6ff05d68b995",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "push",
+     "object": "coquillage_bleu"
+    },
+    {
+     "verb": "push",
+     "object": "coquillage_rose"
+    },
+    {
+     "verb": "push",
+     "object": "coquillage_blanc"
+    },
+    {
+     "verb": "take",
+     "object": "bocal"
+    }
+   ],
+   "why": "ordre lu bleu, rose, blanc (le dessin)"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "La lanterne de la Grande Muraille",
+  "said": "je lui demande pourquoi elle accroche des lampions",
+  "before": "elle fait quoi grand-mère mei",
+  "told": "la place du village La place du village, toute décorée pour la fête. Un grand dragon de papier attend le défilé. Quelque chose tinte dans sa gueule. Grand-mère Mei accroche des lampions rouges.",
+  "state": {
+   "place": "village",
+   "inventory": [
+    "foulard",
+    "lanterne"
+   ],
+   "flags": [],
+   "items_at": {
+    "dragon": "village",
+    "piece": "dragon",
+    "lanterne": "inv",
+    "foulard": "inv",
+    "theiere": "maison_the",
+    "rechaud": "maison_the",
+    "panier_pains": "maison_the",
+    "poivre": "maison_the",
+    "baozi": "",
+    "sechoir": "atelier",
+    "bac": "atelier",
+    "papier": "",
+    "tas": "bambous",
+    "bambou": "",
+    "cerf_volant": "",
+    "gong": "rempart",
+    "foyer": "tour",
+    "riviere": "pont",
+    "carpes": "pont",
+    "cle": "ahfu",
+    "porte_guet": "rempart"
+   },
+   "chars_at": {
+    "mei": "village",
+    "hua": "maison_the",
+    "wen": "maison_the",
+    "lu": "atelier",
+    "dodu": "bambous",
+    "grue": "pied",
+    "ahfu": "rempart"
+   },
+   "visited": [
+    "village",
+    "maison_the"
+   ],
+   "seen": [
+    "village"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 87,
+  "group": "fbc822aba080",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "mei"
+    }
+   ],
+   "why": "lui = Grand-mère Mei"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le phare de Piko",
+  "said": "je secoue le bocal pour que ça brille plus fort",
+  "before": "",
+  "told": "la plage Une petite plage de sable doré. Au loin, sur la mer, on devine le bateau de Zouzou. Sur le sable mouillé, quelqu'un a dessiné trois coquillages, bien en rang : un bleu, puis un rose, puis un blanc. Piko le hérisson fait les cent pas, tout inquiet.",
+  "state": {
+   "place": "plage",
+   "inventory": [
+    "bocal"
+   ],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "gone",
+    "lucioles": "rochers",
+    "cle": "rochers",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "tiroir",
+    "bocal": "inv",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "rochers",
+    "cabane",
+    "pied_phare"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "nourrir_crabe",
+    "attraper_lucioles"
+   ],
+   "props": {
+    "pinces": {
+     "state": "content"
+    },
+    "bocal": {
+     "state": "plein"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 468,
+  "group": "6b80259de16a",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "other",
+     "object": "bocal"
+    }
+   ],
+   "why": "secouer le bocal"
+  }
+ },
+ {
+  "src": "simulé",
+  "title": "Le phare de Piko (nouvelle version)",
+  "said": "Je cours au nord vers les rochers et je lui donne l'algue verte de mon sac pour qu'il la mange !",
+  "before": "Je cours à l'ouest vers the phare et je donne un grand coup de pied dans la porte d'entrée !",
+  "told": "jusqu'au pied du phare ! \n\n[surprise] Le grand phare blanc et rouge monte tout haut dans le ciel. Tu donnes un grand coup de pied dans la porte d'entrée... BAM ! Mais Aïe, elle est en bois très épais et fermée à clé, elle ne bouge pas d'un millimètre ! \n\n[pensif] Tout en haut, Papy Pic te fait de grands signes désespérés par la fenêtre. La porte est fermée à clé, il nous faudrait absolument cette petite clé dorée...\n\nTu te rappelles qui tient la clé dorée ? Que veut-on tenter pour la récupérer ?",
+  "state": {
+   "place": "pied_phare",
+   "inventory": [
+    "allumettes",
+    "algue"
+   ],
+   "flags": [],
+   "items_at": {
+    "dessin": "plage",
+    "algue": "inv",
+    "lucioles": "rochers",
+    "cle": "pinces",
+    "tiroir": "cabane",
+    "coquillage_rose": "cabane",
+    "coquillage_blanc": "cabane",
+    "coquillage_bleu": "cabane",
+    "allumettes": "inv",
+    "bocal": "gone",
+    "porte": "pied_phare",
+    "lampe": "sommet"
+   },
+   "chars_at": {
+    "piko": "plage",
+    "pinces": "rochers",
+    "papy": "sommet"
+   },
+   "visited": [
+    "plage",
+    "cabane",
+    "rochers",
+    "pied_phare"
+   ],
+   "seen": [
+    "plage",
+    "cabane",
+    "rochers",
+    "pied_phare"
+   ],
+   "known": [
+    "dessin"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 26,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 26,
+   "notes": {},
+   "done_actions": [],
+   "props": {
+    "tiroir": {
+     "open": true,
+     "locked": false
+    }
+   },
+   "handled": [
+    "allumettes",
+    "algue"
+   ],
+   "doomed": {},
+   "destroyed": "bocal",
+   "improvised": []
+  },
+  "id": 670,
+  "group": "c07954bb2ef2",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "rochers"
+    },
+    {
+     "verb": "give",
+     "object": "algue",
+     "target": "pinces"
+    }
+   ],
+   "why": "lui = le crabe aux rochers"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le drakkar de Sigrid",
+  "said": "je retourne sur le bateau",
+  "before": "",
+  "told": "la cabane de pêche Une cabane en bois qui sent le poisson fumé. Grand-père Olaf se chauffe près du feu en taillant un bout de bois. Il y a un vieux coffre dans un coin. Un gros navet attend sur la table.",
+  "state": {
+   "place": "cabane",
+   "inventory": [
+    "aiguille",
+    "moufle"
+   ],
+   "flags": [
+    "poisson_trouve"
+   ],
+   "items_at": {
+    "fjord": "plage",
+    "voile": "drakkar",
+    "dragon": "drakkar",
+    "coffre": "cabane",
+    "aiguille": "inv",
+    "navet": "cabane",
+    "poisson": "cabane",
+    "laine": "brunhilde",
+    "rocher": "colline",
+    "pierre_soleil": "",
+    "boucliers": "drakkar",
+    "eau_bord": "drakkar",
+    "moufle": "inv"
+   },
+   "chars_at": {
+    "sigrid": "plage",
+    "olaf": "cabane",
+    "brunhilde": "enclos",
+    "hugin": "drakkar"
+   },
+   "visited": [
+    "plage",
+    "drakkar",
+    "cabane"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [
+    "olaf"
+   ],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "sentir_poisson"
+   ],
+   "props": {
+    "coffre": {
+     "open": true
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 284,
+  "group": "b022ad964aef",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "drakkar"
+    }
+   ],
+   "why": "le bateau = le drakkar, déjà vu"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le petit train de Tutu",
+  "said": "je vais au château d'eau et je parle à la pie",
+  "before": "",
+  "told": "la gare Une petite gare toute fleurie. Le train rouge attend sur les rails. La chaudière de la locomotive est toute froide. Tutu la tortue tapote sa locomotive en soupirant.",
+  "state": {
+   "place": "gare",
+   "inventory": [
+    "pain"
+   ],
+   "flags": [],
+   "items_at": {
+    "locomotive": "gare",
+    "manteau": "salle",
+    "bouton": "",
+    "pain": "inv",
+    "sifflet": "chipie",
+    "levier": "maisonnette",
+    "miel": "gone",
+    "buches": "ours",
+    "nid": "chateau_eau"
+   },
+   "chars_at": {
+    "tutu": "gare",
+    "chipie": "chateau_eau",
+    "taupe": "maisonnette",
+    "ours": "foret"
+   },
+   "visited": [
+    "gare",
+    "maisonnette",
+    "foret",
+    "salle",
+    "chateau_eau"
+   ],
+   "seen": [
+    "gare"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "tirer_levier",
+    "faire_tartine"
+   ],
+   "props": {
+    "taupe": {
+     "state": "contente"
+    },
+    "pain": {
+     "state": "tartine"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 416,
+  "group": "f365202c50cf",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "chateau_eau"
+    },
+    {
+     "verb": "talk",
+     "object": "chipie"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Raya et la perle de lumière",
+  "said": "on va par là",
+  "before": "",
+  "told": "le récif Le récif de corail, tout gris dans la pénombre. Des chemins partent vers une forêt d'algues, une vieille épave, un jardin de corail et une plaine de sable. Raya la raie ondule à côté de Bulle.",
+  "state": {
+   "place": "recif",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "algue_lumineuse": "algues",
+    "algues_brillantes": "algues",
+    "filet": "epave",
+    "ficelle": "",
+    "boite": "epave",
+    "miettes": "boite",
+    "bocal": "epave",
+    "sable": "plaine",
+    "coquillages": "",
+    "collier": "",
+    "perle": "fosse",
+    "corail_soleil": "jardin",
+    "conque": "octave",
+    "gouvernail": "epave",
+    "collier_zigzag": ""
+   },
+   "chars_at": {
+    "raya": "recif",
+    "zigzag": "plaine",
+    "octave": "",
+    "poissons": "fosse",
+    "benitier": "palais"
+   },
+   "visited": [
+    "recif",
+    "jardin",
+    "algues"
+   ],
+   "seen": [
+    "recif"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 564,
+  "group": "45d07cf519eb",
+  "split": "test",
+  "gold": {
+   "kind": "preciser",
+   "why": "« par là » sans direction parmi 4 sorties"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "La lanterne de la Grande Muraille",
+  "said": "je dis bonjour à grand-mère mei",
+  "before": "",
+  "told": "la place du village La place du village, toute décorée pour la fête. Un grand dragon de papier attend le défilé. Quelque chose tinte dans sa gueule. Grand-mère Mei accroche des lampions rouges.",
+  "state": {
+   "place": "village",
+   "inventory": [
+    "foulard",
+    "lanterne"
+   ],
+   "flags": [],
+   "items_at": {
+    "dragon": "village",
+    "piece": "dragon",
+    "lanterne": "inv",
+    "foulard": "inv",
+    "theiere": "maison_the",
+    "rechaud": "maison_the",
+    "panier_pains": "maison_the",
+    "poivre": "maison_the",
+    "baozi": "",
+    "sechoir": "atelier",
+    "bac": "atelier",
+    "papier": "",
+    "tas": "bambous",
+    "bambou": "",
+    "cerf_volant": "",
+    "gong": "rempart",
+    "foyer": "tour",
+    "riviere": "pont",
+    "carpes": "pont",
+    "cle": "ahfu",
+    "porte_guet": "rempart"
+   },
+   "chars_at": {
+    "mei": "village",
+    "hua": "maison_the",
+    "wen": "maison_the",
+    "lu": "atelier",
+    "dodu": "bambous",
+    "grue": "pied",
+    "ahfu": "rempart"
+   },
+   "visited": [
+    "village",
+    "maison_the"
+   ],
+   "seen": [
+    "village"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 85,
+  "group": "fbc822aba080",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "mei"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le carillon de la forêt",
+  "said": "je dis coucou à zouzou",
+  "before": "",
+  "told": "la rivière Une rivière rapide qui chante sur de gros galets gris. Le courant est bien trop fort pour nager ! Au nord, un vieux pont de bois. Au bord de l'eau poussent de grands roseaux tout creux, comme des petits tuyaux. Zouzou la loutre fait des ricochets.",
+  "state": {
+   "place": "riviere",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "carillon": "clairiere",
+    "pommier": "verger",
+    "pomme": "",
+    "champignon": "verger",
+    "lanterne": "taupinette",
+    "galets": "riviere",
+    "silex": "riviere",
+    "cristaux": "grotte",
+    "battant": "",
+    "roseau": "riviere",
+    "pipeau": ""
+   },
+   "chars_at": {
+    "bambou": "clairiere",
+    "taupinette": "terrier",
+    "zouzou": "riviere",
+    "grognon": "pont"
+   },
+   "visited": [
+    "clairiere",
+    "riviere"
+   ],
+   "seen": [
+    "clairiere"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "fouiller_galets"
+   ],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 260,
+  "group": "c4aae9ea5135",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "zouzou"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le miroir du phare d'Alexandrie",
+  "said": "je lui achète son huile",
+  "before": "bonjour monsieur le marchand",
+  "told": "le marché Le marché couvert, qui sent les épices et le pain chaud. À côté, le four du boulanger est encore tout chaud : des braises rougeoient tout au fond. Sur un étal, un pot en terre. Ménès le marchand garde sa dernière amphore d'huile d'olive.",
+  "state": {
+   "place": "marche",
+   "inventory": [
+    "figues"
+   ],
+   "flags": [],
+   "items_at": {
+    "filets": "port",
+    "panier": "port",
+    "obole": "",
+    "sardine": "",
+    "lampe": "port",
+    "pot": "marche",
+    "figues": "inv",
+    "four": "marche",
+    "amphore": "menes",
+    "rouleaux": "bibliotheque",
+    "cle": "ibis",
+    "chiffon": "bibliotheque",
+    "sable": "digue",
+    "porte": "pied",
+    "foyer": "sommet",
+    "miroir": "sommet"
+   },
+   "chars_at": {
+    "theon": "port",
+    "miou": "port",
+    "menes": "marche",
+    "kallia": "bibliotheque",
+    "ibis": "bibliotheque",
+    "pistache": "rampe",
+    "marin": "jetee"
+   },
+   "visited": [
+    "port",
+    "marche"
+   ],
+   "seen": [
+    "port"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 322,
+  "group": "d144b2a34286",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "menes"
+    }
+   ],
+   "why": "lui = Ménès; acheter l'huile = la lui demander"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le bonhomme de neige de Plumette",
+  "said": "je mets la carotte pour faire le nez",
+  "before": "",
+  "told": "le jardin enneigé Un jardin tout blanc qui fait crounch sous les pieds. Au milieu, un gros bonhomme de neige, sans nez et sans chapeau. Plumette volette autour du bonhomme : « Attention, il est tout fragile, ne le pousse pas ! »",
+  "state": {
+   "place": "jardin",
+   "inventory": [
+    "seau",
+    "tabouret",
+    "carotte",
+    "chapeau"
+   ],
+   "flags": [],
+   "items_at": {
+    "bonhomme": "jardin",
+    "fenetre": "cuisine",
+    "panier": "cuisine",
+    "carotte": "inv",
+    "seau": "inv",
+    "tabouret": "inv",
+    "chapeau": "inv",
+    "clou": "cabane",
+    "chaussette": "cabane"
+   },
+   "chars_at": {
+    "plumette": "jardin",
+    "mamie": "cuisine"
+   },
+   "visited": [
+    "jardin",
+    "remise",
+    "cabane",
+    "cuisine"
+   ],
+   "seen": [
+    "jardin"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "fermer_fenetre",
+    "monter_tabouret"
+   ],
+   "props": {
+    "fenetre": {
+     "state": "fermee"
+    },
+    "clou": {
+     "state": "vide"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 235,
+  "group": "eded7de7267d",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "carotte",
+     "target": "bonhomme"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le tournoi du château",
+  "said": "je donne le pain à l'oie",
+  "before": "",
+  "told": "la cour du château La grande cour du château, où tout le monde court dans tous les sens. Sire Bertrand attend dans son armure qui fait cling-clang. Agathe l'oie se dandine près du puits en cacardant.",
+  "state": {
+   "place": "cour",
+   "inventory": [
+    "pomme",
+    "pain"
+   ],
+   "flags": [],
+   "items_at": {
+    "foin": "ecurie",
+    "bouclier": "",
+    "perche": "ecurie",
+    "pomme": "inv",
+    "pain": "inv",
+    "marmite": "cuisine",
+    "plume": "",
+    "livre": "scriptorium",
+    "banniere": "anselme",
+    "trompette": "lice",
+    "puits": "cour"
+   },
+   "chars_at": {
+    "bertrand": "cour",
+    "caramel": "ecurie",
+    "oie": "cour",
+    "berthe": "cuisine",
+    "anselme": "scriptorium",
+    "heraut": "lice"
+   },
+   "visited": [
+    "cour",
+    "cuisine",
+    "scriptorium"
+   ],
+   "seen": [
+    "cour"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 525,
+  "group": "59ce531b1120",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "pain",
+     "target": "oie"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le drakkar de Sigrid",
+  "said": "je vais dans la cabane du papi",
+  "before": "",
+  "told": "la plage Une plage de galets au bord du fjord, sous un ciel tout gris. Le drakkar de la famille de Sigrid est tiré sur les galets, avec sa grande tête de dragon. Brrr, l'eau du fjord est glacée : pas question de s'y baigner ! Sigrid t'attend, les mains sur les hanches.",
+  "state": {
+   "place": "plage",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "fjord": "plage",
+    "voile": "drakkar",
+    "dragon": "drakkar",
+    "coffre": "cabane",
+    "aiguille": "coffre",
+    "navet": "cabane",
+    "poisson": "",
+    "laine": "brunhilde",
+    "rocher": "colline",
+    "pierre_soleil": "",
+    "boucliers": "drakkar",
+    "eau_bord": "drakkar",
+    "moufle": "coffre"
+   },
+   "chars_at": {
+    "sigrid": "plage",
+    "olaf": "cabane",
+    "brunhilde": "enclos",
+    "hugin": "drakkar"
+   },
+   "visited": [
+    "plage",
+    "drakkar"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 295,
+  "group": "5f8f74f15d3a",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "cabane"
+    }
+   ],
+   "why": "cabane du papi = cabane de pêche (Olaf)"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "La grotte aux peintures d'Oukou",
+  "said": "je dis au revoir à oukou et je vais dans la grotte avec ma torche",
+  "before": "",
+  "told": "le campement du clan Le campement du clan, avec ses tentes en peaux de bêtes. Un grand feu crépite, crac crac ! Oukou sautille d'impatience.",
+  "state": {
+   "place": "campement",
+   "inventory": [
+    "torche",
+    "pomme_de_pin"
+   ],
+   "flags": [],
+   "items_at": {
+    "feu": "campement",
+    "torche": "inv",
+    "framboises": "riviere",
+    "buisson": "riviere",
+    "ocre": "",
+    "pomme_de_pin": "inv",
+    "os": "pistache",
+    "charbon": "entree",
+    "foyer": "entree",
+    "tambour": "entree",
+    "paroi": "fond",
+    "chauves_souris": "fond"
+   },
+   "chars_at": {
+    "oukou": "campement",
+    "patapouf": "riviere",
+    "pistache": "bois"
+   },
+   "visited": [
+    "campement",
+    "bois"
+   ],
+   "seen": [
+    "campement"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "allumer_torche"
+   ],
+   "props": {
+    "torche": {
+     "state": "allumee"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 71,
+  "group": "9a1548b3f5d5",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "oukou"
+    },
+    {
+     "verb": "go",
+     "to": "entree"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Raya et la perle de lumière",
+  "said": "je cherche dans les coins",
+  "before": "",
+  "told": "la grotte d'Octave Une grotte pleine de coins et de recoins. On entend un petit rire : « Hi hi, tu ne me trouveras jamais ! » Tends bien l'oreille…",
+  "state": {
+   "place": "grotte",
+   "inventory": [
+    "ficelle",
+    "bocal"
+   ],
+   "flags": [],
+   "items_at": {
+    "algue_lumineuse": "algues",
+    "algues_brillantes": "algues",
+    "filet": "epave",
+    "ficelle": "inv",
+    "boite": "epave",
+    "miettes": "boite",
+    "bocal": "inv",
+    "sable": "plaine",
+    "coquillages": "",
+    "collier": "",
+    "perle": "fosse",
+    "corail_soleil": "jardin",
+    "conque": "octave",
+    "gouvernail": "epave",
+    "collier_zigzag": ""
+   },
+   "chars_at": {
+    "raya": "recif",
+    "zigzag": "plaine",
+    "octave": "",
+    "poissons": "fosse",
+    "benitier": "palais"
+   },
+   "visited": [
+    "recif",
+    "epave",
+    "plaine",
+    "jardin",
+    "algues",
+    "grotte"
+   ],
+   "seen": [
+    "recif"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "detacher_ficelle"
+   ],
+   "props": {
+    "boite": {
+     "open": true
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 576,
+  "group": "a30aed1b81f2",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "La lanterne de la Grande Muraille",
+  "said": "je bois un peu de thé",
+  "before": "",
+  "told": "la maison de thé Une maison de thé toute chaude, qui sent le jasmin. Sur le comptoir, la théière du thé du soir fume à côté d'un panier de petits pains. Au bout du comptoir, un petit pot de poivre du Sichuan, celui qui pique le nez et fait éternuer. Madame Hua fait chauffer l'eau sur un petit réchaud, pschhh. « Pas touche à mon thé du soir, prévient-elle : une gorgée, et on dort jusqu'au matin ! » Dans un coin, Maître Wen, le vieux savant, trempe son pinceau dans l'encre.",
+  "state": {
+   "place": "maison_the",
+   "inventory": [
+    "foulard"
+   ],
+   "flags": [],
+   "items_at": {
+    "dragon": "village",
+    "piece": "dragon",
+    "lanterne": "village",
+    "foulard": "inv",
+    "theiere": "maison_the",
+    "rechaud": "maison_the",
+    "panier_pains": "maison_the",
+    "poivre": "maison_the",
+    "baozi": "",
+    "sechoir": "atelier",
+    "bac": "atelier",
+    "papier": "",
+    "tas": "bambous",
+    "bambou": "",
+    "cerf_volant": "",
+    "gong": "rempart",
+    "foyer": "tour",
+    "riviere": "pont",
+    "carpes": "pont",
+    "cle": "ahfu",
+    "porte_guet": "rempart"
+   },
+   "chars_at": {
+    "mei": "village",
+    "hua": "maison_the",
+    "wen": "maison_the",
+    "lu": "atelier",
+    "dodu": "bambous",
+    "grue": "pied",
+    "ahfu": "rempart"
+   },
+   "visited": [
+    "village",
+    "maison_the",
+    "pont"
+   ],
+   "seen": [
+    "village"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "poivrer_foulard"
+   ],
+   "props": {
+    "foulard": {
+     "state": "poivre"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 110,
+  "group": "2fd16a5c4542",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "drink",
+     "object": "theiere"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le petit train de Tutu",
+  "said": "je regarde dans le nid",
+  "before": "",
+  "told": "le château d'eau Une grande tour ronde pleine d'eau pour le train. Tout en haut, il y a un grand nid plein de choses brillantes. Tout en haut, au bord du nid, Chipie la pie fait briller un sifflet argenté.",
+  "state": {
+   "place": "chateau_eau",
+   "inventory": [
+    "pain"
+   ],
+   "flags": [],
+   "items_at": {
+    "locomotive": "gare",
+    "manteau": "salle",
+    "bouton": "",
+    "pain": "inv",
+    "sifflet": "chipie",
+    "levier": "maisonnette",
+    "miel": "maisonnette",
+    "buches": "ours",
+    "nid": "chateau_eau"
+   },
+   "chars_at": {
+    "tutu": "gare",
+    "chipie": "chateau_eau",
+    "taupe": "maisonnette",
+    "ours": "foret"
+   },
+   "visited": [
+    "gare",
+    "maisonnette",
+    "foret",
+    "salle",
+    "chateau_eau"
+   ],
+   "seen": [
+    "gare"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "tirer_levier"
+   ],
+   "props": {
+    "taupe": {
+     "state": "contente"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 410,
+  "group": "ab6ee866e25d",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "nid"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le drakkar de Sigrid",
+  "said": "allez on y monte",
+  "before": "on va voir le bateau",
+  "told": "la plage Une plage de galets au bord du fjord, sous un ciel tout gris. Le drakkar de la famille de Sigrid est tiré sur les galets, avec sa grande tête de dragon. Brrr, l'eau du fjord est glacée : pas question de s'y baigner ! Sigrid t'attend, les mains sur les hanches.",
+  "state": {
+   "place": "plage",
+   "inventory": [],
+   "flags": [],
+   "items_at": {
+    "fjord": "plage",
+    "voile": "drakkar",
+    "dragon": "drakkar",
+    "coffre": "cabane",
+    "aiguille": "coffre",
+    "navet": "cabane",
+    "poisson": "",
+    "laine": "brunhilde",
+    "rocher": "colline",
+    "pierre_soleil": "",
+    "boucliers": "drakkar",
+    "eau_bord": "drakkar",
+    "moufle": "coffre"
+   },
+   "chars_at": {
+    "sigrid": "plage",
+    "olaf": "cabane",
+    "brunhilde": "enclos",
+    "hugin": "drakkar"
+   },
+   "visited": [
+    "plage",
+    "drakkar"
+   ],
+   "seen": [
+    "plage"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 297,
+  "group": "5f8f74f15d3a",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "drakkar"
+    }
+   ],
+   "why": "y = le bateau (dit avant)"
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le petit rover de la Lune",
+  "said": "je sors",
+  "before": "",
+  "told": "la cabine du module La cabine de la Libellule, toute petite, pleine de petits boutons qui clignotent de toutes les couleurs. Au milieu du tableau de bord, le gros bouton rouge de l'alarme : on n'y touche jamais, sinon c'est le retour immédiat sur Terre ! La trappe est ouverte sur la Lune toute grise. La capitaine Lou regarde par le hublot.",
+  "state": {
+   "place": "cabine",
+   "inventory": [
+    "casque",
+    "batterie"
+   ],
+   "flags": [
+    "trappe_ouverte"
+   ],
+   "items_at": {
+    "casque": "inv",
+    "batterie": "inv",
+    "gros_bouton_rouge": "cabine",
+    "boutons": "cabine",
+    "trappe": "cabine",
+    "soute": "echelle",
+    "drapeau": "soute",
+    "mat": "soute",
+    "pince": "soute",
+    "manche": "soute",
+    "poussiere": "rocher",
+    "ruban": "",
+    "antenne": "antenne_coin",
+    "camera": "antenne_coin",
+    "fente": "fond",
+    "cailloux": "fond",
+    "pierre": "",
+    "bouton_marche": "antenne_coin",
+    "drapeau_plante": "",
+    "panneau_solaire": "plaine"
+   },
+   "chars_at": {
+    "lou": "cabine",
+    "bip": "echelle"
+   },
+   "visited": [
+    "cabine"
+   ],
+   "seen": [
+    "cabine"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "mettre_casque",
+    "ouvrir_trappe"
+   ],
+   "props": {
+    "casque": {
+     "state": "sur_la_tete"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 395,
+  "group": "4f27d9bae2c2",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "echelle"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "La grotte aux peintures d'Oukou",
+  "said": "on retourne au camp",
+  "before": "",
+  "told": "la rivière Une rivière qui fait glou glou entre les cailloux. Au bord de l'eau pousse un buisson piquant, couvert de framboises bien rouges. Patapouf le bébé mammouth s'arrose avec sa trompe, pfiouuu, il est tout content.",
+  "state": {
+   "place": "riviere",
+   "inventory": [
+    "ocre"
+   ],
+   "flags": [],
+   "items_at": {
+    "feu": "campement",
+    "torche": "campement",
+    "framboises": "gone",
+    "buisson": "riviere",
+    "ocre": "inv",
+    "pomme_de_pin": "bois",
+    "os": "pistache",
+    "charbon": "entree",
+    "foyer": "entree",
+    "tambour": "entree",
+    "paroi": "fond",
+    "chauves_souris": "fond"
+   },
+   "chars_at": {
+    "oukou": "campement",
+    "patapouf": "riviere",
+    "pistache": "bois"
+   },
+   "visited": [
+    "campement",
+    "riviere"
+   ],
+   "seen": [
+    "campement"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [
+    "donner_framboises"
+   ],
+   "props": {
+    "patapouf": {
+     "state": "content"
+    }
+   },
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 68,
+  "group": "17ce8bd2eac8",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "campement"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "L'atelier de Léonard",
+  "said": "je lance la machine volante par la fenêtre",
+  "before": "",
+  "told": "l'atelier Un grand atelier plein de dessins, de pinceaux et de drôles de machines. La grande fenêtre est fermée, avec un petit mot du maître : « Ne pas ouvrir, mes dessins s'envolent ! » Sur la table, la maquette de la machine volante attend ses ailes.",
+  "state": {
+   "place": "atelier",
+   "inventory": [
+    "plan",
+    "ficelle"
+   ],
+   "flags": [],
+   "items_at": {
+    "maquette": "atelier",
+    "plan": "inv",
+    "ficelle": "inv",
+    "fenetre": "atelier",
+    "farine": "cuisine",
+    "graines": "",
+    "etagere": "cuisine",
+    "puits": "cour",
+    "seau": "cour",
+    "miroir": "chambre",
+    "soie": "",
+    "plumes": "",
+    "dessins": "atelier"
+   },
+   "chars_at": {
+    "rosa": "cuisine",
+    "mascarpone": "chambre",
+    "colombo": "terrasse"
+   },
+   "visited": [
+    "atelier",
+    "chambre"
+   ],
+   "seen": [
+    "atelier"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 17,
+  "group": "d7517511dec8",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "throw",
+     "object": "maquette",
+     "target": "fenetre"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "L'atelier de Léonard",
+  "said": "je prends le bol de farine",
+  "before": "",
+  "told": "la cuisine Une cuisine qui sent le pain chaud, avec une grande étagère à provisions. Sur l'étagère à provisions, il y a un bol de farine. Mamma Rosa, la cuisinière, roule des pâtes en chantant.",
+  "state": {
+   "place": "cuisine",
+   "inventory": [
+    "plan"
+   ],
+   "flags": [],
+   "items_at": {
+    "maquette": "atelier",
+    "plan": "inv",
+    "ficelle": "atelier",
+    "fenetre": "atelier",
+    "farine": "cuisine",
+    "graines": "",
+    "etagere": "cuisine",
+    "puits": "cour",
+    "seau": "cour",
+    "miroir": "chambre",
+    "soie": "",
+    "plumes": "",
+    "dessins": "atelier"
+   },
+   "chars_at": {
+    "rosa": "cuisine",
+    "mascarpone": "chambre",
+    "colombo": "terrasse"
+   },
+   "visited": [
+    "atelier",
+    "chambre",
+    "cuisine"
+   ],
+   "seen": [
+    "atelier"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 0,
+  "group": "80a5032ae292",
+  "split": "test",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "farine"
+    }
+   ]
+  }
+ },
+ {
+  "src": "opus",
+  "title": "Le bonhomme de neige de Plumette",
+  "said": "je tape sur le seau boum boum comme un tambour",
+  "before": "",
+  "told": "la remise Une petite remise en bois pleine d'outils. Dans un coin, il y a un vieux seau cabossé.",
+  "state": {
+   "place": "remise",
+   "inventory": [
+    "tabouret"
+   ],
+   "flags": [],
+   "items_at": {
+    "bonhomme": "jardin",
+    "fenetre": "cuisine",
+    "panier": "cuisine",
+    "carotte": "mamie",
+    "seau": "remise",
+    "tabouret": "inv",
+    "chapeau": "",
+    "clou": "cabane",
+    "chaussette": "cabane"
+   },
+   "chars_at": {
+    "plumette": "jardin",
+    "mamie": "cuisine"
+   },
+   "visited": [
+    "jardin",
+    "cabane",
+    "remise"
+   ],
+   "seen": [
+    "jardin"
+   ],
+   "known": [],
+   "tried": [],
+   "ending": null,
+   "turns": 0,
+   "stalled": 0,
+   "reminded": false,
+   "warned": [],
+   "hint_level": 0,
+   "score": 0,
+   "notes": {},
+   "done_actions": [],
+   "props": {},
+   "handled": [],
+   "doomed": {},
+   "destroyed": "",
+   "improvised": []
+  },
+  "id": 218,
+  "group": "1584d20688a3",
+  "split": "dev",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "hit",
+     "object": "seau"
+    }
+   ]
+  }
+ }
+]
