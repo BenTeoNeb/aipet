@@ -30,16 +30,19 @@ from loguru import logger
 
 from aipet import engines
 from aipet.fileio import atomic_write_json, load_json, lock_for
+from aipet.games import adventure_intent
 from aipet.games.adventure_engine import (
     DIFFICULTIES,
     KINDS,
     STUCK,
     VERBS,
     WINS,
+    Atlas,
     State,
     World,
     _stems,
     _words,
+    atlas_of,
     canonical_verb,
     check,
     errors_of,
@@ -50,7 +53,6 @@ from aipet.games.common import PREPARING_NOTE, UNKNOWN_PLAYER, Activity, JsonSto
 from aipet.memory.cards import DIR_ADVENTURES, DIR_STORIES, child_level
 from aipet.memory.text import STOPWORDS, normalize_text
 from aipet.timefmt import now
-from storyworld.atlas import Atlas
 
 ADVENTURE_TOOLS = {"adventure_start", "adventure_act", "adventure_end"}
 LIBRARY = Path(__file__).parent.parent / "data" / "adventures"
@@ -627,6 +629,8 @@ class AdventureGame(Activity):
         self.world: World | None = None
         self._atlas: tuple[str, Atlas | None] = ("", None)  # the adventure (its graph hash) and its atlas
         self.state: State | None = None
+        self._pending: dict | None = None  # Jev's reading of the child's last sentence, in the shadow
+        self._said_before = ""
 
     # ------------------------------------------------------------------ memory (one file each)
     def _file(self, ident: str) -> Path:
@@ -840,7 +844,7 @@ class AdventureGame(Activity):
 
         def build():
             try:
-                atlas = Atlas(w)
+                atlas, kept = atlas_of(w)
             except Exception as e:  # noqa: BLE001  the shadow never breaks a game
                 logger.warning(f"🗺️ No atlas: {e!r}")
                 return
@@ -849,8 +853,8 @@ class AdventureGame(Activity):
             self._atlas = (key, atlas)
             if self.world and graph_hash(self.world.g) == key:
                 self.world.atlas = atlas
-            self._ev("adventure_atlas", states=len(atlas.seen), winnable=len(atlas.dist),
-                     complete=atlas.complete, seconds=round(atlas.seconds, 2))  # fmt: skip
+            self._ev("adventure_atlas", states=len(atlas.table), winnable=atlas.winnable, complete=atlas.complete,
+                     kept=kept, seconds=round(atlas.seconds, 2))  # fmt: skip
 
         threading.Thread(target=build, name="adventure-atlas", daemon=True).start()
 
@@ -915,6 +919,8 @@ class AdventureGame(Activity):
         if remember:
             w.note(st, remember, about)
         intents = actions or [{"verb": "look"}]
+        if self._pending is not None:
+            self._pending["narrator"] = [*(self._pending["narrator"] or []), *intents]  # what the narrator did with it
         results: list[dict] = []
         skipped: list[dict] = []
         for n, intent in enumerate(intents):
@@ -954,6 +960,46 @@ class AdventureGame(Activity):
             w.atlas.disagreements.clear()
         self._ev("adventure_act", said=said[:120], outcomes=[r.get("outcome") for r in results], **atlas)
         return out
+
+    def _intent_mode(self) -> str:
+        """`[adventure] intent`: « narrator » (the narrator understands the child), or « jev-shadow »
+        (Jev decides too, in the shadow: logged next to the narrator, changes nothing)."""
+        return str((self.cfg.get("adventure") or {}).get("intent", "narrator"))
+
+    def _shadow_start(self, said: str):
+        """Each sentence of the child during the adventure: Jev reads it, in the background, on its own
+        world (never the game's), from the state before anything is played. Closed at the next
+        sentence (`_shadow_close`), with what the narrator did in between."""
+        assert self.adventure is not None and self.state is not None
+        graph, cfg, before = self.adventure["graph"], self.cfg, self.state.copy()
+        told = getattr(self.host, "last_pet_line", lambda: "")() or ""
+        pending: dict = {"said": said, "before": before, "narrator": None, "result": None, "world": None}
+        previous, self._said_before, self._pending = self._said_before, said, pending
+
+        def run():
+            try:
+                pending["world"] = w = World(graph)
+                pending["result"] = adventure_intent.decide(cfg, w, before, said, previous, told)
+            except Exception as e:  # noqa: BLE001  the shadow never breaks a game
+                pending["result"] = {"error": repr(e)[:200]}
+
+        threading.Thread(target=run, name="adventure-intent", daemon=True).start()
+
+    def _shadow_close(self):
+        """`adventure_intent_shadow`: Jev's reading next to what the narrator did — `narrator` None
+        when it called no action (chat, or it asked the child). `agrees`: the same world after and the
+        same told (both no action counts); `false_action`: Jev would have played an action, confident,
+        where the narrator played none (the risk of letting Jev decide)."""
+        p, self._pending = self._pending, None
+        if p is None:
+            return
+        d = dict(p["result"] or {"error": "no answer yet"})
+        if "error" not in d:
+            jev, narrator = d["actions"], p["narrator"]
+            d["would_decide"] = d["confidence"] >= adventure_intent.CONFIDENT and not d["unclear"]
+            d["agrees"] = adventure_intent.agrees(p["world"], p["before"], jev, narrator or [])
+            d["false_action"] = bool(d["would_decide"] and jev and not narrator)
+        self._ev("adventure_intent_shadow", said=p["said"][:160], narrator=p["narrator"], **d)
 
     def _naming(self, intent: dict) -> list[dict]:
         """How the narrator named things, when not by an id in reach (to measure how often the
@@ -1028,6 +1074,7 @@ class AdventureGame(Activity):
         run["reaction"] = reaction.strip()
         self._save()
         title = self.adventure["title"]
+        self._shadow_close()
         self._ev("adventure_end", title=title, outcome=run.get("outcome"), reaction=reaction[:200])
         self.adventure = self.world = self.state = None
         self._refresh()
@@ -1038,6 +1085,7 @@ class AdventureGame(Activity):
 
     def stop(self):
         """The activity ends without adventure_end: the state is kept, to resume later."""
+        self._shadow_close()
         self.cancel_preparation()
         if self.adventure:
             self._save()
@@ -1102,8 +1150,11 @@ class AdventureGame(Activity):
         return kept + ("\n" + discover if discover else "")
 
     def on_user_message(self, text: str) -> str | None:
+        self._shadow_close()
         if not self.state:
             return None
+        if self._intent_mode() == "jev-shadow" and not self.state.ending and text.strip():
+            self._shadow_start(text.strip())
         return "aventure : traduis ce que dit l'enfant en actions pour adventure_act (sauf s'il parle d'autre chose)"
 
     def names(self) -> list[str]:

@@ -14,6 +14,7 @@ the game yet."""
 
 from __future__ import annotations
 
+import marshal
 import time
 from collections import deque
 from typing import TYPE_CHECKING
@@ -31,52 +32,40 @@ class Atlas:
     """`distance(st)`: fair steps to the nearest win (0: won), -1 when no win is reachable, None when
     the state is off the atlas (or the atlas is not complete)."""
 
-    def __init__(self, w: World, max_states: int = ATLAS_STATES) -> None:
-        from storyworld.solver import _fair, _key, _moves
-
+    def __init__(self, w: World, max_states: int = ATLAS_STATES, table: dict | None = None) -> None:
+        """Explored from the start, or `table` (state → distance) as kept (`to_bytes`)."""
         t = time.monotonic()
         self.w = w
-        s0 = w.start()
-        k0 = _key(s0, w)
-        self.seen: set[tuple] = {k0}
-        reverse: dict[tuple, list[tuple]] = {}  # state → the states one fair step before it
-        wins: list[tuple] = []
-        todo = [s0]
-        while todo and len(self.seen) < max_states:
-            st = todo.pop()
-            k = _key(st, w)
-            if st.ending:
-                if w.ending(st, st.ending).get("kind") == "win":
-                    wins.append(k)
-                continue
-            for step, n in _moves(w, st, reduce=False, fair=False):
-                nk = _key(n, w)
-                if _fair(w, st, step):
-                    reverse.setdefault(nk, []).append(k)
-                if nk not in self.seen:
-                    self.seen.add(nk)
-                    todo.append(n)
-        self.complete = not todo
-        self.dist: dict[tuple, int] = dict.fromkeys(wins, 0)
-        back = deque(wins)
-        while back:
-            b = back.popleft()
-            for a in reverse.get(b, []):
-                if a not in self.dist:
-                    self.dist[a] = self.dist[b] + 1
-                    back.append(a)
+        self.complete = True
+        if table is None:
+            table, self.complete = _explore(w, max_states)
+        self.table: dict[tuple, int] = table
         self.seconds = time.monotonic() - t
         self.disagreements: list[dict] = []
+
+    @property
+    def winnable(self) -> int:
+        return sum(d >= 0 for d in self.table.values())
+
+    def to_bytes(self) -> bytes:
+        """To keep it (`marshal`: plain values only, nothing runs when it is read back). A cut
+        exploration is not kept: it answers nothing."""
+        return marshal.dumps(self.table)
+
+    @classmethod
+    def from_bytes(cls, w: World, data: bytes) -> Atlas:
+        """The atlas as kept, for the same adventure and the same engine (the caller's key)."""
+        table = marshal.loads(data)
+        if not isinstance(table, dict):
+            raise ValueError("not an atlas")
+        return cls(w, table=table)
 
     def distance(self, st: State) -> int | None:
         from storyworld.solver import _key
 
         if not self.complete:
             return None
-        k = _key(st, self.w)
-        if k not in self.seen:
-            return None
-        return self.dist.get(k, -1)
+        return self.table.get(_key(st, self.w))
 
     def compare(self, st: State, where: str, path: list | None, complete: bool) -> None:
         """The shadow: what a search found from `st` (a way to win, or none, `complete` if it saw
@@ -92,3 +81,38 @@ class Atlas:
         if not ok and len(self.disagreements) < KEPT:
             self.disagreements.append({"where": where, "place": st.place, "atlas": d,
                                        "search": len(path) if path else (0 if complete else None)})  # fmt: skip
+
+
+def _explore(w: World, max_states: int) -> tuple[dict[tuple, int], bool]:
+    """Every state reachable from the start (every move, in every order, guesses included), then
+    the fair distance to a win, backwards from the wins (-1: none). Complete unless cut."""
+    from storyworld.solver import _fair, _key, _moves
+
+    s0 = w.start()
+    seen: set[tuple] = {_key(s0, w)}
+    reverse: dict[tuple, list[tuple]] = {}  # state → the states one fair step before it
+    wins: list[tuple] = []
+    todo = [s0]
+    while todo and len(seen) < max_states:
+        st = todo.pop()
+        k = _key(st, w)
+        if st.ending:
+            if w.ending(st, st.ending).get("kind") == "win":
+                wins.append(k)
+            continue
+        for step, n in _moves(w, st, reduce=False, fair=False):
+            nk = _key(n, w)
+            if _fair(w, st, step):
+                reverse.setdefault(nk, []).append(k)
+            if nk not in seen:
+                seen.add(nk)
+                todo.append(n)
+    dist: dict[tuple, int] = dict.fromkeys(wins, 0)
+    back = deque(wins)
+    while back:
+        b = back.popleft()
+        for a in reverse.get(b, []):
+            if a not in dist:
+                dist[a] = dist[b] + 1
+                back.append(a)
+    return {k: dist.get(k, -1) for k in seen}, not todo

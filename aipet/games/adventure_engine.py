@@ -8,6 +8,7 @@ import hashlib
 import json
 from pathlib import Path
 
+from storyworld.atlas import Atlas
 from storyworld.check import (  # noqa: F401
     CONDITIONS,
     EFFECTS,
@@ -124,3 +125,32 @@ def errors_of(graph: dict) -> list[str]:
     except OSError:  # a read-only cache: kept in memory only
         pass
     return list(errors)
+
+
+_ATLASES = "atlases"
+_ATLASES_KEPT = 60  # adventures whose atlas is kept on disk (the bank, the latest invented ones)
+
+
+def atlas_of(w: World) -> tuple[Atlas, bool]:
+    """The atlas of this world, kept on disk per adventure and engine version: built once (up to
+    1.5 s for the biggest), then read back. (atlas, read back?)"""
+    from aipet import paths
+
+    folder = paths.cache_dir() / _ATLASES
+    path = folder / f"{graph_hash(w.g)}-{engine_hash()}.marshal"
+    try:
+        return Atlas.from_bytes(w, path.read_bytes()), True
+    except (OSError, ValueError, EOFError, TypeError):  # not built yet, or damaged: built again
+        pass
+    atlas = Atlas(w)
+    if atlas.complete:
+        try:
+            folder.mkdir(parents=True, exist_ok=True)
+            tmp = path.with_suffix(".tmp")
+            tmp.write_bytes(atlas.to_bytes())
+            tmp.replace(path)
+            for old in sorted(folder.glob("*.marshal"), key=lambda p: p.stat().st_mtime)[:-_ATLASES_KEPT]:
+                old.unlink(missing_ok=True)
+        except OSError:  # a read-only cache: built again next time
+            pass
+    return atlas, False
