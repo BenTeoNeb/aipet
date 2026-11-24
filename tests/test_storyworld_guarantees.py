@@ -196,3 +196,21 @@ def test_a_persona_that_gives_an_answer_away_is_reported():
     g["characters"][0]["persona"] = "Parle en rimes, ronronne entre deux questions."
     _, report = errors(g)
     assert not any("persona" in x for x in report["warnings"])
+
+
+def test_a_creative_idea_may_pick_up_what_lies_here():
+    """« je cueille les framboises et je les lance à Patapouf »: the step is ready once its trigger
+    has taken what lies here, as the turn takes first."""
+    g = two_rooms(
+        [thing("framboises", "a"), thing("ocre", "")],
+        [person("patapouf", "a")],
+        [act("donner", [("give", "framboises", "patapouf")], ["lose:framboises", "reveal:ocre"], ["has:framboises"]),
+         act("fin", [("take", "ocre")], ["end:gagne"], [])],
+    )  # fmt: skip
+    w = World(g)
+    st = w.start()
+    assert [s["step"] for s in w.view.gm_screen(st)] == ["donner"]
+    res = w.act(st, {"verb": "improvise", "step": "donner", "object": "framboises", "target": "patapouf"})
+    assert res["outcome"] == "done" and st.items_at["ocre"] == "a" and "framboises" not in st.inventory
+    st2 = w.start()  # naming only Patapouf: the raspberries were not part of the idea
+    assert w.act(st2, {"verb": "improvise", "step": "donner", "target": "patapouf"})["outcome"] == "free"

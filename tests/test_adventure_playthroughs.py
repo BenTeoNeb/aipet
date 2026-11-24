@@ -191,3 +191,14 @@ def test_the_atlas_is_built_in_the_shadow_and_logged(tmp_path, monkeypatch):
     game.act([A("talk", "plumette")], said="Bonjour !")
     (kw,) = [kw for t, kw in events if t == "adventure_act"]
     assert kw["atlas"] > 0
+
+
+def test_a_new_run_of_the_same_adventure_reuses_its_atlas(tmp_path, monkeypatch):
+    monkeypatch.setattr(adv, "SHADOW_ATLAS", True)
+    built = []
+    monkeypatch.setattr(adv.threading, "Thread", lambda target, **kw: built.append(target) or type(
+        "T", (), {"start": lambda self: target()})())  # synchronous, for the test
+    game = play(tmp_path, monkeypatch, "Le bonhomme de neige de Plumette", [])
+    atlas = game.world.atlas
+    game._new_run()
+    assert len(built) == 1 and game.world.atlas is atlas

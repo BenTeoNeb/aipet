@@ -43,6 +43,7 @@ from aipet.games.adventure_engine import (
     canonical_verb,
     check,
     errors_of,
+    graph_hash,
     upgrade,
 )
 from aipet.games.common import PREPARING_NOTE, UNKNOWN_PLAYER, Activity, JsonStore, pet_intro
@@ -624,6 +625,7 @@ class AdventureGame(Activity):
         self.dir = self.root / DIR_ADVENTURES
         self.adventure: dict | None = None  # the running one (its record)
         self.world: World | None = None
+        self._atlas: tuple[str, Atlas | None] = ("", None)  # the adventure (its graph hash) and its atlas
         self.state: State | None = None
 
     # ------------------------------------------------------------------ memory (one file each)
@@ -825,10 +827,16 @@ class AdventureGame(Activity):
 
     def _shadow_atlas(self):
         """Build the atlas of the new world in the background, in the shadow of the searches
-        (`storyworld.atlas`): its answers are only compared and logged, they change nothing yet."""
-        if not SHADOW_ATLAS:
+        (`storyworld.atlas`): its answers are only compared and logged, they change nothing yet.
+        Built once per adventure: a new run of the same one (a checkpoint, a replay) reuses it."""
+        if not SHADOW_ATLAS or not self.world:
             return
         w = self.world
+        key = graph_hash(w.g)
+        if self._atlas[0] == key:
+            w.atlas = self._atlas[1]  # None while it is being built: `build` gives it to the world then
+            return
+        self._atlas = (key, None)
 
         def build():
             try:
@@ -836,7 +844,11 @@ class AdventureGame(Activity):
             except Exception as e:  # noqa: BLE001  the shadow never breaks a game
                 logger.warning(f"🗺️ No atlas: {e!r}")
                 return
-            w.atlas = atlas
+            if self._atlas[0] != key:
+                return  # another adventure meanwhile
+            self._atlas = (key, atlas)
+            if self.world and graph_hash(self.world.g) == key:
+                self.world.atlas = atlas
             self._ev("adventure_atlas", states=len(atlas.seen), winnable=len(atlas.dist),
                      complete=atlas.complete, seconds=round(atlas.seconds, 2))  # fmt: skip
 

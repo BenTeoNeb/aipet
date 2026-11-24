@@ -92,7 +92,7 @@ class View:
             if a["id"] in out or (a.get("place") and a["place"] != st.place):
                 continue
             things = [x for x in (a.get("object"), a.get("target")) if x]
-            if not things or not all(x in scope for x in things) or not w.holds(st, a.get("when")):
+            if not things or not all(x in scope for x in things) or not self._ready(st, a):
                 continue
             if about is not None and not about & set(things):
                 continue
@@ -101,6 +101,16 @@ class View:
             goal = goals.get(a["id"]) or a.get("hint") or ""
             out[a["id"]] = {"step": a["id"], "goal": goal, "with": [w.name(x, st) for x in things]}
         return list(out.values())
+
+    def _ready(self, st: State, rule: dict) -> bool:
+        """Its conditions hold once its trigger has picked up what lies here (the turn takes first,
+        `Turn.perform`: « je cueille les framboises et je les lance à Patapouf »)."""
+        w = self.w
+        if not w.builtins.would_take(st, rule.get("verb", ""), rule.get("object"), rule.get("target")):
+            return w.holds(st, rule.get("when"))
+        trial = st.copy()
+        w.builtins.take_for(trial, rule)
+        return w.holds(trial, rule.get("when"))
 
     def progress(self, st: State) -> dict:
         """Where the story stands, for the pacing (the puzzles of the chart solved, and the act: the
