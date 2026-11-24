@@ -10,7 +10,9 @@ from __future__ import annotations
 import re
 import unicodedata
 from collections.abc import Callable
+from collections.abc import Set as AbstractSet
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Any
 
 IDS = {"in_reach"}  # maps keyed by ids: left as they are
@@ -75,8 +77,8 @@ class Language:
     # canonical form, the hero's bag, the words for « just leave », what says « locked » in a text.
     norm: Callable[[str], str] = _plain
     norm_keep: Callable[[str], str] = _plain
-    stems: Callable[[str], set[str]] = _plain_stems
-    way: Callable[[str], set[str]] = _plain_stems
+    stems: Callable[[str], AbstractSet[str]] = _plain_stems  # frozen once memoised
+    way: Callable[[str], AbstractSet[str]] = _plain_stems
     canonical_verb: Callable[[str], str] = _same
     bag: frozenset[str] = frozenset()
     leave_words: frozenset[str] = frozenset()
@@ -84,6 +86,15 @@ class Language:
     of: Callable[[str], str] = _same  # a name after « of » (« du jardin »)
     bare: Callable[[str], str] = _same  # a name without its article (« des cailloux » → « cailloux »)
     plural: Callable[[str], bool] = _never  # does the name speak of several things?
+
+    def __post_init__(self) -> None:
+        """The word helpers are pure: each string is normalized once (the same names are compared at
+        every turn and on every edge the checker replays). Sets come back frozen: never changed."""
+        for name in ("norm", "norm_keep", "canonical_verb"):
+            object.__setattr__(self, name, lru_cache(maxsize=16_384)(getattr(self, name)))
+        for name in ("stems", "way"):
+            raw = getattr(self, name)
+            object.__setattr__(self, name, lru_cache(maxsize=16_384)(lambda s, raw=raw: frozenset(raw(s))))
 
     def say(self, msgid: str, **kw: Any) -> str:
         """The message in this language (the English id when it has no translation), filled in."""

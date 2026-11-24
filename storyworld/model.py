@@ -133,6 +133,20 @@ class State:
     def to_dict(self) -> dict:
         return copy.deepcopy(self.__dict__)
 
+    def copy(self) -> State:
+        """An independent copy, field by field (the solver makes one per edge: a deepcopy walks every
+        string). The same as `State.from_dict(self.to_dict())`."""
+        d = dict(self.__dict__)
+        for k, v in d.items():
+            if type(v) is list:
+                d[k] = v[:]
+        d["items_at"] = dict(self.items_at)
+        d["chars_at"] = dict(self.chars_at)
+        d["props"] = {i: dict(v) for i, v in self.props.items()}
+        d["notes"] = {i: v[:] for i, v in self.notes.items()}
+        d["doomed"] = copy.deepcopy(self.doomed) if self.doomed else {}
+        return State(**d)
+
     @classmethod
     def from_dict(cls, d: dict) -> State:
         known = {k: v for k, v in d.items() if k in cls.__dataclass_fields__}

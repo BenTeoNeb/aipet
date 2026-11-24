@@ -35,7 +35,7 @@ def _all_moves(w: World, st: State, reduce: bool, fair: bool):
     takeable = [i for i in w.visible_items(st) if w.items[i].get("takeable", True)]
     eager = [i for i in takeable if i in w.eager_ok] if reduce else []
     for i in eager[:1] or takeable:
-        n = State.from_dict(st.to_dict())
+        n = st.copy()
         n.items_at[i] = "inv"
         n.inventory.append(i)
         yield ("take", i), n
@@ -51,7 +51,7 @@ def _all_moves(w: World, st: State, reduce: bool, fair: bool):
             and w.holds(st, x.get("when"))
             and (not door or w.prop(st, door, "open") or can_open(door))
         ):
-            n = State.from_dict(st.to_dict())
+            n = st.copy()
             if door:
                 w.apply(n, [f"open:{door}"])
             w.enter(n, x["to"])
@@ -59,20 +59,20 @@ def _all_moves(w: World, st: State, reduce: bool, fair: bool):
     doors = {d for ds in w.doors.values() for d in ds}
     for i in w.visible_items(st):
         if w.items[i].get("openable") and i not in doors and can_open(i):
-            n = State.from_dict(st.to_dict())
+            n = st.copy()
             w.apply(n, [f"open:{i}"])
             yield ("open", i), n
     for b in w.visible_items(st):  # the next button of a code (a wrong one only starts it again)
         box = w.buttons.get(b)
         if (box and not w.prop(st, box, "open") and (not fair or w.knows(st, box))
                 and w.items[box]["code"]["press"][w.prop(st, box, "pressed") or 0] == b):  # fmt: skip
-            n = State.from_dict(st.to_dict())
+            n = st.copy()
             w.press(n, b)
             yield ("press", b), n
     for r in w.riddles_here(st):  # the right answer (a wrong one changes nothing)
         if fair and not w.knows(st, r):
             continue
-        n = State.from_dict(st.to_dict())
+        n = st.copy()
         w.solve_riddle(n, r)
         yield ("answer", r), n
     scope = set(w.scope(st))
@@ -87,7 +87,7 @@ def _all_moves(w: World, st: State, reduce: bool, fair: bool):
         if not w.holds(st, a.get("when")) or w.red_herring(a) or w.achieved(a, st):
             continue
         tried.add(a["id"])
-        n = State.from_dict(st.to_dict())
+        n = st.copy()
         # The trigger a child would say (`intent_for`), and what the turn takes then: another trigger
         # that takes more is that take, then this.
         w.builtins.take_for(n, _trigger_for(w, a["id"], st))
@@ -124,7 +124,7 @@ def solve(w: World, start: State | None = None, first_path: bool = False, max_st
     missed later: the object is never forbidden (« !has: ») nor hidden, and the hero can always walk
     back (`World.eager_ok`). A path search (`first_path`) always takes first, fairly: it only needs
     one way."""
-    s0 = State.from_dict((start or w.start()).to_dict())
+    s0 = (start or w.start()).copy()
     k0 = _key(s0, w)
     parent: dict[tuple, tuple[tuple | None, tuple | None]] = {k0: (None, None)}
     states = {k0: s0}
@@ -241,8 +241,8 @@ def disagreements(w: World, max_states: int = MAX_STATES, reduce: bool = True) -
         st = todo.pop()
         if st.ending:
             continue
-        for step, nxt in _moves(w, st, reduce=reduce):
-            trial = State.from_dict(st.to_dict())
+        for step, nxt in _moves(w, st, reduce=reduce, fair=False):  # the states a lucky guess reaches too
+            trial = st.copy()
             trial.warned = [a["id"] for a in w.actions]  # a loss is warned once first: past that
             intent = intent_for(w, trial, step)
             res = w.act(trial, intent)

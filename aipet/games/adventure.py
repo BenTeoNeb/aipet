@@ -41,6 +41,7 @@ from aipet.games.adventure_engine import (
     _words,
     canonical_verb,
     check,
+    errors_of,
     upgrade,
 )
 from aipet.games.common import PREPARING_NOTE, UNKNOWN_PLAYER, Activity, JsonStore, pet_intro
@@ -603,7 +604,7 @@ def drafts(difficulty: str | None = None) -> list[dict]:
     for p in sorted(MODEL_DIR.glob("*.json")) if MODEL_DIR.is_dir() else []:
         g = json.loads(p.read_text(encoding="utf-8"))
         g["title"] = f"{g['title']} (nouvelle version)"
-        if difficulty in (None, g.get("difficulty")) and not check(g)[0]:
+        if difficulty in (None, g.get("difficulty")) and not errors_of(g):
             out.append(g)
     return out
 
@@ -748,7 +749,7 @@ class AdventureGame(Activity):
         for a in self._all():
             g = a.get("graph") or {}
             if generated(g) and difficulty in (None, g.get("difficulty")) and g["title"] not in out:
-                if not check(g)[0]:  # made with an older engine, or damaged: not drawn any more
+                if not errors_of(g):  # made with an older engine, or damaged: not drawn any more
                     out[g["title"]] = g
         return list(out.values())
 
@@ -809,7 +810,7 @@ class AdventureGame(Activity):
 
     def _load(self, record: dict) -> dict | None:
         """Make `record` the running adventure; refuses a world that no longer checks (forget, edits)."""
-        errors, _ = check(record.get("graph", {}))
+        errors = errors_of(record.get("graph", {}))
         if errors:
             logger.warning(f"🗺️ Stored adventure « {record.get('title')} » is broken: {errors[:3]}")
             return {"error": "Cette aventure est abîmée : propose d'en commencer une nouvelle."}

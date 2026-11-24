@@ -159,7 +159,7 @@ class Hints:
                 return any({r.get("object"), r.get("target")} & tried for r in w.rules if r["id"] == ident)
             return kind in ("open", "answer") and ident in tried or kind == "press" and w.buttons.get(ident) in tried
 
-        start = State.from_dict(st.to_dict())
+        start = st.copy()
         budget = TRIES_CHECKED
         seen = {_key(start, w)}
         frontier: list[tuple[State, list[tuple]]] = [(start, [])]

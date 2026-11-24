@@ -5,6 +5,7 @@ thing or a place is, from what the hero knows."""
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Set as AbstractSet
 from typing import TYPE_CHECKING
 
 from storyworld.model import (
@@ -49,7 +50,7 @@ class Ways:
             }
         return self.through(st, best_exits[0])
 
-    def _towards(self, st: State, to: str, words: set[str], exits: list[dict]) -> dict:
+    def _towards(self, st: State, to: str, words: AbstractSet[str], exits: list[dict]) -> dict:
         """No way is named: the way to where someone or something is, or it is right here."""
         w = self.w
         resolve = w.names.resolve

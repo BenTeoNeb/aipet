@@ -110,6 +110,26 @@ def test_a_state_survives_json():
     assert again.key() == st.key() and again.to_dict() == st.to_dict()
 
 
+def test_a_copy_is_the_json_round_trip_and_shares_nothing():
+    w = World(REFERENCE)
+    st = w.start()
+    for intent in [{"verb": "go", "to": "rochers"}, {"verb": "give", "object": "algue", "target": "pinces"}]:
+        w.act(st, intent)
+    st.notes = {"rochers": ["il a nommé le crabe Bob"]}
+    st.doomed = {"lost": "cle", "before": st.to_dict(), "text": "…"}
+    twin = st.copy()
+    assert twin.to_dict() == State.from_dict(st.to_dict()).to_dict()
+    twin.inventory.append("x")
+    twin.items_at["cle"] = "gone"
+    twin.props.setdefault("coffre", {})["open"] = True
+    twin.notes["rochers"].append("y")
+    twin.doomed["before"]["place"] = "ailleurs"
+    assert (
+        "x" not in st.inventory and st.items_at["cle"] != "gone" and st.notes["rochers"] == ["il a nommé le crabe Bob"]
+    )
+    assert "coffre" not in st.props and st.doomed["before"]["place"] != "ailleurs"
+
+
 @pytest.mark.parametrize("graph", library(), ids=lambda g: g["title"][:30])
 def test_migration_is_stable_and_keeps_the_verdict(graph):
     once = migrate(graph)

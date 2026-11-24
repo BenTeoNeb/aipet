@@ -430,9 +430,9 @@ def played(worlds: dict[str, World], logs: Path) -> dict[str, list[dict]]:
                 mode = ("checkpoint" if args.get("from_checkpoint") else
                         "resume" if args.get("resume") else "replay" if args.get("replay") else "new")  # fmt: skip
                 if mode == "checkpoint" and title in checkpoint:
-                    st = State.from_dict(checkpoint.pop(title).to_dict())
+                    st = checkpoint.pop(title).copy()
                 elif mode == "resume" and title in last_state:
-                    st = State.from_dict(last_state[title].to_dict())
+                    st = last_state[title].copy()
                 else:
                     st = w.start()
                 game = {"session": f.stem, "t": ev.get("t", ""), "mode": mode, "turns": [],
@@ -442,7 +442,7 @@ def played(worlds: dict[str, World], logs: Path) -> dict[str, list[dict]]:
                 w = worlds[title]
                 intents, outcomes, fired = args.get("actions") or [{"verb": "look"}], [], []
                 for intent in intents:
-                    before = State.from_dict(st.to_dict())
+                    before = st.copy()
                     r = w.act(st, intent)
                     outcomes.append(r.get("outcome", "?"))
                     fired += [x for x in st.done_actions if x not in before.done_actions]

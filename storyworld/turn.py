@@ -48,7 +48,7 @@ class Turn:
         st.turns += 1
         if verb == "destroy" and (pause := self.think_twice(st, intent)):
             return pause
-        before_play = State.from_dict(st.to_dict())
+        before_play = st.copy()
         res = self.play(st, verb, intent)
         texts, changes = self.w.react(before_play, st)
         if texts or changes:
@@ -263,7 +263,7 @@ class Turn:
         think twice (a character reacts, the thing seems precious), never a « game over » warning;
         if the child does it again, it happens (Nelson: an irrevocable act needs due warning)."""
         w = self.w
-        trial = State.from_dict(st.to_dict())
+        trial = st.copy()
         res = self.play(trial, "destroy", intent)
         lost = res.get("lost")
         if not lost or f"destroy:{lost}" in st.warned or st.doomed:
