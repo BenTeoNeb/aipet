@@ -183,8 +183,11 @@ def test_the_atlas_is_built_in_the_shadow_and_logged(tmp_path, monkeypatch):
     events: list[tuple] = []
     monkeypatch.setattr(adv, "SHADOW_ATLAS", True)
     built = []
-    monkeypatch.setattr(adv.threading, "Thread", lambda target, **kw: built.append(target) or type(
-        "T", (), {"start": lambda self: target()})())  # synchronous, for the test
+    monkeypatch.setattr(
+        adv.threading,
+        "Thread",
+        lambda target, **kw: built.append(target) or type("T", (), {"start": lambda self: target()})(),
+    )  # synchronous, for the test
     game = play(tmp_path, monkeypatch, "Le bonhomme de neige de Plumette", [])
     monkeypatch.setattr(game, "_ev", lambda type_, **kw: events.append((type_, kw)))
     assert built and game.world.atlas and game.world.atlas.complete
@@ -196,8 +199,11 @@ def test_the_atlas_is_built_in_the_shadow_and_logged(tmp_path, monkeypatch):
 def test_a_new_run_of_the_same_adventure_reuses_its_atlas(tmp_path, monkeypatch):
     monkeypatch.setattr(adv, "SHADOW_ATLAS", True)
     built = []
-    monkeypatch.setattr(adv.threading, "Thread", lambda target, **kw: built.append(target) or type(
-        "T", (), {"start": lambda self: target()})())  # synchronous, for the test
+    monkeypatch.setattr(
+        adv.threading,
+        "Thread",
+        lambda target, **kw: built.append(target) or type("T", (), {"start": lambda self: target()})(),
+    )  # synchronous, for the test
     game = play(tmp_path, monkeypatch, "Le bonhomme de neige de Plumette", [])
     atlas = game.world.atlas
     game._new_run()

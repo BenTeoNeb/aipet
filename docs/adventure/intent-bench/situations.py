@@ -1,16 +1,24 @@
 """~8 situations per bank adventure: states along random walks (fair moves), at several depths."""
-import json, random, sys
+
+import json
+import random
+import sys
+
 sys.path.insert(0, sys.argv[0].rsplit("/", 1)[0])
 from dec_lib import graphs, world
+
 from aipet.games.adventure_engine import _moves
+
 out = []
 for title in sorted(graphs()):
     if "nouvelle version" in title:
         continue
-    w = world(title); rng = random.Random(title)
+    w = world(title)
+    rng = random.Random(title)
     picks = []
-    for walk in range(4):
-        st = w.start(); depth = rng.choice([4, 8, 14, 22])
+    for _walk in range(4):
+        st = w.start()
+        depth = rng.choice([4, 8, 14, 22])
         for d in range(depth + 1):
             if d in (depth // 2, depth) and not st.ending:
                 picks.append(st.copy())
