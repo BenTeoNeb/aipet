@@ -50,7 +50,7 @@ class View:
             ],  # fmt: skip
             **({"decor": p["decor"]} if p.get("decor") and not dark else {}),
             **({"personas": personas} if (personas := self.personas(st)) else {}),
-            **({"gm_screen": screen} if (screen := self.gm_screen(st)) else {}),
+            **({"progress": progress} if (progress := self.progress(st)) else {}),
             **({"memories": notes} if (notes := self.notes_here(st)) else {}),
             "in_reach": self.in_reach(st),
             **({"worth_exploring": explore} if (explore := self.worth_exploring(st)) else {}),
@@ -79,10 +79,11 @@ class View:
         ]  # a companion is with you
         return " ".join(x for x in parts if x)
 
-    def gm_screen(self, st: State) -> list[dict]:
+    def gm_screen(self, st: State, about: set[str] | None = None) -> list[dict]:
         """The game master's screen: the steps the hero is ready for here (their conditions hold, their
-        things are in reach), each with what it achieves. The narrator never tells them; a creative idea
-        of the child that achieves one of them may be played as that step (`improvise`)."""
+        things are in reach), each with what it achieves; with `about`, only the steps on those things
+        (what the child is reaching for). The narrator never tells them; a creative idea of the child
+        that achieves one of them may be played as that step (`improvise`)."""
         w = self.w
         goals = {z.get("action"): z.get("goal", "") for z in w.g.get("puzzles", []) if isinstance(z, dict)}
         scope = set(w.scope(st))
@@ -93,11 +94,34 @@ class View:
             things = [x for x in (a.get("object"), a.get("target")) if x]
             if not things or not all(x in scope for x in things) or not w.holds(st, a.get("when")):
                 continue
+            if about is not None and not about & set(things):
+                continue
             if w.scripts.risky(a) or w.scripts.red_herring(a) or not w.scripts.again(a, st):
                 continue
             goal = goals.get(a["id"]) or a.get("hint") or ""
             out[a["id"]] = {"step": a["id"], "goal": goal, "with": [w.name(x, st) for x in things]}
         return list(out.values())
+
+    def progress(self, st: State) -> dict:
+        """Where the story stands, for the pacing (the puzzles of the chart solved, and the act: the
+        beginning, the middle, the finale), never what is left to do."""
+        w = self.w
+        puzzles = [
+            z["action"] for z in w.g.get("puzzles", []) if isinstance(z, dict) and isinstance(z.get("action"), str)
+        ]
+        if not puzzles:
+            return {}
+
+        def solved(x: str) -> bool:
+            if x in w.riddles:
+                return bool(w.prop(st, x, "answered"))
+            if w.items.get(x, {}).get("openable"):  # a code lock, a locked door
+                return bool(w.prop(st, x, "open"))
+            return x in st.done_actions
+
+        n = sum(map(solved, puzzles))
+        act = "beginning" if n * 3 < len(puzzles) else "middle" if n * 3 < 2 * len(puzzles) else "finale"
+        return {"solved": n, "of": len(puzzles), "act": w.say(act)}
 
     def blocked(self, st: State, x: dict) -> str:
         """Why a way out is shut (its door, or the author's words)."""

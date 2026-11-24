@@ -217,6 +217,21 @@ def _random_world(rng: random.Random) -> dict:
                 rng.sample(conds, rng.randint(0, 2)), **({"repeatable": True} if rng.random() < 0.3 else {}))
             for n in range(rng.randint(3, 6))]  # fmt: skip
     acts.append(act("fin", [("give", "tresor", "roi")], ["end:gagne"], ["has:tresor"]))
+
+    def reaction():  # Inform's « after »: gated on what the hero holds or what is true
+        return {
+            "when": rng.sample(conds, rng.randint(0, 2)),
+            "effects": rng.sample(effs, rng.randint(1, 2)),
+            "text": "!",
+        }
+
+    for i in items:
+        if i["id"] == "coffre" and rng.random() < 0.4:
+            i["after"] = {"open": reaction()}
+        elif i["id"] in ("seau", "perle") and rng.random() < 0.3:
+            i["after"] = {"take": reaction()}
+    if rng.random() < 0.3:
+        places[2]["after"] = {"enter": reaction()}
     return adventure(places, items, chars, acts)
 
 

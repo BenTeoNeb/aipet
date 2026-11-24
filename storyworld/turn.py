@@ -43,7 +43,7 @@ class Turn:
             return self.over(st)
         intent = self.coerce(intent)
         verb = self.w.lang.canonical_verb(intent.get("verb", ""))
-        before_all = st.to_dict() if verb == "destroy" else None
+        before_all = st.to_dict() if verb == "destroy" or st.destroyed else None
         before = self.progress_mark(st)
         st.turns += 1
         if verb == "destroy" and (pause := self.think_twice(st, intent)):
@@ -54,13 +54,16 @@ class Turn:
         if texts or changes:
             res["then"] = texts
             res["changes"] = [*res.get("changes", []), *changes]
+            if "arrival" in res:  # the place as it is after the reaction (the dragon flew away)
+                res["arrival"] = self.w.view.describe(st)
+        self.screen(st, res, intent)
         self.count_progress(st, res, before, intent)
         place = self.w.places.get(st.place, {}).get("name", st.place)
         res.setdefault("you_are", place)  # the narrator never loses track
         if st.place not in st.seen and not self.w.dark(st):
             st.seen.append(st.place)
         self.w.learn(st)
-        self.detect_doom(st, res, before_all)
+        self.detect_doom(st, res, before_all, before)
         self.end_if_doomed(st, verb, res)
         self.tell_ending(st, res)
         return res
@@ -109,6 +112,8 @@ class Turn:
         if verb == "inventory":
             return w.builtins.inventory(st)
         if verb == "help":
+            if st.doomed:  # nothing to hint: the mission ends now (`end_if_doomed`)
+                return {"outcome": "hint", "hint": ""}
             return {"outcome": "hint", "hint": w.hint(st, force=True) or w.say("Take a good look around you.")}
         if verb == "where":
             return w.ways.where(st, intent.get("object") or intent.get("to") or "")
@@ -123,17 +128,42 @@ class Turn:
 
     def improvise(self, st: State, intent: dict) -> dict:
         """A creative idea of the child (« je fais un lasso avec la ficelle »), played as a step of the
-        game master's screen it achieves: only a step ready now, and only when the idea names one of
-        its things (the child did the work; the narrator chose the words). The solver's step is the
-        same, so the adventure stays as proven."""
+        game master's screen it achieves: only a step ready now, by one of its triggers whose things
+        the idea names (all of them, but what the hero already holds: the child did the work, the
+        narrator chose the words). The solver's step is the same, so the adventure stays as proven.
+        The author's text is not told: the child's idea is the story. A refused idea counts as a try
+        that led nowhere (probing every step is no way through)."""
         w = self.w
         step = intent.get("step", "")
-        ready = {s["step"] for s in w.view.gm_screen(st)}
-        rule = next((a for a in w.rules if a["id"] == step), None)
         named = {w.names.find(intent.get(k), st)[0] for k in ("object", "target") if intent.get(k)} - {None}
-        if not rule or step not in ready or not named & {rule.get("object"), rule.get("target")}:
+        rule = None
+        if step in {s["step"] for s in w.view.gm_screen(st)}:
+            scope = set(w.scope(st))
+            for r in (x for x in w.rules if x["id"] == step):
+                things = {x for x in (r.get("object"), r.get("target")) if x}
+                if things <= scope and named & things and things - set(st.inventory) <= named:
+                    rule = r
+                    break
+        if rule is None:
+            st.stalled += 1
             return {**w.builtins.free(intent.get("object"), intent.get("target")), "note": w.lang.improvise_no_note}
-        return {**w.scripts.do(st, rule), "note": w.lang.improvise_note}
+        res = w.scripts.do(st, rule)
+        res.pop("text", None)
+        st.improvised.append(step)
+        return {**res, "note": w.lang.improvise_note}
+
+    def screen(self, st: State, res: dict, intent: dict) -> None:
+        """The game master's screen, when the child's idea comes close (Riedl's narrative mediation):
+        a try that didn't work, or a free moment, about the things of a step ready here. Never all
+        the steps at every turn: only the ones the child is reaching for."""
+        if (
+            res.get("outcome") not in (*FAILED, "free")
+            or self.w.lang.canonical_verb(intent.get("verb", "")) == "improvise"
+        ):
+            return
+        named = {f for k in ("object", "target") if intent.get(k) and (f := self.w.names.find(intent.get(k), st)[0])}
+        if near := self.w.view.gm_screen(st, named - {st.place}):
+            res["gm_screen"] = near
 
     def into_bag(self, st: State, verb: str, intent: dict) -> tuple[str, dict]:
         """« je mets l'algue dans mon sac »: taking it."""
@@ -236,7 +266,7 @@ class Turn:
         trial = State.from_dict(st.to_dict())
         res = self.play(trial, "destroy", intent)
         lost = res.get("lost")
-        if not lost or f"destroy:{lost}" in st.warned:
+        if not lost or f"destroy:{lost}" in st.warned or st.doomed:
             return None
         found = solve(w, trial, first_path=True)
         if found.get("path") or not found.get("complete"):
@@ -247,11 +277,18 @@ class Turn:
                 **({"witness": w.name(witness, st)} if witness else {}),
                 "note": w.lang.think_twice_note}  # fmt: skip
 
-    def detect_doom(self, st: State, res: dict, before_all: dict | None) -> None:
-        """After a destroy, is the adventure still winnable? (`lost` never reaches the narrator.)"""
-        if before_all is not None and res.get("lost") and not st.doomed:
-            self.doom(st, res.pop("lost"), before_all)
-        res.pop("lost", None)
+    def detect_doom(self, st: State, res: dict, before_all: dict | None, mark: tuple) -> None:
+        """After a destroy, is the adventure still winnable? A destroy takes the game off the proven
+        ways (the solver never destroys): from then on, every turn that changes something is checked
+        again (the second key traded away later). (`lost` never reaches the narrator.)"""
+        lost = res.pop("lost", None)
+        if before_all is None or st.doomed:
+            return
+        if lost:
+            st.destroyed = lost
+            self.doom(st, lost, before_all)
+        elif st.destroyed and self.progress_mark(st) != mark:
+            self.doom(st, st.destroyed, before_all)
 
     def doom(self, st: State, lost: str, before: dict) -> None:
         """After a thing is destroyed: can a win still be reached? If not, the adventure will end

@@ -20,8 +20,9 @@ assert not [d for d in diagnostics if d.severity == "error"]
 
 world = World(graph)
 state = world.start()
+world.act(state, {"verb": "go", "to": "rochers"})  # {"outcome": "done", "arrival": {...}, ...}
 outcome = world.act(state, {"verb": "give", "object": "algue", "target": "pinces"})
-# {"outcome": "done", "text": "Pinces croque l'algue…", "changes": [...], "in_reach": {...}}
+# {"outcome": "done", "text": "Pinces croque l'algue…", "changes": [...], "you_are": "Les rochers"}
 ```
 
 - **The format** — `SPEC.md`, with its JSON Schema in `schema/adventure.schema.json` (draft
@@ -31,8 +32,9 @@ outcome = world.act(state, {"verb": "give", "object": "algue", "target": "pinces
   outcome to tell: `done`, `not_yet`, `impossible`, `absent`, `no_exit`, `ask`, `free`, `clue`,
   `warning`, `hint`, `end`.
 - **The checker** — `validate(graph, profile=None)` returns `Diagnostic(code, message, severity)`
-  and the solver's report. A valid adventure can be won, never leaves the hero stuck, and the turn
-  does what the solver counts on, on every move it explores (`disagreements`). A `profile` adds an
+  and the solver's report. A valid adventure can be won, never leaves the hero stuck as written
+  (see [Guarantees](#guarantees-and-tests) for what that covers), and the turn does what the solver
+  counts on, on every move it explores (`disagreements`). A `profile` adds an
   application's policy (sizes, steps, puzzles: `profiles.py` has the pet's).
 - **Languages** — `locale/`: the words children say for each verb, how names are normalized, the
   messages and the narrator's notes, the outcome keys a narrator reads. French first.
@@ -43,10 +45,18 @@ outcome = world.act(state, {"verb": "give", "object": "algue", "target": "pinces
 |---|---|
 | `model.py` | versions and `migrate`, kinds, normalized things, `State` |
 | `rules.py` | conditions and effects: the mini-language, parsed once into typed `Rule`s, with the table of kinds |
-| `world.py` | `World`: what is true and around, the turn |
+| `world.py` | `World`, the facade: what is true and around (conditions, effects, light, uses, reactions) |
+| `names.py` | which thing a word names, exactly |
+| `actions.py` | the author's actions, and which one an intent does |
+| `builtins.py` | the built-in behaviours: taking, opening, codes, riddles, senses, the bag |
+| `ways.py` | going, and « where is… » |
+| `view.py` | what the narrator is told (the place, what is in reach, the game master's screen, the progress) |
+| `turn.py` | `act()`: one intent, played as a pipeline |
+| `verbs.py` | the canonical verbs and their families |
 | `solver.py` | the state space, the ways to win, agreement between solver and turn |
 | `check.py` | `validate`, `Diagnostic`, the format's lints |
-| `hints.py` | hints from the solver's next useful step |
+| `chart.py` | the puzzle dependency chart derived from a way to win (depth, width) |
+| `hints.py` | hints from the solver's next useful step, or the puzzle the child is trying |
 | `schema/` | the JSON Schema |
 | `locale/` | languages (`fr.py`), `localize` |
 | `profiles.py` | the pet's difficulty profiles (an application's policy, not the format) |
@@ -55,20 +65,25 @@ outcome = world.act(state, {"verb": "give", "object": "algue", "target": "pinces
 
 What `validate` proves, by exploring every reachable state (up to 60,000):
 
-- a win can be reached, every ending can be reached, and the hero can never get stuck as written;
-- a code or a riddle is played only once its clue (`puzzles[].clue_in`) has been met: winnable
-  means winnable by a child who doesn't know the answer beforehand;
+- a win can be reached, every ending can be reached, and from every state the solver reaches
+  (without `destroy`), a win is still reachable: the hero can't get stuck as written;
+- fair play: a win counts only along steps a child can do knowing what they met (a code pressed, a
+  riddle answered once its `puzzles[].clue_in` has been met); states a lucky guess reaches are
+  explored too, and each must still have such a way to win;
 - every move the solver counts on is what the turn does (`disagreements`).
 
 What is not proven, and how it is tested instead:
 
 - that the turn never leads outside the solver's states: tested as a property on the patterns, the
   reference adventure and a sample of states of the easy bank adventures, with every verb on every
-  thing in reach (`test_the_turn_never_leaves_the_solvers_states`);
+  thing in reach, `improvise` included (`test_the_turn_never_leaves_the_solvers_states`);
 - that the solver's take-first reduction keeps the verdict: argued in `World._eager_ok`, tested on
-  the corpus and on random worlds with dark places, lights and uses;
-- the player's `destroy`: outside the proof; the engine checks after it whether a win is still
-  reachable, and makes the hero think twice, in the story, before one that would not (SPEC 7.9).
+  the corpus and on random worlds with dark places, lights, uses and reactions;
+- the player's `destroy`: outside the proof (the solver never destroys). The engine makes the hero
+  think twice, in the story, before one that would leave no win (SPEC 7.9); after any destroy, every
+  turn that changes something checks again that a win is reachable, and the game ends gently when it
+  is not. So a destroy can make the adventure unwinnable, never without telling: "tough" on
+  Plotkin's scale, not "polite".
 
 Also: deterministic (no randomness, ordered iteration); never raises on odd input (a graph too
 broken to check is reported, an odd intent is told); states round-trip through JSON; migration is
@@ -105,7 +120,9 @@ What the library builds on, and what it takes from each.
 **Puzzle design and fair play**
 
 - Ron Gilbert, [Puzzle Dependency Charts][gilbert-charts] (2014). The `puzzles` list: each puzzle
-  with what it needs and where its clue is, written backwards from the end.
+  with what it needs, written backwards from the end. Two extensions are ours, not Gilbert's: where
+  a puzzle's clue is (`clue_in`, a dependency on what the child knows, which the solver checks), and
+  the chart derived from a way to win (`chart.py`), whose width of one we warn about as a corridor.
 - Emily Short, [Storylets: You Want Them][storylets] (2019). Content with prerequisites: the texts
   gated by conditions (`details`, `says`, `initial`). An action (conditions, a text, effects) is the
   closest thing here to a full storylet.
@@ -115,9 +132,27 @@ What the library builds on, and what it takes from each.
   have to type exactly the right verb (verb families, remap), to have a good reason why something is
   impossible (`fixed`, `sturdy`).
 - Andrew Plotkin's [cruelty scale][cruelty]. A valid adventure, as written, is "merciful" or
-  "polite": the hero may lose, but never gets stuck. `destroy` is the one exception (SPEC 7.9).
+  "polite": the hero may lose, but never gets stuck. With `destroy` it is "tough": the hero can make
+  it unwinnable, but is warned in the story first and told when it happens (SPEC 7.9).
+- Inform 7's [after rules][wi-7-4] (§7.4): what the world does once a built-in action has happened,
+  the model of `after` reactions (SPEC 7.15).
 - Infocom's [InvisiClues][invisiclues]. Hints that say more each time: the three hint levels and an
-  action's `hint`.
+  action's `hint`; a hint about the puzzle the child is trying, not the next one on the designer's
+  path.
+
+**The narrator as game master**
+
+- Mark Riedl, C. J. Saretto and R. Michael Young, [Managing Interaction Between Users and Agents in
+  a Multi-agent Storytelling Environment][riedl] (AAMAS 2003). Narrative mediation: the system
+  watches what the player does against the story's plan and accommodates it. Here the plan is the
+  solver's steps; `improvise` accommodates a creative idea as one of them, and the game master's
+  screen is shown only when the child's try comes close to one.
+- Michael Mateas and Andrew Stern, [Façade: An Experiment in Building a Fully-Realized Interactive
+  Drama][facade] (GDC 2003). A drama manager keeps the plot while characters improvise around the
+  player: the split between the engine (the plot, what is true) and the narrator (the voices).
+- Richard Evans and Emily Short, [Versu, a Simulationist Storytelling System][versu] (IEEE TCIAIG,
+  2014). Characters as improvising agents with their own manners and moods: the `persona` a
+  narrator plays.
 
 [wi]: https://ganelson.github.io/inform-website/book/WI_1_1.html
 [wi-3-5]: https://ganelson.github.io/inform-website/book/WI_3_5.html
@@ -138,6 +173,10 @@ What the library builds on, and what it takes from each.
 [craft]: https://ifarchive.org/if-archive/info/Craft.Of.Adventure.pdf
 [cruelty]: https://www.ifwiki.org/Cruelty_scale
 [invisiclues]: https://www.ifwiki.org/InvisiClues
+[wi-7-4]: https://ganelson.github.io/inform-website/book/WI_7_4.html
+[riedl]: https://dblp.org/rec/conf/atal/RiedlSY03.html
+[facade]: https://faculty.cc.gatech.edu/~isbell/classes/reading/papers/MateasSternGDC03.pdf
+[versu]: https://www.cs.uky.edu/~sgware/reading/papers/evans2014versu.pdf
 
 ## Status
 

@@ -91,8 +91,8 @@ class World:
         self.idempotent_ids = {a["id"] for a in self.actions if self.idempotent(a)}
         self.eager_ok = self._eager_ok(rules)
         self.lights = [i for i, it in self.items.items() if it.get("light")]
-        # What a child must have met to know a code or a riddle's answer (Gilbert's information
-        # dependencies): the clue of its puzzle. The solver plays them only once it is known.
+        # What a child must have met to know a code or a riddle's answer (our extension of Gilbert's
+        # charts): the clue of its puzzle. A win counts only once it is known (`solver._fair`).
         chart: dict[str, str] = {str(z.get("action")): z["clue_in"] for z in graph.get("puzzles", [])
                                  if isinstance(z, dict) and isinstance(z.get("clue_in"), str)}  # fmt: skip
         gated = [i for i, it in self.items.items() if it.get("code")] + self.riddles
@@ -147,8 +147,11 @@ class World:
                 if not any(set(exit_rules(b)) <= known for b in back):
                     return set()
         reacting = {i for k, i in self.reactions if k == "take"}  # taking it changes the world: not first
-        rules += [r for x in self.reactions.values() for r in x.get("when") or []]
-        return set(self.items) - args_of(rules, "has", negated=True) - self._maybe_in_the_dark() - reacting
+        # A reaction that asks what the hero holds (« has:filet » when the chest opens) depends on when
+        # it was taken: the other orders are played.
+        when = [r for x in self.reactions.values() for r in x.get("when") or []]
+        held = args_of(when, "has") | args_of(when, "has", negated=True)
+        return set(self.items) - args_of(rules, "has", negated=True) - held - self._maybe_in_the_dark() - reacting
 
     def _maybe_in_the_dark(self) -> set[str]:
         """Items that may lie in a dark place: seen there by a light, they may be unseen later (the
@@ -287,23 +290,42 @@ class World:
     def react(self, before: State, st: State) -> tuple[list[str], list[str]]:
         """What the world does after a built-in step (Inform's « after » rules): taking a thing, opening
         it, entering a place may have a reaction (`after: {take|open|enter: {when, effects, text}}`),
-        once. Played by the turn and by the solver alike, on what changed. Returns (texts, changes)."""
-        happened = [("take", i) for i in st.inventory if i not in before.inventory]
-        happened += [("open", i) for i in self.items if self.prop(st, i, "open") and not self.prop(before, i, "open")]
-        if st.place != before.place:
-            happened.append(("enter", st.place))
+        once. Played by the turn and by the solver alike, on what changed, in the order it happens
+        (a chest opens, then the hero takes the egg), again while a reaction makes something else
+        happen. Returns (texts, changes)."""
         texts: list[str] = []
         changes: list[str] = []
-        for kind, ident in happened:
-            r = self.reactions.get((kind, ident))
-            mark = f"after:{kind}:{ident}"
-            if not isinstance(r, dict) or mark in st.done_actions or not self.holds(st, r.get("when")):
-                continue
-            st.done_actions.append(mark)
-            changes += self.apply(st, r.get("effects") or [])
-            if r.get("text"):
-                texts.append(r["text"])
+        fired = True
+        while fired:
+            fired = False
+            happened = [
+                ("open", i) for i in self.items if self.prop(st, i, "open") and not self.prop(before, i, "open")
+            ]
+            happened += [("enter", st.place)] if st.place != before.place else []
+            happened += [("take", i) for i in st.inventory if i not in before.inventory]
+            for kind, ident in happened:
+                r = self.reactions.get((kind, ident))
+                mark = f"after:{kind}:{ident}"
+                if not isinstance(r, dict) or mark in st.done_actions or not self.holds(st, r.get("when")):
+                    continue
+                st.done_actions.append(mark)
+                changes += self.apply(st, r.get("effects") or [])
+                if r.get("text"):
+                    texts.append(r["text"])
+                fired = True
         return texts, changes
+
+    def restore(self, saved: dict) -> State:
+        """A saved state, as it is played now: a save from before the clues were kept (no `known`)
+        gets the clues it had met (in the places it saw, the things it held, the people it met)."""
+        st = State.from_dict(saved)
+        if "known" not in saved and self.clues:
+            met = set(st.seen) | set(st.handled) | set(st.inventory)
+            met |= {i for i, at in st.items_at.items() if at in st.seen}
+            met |= {c for c, at in st.chars_at.items() if at in st.seen}
+            st.known = sorted(self.clues & met)
+            self.learn(st)
+        return st
 
     def knows(self, st: State, puzzle: str) -> bool:
         """Has the hero met what tells the code or the answer (no clue written: yes)?"""

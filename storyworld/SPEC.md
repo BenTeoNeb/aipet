@@ -415,7 +415,10 @@ ban on the player, but it is never a trap (Nelson: an irrevocable act needs due 
 destroy that would leave no win, the engine answers once `warning` with `precious` (the thing) and
 `witness` (someone here), and a note: the narrator makes the hero think twice *in the story* (a
 character reacts, the thing looks precious), never a "game over" warning. Sent again, it happens.
-The game is then *doomed* and says nothing more; it ends with the built-in lose
+A destroy takes the game off the ways the checker proved (the solver never destroys): after any
+destroy, every turn that changes something checks again that a win is reachable (a second key, kept
+as a spare, traded away later), and when none is the game is *doomed*. A doomed game says nothing
+more and makes the hero think twice no more; it ends with the built-in lose
 ending `_coince` ("Sans X, impossible d'aller plus loin…") when the player runs into it: a failed
 try, a request for help, or several turns without progress. Applications may offer to resume from
 just before the destroy.
@@ -466,9 +469,12 @@ hiding place).
 Taking, opening and going are built in; `after` adds what the world does once they are done
 ("prendre l'œuf réveille le dragon", "ouvrir le coffre libère des papillons", "entrer dans la
 salle fait sonner une cloche"). A Reaction is `{when, effects, text}`: after the step, once, if
-`when` holds, its effects are applied and its text told (`then`). It never loses (a loss needs the
-warning of an action). The solver plays reactions on its own steps the same way, and an item that
-reacts to being taken is never taken ahead by the solver's reduction.
+`when` holds, its effects are applied and its text told (`then`). In one turn that does several
+steps (taking from a closed chest opens it first), reactions come in the order things happen:
+opening, entering, taking; and again while a reaction makes something else happen. It never loses
+(a loss needs the warning of an action). The solver plays reactions on its own steps the same way;
+the solver's reduction never takes ahead an item that reacts to being taken, nor one a reaction's
+`when` asks about (`has:filet` when the chest opens).
 
 ## 8. What a valid adventure guarantees
 
@@ -504,9 +510,11 @@ adventure too big to explore is rejected) and proves that:
 - at least one win ending is reachable, and every ending (win or lose) is reachable;
 - the hero can never get stuck: from every reachable state that has not ended, a win is still
   reachable (losing is allowed; a lose ending is an end, not a trap);
-- **fair play**: a code is pressed and a riddle answered only once its `clue_in` has been met (a
-  place seen lit, a thing or someone in reach), so a win never needs an answer the child could not
-  know (Gilbert's information dependencies);
+- **fair play**: a win counts only along steps a child can do knowing what they met: a code
+  pressed and a riddle answered once its `clue_in` has been met (a place seen lit, a thing or
+  someone in reach). The states a lucky guess reaches are explored too, and each must still have
+  such a way to win (a guess that sends the hero past the clue is a stuck state). This dependency on
+  knowledge extends Gilbert's charts;
 - **the solver and the turn agree**: every move the solver counts on is replayed through the turn
   engine with the words a player would use, and must change the world the same way (so a scripted
   action can never shadow a built-in behaviour the solver relied on).
@@ -514,7 +522,9 @@ adventure too big to explore is rejected) and proves that:
 An unreachable ending is reported with its reason ("action X needs has:Y, and no effect ever makes
 it true"). Warnings, not errors: actions that can never happen, a `clue_in` whose texts name none of
 what the puzzle needs, a flag that nothing sets and is close to one that is set (a typo), the
-derived puzzle chart a single corridor of five puzzles or more, texts that would lie (a place's lasting text naming a character who moves; a
+derived puzzle chart a single corridor of five puzzles or more, a `persona` that tells a riddle's answer or names a thing a
+puzzle needs (which the character's own lines, the title, the intro and the goal never name), texts
+that would lie (a place's lasting text naming a character who moves; a
 "locked" sentence told while the key may be in hand).
 
 Applications add their own policy on top (for example, per `difficulty`: the number of places and
@@ -522,15 +532,24 @@ lose endings, the length and number of puzzles of the shortest win).
 
 ## 8.1 The narrator as game master
 
-The engine holds the plot; the narrator plays it like a game master or an improv actor. What the
+The engine holds the plot; the narrator plays it like a game master or an improv actor (Façade's
+drama manager and improvising characters; Versu's characters with manners and moods). What the
 engine gives it for that, and how it stays within the proof:
 
-- `persona` (characters): how to play them live; it never adds a clue.
-- `gm_screen` (in a place's description): the steps the hero is ready for here and what each
-  achieves (the puzzle's `goal`, else the action's `hint`). Never told to the player.
+- `persona` (characters): how to play them live (voice, manners, mood); it never adds a clue (the
+  checker warns when one may).
+- `progress` (in a place's description): the puzzles of the chart solved, out of how many, and the
+  act (beginning, middle, finale): for the pacing, never what is left to do.
+- `gm_screen`, the game master's screen: the steps the hero is ready for here and what each achieves
+  (the puzzle's `goal`, else the action's hint). Never at every turn: it comes with a try that didn't
+  work or a free moment about the things of a ready step, when the child is reaching for it (Riedl's
+  narrative mediation). Never told to the player.
 - `improvise` (verb), with `step`: a creative idea of the player that achieves one of those steps
-  ("je fais un lasso avec la ficelle") is played as that step, only if it is ready now and the
-  intent names one of its things. The world changes exactly as the solver's step does.
+  ("je fais un lasso avec la ficelle") is played as that step, by one of its triggers, only if it is
+  ready now and the idea names every thing of that trigger the hero doesn't already hold. The world
+  changes exactly as the solver's step does; the author's text is not told (the child's idea is the
+  story). A refused idea counts as a try that led nowhere. The steps improvised are kept
+  (`improvised`).
 - A destroy that would leave no win is felt in the story first (7.9); the player decides.
 
 ## 9. Minimal example

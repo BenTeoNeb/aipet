@@ -127,6 +127,8 @@ class State:
     # The adventure can't be won any more (a needed thing destroyed): {lost, text, before (the state
     # just before)}. It ends when the child runs into it, not when it happens.
     doomed: dict = field(default_factory=dict)
+    destroyed: str = ""  # the last thing destroyed: off the solver's ways, each change is checked again
+    improvised: list[str] = field(default_factory=list)  # the steps a creative idea of the child did
 
     def to_dict(self) -> dict:
         return copy.deepcopy(self.__dict__)

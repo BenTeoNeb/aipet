@@ -122,24 +122,24 @@ class Builtins:
         if x not in st.handled:
             st.handled.append(x)
 
-    def take_for(self, st: State, action: str) -> list[str]:
-        """An action done takes what its triggers hold in hand (each trigger's implicit take), however
-        the child said it: « utiliser l'ouvre-boîte » with the tin on the floor takes the tin too,
-        as the solver does."""
-        return [x for r in self.w.rules if r["id"] == action
-                for x in self.implicit_take(st, r.get("verb", ""), r.get("object"), r.get("target"))]  # fmt: skip
+    def take_for(self, st: State, rule: dict) -> list[str]:
+        """An action done takes what its trigger holds in hand (the trigger played, not the others)."""
+        return self.implicit_take(st, rule.get("verb", ""), rule.get("object"), rule.get("target"))
+
+    def would_take(self, st: State, verb: str, obj: str | None, tgt: str | None) -> list[str]:
+        """What `implicit_take` would pick up (nothing changes)."""
+        w = self.w
+        held_nouns = [obj] + ([tgt] if verb in SYMMETRIC else [])
+        return [x for x in held_nouns
+                if verb in HELD_VERBS and x in w.items and x not in st.inventory and w.items[x].get("takeable")
+                and x in w.visible_items(st)]  # fmt: skip
 
     def implicit_take(self, st: State, verb: str, obj: str | None, tgt: str | None) -> list[str]:
         """Giving, using or throwing a thing that lies here takes it first (Inform's implicit taking):
         « je donne l'algue au crabe » with the seaweed at his feet."""
-        w = self.w
-        held_nouns = [obj] + ([tgt] if verb in SYMMETRIC else [])
-        taken = []
-        for x in held_nouns:
-            if verb in HELD_VERBS and x in w.items and x not in st.inventory and w.items[x].get("takeable") \
-                    and x in w.visible_items(st):  # fmt: skip
-                self._pick_up(st, x)
-                taken.append(x)
+        taken = self.would_take(st, verb, obj, tgt)
+        for x in taken:
+            self._pick_up(st, x)
         return taken
 
     def in_closed(self, st: State, said: list[str]) -> tuple[str, str] | None:

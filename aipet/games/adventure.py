@@ -720,7 +720,7 @@ class AdventureGame(Activity):
         assert graph is not None
         known = next((a for a in self._mine(player) if a["title"] == graph["title"]), None)
         if known and (st := known.get("state")) and not st.get("ending") and self._load(known) is None:
-            self.state = State.from_dict(st)  # the same idea again: never wipe an adventure going on
+            self.state = self._restore(st)  # the same idea again: never wipe an adventure going on
             self._refresh()
             return self._intro("Cette aventure est déjà commencée : on reprend où il en était (rappelle-le en deux "
                                "phrases). S'il veut recommencer depuis le début : adventure_start avec replay.")  # fmt: skip
@@ -802,6 +802,11 @@ class AdventureGame(Activity):
         self._save()
         self._refresh()
 
+    def _restore(self, saved: dict) -> State:
+        """A saved state of the running adventure, as it is played now (`World.restore`)."""
+        assert self.world is not None
+        return self.world.restore(saved)
+
     def _load(self, record: dict) -> dict | None:
         """Make `record` the running adventure; refuses a world that no longer checks (forget, edits)."""
         errors, _ = check(record.get("graph", {}))
@@ -828,7 +833,7 @@ class AdventureGame(Activity):
                         "(adventure_start avec replay)."}  # fmt: skip
             if err := self._load(rec):
                 return err
-            checkpoint, rec["checkpoint"] = State.from_dict(rec["checkpoint"]), None
+            checkpoint, rec["checkpoint"] = self._restore(rec["checkpoint"]), None
             if left is not None:
                 rec["checkpoints_left"] = left - 1
             self._new_run(checkpoint, note="checkpoint")
@@ -842,7 +847,7 @@ class AdventureGame(Activity):
                 return {"error": "Pas d'aventure en cours à reprendre.", "aventures": [a["title"] for a in mine][-6:]}
             if err := self._load(rec):
                 return err
-            self.state = State.from_dict(rec["state"])
+            self.state = self._restore(rec["state"])
             self._refresh()
             return self._intro("On reprend l'aventure : rappelle en deux phrases où on en était.")
         rec = self._by_title(replay, mine)

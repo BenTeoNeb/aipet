@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from storyworld.world import World
 
 HINT_STATES = 20_000  # a hint is searched during the conversation: keep it quick
+TRIES_CHECKED = 12  # steps on the things tried whose way to win is checked, at most (each is a search)
 
 
 def useful_steps(w: World, path: list[tuple]) -> list[tuple]:
@@ -107,8 +108,9 @@ def _clue_pointer(w: World, step: tuple, st: State | None) -> str:
 
 
 def _trigger_for(w: World, action: str, st: State | None) -> dict:
-    """The trigger to hint: the one whose things are at hand, the bag's first (« les allumettes »
-    rather than « la lampe » when the hero holds the matches)."""
+    """The trigger to hint (and the solver's): the one whose things are at hand, that picks up the
+    least, the bag's first (« les allumettes » rather than « la lampe » when the hero holds the
+    matches)."""
     rules = [x for x in w.rules if x["id"] == action]
     if not rules or st is None:
         return rules[0] if rules else {}
@@ -116,7 +118,8 @@ def _trigger_for(w: World, action: str, st: State | None) -> dict:
 
     def score(r: dict) -> tuple:
         things = [x for x in (r.get("object"), r.get("target")) if x]
-        return (all(x in scope for x in things), any(x in st.inventory for x in things))
+        taken = w.builtins.would_take(st, r.get("verb", ""), r.get("object"), r.get("target"))
+        return (all(x in scope for x in things), -len(taken), any(x in st.inventory for x in things))
 
     return max(rules, key=score)  # max keeps the first of equals: the author's order
 
@@ -141,7 +144,7 @@ class Hints:
 
     def towards_tries(self, st: State) -> list[tuple]:
         """The useful steps towards the puzzle the child is trying (what their last tries were about):
-        the shortest way to a step on those things, if it is on a way to win (InvisiClues answer the
+        the shortest way to a step on those things, if it brings a win closer (InvisiClues answer the
         question the player has, not the next one on the designer's path)."""
         from storyworld.solver import _key, _moves
 
@@ -157,13 +160,20 @@ class Hints:
             return kind in ("open", "answer") and ident in tried or kind == "press" and w.buttons.get(ident) in tried
 
         start = State.from_dict(st.to_dict())
+        budget = TRIES_CHECKED
         seen = {_key(start, w)}
         frontier: list[tuple[State, list[tuple]]] = [(start, [])]
         while frontier and len(seen) < HINT_STATES // 4:
             nxt: list[tuple[State, list[tuple]]] = []
             for s, path in frontier:
                 for step, n in _moves(w, s, reduce=True):
-                    if about(step) and self.way_to_win(n):  # the try leads somewhere that can still win
+                    if not about(step):
+                        pass
+                    elif (budget := budget - 1) < 0:  # a hint is searched while the child waits
+                        return []
+                    # the try brings a win closer (not a side step that spends what a win needs:
+                    # the second key traded for a sweet)
+                    elif (way := self.way_to_win(n)) and len(way) < (len(self.way_to_win(s)) or len(way) + 1):
                         return useful_steps(w, [*path, step]) or [step]
                     if (k := _key(n, w)) not in seen and not n.ending:
                         seen.add(k)

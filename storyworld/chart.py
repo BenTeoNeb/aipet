@@ -2,7 +2,8 @@
 the way (an action, an opening, a riddle, a code) and the earlier puzzles it needs, through the
 facts they make true (a thing revealed and taken, a flag, a door opened, a clue met). Its depth is
 the longest chain of puzzles; its width, the most puzzles open at once (one level of the chart).
-A chart one puzzle wide is a single corridor: Gilbert's « worst outcome »."""
+A chart one puzzle wide is a single corridor, one puzzle after another (the checker warns about long
+ones: the derived chart and that warning are ours, not Gilbert's)."""
 
 from __future__ import annotations
 

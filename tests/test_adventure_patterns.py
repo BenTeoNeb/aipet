@@ -212,11 +212,16 @@ def test_a_creative_idea_plays_a_ready_step_of_the_game_masters_screen():
     say(w, st, "go", "ouest")
     say(w, st, "take", "l'ouvre-boîte")
     say(w, st, "go", "est")
-    screen = w.describe(st)["écran_mj"]
+    assert "écran_mj" not in w.describe(st)  # the screen is never shown at every turn
+    screen = say(w, st, "hit", "conserve")["écran_mj"]  # the child reaches for the tin: the step comes close
     assert [s["étape"] for s in screen] == ["ouvrir_conserve"]
+    assert "écran_mj" not in say(w, st, "hit", "chat")  # nothing ready on the cat
+    stalled = st.stalled
     assert w.act(st, {"verb": "improvise", "step": "ouvrir_conserve", "object": "chat"})["outcome"] == "free"
+    assert st.stalled == stalled + 1  # a refused idea is a try that led nowhere
     done = w.act(st, idea)  # « je fais sauter le couvercle avec la pointe de l'ouvre-boîte, comme un pirate »
     assert done["outcome"] == "done" and w.prop(st, "conserve", "state") == "ouverte" and "SES mots" in done["note"]
+    assert "text" not in done and st.improvised == ["ouvrir_conserve"]  # his idea is the story, not the author's
 
 
 def test_a_persona_reaches_the_narrator():

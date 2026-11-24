@@ -284,6 +284,10 @@ KEYS = {
     "step": "étape",
     "goal": "but",
     "with": "avec",
+    "progress": "progression",
+    "solved": "résolues",
+    "of": "sur",
+    "act": "acte",
 }
 
 
@@ -305,6 +309,9 @@ MESSAGES: dict[str, str] = {
     "{thing} ({n} uses left)": "{thing} (encore {n} fois)",
     "It's too dark to see that: you'd need some light.": "Il fait trop noir pour voir ça : il te faudrait de la lumière.",
     "It's dark here.": "Il fait tout noir ici.",
+    "beginning": "début",
+    "middle": "milieu",
+    "finale": "finale",
     # what is around
     "{thing} (in your bag)": "{thing} (dans ton sac)",
     "{who} holds {thing}": "{who} tient {thing}",

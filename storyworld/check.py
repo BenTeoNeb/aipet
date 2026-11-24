@@ -397,7 +397,7 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
             warn(
                 "chart.corridor",
                 f"the {len(chart['puzzles'])} puzzles of the shortest win form one corridor (each "
-                "needs the one before): give the child two puzzles to work on at once somewhere (Gilbert)",
+                "needs the one before): give the child two puzzles to work on at once somewhere",
             )
         steps = useful_steps(w, report["path"])
         report["shortest"] = len(steps)  # the things picked up on the way that serve nothing don't count
@@ -424,7 +424,35 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
         warn("action.dead", f"action {a} can never happen")
     for text in _prose(w):
         warn("text.lies", text)
+    for who, said in _persona_clues(w):
+        warn("persona.clue", f"the persona of {who} says {said}: the narrator plays it at every turn, a clue "
+             "the puzzles don't give (keep the voice, the manners, the mood)")  # fmt: skip
     return report
+
+
+def _persona_clues(w: World) -> list[tuple[str, str]]:
+    """A persona that tells an answer or names a thing a puzzle needs which the character's own lines
+    never name: the narrator would give it away while improvising."""
+    stems = w.lang.stems
+    answers = {a: stems(a) for r in w.riddles for a in w.thing(r)["answer"].get("accept", []) if isinstance(a, str)}
+    needs = {x for z in w.g.get("puzzles", []) if isinstance(z, dict) for x in z.get("needs") or [] if x in w.items}
+    public = stems(" ".join(str(w.g.get(k) or "") for k in ("title", "intro", "goal")))
+    out = []
+    for c, ch in w.chars.items():
+        persona = ch.get("persona")
+        if not isinstance(persona, str) or not persona:
+            continue
+        words = stems(persona)
+        lines = {k: v for k, v in ch.items() if k not in ("persona", "answer")}  # what they say, not the answer
+        own = stems(" ".join(_texts({**lines, "question": (ch.get("answer") or {}).get("question", "")})))
+        said = [f"« {a} »" for a, s in answers.items() if s and s <= words and not s <= own]
+        for x in sorted(needs - {c}):  # not the story's own subject (the title, the intro, the goal)
+            labels = [s for label in w.names.labels(x) if (s := stems(label))]
+            if any(s <= words for s in labels) and not any(s <= own or s <= public for s in labels):
+                said.append(w.name(x))
+        if said:
+            out.append((c, ", ".join(said)))
+    return out
 
 
 def _prose(w: World) -> list[str]:
