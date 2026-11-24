@@ -32,7 +32,7 @@ ABSENT_NOTE = (
     "“decor” gives ideas, you can imagine others."
 )
 DESTROY_NOTE = (
-    "It's done, for good: tell it. If it stops the mission from being finished, the child will find out later "
+    "It's done, for good: tell it. If it stops the mission from being finished, the player will find out later "
     "(don't say so now)."
 )
 

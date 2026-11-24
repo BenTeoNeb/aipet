@@ -1,4 +1,4 @@
-"""Going and « where is… »: the ways out named by the child (a destination, a label, a direction, or
+"""Going and « where is… »: the ways out named by the player (a destination, a label, a direction, or
 someone over there), going through them (a closed door opens on the way when it can), and where a
 thing or a place is, from what the hero knows."""
 

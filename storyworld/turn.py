@@ -127,11 +127,11 @@ class Turn:
         return None
 
     def improvise(self, st: State, intent: dict) -> dict:
-        """A creative idea of the child (« je fais un lasso avec la ficelle »), played as a step of the
+        """A creative idea of the player (« je fais un lasso avec la ficelle »), played as a step of the
         game master's screen it achieves: only a step ready now, by one of its triggers whose things
-        the idea names (all of them, but what the hero already holds: the child did the work, the
+        the idea names (all of them, but what the hero already holds: the player did the work, the
         narrator chose the words). The solver's step is the same, so the adventure stays as proven.
-        The author's text is not told: the child's idea is the story. A refused idea counts as a try
+        The author's text is not told: the player's idea is the story. A refused idea counts as a try
         that led nowhere (probing every step is no way through)."""
         w = self.w
         step = intent.get("step", "")
@@ -153,9 +153,9 @@ class Turn:
         return {**res, "note": w.lang.improvise_note}
 
     def screen(self, st: State, res: dict, intent: dict) -> None:
-        """The game master's screen, when the child's idea comes close (Riedl's narrative mediation):
+        """The game master's screen, when the player's idea comes close (Riedl's narrative mediation):
         a try that didn't work, or a free moment, about the things of a step ready here. Never all
-        the steps at every turn: only the ones the child is reaching for."""
+        the steps at every turn: only the ones the player is reaching for."""
         if (
             res.get("outcome") not in (*FAILED, "free")
             or self.w.lang.canonical_verb(intent.get("verb", "")) == "improvise"
@@ -248,7 +248,7 @@ class Turn:
     # ------------------------------------------------------------ bookkeeping
     def count_progress(self, st: State, res: dict, before: tuple, intent: dict | None = None) -> None:
         """Progress resets the hints; a try that didn't work (not a chat, a look or imagination) counts,
-        and what it was about is kept: the hint goes to the puzzle the child is on."""
+        and what it was about is kept: the hint goes to the puzzle the player is on."""
         if self.progress_mark(st) != before:
             st.stalled, st.hint_level, st.reminded, st.tried = 0, 0, False, []
         elif res.get("outcome") in FAILED:
@@ -261,7 +261,7 @@ class Turn:
     def think_twice(self, st: State, intent: dict) -> dict | None:
         """Before a destroy that would make the mission impossible: once, the story makes the hero
         think twice (a character reacts, the thing seems precious), never a « game over » warning;
-        if the child does it again, it happens (Nelson: an irrevocable act needs due warning)."""
+        if the player does it again, it happens (Nelson: an irrevocable act needs due warning)."""
         w = self.w
         trial = st.copy()
         res = self.play(trial, "destroy", intent)
@@ -294,7 +294,7 @@ class Turn:
 
     def doom(self, st: State, lost: str, before: dict) -> None:
         """After a thing is destroyed: can a win still be reached? If not, the adventure will end
-        when the child runs into it (Sierra's « dead man walking », but told then, not later)."""
+        when the player runs into it (Sierra's « dead man walking », but told then, not later)."""
         w = self.w
         found = solve(w, st, first_path=True)  # rare (after a destroy): the full search, not the hints' quick one
         if w.atlas:
@@ -306,7 +306,7 @@ class Turn:
                                        thing=name)}  # fmt: skip
 
     def end_if_doomed(self, st: State, verb: str, res: dict) -> None:
-        """A doomed game ends when the child runs into it; otherwise a failed try tells how many
+        """A doomed game ends when the player runs into it; otherwise a failed try tells how many
         are left before a hint."""
         failed = res.get("outcome") in FAILED
         runs_into_it = failed or res.get("outcome") == "absent" or verb == "help"

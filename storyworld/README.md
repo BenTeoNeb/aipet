@@ -7,7 +7,7 @@ intent the narrator understood, and proves, before anyone plays, that the advent
 It stands on the interactive-fiction standards ([Inform 7][wi]'s world model and
 [kinds of action][wi-7-15], [TADS 3's remapping][tads-remap], [TextWorld][textworld]'s typed,
 STRIPS-like rules, Ron Gilbert's [puzzle dependency charts][gilbert-charts], [storylets][storylets]),
-cut down to what a spoken adventure for children needs. The sources are listed under
+cut down to what a spoken adventure needs. The sources are listed under
 [References](#references).
 
 ## In short
@@ -25,6 +25,8 @@ outcome = world.act(state, {"verb": "give", "object": "algue", "target": "pinces
 # {"outcome": "done", "text": "Pinces croque l'algue…", "changes": [...], "you_are": "Les rochers"}
 ```
 
+- **How it works** — `HOW_IT_WORKS.md`: the roles (narrator, intent reader, engine), the lexicon,
+  the turn pipeline stage by stage, the outcomes, how the player is helped, with diagrams.
 - **The format** — `SPEC.md`, with its JSON Schema in `schema/adventure.schema.json` (draft
   2020-12). Version 2 (`"format": 2`); older graphs are migrated on load (`migrate`).
 - **The turn** — `World.act(state, intent)`: an intent is a canonical verb and ids (the narrator
@@ -36,7 +38,7 @@ outcome = world.act(state, {"verb": "give", "object": "algue", "target": "pinces
   (see [Guarantees](#guarantees-and-tests) for what that covers), and the turn does what the solver
   counts on, on every move it explores (`disagreements`). A `profile` adds an
   application's policy (sizes, steps, puzzles: `profiles.py` has the pet's).
-- **Languages** — `locale/`: the words children say for each verb, how names are normalized, the
+- **Languages** — `locale/`: the words players say for each verb, how names are normalized, the
   messages and the narrator's notes, the outcome keys a narrator reads. French first.
 
 ## Modules
@@ -57,7 +59,7 @@ outcome = world.act(state, {"verb": "give", "object": "algue", "target": "pinces
 | `check.py` | `validate`, `Diagnostic`, the format's lints |
 | `atlas.py` | every reachable state and how far a win is, built once: for now in the shadow of the searches |
 | `chart.py` | the puzzle dependency chart derived from a way to win (depth, width) |
-| `hints.py` | hints from the solver's next useful step, or the puzzle the child is trying |
+| `hints.py` | hints from the solver's next useful step, or the puzzle the player is trying |
 | `schema/` | the JSON Schema |
 | `locale/` | languages (`fr.py`), `localize` |
 | `profiles.py` | the pet's difficulty profiles (an application's policy, not the format) |
@@ -68,7 +70,7 @@ What `validate` proves, by exploring every reachable state (up to 60,000):
 
 - a win can be reached, every ending can be reached, and from every state the solver reaches
   (without `destroy`), a win is still reachable: the hero can't get stuck as written;
-- fair play: a win counts only along steps a child can do knowing what they met (a code pressed, a
+- fair play: a win counts only along steps a player can do knowing what they met (a code pressed, a
   riddle answered once its `puzzles[].clue_in` has been met); states a lucky guess reaches are
   explored too, and each must still have such a way to win;
 - every move the solver counts on is what the turn does (`disagreements`).
@@ -122,7 +124,7 @@ What the library builds on, and what it takes from each.
 
 - Ron Gilbert, [Puzzle Dependency Charts][gilbert-charts] (2014). The `puzzles` list: each puzzle
   with what it needs, written backwards from the end. Two extensions are ours, not Gilbert's: where
-  a puzzle's clue is (`clue_in`, a dependency on what the child knows, which the solver checks), and
+  a puzzle's clue is (`clue_in`, a dependency on what the player knows, which the solver checks), and
   the chart derived from a way to win (`chart.py`), whose width of one we warn about as a corridor.
 - Emily Short, [Storylets: You Want Them][storylets] (2019). Content with prerequisites: the texts
   gated by conditions (`details`, `says`, `initial`). An action (conditions, a text, effects) is the
@@ -138,7 +140,7 @@ What the library builds on, and what it takes from each.
 - Inform 7's [after rules][wi-7-4] (§7.4): what the world does once a built-in action has happened,
   the model of `after` reactions (SPEC 7.15).
 - Infocom's [InvisiClues][invisiclues]. Hints that say more each time: the three hint levels and an
-  action's `hint`; a hint about the puzzle the child is trying, not the next one on the designer's
+  action's `hint`; a hint about the puzzle the player is trying, not the next one on the designer's
   path.
 
 **The narrator as game master**
@@ -147,7 +149,7 @@ What the library builds on, and what it takes from each.
   a Multi-agent Storytelling Environment][riedl] (AAMAS 2003). Narrative mediation: the system
   watches what the player does against the story's plan and accommodates it. Here the plan is the
   solver's steps; `improvise` accommodates a creative idea as one of them, and the game master's
-  screen is shown only when the child's try comes close to one.
+  screen is shown only when the player's try comes close to one.
 - Michael Mateas and Andrew Stern, [Façade: An Experiment in Building a Fully-Realized Interactive
   Drama][facade] (GDC 2003). A drama manager keeps the plot while characters improvise around the
   player: the split between the engine (the plot, what is true) and the narrator (the voices).
@@ -181,7 +183,7 @@ What the library builds on, and what it takes from each.
 
 ## Status
 
-Extracted from an application (a voice pet for children) and still living in its repository: the app
+Extracted from an application (a voice pet) and still living in its repository: the app
 uses it through `aipet/games/adventure_engine.py`. Before publishing on its own: its own
 `pyproject.toml`, a licence for the library and the format (the repository is AGPL-3.0-only), a
 second language to prove the locale abstraction, and an immutable state for the solver.

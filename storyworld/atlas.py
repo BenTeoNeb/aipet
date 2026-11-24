@@ -2,7 +2,7 @@
 
 Built once per adventure, then a turn's question « can he still win from here? » is a lookup
 instead of a search. It explores every move, in every order (no take-first reduction), lucky guesses
-included, and counts a win only along the steps a child can do knowing what they met (the solver's
+included, and counts a win only along the steps a player can do knowing what they met (the solver's
 fair play, `storyworld.solver.solve`).
 
 A state off the atlas (after a destroy: the solver never destroys) is not known: `distance` says

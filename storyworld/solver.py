@@ -23,7 +23,7 @@ MAX_STATES = 60_000  # a bigger adventure is refused (« too big to check »)
 def _moves(w: World, st: State, reduce: bool, fair: bool = True):
     """Every useful thing the hero can do from `st`: (step, next state), with the clues met there.
     With `reduce`, an object that can safely be taken is taken first, without exploring the other
-    orders. `fair`: a code or a riddle is played only once its clue is known (a child doesn't know
+    orders. `fair`: a code or a riddle is played only once its clue is known (a player doesn't know
     the answer before meeting it)."""
     for step, n in _all_moves(w, st, reduce, fair):
         w.react(st, n)
@@ -88,7 +88,7 @@ def _all_moves(w: World, st: State, reduce: bool, fair: bool):
             continue
         tried.add(a["id"])
         n = st.copy()
-        # The trigger a child would say (`intent_for`), and what the turn takes then: another trigger
+        # The trigger a player would say (`intent_for`), and what the turn takes then: another trigger
         # that takes more is that take, then this.
         w.builtins.take_for(n, _trigger_for(w, a["id"], st))
         w.apply(n, a.get("effects", []))
@@ -104,7 +104,7 @@ def _key(st: State, w: World) -> tuple:
 
 
 def _fair(w: World, st: State, step: tuple) -> bool:
-    """Could a child do this step knowing only what they met (a code or an answer needs its clue)?"""
+    """Could a player do this step knowing only what they met (a code or an answer needs its clue)?"""
     kind, ident = step
     if kind == "press":
         return w.knows(st, w.buttons.get(ident, ident))
@@ -117,7 +117,7 @@ def solve(w: World, start: State | None = None, first_path: bool = False, max_st
     states: count, complete: False if the exploration was cut}.
 
     Fair play: every state is explored, even those a lucky guess reaches (a code pressed before its
-    clue is met); a win counts only along steps a child can do knowing what they met. A state a guess
+    clue is met); a win counts only along steps a player can do knowing what they met. A state a guess
     reaches from which no fair way wins is stuck.
 
     Taking an object first, without trying the other orders, is only exact when it can never be
@@ -165,7 +165,7 @@ def solve(w: World, start: State | None = None, first_path: bool = False, max_st
             out["path"] = _path(parent, found)
             out["shortest"] = len(out["path"])
         return out
-    # The ways to win a child can follow: breadth first over the fair steps.
+    # The ways to win a player can follow: breadth first over the fair steps.
     fair_parent: dict[tuple, tuple[tuple | None, tuple | None]] = {k0: (None, None)}
     todo = deque([k0])
     wins: dict[str, int] = {}
@@ -257,7 +257,7 @@ def disagreements(w: World, max_states: int = MAX_STATES, reduce: bool = True) -
 
 
 def replay(w: World, path: list[tuple]) -> str:
-    """Play a solver's path through `World.act`, as a child would say it: "" when every step does
+    """Play a solver's path through `World.act`, as a player would say it: "" when every step does
     what the solver did, else the first step that doesn't (the solver and the turn must agree)."""
     st = w.start()
     for n, (kind, ident) in enumerate(path, 1):

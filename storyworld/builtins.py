@@ -71,7 +71,7 @@ class Builtins:
         return out
 
     def free(self, *about: str | None) -> dict:
-        """The child's own play: the narrator invents it, the world doesn't change."""
+        """The player's own play: the narrator invents it, the world doesn't change."""
         return {"outcome": "free", "about": [a for a in about if a], "note": self.w.lang.free_note}
 
     # ------------------------------------------------------------ opening, taking, destroying
@@ -277,7 +277,7 @@ class Builtins:
         return [r for r in w.riddles if r in here and not w.prop(st, r, "answered")]
 
     def right_answer(self, who: str, said: str) -> bool:
-        """Is what the child said one of the accepted answers (« un peigne », « c'est le peigne ! »)?"""
+        """Is what the player said one of the accepted answers (« un peigne », « c'est le peigne ! »)?"""
         words = self.w.lang.stems(said)
         return any(
             self.w.lang.stems(a) and self.w.lang.stems(a) <= words
@@ -295,7 +295,7 @@ class Builtins:
         return {"outcome": "done", "text": ans.get("right") or w.say("Well done, that's it!"), "changes": changes}
 
     def answer(self, st: State, said: str, to: str) -> dict:
-        """The child's answer to a riddle or a password, in their words."""
+        """The player's answer to a riddle or a password, in their words."""
         w = self.w
         here = self.riddles_here(st)
         who = w.names.resolve(to, here)[0] if to else (here[0] if len(here) == 1 else None)

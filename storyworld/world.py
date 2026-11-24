@@ -93,7 +93,7 @@ class World:
         self.idempotent_ids = {a["id"] for a in self.actions if self.idempotent(a)}
         self.eager_ok = self._eager_ok(rules)
         self.lights = [i for i, it in self.items.items() if it.get("light")]
-        # What a child must have met to know a code or a riddle's answer (our extension of Gilbert's
+        # What a player must have met to know a code or a riddle's answer (our extension of Gilbert's
         # charts): the clue of its puzzle. A win counts only once it is known (`solver._fair`).
         chart: dict[str, str] = {str(z.get("action")): z["clue_in"] for z in graph.get("puzzles", [])
                                  if isinstance(z, dict) and isinstance(z.get("clue_in"), str)}  # fmt: skip

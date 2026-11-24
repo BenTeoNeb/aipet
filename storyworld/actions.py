@@ -3,7 +3,7 @@
 Matching an intent to a scripted action ranks every rule (one per trigger) on two scales, then
 chooses among the ranked ones.
 
-Verb tier (the child's canonical verb against the trigger's):
+Verb tier (the player's canonical verb against the trigger's):
 
     ======  =====  ==============================================================================
     tier    name   when
@@ -17,7 +17,7 @@ Verb tier (the child's canonical verb against the trigger's):
     0       NONE   not this action
     ======  =====  ==============================================================================
 
-Things rank (what the child named against the trigger's object and target):
+Things rank (what the player named against the trigger's object and target):
 
     ======  =========  ===========================================================================
     rank    name       when
@@ -168,7 +168,7 @@ class Actions:
             x in st.inventory for x in wanted - said)  # fmt: skip
 
     def remap_allowed(self, a: dict, verb: str, obj: str | None, st: State) -> bool:
-        """May the child's verb do this action because the things match? Never for a loss, a blow or
+        """May the player's verb do this action because the things match? Never for a loss, a blow or
         a look; and taking a thing that can be taken is taking it."""
         if verb in NO_REMAP or a.get("verb") in NO_REMAP or self.risky(a):
             return False
@@ -204,7 +204,7 @@ class Actions:
         ranked = self.ranked(st, verb, obj, tgt)
         if not ranked:
             return None
-        # The child's verb first (its tier), then: what can run now, the closest things, real steps
+        # The player's verb first (its tier), then: what can run now, the closest things, real steps
         # before clues — a clue on the same things must not hide the real action.
         steps = [m for m in ranked if self.again(m.rule, st) and not self.red_herring(m.rule)]
         tier = max(m.verb for m in (steps or ranked))  # a done action or a clue never hides a real step
@@ -223,7 +223,7 @@ class Actions:
         best = max(m.things for m in ready)
         top = list({m.rule["id"]: m.rule for m in ready if m.things == best}.values())  # one per action
         risky = [a for a in top if self.risky(a) and a["id"] not in st.warned]
-        if risky:  # the first time: a warning, the child may still do it (losing stays possible)
+        if risky:  # the first time: a warning, the player may still do it (losing stays possible)
             st.warned.append(risky[0]["id"])
             return {"outcome": "warning", "text": risky[0].get("warning") or w.lang.warning}
         if best == THINGS_PARTIAL and len({a.get("target") or a.get("object") for a in top}) > 1:

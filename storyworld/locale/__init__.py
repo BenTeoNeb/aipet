@@ -72,7 +72,7 @@ class Language:
     think_twice_note: str = ""
     improvise_note: str = ""
     improvise_no_note: str = ""
-    # Words: how the child's words are compared with names (no article, no accent), the words that
+    # Words: how the player's words are compared with names (no article, no accent), the words that
     # name a thing (« des poissons » shows « un poisson »), the words that name a way, a verb's
     # canonical form, the hero's bag, the words for « just leave », what says « locked » in a text.
     norm: Callable[[str], str] = _plain

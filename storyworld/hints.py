@@ -146,7 +146,7 @@ class Hints:
         return self.cache[k]
 
     def towards_tries(self, st: State) -> list[tuple]:
-        """The useful steps towards the puzzle the child is trying (what their last tries were about):
+        """The useful steps towards the puzzle the player is trying (what their last tries were about):
         the shortest way to a step on those things, if it brings a win closer (InvisiClues answer the
         question the player has, not the next one on the designer's path)."""
         from storyworld.solver import _key, _moves
@@ -172,7 +172,7 @@ class Hints:
                 for step, n in _moves(w, s, reduce=True):
                     if not about(step):
                         pass
-                    elif (budget := budget - 1) < 0:  # a hint is searched while the child waits
+                    elif (budget := budget - 1) < 0:  # a hint is searched while the player waits
                         return []
                     # the try brings a win closer (not a side step that spends what a win needs:
                     # the second key traded for a sweet)

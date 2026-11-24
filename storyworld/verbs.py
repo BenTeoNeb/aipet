@@ -48,7 +48,7 @@ NEVER_SCRIPTED = {
     "where",
     "improvise",
 }  # built in: scripts can't use them
-# The verb carries little once two things are named (a child over speech recognition: « j'attrape les
+# The verb carries little once two things are named (a player over speech recognition: « j'attrape les
 # lucioles avec le bocal » is « remplir le bocal de lucioles »): such an action is found by its things,
 # whatever the verb, except for these, which mean something else (looking, talking, a cuddle, a blow,
 # leaving, playing).

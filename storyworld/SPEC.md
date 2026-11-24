@@ -510,7 +510,7 @@ adventure too big to explore is rejected) and proves that:
 - at least one win ending is reachable, and every ending (win or lose) is reachable;
 - the hero can never get stuck: from every reachable state that has not ended, a win is still
   reachable (losing is allowed; a lose ending is an end, not a trap);
-- **fair play**: a win counts only along steps a child can do knowing what they met: a code
+- **fair play**: a win counts only along steps a player can do knowing what they met: a code
   pressed and a riddle answered once its `clue_in` has been met (a place seen lit, a thing or
   someone in reach). The states a lucky guess reaches are explored too, and each must still have
   such a way to win (a guess that sends the hero past the clue is a stuck state). This dependency on
@@ -542,12 +542,12 @@ engine gives it for that, and how it stays within the proof:
   act (beginning, middle, finale): for the pacing, never what is left to do.
 - `gm_screen`, the game master's screen: the steps the hero is ready for here and what each achieves
   (the puzzle's `goal`, else the action's hint). Never at every turn: it comes with a try that didn't
-  work or a free moment about the things of a ready step, when the child is reaching for it (Riedl's
+  work or a free moment about the things of a ready step, when the player is reaching for it (Riedl's
   narrative mediation). Never told to the player.
 - `improvise` (verb), with `step`: a creative idea of the player that achieves one of those steps
   ("je fais un lasso avec la ficelle") is played as that step, by one of its triggers, only if it is
   ready now and the idea names every thing of that trigger the hero doesn't already hold. The world
-  changes exactly as the solver's step does; the author's text is not told (the child's idea is the
+  changes exactly as the solver's step does; the author's text is not told (the player's idea is the
   story). A refused idea counts as a try that led nowhere. The steps improvised are kept
   (`improvised`).
 - A destroy that would leave no win is felt in the story first (7.9); the player decides.

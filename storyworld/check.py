@@ -397,7 +397,7 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
             warn(
                 "chart.corridor",
                 f"the {len(chart['puzzles'])} puzzles of the shortest win form one corridor (each "
-                "needs the one before): give the child two puzzles to work on at once somewhere",
+                "needs the one before): give the player two puzzles to work on at once somewhere",
             )
         steps = useful_steps(w, report["path"])
         report["shortest"] = len(steps)  # the things picked up on the way that serve nothing don't count

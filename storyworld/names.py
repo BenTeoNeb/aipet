@@ -2,7 +2,7 @@
 
 The narrator sends ids (`World.in_reach`); a name, an alias or a state's name works too, the articles
 aside and singular or plural alike. Several things sharing that name is an ambiguity to ask about,
-never a choice made for the child.
+never a choice made for the player.
 """
 
 from __future__ import annotations

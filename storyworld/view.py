@@ -82,7 +82,7 @@ class View:
     def gm_screen(self, st: State, about: set[str] | None = None) -> list[dict]:
         """The game master's screen: the steps the hero is ready for here (their conditions hold, their
         things are in reach), each with what it achieves; with `about`, only the steps on those things
-        (what the child is reaching for). The narrator never tells them; a creative idea of the child
+        (what the player is reaching for). The narrator never tells them; a creative idea of the player
         that achieves one of them may be played as that step (`improvise`)."""
         w = self.w
         goals = {z.get("action"): z.get("goal", "") for z in w.g.get("puzzles", []) if isinstance(z, dict)}
@@ -225,7 +225,7 @@ class View:
 
     # ------------------------------------------------------------ what is true, what can be done
     def truth(self, st: State, ident: str) -> str:
-        """What is true about a thing the child acts on in their own way (a locked door, a code, a
+        """What is true about a thing the player acts on in their own way (a locked door, a code, a
         riddle, someone holding it): the narrator invents the scene, and says this."""
         w = self.w
         item = w.items.get(ident, {})
@@ -248,7 +248,7 @@ class View:
         return ""
 
     def options(self, st: State) -> dict:
-        """What can be done here, to remind a child who goes round in circles: the ways, the things,
+        """What can be done here, to remind a player who goes round in circles: the ways, the things,
         the characters, the bag, and a few things to try (never which one wins)."""
         w = self.w
         here = self.describe(st)

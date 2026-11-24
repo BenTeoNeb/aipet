@@ -1,4 +1,4 @@
-"""French: the words children say for each verb, how names are normalized, and the notes the engine
+"""French: the words players say for each verb, how names are normalized, and the notes the engine
 joins to its answers for a French-speaking narrator. Another language provides the same names."""
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ def normalize_text(s: str) -> str:
 
 # ---- verbs --------------------------------------------------------------------------------------
 # Canonical verbs (what the narrator sends and the generator writes) and the French words for them:
-# a safety net, the narrator already maps the child's words.
+# a safety net, the narrator already maps the player's words.
 VERBS: dict[str, list[str]] = {
     "go": [
         "va",
@@ -88,7 +88,7 @@ VERBS: dict[str, list[str]] = {
     "read": ["lire", "lis", "dechiffrer"],
     "hit": ["tape", "frapper", "taper", "attaquer", "combattre", "assommer"],
     # Making a thing gone for good (« effacer le dessin », « jeter la clé à la mer »): allowed when it is
-    # plausible; if the adventure can't be won any more, it ends when the child runs into it.
+    # plausible; if the adventure can't be won any more, it ends when the player runs into it.
     "destroy": [
         "effacer",
         "efface",
@@ -116,7 +116,7 @@ VERBS: dict[str, list[str]] = {
     "other": [],
 }
 
-# What the engine cannot know is left to the narrator (a language model): it understands the child.
+# What the engine cannot know is left to the narrator (a language model): it understands the player.
 WARNING = "Attention, ça risque de très mal finir pour ta mission… Tu es sûr de vouloir le faire ?"
 TRUTH_NOTE = (
     "« à_savoir » est vrai dans l'aventure : glisse-le dans ton récit, avec tes mots (« On dirait bien qu'elle "
@@ -135,7 +135,7 @@ ABSENT_NOTE = (
     "ce qu'il veut dire. Le « décor » du lieu donne des idées, tu peux en imaginer d'autres."
 )
 DESTROY_NOTE = (
-    "C'est fait, pour de bon : raconte-le. Si ça empêche de finir la mission, l'enfant s'en rendra compte plus tard "
+    "C'est fait, pour de bon : raconte-le. Si ça empêche de finir la mission, le joueur s'en rendra compte plus tard "
     "(ne le dis pas maintenant)."
 )
 THINK_TWICE_NOTE = (
@@ -291,7 +291,7 @@ KEYS = {
 }
 
 
-# The engine's messages: its English source text (the message id) → the French said to the child or
+# The engine's messages: its English source text (the message id) → the French said to the player or
 # the narrator. Same named placeholders; `{of_place}` is already « du phare », `{Name}` capitalized.
 MESSAGES: dict[str, str] = {
     # what changed (effects)
@@ -321,7 +321,7 @@ MESSAGES: dict[str, str] = {
     "{about}: {note}": "{about} : {note}",
     "nothing": "rien",
     "closed": "fermé",
-    # questions back to the child
+    # questions back to the player
     "with what / on what?": "avec quoi / sur quoi ?",
     "which one?": "lequel ?",
     "on what / to whom?": "sur quoi / à qui ?",
