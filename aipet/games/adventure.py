@@ -881,6 +881,8 @@ class AdventureGame(Activity):
         results: list[dict] = []
         skipped: list[dict] = []
         for n, intent in enumerate(intents):
+            if named := self._naming(intent):
+                self._ev("adventure_naming", verb=intent.get("verb", ""), named=named)
             before = st.to_dict()
             res = w.act(st, intent)
             results.append(res)
@@ -908,6 +910,25 @@ class AdventureGame(Activity):
         self._save()
         self._refresh()
         self._ev("adventure_act", said=said[:120], outcomes=[r.get("outcome") for r in results])
+        return out
+
+    def _naming(self, intent: dict) -> list[dict]:
+        """How the narrator named things, when not by an id in reach (to measure how often the
+        engine has to read words): « elsewhere » (an id, not in reach), « words » (names a thing of
+        the adventure), « unknown » (names nothing: imagination, or a miss). An answer is words."""
+        assert self.world and self.state
+        w, st = self.world, self.state
+        if intent.get("verb") == "answer":
+            return []
+        reach = set(w.in_reach(st))
+        out = []
+        for field in ("object", "target"):
+            said = intent.get(field)
+            if not isinstance(said, str) or not said or said in reach:
+                continue
+            everything = w.everything()
+            kind = "elsewhere" if said in everything else "words" if any(w.resolve(said, everything)) else "unknown"
+            out.append({"field": field, "said": said[:60], "kind": kind})
         return out
 
     def _remember_play(self, intents: list[dict], results: list[dict], said: str):

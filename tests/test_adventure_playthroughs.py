@@ -163,3 +163,16 @@ def test_every_object_shown_or_out_of_reach_is_never_absent(graph):
             else:
                 a = next(x for x in w.rules if x["id"] == ident)
                 w.act(st, A(a["verb"], w.name(a.get("object", "")), w.name(a["target"]) if a.get("target") else ""))
+
+
+def test_how_the_narrator_names_things_is_logged(tmp_path, monkeypatch):
+    """Words instead of ids are measured (the engine reads words only when it must)."""
+    game = play(tmp_path, monkeypatch, "Le bonhomme de neige de Plumette", [])
+    events: list[tuple] = []
+    monkeypatch.setattr(game, "_ev", lambda type_, **kw: events.append((type_, kw)))
+    game.act([A("talk", "plumette")], said="Bonjour !")
+    game.act([A("talk", "Plumette"), A("use", "mon doigt", "le bonhomme")], said="Bonjour, je fais le nez")
+    named = [kw["named"] for t, kw in events if t == "adventure_naming"]
+    assert named == [[{"field": "object", "said": "Plumette", "kind": "words"}],
+                     [{"field": "object", "said": "mon doigt", "kind": "unknown"},
+                      {"field": "target", "said": "le bonhomme", "kind": "words"}]]  # fmt: skip
