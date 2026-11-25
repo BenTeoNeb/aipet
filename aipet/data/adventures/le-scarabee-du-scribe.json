@@ -74,7 +74,10 @@
      "label": "l'escalier vers l'atelier",
      "dir": "bas"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Rrrr… rrrr… Un gros ronronnement : quelqu'un fait la sieste au soleil !"
+   }
   },
   {
    "id": "marche",
@@ -100,7 +103,11 @@
      "label": "vers le temple",
      "dir": "nord"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Hi-han, fait un âne ! Et les marchands crient : « Des dattes ! Des oignons tout frais ! »",
+    "smell": "Les épices, les dattes… et les poissons de Tante Hénout. Pouah !"
+   }
   },
   {
    "id": "temple",
@@ -121,7 +128,11 @@
      "label": "vers le marché",
      "dir": "sud"
     }
-   ]
+   ],
+   "senses": {
+    "smell": "L'encens sent bon le miel et les fleurs.",
+    "listen": "Des chants tout doux, et des clochettes : ding, ding."
+   }
   },
   {
    "id": "nil",
@@ -145,7 +156,11 @@
      "label": "vers l'atelier des scribes",
      "dir": "est"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Les grands papyrus chuchotent, chhh… et les grenouilles font coâ, coâ.",
+    "smell": "Ça sent la boue et l'eau du fleuve."
+   }
   }
  ],
  "items": [
@@ -286,6 +301,7 @@
    ],
    "at": "atelier",
    "description": "Un petit garçon au crâne rasé, avec une mèche sur le côté et les doigts pleins d'encre.",
+   "persona": "Parle en reniflant « snif, snif », avec des « bouhouhou ! » quand il pense à son scarabée. Gentil et appliqué, il adore écrire des hiéroglyphes et a peur de décevoir la princesse. Il voit le héros comme son sauveur et retrouve son grand sourire au moindre espoir.",
    "initial": "Kha renifle dans un coin.",
    "says": [
     {
@@ -311,6 +327,7 @@
    ],
    "at": "terrasse",
    "description": "Une chatte toute fine aux grands yeux verts, qui adore le poisson, déteste les chatouilles et bondit sur tout ce qui frétille.",
+   "persona": "Parle en « mrrrou… » et en ronrons, en ouvrant un œil paresseux et en reniflant l'air. Capricieuse et câline à la fois, elle adore le poisson, déteste les chatouilles et bondit sur tout ce qui frétille. Elle ignore d'abord le héros, boude si on la vexe, et devient une amie fidèle quand on la gâte.",
    "states": [
     {
      "id": "sieste",
@@ -343,6 +360,7 @@
    ],
    "at": "marche",
    "description": "Une dame joyeuse avec une grande robe de lin et des colliers de perles.",
+   "persona": "Parle d'une voix chantante de marchande, en faisant tinter ses colliers de perles, avec des « petit scribe » affectueux. Joyeuse mais découragée, elle aime ses poissons et voudrait que les gens s'arrêtent à son étal. Elle est pleine d'espoir avec le héros et le comble de compliments quand il l'aide.",
    "states": [
     {
      "id": "triste",
@@ -366,6 +384,7 @@
    ],
    "at": "temple",
    "description": "Une petite princesse avec une robe blanche, des bracelets d'or et un grand sourire.",
+   "persona": "Parle d'une voix claire et rieuse, en tapant dans ses mains, ses bracelets faisant « cling cling ». Curieuse et espiègle, elle adore les énigmes et les fêtes du Nil. Elle traite le héros avec gentillesse, en petite princesse joueuse qui aime le mettre au défi.",
    "initial": "La petite princesse Méryt attend, avec sa robe blanche et ses bracelets d'or.",
    "says": "Bonjour ! Kha devait m'apporter un scarabée porte-bonheur pour la fête de la crue. Tu l'as vu ? Mais attention : au temple, un porte-bonheur ne se reçoit qu'après une énigme, comme celles du Sphinx des légendes !",
    "states": [
@@ -402,6 +421,7 @@
    ],
    "at": "nil",
    "description": "Un grand oiseau blanc et noir, au long bec courbé. En Égypte, l'ibis est l'oiseau des scribes.",
+   "persona": "Parle d'une voix posée de vieux sage, avec un « croâ ! » pour saluer, en pêchant entre deux phrases. Calme et bienveillant, il aime le Nil et les scribes, et a peur du courant pour les petits. Il conseille le héros avec douceur, comme un vieux maître.",
    "initial": "Sage l'ibis, un grand oiseau au long bec courbé, pêche dans l'eau.",
    "says": "Croâ ! Bonjour ! Ma plume est toute douce, parfaite pour chatouiller. Et ne monte surtout pas dans cette barque sans rame : le courant t'emporterait jusqu'à la mer !"
   }

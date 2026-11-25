@@ -20,13 +20,22 @@ MAX_STATES = 60_000  # a bigger adventure is refused (« too big to check »)
 
 
 # ---- solver -------------------------------------------------------------------------------------
-def _moves(w: World, st: State, reduce: bool):
-    """Every useful thing the hero can do from `st`: (step, next state). With `reduce`, an object
-    that can safely be taken is taken first, without exploring the other orders."""
+def _moves(w: World, st: State, reduce: bool, fair: bool = True):
+    """Every useful thing the hero can do from `st`: (step, next state), with the clues met there.
+    With `reduce`, an object that can safely be taken is taken first, without exploring the other
+    orders. `fair`: a code or a riddle is played only once its clue is known (a player doesn't know
+    the answer before meeting it)."""
+    for step, n in _all_moves(w, st, reduce, fair):
+        w.react(st, n)
+        w.learn(n)
+        yield step, n
+
+
+def _all_moves(w: World, st: State, reduce: bool, fair: bool):
     takeable = [i for i in w.visible_items(st) if w.items[i].get("takeable", True)]
     eager = [i for i in takeable if i in w.eager_ok] if reduce else []
     for i in eager[:1] or takeable:
-        n = State.from_dict(st.to_dict())
+        n = st.copy()
         n.items_at[i] = "inv"
         n.inventory.append(i)
         yield ("take", i), n
@@ -42,7 +51,7 @@ def _moves(w: World, st: State, reduce: bool):
             and w.holds(st, x.get("when"))
             and (not door or w.prop(st, door, "open") or can_open(door))
         ):
-            n = State.from_dict(st.to_dict())
+            n = st.copy()
             if door:
                 w.apply(n, [f"open:{door}"])
             w.enter(n, x["to"])
@@ -50,17 +59,20 @@ def _moves(w: World, st: State, reduce: bool):
     doors = {d for ds in w.doors.values() for d in ds}
     for i in w.visible_items(st):
         if w.items[i].get("openable") and i not in doors and can_open(i):
-            n = State.from_dict(st.to_dict())
+            n = st.copy()
             w.apply(n, [f"open:{i}"])
             yield ("open", i), n
     for b in w.visible_items(st):  # the next button of a code (a wrong one only starts it again)
         box = w.buttons.get(b)
-        if box and not w.prop(st, box, "open") and w.items[box]["code"]["press"][w.prop(st, box, "pressed") or 0] == b:
-            n = State.from_dict(st.to_dict())
+        if (box and not w.prop(st, box, "open") and (not fair or w.knows(st, box))
+                and w.items[box]["code"]["press"][w.prop(st, box, "pressed") or 0] == b):  # fmt: skip
+            n = st.copy()
             w.press(n, b)
             yield ("press", b), n
     for r in w.riddles_here(st):  # the right answer (a wrong one changes nothing)
-        n = State.from_dict(st.to_dict())
+        if fair and not w.knows(st, r):
+            continue
+        n = st.copy()
         w.solve_riddle(n, r)
         yield ("answer", r), n
     scope = set(w.scope(st))
@@ -75,9 +87,10 @@ def _moves(w: World, st: State, reduce: bool):
         if not w.holds(st, a.get("when")) or w.red_herring(a) or w.achieved(a, st):
             continue
         tried.add(a["id"])
-        n = State.from_dict(st.to_dict())
-        t = _trigger_for(w, a["id"], st)  # the words a narrator sends (`intent_for`): the turn takes what they name
-        w.builtins.implicit_take(n, t.get("verb", ""), t.get("object"), t.get("target"))
+        n = st.copy()
+        # The trigger a player would say (`intent_for`), and what the turn takes then: another trigger
+        # that takes more is that take, then this.
+        w.builtins.take_for(n, _trigger_for(w, a["id"], st))
         w.apply(n, a.get("effects", []))
         n.done_actions.append(a["id"])
         yield ("act", a["id"]), n
@@ -87,7 +100,15 @@ def _key(st: State, w: World) -> tuple:
     """Done actions matter only when doing them again would change something (gains, losses); the
     others are skipped once their effects hold (`World.achieved`), whichever variant did it."""
     done = frozenset(a for a in st.done_actions if a not in w.idempotent_ids)
-    return (*st.key(), done, frozenset(st.visited) if w.uses_visited else None)
+    return (*st.key(), done, frozenset(st.visited) if w.uses_visited else None, frozenset(st.known))
+
+
+def _fair(w: World, st: State, step: tuple) -> bool:
+    """Could a player do this step knowing only what they met (a code or an answer needs its clue)?"""
+    kind, ident = step
+    if kind == "press":
+        return w.knows(st, w.buttons.get(ident, ident))
+    return kind != "answer" or w.knows(st, ident)
 
 
 def solve(w: World, start: State | None = None, first_path: bool = False, max_states: int = MAX_STATES) -> dict:
@@ -95,68 +116,93 @@ def solve(w: World, start: State | None = None, first_path: bool = False, max_st
     an example path to a state from which no win is reachable, path: shortest path to a win,
     states: count, complete: False if the exploration was cut}.
 
+    Fair play: every state is explored, even those a lucky guess reaches (a code pressed before its
+    clue is met); a win counts only along steps a player can do knowing what they met. A state a guess
+    reaches from which no fair way wins is stuck.
+
     Taking an object first, without trying the other orders, is only exact when it can never be
     missed later: the object is never forbidden (« !has: ») nor hidden, and the hero can always walk
-    back (`World.eager_ok`). A path search (`first_path`) always takes first: it only needs one way."""
-    s0 = State.from_dict((start or w.start()).to_dict())
+    back (`World.eager_ok`). A path search (`first_path`) always takes first, fairly: it only needs
+    one way."""
+    s0 = (start or w.start()).copy()
     k0 = _key(s0, w)
     parent: dict[tuple, tuple[tuple | None, tuple | None]] = {k0: (None, None)}
     states = {k0: s0}
-    edges: dict[tuple, list[tuple]] = {}
+    edges: dict[tuple, list[tuple[tuple, tuple, bool]]] = {}  # state → (next, step, fair)
     queue = deque([k0])
-    wins: dict[str, int] = {}
     loses: set[str] = set()
-    depth = {k0: 0}
-    best_win: tuple | None = None
-    win_at: dict[str, tuple] = {}
     fired: set[str] = set()
+
+    def won(k: tuple) -> bool:
+        s = states[k]
+        return bool(s.ending) and w.ending(s, s.ending or "").get("kind") == "win"
+
+    found: tuple | None = None
     while queue and len(states) < max_states:
         k = queue.popleft()
         st = states[k]
         if st.ending:
-            e = w.ending(st, st.ending)
-            if e.get("kind") == "win":
-                if st.ending not in wins:
-                    wins[st.ending] = depth[k]
-                    win_at[st.ending] = k
-                if best_win is None:
-                    best_win = k
-                    if first_path:
-                        break
+            if won(k):
+                if first_path:
+                    found = k
+                    break
             else:
                 loses.add(st.ending)
             continue
-        for step, n in _moves(w, st, reduce=True):
+        for step, n in _moves(w, st, reduce=True, fair=first_path):
             if step[0] == "act":
                 fired.add(step[1])
             nk = _key(n, w)
-            edges.setdefault(k, []).append(nk)
+            edges.setdefault(k, []).append((nk, step, first_path or _fair(w, st, step)))
             if nk not in states:
-                states[nk], parent[nk], depth[nk] = n, (k, step), depth[k] + 1
+                states[nk], parent[nk] = n, (k, step)
                 queue.append(nk)
     complete = not queue
-    out: dict = {"wins": wins, "loses": loses, "states": len(states), "complete": complete, "fired": fired}
-    if best_win:
-        out["path"] = _path(parent, best_win)
-        out["shortest"] = len(out["path"])
-        out["win_paths"] = {e: _path(parent, k) for e, k in win_at.items()}
-    if first_path or not complete:
+    out: dict = {"loses": loses, "states": len(states), "complete": complete, "fired": fired}
+    if first_path:
+        out["wins"] = {states[found].ending: len(_path(parent, found))} if found else {}
+        if found:
+            out["path"] = _path(parent, found)
+            out["shortest"] = len(out["path"])
         return out
-    # States from which a win is still reachable (backwards from the wins).
+    # The ways to win a player can follow: breadth first over the fair steps.
+    fair_parent: dict[tuple, tuple[tuple | None, tuple | None]] = {k0: (None, None)}
+    todo = deque([k0])
+    wins: dict[str, int] = {}
+    win_at: dict[str, tuple] = {}
+    while todo:
+        k = todo.popleft()
+        if won(k) and states[k].ending not in wins:
+            win_at[states[k].ending or ""] = k
+            wins[states[k].ending or ""] = len(_path(fair_parent, k))
+        for nk, step, fair in edges.get(k, []):
+            if fair and nk not in fair_parent:
+                fair_parent[nk] = (k, step)
+                todo.append(nk)
+    out["wins"] = wins
+    if win_at:
+        best = min(win_at.values(), key=lambda k: len(_path(fair_parent, k)))
+        out["path"] = _path(fair_parent, best)
+        out["shortest"] = len(out["path"])
+        out["win_paths"] = {e: _path(fair_parent, k) for e, k in win_at.items()}
+    if not complete:
+        return out
+    # States from which a win is still reachable fairly (backwards from the wins, along fair steps).
     reverse: dict[tuple, list[tuple]] = {}
     for a, bs in edges.items():
-        for b in bs:
-            reverse.setdefault(b, []).append(a)
-    good = {k for k, s in states.items() if s.ending and w.ending(s, s.ending).get("kind") == "win"}
-    todo = deque(good)
-    while todo:
-        for a in reverse.get(todo.popleft(), []):
+        for b, _, fair in bs:
+            if fair:
+                reverse.setdefault(b, []).append(a)
+    good = {k for k in states if won(k)}
+    back = deque(good)
+    while back:
+        for a in reverse.get(back.popleft(), []):
             if a not in good:
                 good.add(a)
-                todo.append(a)
+                back.append(a)
     stuck = [k for k, s in states.items() if not s.ending and k not in good]
     if stuck:
-        out["stuck"] = _path(parent, min(stuck, key=lambda k: depth[k]))
+        out["stuck"] = _path(parent, min(stuck, key=lambda k: len(_path(parent, k))))
     return out
 
 
@@ -195,8 +241,8 @@ def disagreements(w: World, max_states: int = MAX_STATES, reduce: bool = True) -
         st = todo.pop()
         if st.ending:
             continue
-        for step, nxt in _moves(w, st, reduce=reduce):
-            trial = State.from_dict(st.to_dict())
+        for step, nxt in _moves(w, st, reduce=reduce, fair=False):  # the states a lucky guess reaches too
+            trial = st.copy()
             trial.warned = [a["id"] for a in w.actions]  # a loss is warned once first: past that
             intent = intent_for(w, trial, step)
             res = w.act(trial, intent)
@@ -211,7 +257,7 @@ def disagreements(w: World, max_states: int = MAX_STATES, reduce: bool = True) -
 
 
 def replay(w: World, path: list[tuple]) -> str:
-    """Play a solver's path through `World.act`, as a child would say it: "" when every step does
+    """Play a solver's path through `World.act`, as a player would say it: "" when every step does
     what the solver did, else the first step that doesn't (the solver and the turn must agree)."""
     st = w.start()
     for n, (kind, ident) in enumerate(path, 1):

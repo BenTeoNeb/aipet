@@ -59,7 +59,10 @@
     "guirlandes",
     "pavés",
     "puits"
-   ]
+   ],
+   "senses": {
+    "listen": "Des rires, des pétards au loin, pan-pan… et dans la gueule du dragon, quelque chose fait ding !"
+   }
   },
   {
    "id": "maison_the",
@@ -83,7 +86,10 @@
     "tables basses",
     "encre",
     "pinceaux"
-   ]
+   ],
+   "senses": {
+    "smell": "Le jasmin, le thé chaud et les petits pains à la vapeur… miam !"
+   }
   },
   {
    "id": "pont",
@@ -176,7 +182,10 @@
     "pousses",
     "papillons",
     "sentier"
-   ]
+   ],
+   "senses": {
+    "listen": "Crrr, crrr, les bambous se frottent dans le vent… et rrron, rrron : quelqu'un ronfle sur un tas de bambous !"
+   }
   },
   {
    "id": "pied",
@@ -243,7 +252,10 @@
     "drapeaux",
     "vent",
     "dalles de pierre"
-   ]
+   ],
+   "senses": {
+    "listen": "Whooo, le vent ! Et entre deux coups de vent : rrrrRRRON… Ah-Fu ronfle comme un dragon."
+   }
   },
   {
    "id": "tour",
@@ -665,6 +677,7 @@
    ],
    "at": "village",
    "description": "Une grand-mère toute ridée et toute souriante, les bras pleins de lampions.",
+   "persona": "Parle doucement, avec un petit rire de grand-mère, et commence ses histoires par « Autrefois… ». Tendre et un peu inquiète, elle adore la fête des lanternes et ne veut surtout pas qu'il arrive malheur au héros. Elle compte sur lui comme sur son petit-enfant préféré et le couvre de compliments.",
    "says": "Ah, te voilà ! La tour lointaine doit recevoir notre message avant le lever de la lune, sinon pas de fête ! Autrefois, les soldats de la Muraille se parlaient de tour en tour : avec de la fumée le jour, du feu la nuit. Maître Wen, à la maison de thé, écrit aussi de très beaux messages… Prends ma lanterne et mon foulard de soie, s'ils peuvent t'aider. Et sur le vieux pont, sois sage : on ne saute pas et on ne nage pas dans la rivière, l'eau est froide et le courant tire fort !",
    "initial": "Grand-mère Mei accroche des lampions rouges."
   },
@@ -679,6 +692,7 @@
    ],
    "at": "maison_the",
    "description": "La patronne de la maison de thé, avec un grand tablier fleuri.",
+   "persona": "Parle vite, d'un ton de patronne affairée, avec le « pschhh » de son eau qui chauffe et des « mon petit » à tout bout de champ. Accueillante mais très attachée à ses affaires, elle adore faire goûter ses petits pains et surveille sa théière comme un trésor. Elle sert le héros avec le sourire, et le gronde gentiment s'il touche à ce qui est à elle.",
    "says": "Bienvenue ! Un petit pain à la vapeur ? C'est une pièce, mon petit. Mais ne touche pas à ma théière : c'est mon thé du soir. Une gorgée, et on dort jusqu'au matin ! Et attention à mon poivre du Sichuan : une pincée sous le nez, et atchoum !",
    "initial": "Madame Hua fait chauffer l'eau sur un petit réchaud, pschhh. « Pas touche à mon thé du soir, prévient-elle : une gorgée, et on dort jusqu'au matin ! »"
   },
@@ -693,6 +707,7 @@
    ],
    "at": "maison_the",
    "description": "Un vieux savant à la longue barbe blanche, un pinceau à la main.",
+   "persona": "Parle lentement, d'une voix douce de savant, en caressant sa longue barbe et en disant « hmm, hmm… » avant de répondre. Calme et patient, il adore les beaux messages et les belles lettres tracées au pinceau. Il traite le héros comme un élève prometteur et s'émerveille de ses idées.",
    "says": [
     {
      "when": [
@@ -722,6 +737,7 @@
    ],
    "at": "atelier",
    "description": "Un garçon aux manches retroussées, couvert de pâte à papier jusqu'aux coudes.",
+   "persona": "Parle avec entrain, tout fier de son métier, et tapote ses manches pleines de pâte, « splotch ». Rieur et taquin, il adore les devinettes et raconter comment on fabrique le papier. Il met le héros au défi comme un copain de jeu, et rit de bon cœur quand il se trompe.",
    "says": "Ici, on fait le papier avec de l'écorce écrasée dans l'eau, puis séchée. C'est en Chine qu'on l'a inventé ! Avec mon papier, on fabrique aussi les lanternes de la fête, et ce soir, on écrit des devinettes dessus ! Tu veux une feuille bien sèche ? Devine d'abord la devinette de ma lanterne.",
    "initial": "Petit Lu, l'apprenti, écrase de l'écorce dans le grand bac de pâte. Au-dessus de lui pend une lanterne de papier, avec une devinette écrite dessus.",
    "states": [
@@ -759,6 +775,7 @@
    ],
    "at": "bambous",
    "description": "Un grand chameau à deux bosses, tout poilu, échappé d'une caravane de la route de la Soie. Il mâchonne un bambou d'un air ennuyé.",
+   "persona": "Parle en mâchonnant, d'une voix traînante et ennuyée, « mmmh… », avec de longs soupirs de chameau. Paresseux et gourmand, il en a assez des bambous et rêve de bonnes choses chaudes. Il regarde le héros d'un air blasé, mais devient tout aimable et serviable quand il a le ventre plein.",
    "says": "Mmmh… des bambous, encore des bambous… Ce dont je rêve, moi, c'est d'un petit pain tout chaud de la maison de thé ! Pour un petit pain, je me relèverais tout de suite.",
    "states": [
     {
@@ -782,6 +799,7 @@
    ],
    "at": "pied",
    "description": "Un grand oiseau blanc, élégant, avec une tache rouge sur la tête.",
+   "persona": "Parle avec élégance, en lançant de longs « krouuu ! » et en se tenant sur une patte. Calme et fière, elle aime le vent et regarder le monde de très haut. Elle conseille le héros avec bienveillance, comme une vieille dame un peu mystérieuse.",
    "says": "Krouuu ! Là-haut, sur le rempart, le vent file tout droit vers la tour lointaine. Un cerf-volant y arriverait en un battement d'ailes… s'il portait un message !",
    "initial": "Plume Blanche la grue se tient sur une patte près du grand escalier."
   },
@@ -796,6 +814,7 @@
    ],
    "at": "rempart",
    "description": "Un soldat au gros ventre, avec un casque de travers et une clé à la ceinture.",
+   "persona": "Ronfle en grands « rrrrron-pfiou » quand il dort, et parle d'une grosse voix de soldat important, en remettant son casque de travers. Brave mais très dormeur, il adore son métier de garde et se vante de connaître les signaux de la Muraille. Une fois réveillé, il est un peu confus, puis aide le héros avec un grand sérieux bon enfant.",
    "says": "Le signal ? Du bambou bien sec dans le foyer de la tour, et une flamme. La fumée montera, et la tour lointaine allumera ses lanternes !",
    "states": [
     {
@@ -938,6 +957,10 @@
    "triggers": [
     {
      "verb": "search",
+     "object": "sechoir"
+    },
+    {
+     "verb": "touch",
      "object": "sechoir"
     }
    ],

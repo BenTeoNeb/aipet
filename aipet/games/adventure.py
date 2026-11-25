@@ -20,6 +20,7 @@ from __future__ import annotations
 import json
 import random
 import re
+import threading
 import time
 import uuid
 from collections.abc import Set as AbstractSet
@@ -29,18 +30,23 @@ from loguru import logger
 
 from aipet import engines
 from aipet.fileio import atomic_write_json, load_json, lock_for
+from aipet.games import adventure_intent
 from aipet.games.adventure_engine import (
     DIFFICULTIES,
     KINDS,
     STUCK,
     VERBS,
     WINS,
+    Atlas,
     State,
     World,
     _stems,
     _words,
+    atlas_of,
     canonical_verb,
     check,
+    errors_of,
+    graph_hash,
     upgrade,
 )
 from aipet.games.common import PREPARING_NOTE, UNKNOWN_PLAYER, Activity, JsonStore, pet_intro
@@ -55,6 +61,7 @@ FIRST_CALL_SECS = 44  # Gemini 3.8 Flash « medium » took 38–44 s for a world
 TITLE_STOPWORDS = {"aventure", "avec", "dans", "pour", "les", "des", "une", "cette", "celle", "derniere"}
 LITTLE_ONES = {"PS", "MS", "GS", "CP"}
 STT_NAMES = 30
+SHADOW_ATLAS = True  # build each world's atlas in the background and compare it with the searches (tests: off)
 CATALOG_SHOWN = 40  # adventures listed for the narrator while the activity is open (short lines)
 # Verbs the models write instead of the canonical ones.
 ENGLISH_VERBS = {"say": "talk", "speak": "talk", "tell": "talk", "put": "use", "place": "use", "insert": "use",
@@ -108,8 +115,14 @@ le monde, en JSON, qu'un programme fera tourner.
    question, accept = les réponses acceptées (des mots-clés courts : « peigne », « sesame »), right / wrong,
    hint, effects = ce que la bonne réponse déclenche (une porte ou un coffre s'ouvre tout seul). L'action du
    puzzle = l'id de celui qui pose la question. Répondre est automatique : pas d'action pour ça.
+   uses = combien de fois l'objet sert avant d'être vide (0 sinon) : une action qui l'use a l'effet
+   "spend:OBJET", une autre le recharge ("refill:OBJET", à la fontaine, avec des lucioles) ; texts.empty =
+   ce qu'on dit quand il est vide. light = il éclaire les lieux noirs (light_when : quand, ex.
+   "is:lampe:allumee" ; une lumière avec uses en perd une en sortant d'un lieu noir). senses = ce qu'on
+   entend, sent ou touche (listen, smell, touch).
 5. characters : 1 à 3 personnages (id, name, aliases, description, at, says = ce qu'il dit quand on lui
-   parle, qui donne un indice ou le but ; initial = ce qu'il fait quand on arrive ; states comme les
+   parle, qui donne un indice ou le but ; persona = pour que le conteur le joue en improvisant : sa voix, une
+   manie ou une expression, ce qu'il aime ou craint, comment il réagit au héros, sans indice en plus ; initial = ce qu'il fait quand on arrive ; states comme les
    objets, avec says et initial, ex. « grognon » puis « content »).
 6. places : les lieux (id court sans espace, name avec l'article, aliases = autres mots que l'enfant pourrait
    dire, description = 1 ou 2 phrases de ce qui ne change jamais : ne cite pas les objets à prendre ni les
@@ -117,15 +130,17 @@ le monde, en JSON, qu'un programme fera tourner.
    servent (cailloux, flaques, mouettes). details = des phrases qui dépendent de la situation, chacune avec
    when, text (quand c'est vrai) et else (sinon). exits : to, label (un repère, ex. « vers l'étang »), dir
    (nord, sud, est, ouest, haut, bas, dedans, dehors), door (l'id de la porte, d'un seul côté suffit), when et
-   blocked (ce qu'on dit si c'est bloqué). Les sorties vont dans les deux sens.
+   blocked (ce qu'on dit si c'est bloqué). Les sorties vont dans les deux sens. dark = ce qu'on sent dans
+   le noir si le lieu est noir (sans lumière on n'y voit rien d'autre que les sorties ; une lumière doit
+   exister dans l'aventure), vide sinon. senses = ce qu'on y entend, sent ou touche.
 7. start (lieu de départ, inventaire), goal (le but en une phrase), intro (2 phrases), tags (4 à 8 mots-clés
    sans accents), fact (une anecdote vraie et simple liée au thème, si une fin n'a pas la sienne).
 
 Conditions (toutes vraies) : "has:OBJET", "flag:NOM", "at:LIEU", "here:PERSONNAGE", "open:OBJET",
-"is:OBJET:ETAT", avec "!" devant pour « pas ». Effets : "gain:OBJET", "lose:OBJET", "reveal:OBJET" (il
+"is:OBJET:ETAT", "charged:OBJET" (il lui reste au moins une utilisation), avec "!" devant pour « pas ». Effets : "gain:OBJET", "lose:OBJET", "reveal:OBJET" (il
 apparaît ici, ou le personnage qui le tenait le lâche), "set:OBJET:ETAT", "flag:NOM", "move:PERSONNAGE:LIEU",
 "open:OBJET", "follow:PERSONNAGE" (il suit le héros partout, pour aider plus loin : « here:PERSONNAGE »),
-"end:FIN". Rien ne se referme et rien ne disparaît tout seul : ce qui est fait reste fait.
+"spend:OBJET" (une utilisation de moins), "refill:OBJET" (rechargé), "end:FIN". Rien ne se referme et rien ne disparaît tout seul : ce qui est fait reste fait.
 Un flag, c'est un fait qui n'appartient à aucun objet ; si c'est un objet qui change, utilise ses states.
 
 Des mécanismes qui marchent (choisis-en quelques-uns, variés) : clé et porte ou coffre ; objet caché à
@@ -135,7 +150,10 @@ loufoque et drôle (une chaussette et du poivre → une bombe à éternuer) comm
 jamais un piège ; troc avec un personnage qui tient l'objet ; personnage à gagner en plusieurs fois
 (states) ; rassembler plusieurs objets ; passage bloqué (noir, pont cassé) ; carte qui révèle un chemin ;
 code de boutons dans l'ordre vu ailleurs ; devinette ou mot de passe ; compagnon qui suit et aide ; choix
-et bêtise annoncée.
+et bêtise annoncée ; un lieu noir (une grotte, une cale, un grenier) où l'on ne voit rien sans une
+lumière qu'on allume ; un objet qui sert quelques fois puis se recharge (l'arrosoir qu'on remplit à la
+fontaine, la lanterne à lucioles qui s'éteint en sortant du noir et qu'on recharge) ; écouter, sentir ou
+toucher pour trouver (le mur qui sonne creux, l'odeur de tarte qui mène à la cuisine).
 
 Les règles d'or :
 - Toujours gagnable, jamais coincé : aucun objet indispensable ne doit pouvoir être perdu ou gaspillé
@@ -152,7 +170,7 @@ LEVEL_SHAPE = {
 # Verbs the generator writes in triggers: the ones that say what a puzzle is. The others (open, take,
 # go…) are built in, or mean looking and playing.
 TRIGGER_VERBS = ["use", "give", "combine", "push", "pull", "light", "fill", "throw", "eat", "drink", "climb",
-                 "swim", "jump", "wear", "read", "talk", "ask", "touch", "hit", "search"]  # fmt: skip
+                 "swim", "jump", "wear", "read", "talk", "ask", "touch", "hit", "search", "listen", "smell"]  # fmt: skip
 
 
 def level_rules(difficulty: str) -> str:
@@ -195,6 +213,11 @@ _ANSWER = {
         "hint": {"type": "string"},
         "effects": _RULES,
     },
+}
+_SENSES = {
+    "type": "object",
+    "description": "ce qu'on entend, sent, touche (vide sinon)",
+    "properties": {"listen": {"type": "string"}, "smell": {"type": "string"}, "touch": {"type": "string"}},
 }
 _DETAILS = {
     "type": "array",
@@ -278,8 +301,19 @@ GRAPH_SCHEMA = {
                     "key": {"type": "string"},
                     "texts": {
                         "type": "object",
-                        "properties": {"open": {"type": "string"}, "locked": {"type": "string"}},
+                        "properties": {
+                            "open": {"type": "string"},
+                            "locked": {"type": "string"},
+                            "empty": {"type": "string"},
+                        },
                     },
+                    "uses": {
+                        "type": "integer",
+                        "description": "combien de fois il sert avant d'être rechargé, 0 sinon",
+                    },
+                    "light": {"type": "boolean", "description": "il éclaire les lieux noirs"},
+                    "light_when": {**_RULES, "description": "quand il éclaire (ex. is:lampe:allumee), vide = toujours"},
+                    "senses": _SENSES,
                     "states": _STATES,
                     "answer": _ANSWER,
                     "code": {
@@ -306,6 +340,10 @@ GRAPH_SCHEMA = {
                     "description": {"type": "string"},
                     "at": {"type": "string"},
                     "says": {"type": "string"},
+                    "persona": {
+                        "type": "string",
+                        "description": "sa voix, ses manies, ce qu'il veut, comment il réagit",
+                    },
                     "initial": {"type": "string"},
                     "states": _STATES,
                     "answer": _ANSWER,
@@ -322,6 +360,8 @@ GRAPH_SCHEMA = {
                     "aliases": _ALIASES,
                     "description": {"type": "string"},
                     "decor": {"type": "array", "items": {"type": "string"}},
+                    "dark": {"type": "string", "description": "lieu noir : ce qu'on y sent dans le noir, vide sinon"},
+                    "senses": _SENSES,
                     "details": _DETAILS,
                     "exits": {
                         "type": "array",
@@ -415,7 +455,8 @@ def _clean(graph: dict, difficulty: str) -> dict:
             if not v.get("when"):
                 p["variants"].remove(v)
         p["decor"] = [x for x in p.get("decor") or [] if x]
-        _drop_empty(p, "details", "aliases", "decor")
+        _drop_empty(p, "details", "aliases", "decor", "dark")
+        _clean_senses(p)
     for t in [*graph.get("items", []), *graph.get("characters", [])]:
         t["at"] = t.get("at") or ""
         for s in t.get("states") or []:
@@ -435,7 +476,11 @@ def _clean(graph: dict, difficulty: str) -> dict:
             t["locked"] = True
             if t.get("kind") not in ("container", "door"):
                 t["kind"] = "container"
-        _drop_empty(t, "fixed", "sturdy", "fragile", "initial", "key", "states", "aliases")
+        _drop_empty(t, "fixed", "sturdy", "fragile", "initial", "key", "states", "aliases", "uses", "persona")
+        light, when = t.pop("light", None), t.pop("light_when", None) or []
+        if light:
+            t["light"] = when or True
+        _clean_senses(t)
         if t.get("key"):
             t["locked"] = True
             if t.get("kind") not in ("container", "door"):
@@ -445,6 +490,12 @@ def _clean(graph: dict, difficulty: str) -> dict:
     for p in graph.get("puzzles", []):
         p["needs"] = [x for x in p.get("needs") or [] if x]
     return graph
+
+
+def _clean_senses(t: dict) -> None:
+    senses = {k: v for k, v in (t.pop("senses", None) or {}).items() if v}
+    if senses:
+        t["senses"] = senses
 
 
 def generate_adventure(cfg: dict, idea: str, who: str, difficulty: str, recurring: list[str], past: list[str]) -> dict:
@@ -559,7 +610,7 @@ def drafts(difficulty: str | None = None) -> list[dict]:
     for p in sorted(MODEL_DIR.glob("*.json")) if MODEL_DIR.is_dir() else []:
         g = json.loads(p.read_text(encoding="utf-8"))
         g["title"] = f"{g['title']} (nouvelle version)"
-        if difficulty in (None, g.get("difficulty")) and not check(g)[0]:
+        if difficulty in (None, g.get("difficulty")) and not errors_of(g):
             out.append(g)
     return out
 
@@ -576,7 +627,10 @@ class AdventureGame(Activity):
         self.dir = self.root / DIR_ADVENTURES
         self.adventure: dict | None = None  # the running one (its record)
         self.world: World | None = None
+        self._atlas: tuple[str, Atlas | None] = ("", None)  # the adventure (its graph hash) and its atlas
         self.state: State | None = None
+        self._pending: dict | None = None  # Jev's reading of the child's last sentence, in the shadow
+        self._said_before = ""
 
     # ------------------------------------------------------------------ memory (one file each)
     def _file(self, ident: str) -> Path:
@@ -676,7 +730,7 @@ class AdventureGame(Activity):
         assert graph is not None
         known = next((a for a in self._mine(player) if a["title"] == graph["title"]), None)
         if known and (st := known.get("state")) and not st.get("ending") and self._load(known) is None:
-            self.state = State.from_dict(st)  # the same idea again: never wipe an adventure going on
+            self.state = self._restore(st)  # the same idea again: never wipe an adventure going on
             self._refresh()
             return self._intro("Cette aventure est déjà commencée : on reprend où il en était (rappelle-le en deux "
                                "phrases). S'il veut recommencer depuis le début : adventure_start avec replay.")  # fmt: skip
@@ -704,7 +758,7 @@ class AdventureGame(Activity):
         for a in self._all():
             g = a.get("graph") or {}
             if generated(g) and difficulty in (None, g.get("difficulty")) and g["title"] not in out:
-                if not check(g)[0]:  # made with an older engine, or damaged: not drawn any more
+                if not errors_of(g):  # made with an older engine, or damaged: not drawn any more
                     out[g["title"]] = g
         return list(out.values())
 
@@ -749,24 +803,60 @@ class AdventureGame(Activity):
         just before a loss."""
         assert self.adventure is not None
         self.world = World(self.adventure["graph"])
+        self._shadow_atlas()
         self.state = state or self.world.start()
         if state is None:
-            self.adventure["checkpoints_left"] = self.world.spec["checkpoints"]
+            self.adventure["checkpoints_left"] = self.world.policy["checkpoints"]
             self.adventure["checkpoint"] = None
         self.adventure["runs"].append({"started": now().isoformat(timespec="minutes"), "outcome": None,
                                        **({"from": note} if note else {})})  # fmt: skip
         self._save()
         self._refresh()
 
+    def _restore(self, saved: dict) -> State:
+        """A saved state of the running adventure, as it is played now (`World.restore`)."""
+        assert self.world is not None
+        return self.world.restore(saved)
+
     def _load(self, record: dict) -> dict | None:
         """Make `record` the running adventure; refuses a world that no longer checks (forget, edits)."""
-        errors, _ = check(record.get("graph", {}))
+        errors = errors_of(record.get("graph", {}))
         if errors:
             logger.warning(f"🗺️ Stored adventure « {record.get('title')} » is broken: {errors[:3]}")
             return {"error": "Cette aventure est abîmée : propose d'en commencer une nouvelle."}
         self.adventure = record
         self.world = World(record["graph"])
+        self._shadow_atlas()
         return None
+
+    def _shadow_atlas(self):
+        """Build the atlas of the new world in the background, in the shadow of the searches
+        (`storyworld.atlas`): its answers are only compared and logged, they change nothing yet.
+        Built once per adventure: a new run of the same one (a checkpoint, a replay) reuses it."""
+        if not SHADOW_ATLAS or not self.world:
+            return
+        w = self.world
+        key = graph_hash(w.g)
+        if self._atlas[0] == key:
+            w.atlas = self._atlas[1]  # None while it is being built: `build` gives it to the world then
+            return
+        self._atlas = (key, None)
+
+        def build():
+            try:
+                atlas, kept = atlas_of(w)
+            except Exception as e:  # noqa: BLE001  the shadow never breaks a game
+                logger.warning(f"🗺️ No atlas: {e!r}")
+                return
+            if self._atlas[0] != key:
+                return  # another adventure meanwhile
+            self._atlas = (key, atlas)
+            if self.world and graph_hash(self.world.g) == key:
+                self.world.atlas = atlas
+            self._ev("adventure_atlas", states=len(atlas.table), winnable=atlas.winnable, complete=atlas.complete,
+                     kept=kept, seconds=round(atlas.seconds, 2))  # fmt: skip
+
+        threading.Thread(target=build, name="adventure-atlas", daemon=True).start()
 
     def _reopen(self, player: str, replay: str, resume: bool, from_checkpoint: bool) -> dict:
         mine = self._mine(player)
@@ -784,7 +874,7 @@ class AdventureGame(Activity):
                         "(adventure_start avec replay)."}  # fmt: skip
             if err := self._load(rec):
                 return err
-            checkpoint, rec["checkpoint"] = State.from_dict(rec["checkpoint"]), None
+            checkpoint, rec["checkpoint"] = self._restore(rec["checkpoint"]), None
             if left is not None:
                 rec["checkpoints_left"] = left - 1
             self._new_run(checkpoint, note="checkpoint")
@@ -798,7 +888,7 @@ class AdventureGame(Activity):
                 return {"error": "Pas d'aventure en cours à reprendre.", "aventures": [a["title"] for a in mine][-6:]}
             if err := self._load(rec):
                 return err
-            self.state = State.from_dict(rec["state"])
+            self.state = self._restore(rec["state"])
             self._refresh()
             return self._intro("On reprend l'aventure : rappelle en deux phrases où on en était.")
         rec = self._by_title(replay, mine)
@@ -829,9 +919,13 @@ class AdventureGame(Activity):
         if remember:
             w.note(st, remember, about)
         intents = actions or [{"verb": "look"}]
+        if self._pending is not None:
+            self._pending["narrator"] = [*(self._pending["narrator"] or []), *intents]  # what the narrator did with it
         results: list[dict] = []
         skipped: list[dict] = []
         for n, intent in enumerate(intents):
+            if named := self._naming(intent):
+                self._ev("adventure_naming", verb=intent.get("verb", ""), named=named)
             before = st.to_dict()
             res = w.act(st, intent)
             results.append(res)
@@ -858,7 +952,72 @@ class AdventureGame(Activity):
             )  # fmt: skip
         self._save()
         self._refresh()
-        self._ev("adventure_act", said=said[:120], outcomes=[r.get("outcome") for r in results])
+        atlas = {}
+        if w.atlas:
+            atlas = {"atlas": w.atlas.distance(st)}
+            for d in w.atlas.disagreements:
+                self._ev("adventure_atlas_disagrees", **d)
+            w.atlas.disagreements.clear()
+        self._ev("adventure_act", said=said[:120], outcomes=[r.get("outcome") for r in results], **atlas)
+        return out
+
+    def _intent_mode(self) -> str:
+        """`[adventure] intent`: « narrator » (the narrator understands the child), or « jev-shadow »
+        (Jev decides too, in the shadow: logged next to the narrator, changes nothing)."""
+        return str((self.cfg.get("adventure") or {}).get("intent", "narrator"))
+
+    def _shadow_start(self, said: str):
+        """Each sentence of the child during the adventure: Jev reads it, in the background, on its own
+        world (never the game's), from the state before anything is played. Closed at the next
+        sentence (`_shadow_close`), with what the narrator did in between."""
+        assert self.adventure is not None and self.state is not None
+        graph, cfg, before = self.adventure["graph"], self.cfg, self.state.copy()
+        told = getattr(self.host, "last_pet_line", lambda: "")() or ""
+        pending: dict = {"said": said, "before": before, "narrator": None, "result": None, "world": None}
+        previous, self._said_before, self._pending = self._said_before, said, pending
+
+        def run():
+            try:
+                pending["world"] = w = World(graph)
+                pending["result"] = adventure_intent.decide(cfg, w, before, said, previous, told)
+            except Exception as e:  # noqa: BLE001  the shadow never breaks a game
+                pending["result"] = {"error": repr(e)[:200]}
+
+        threading.Thread(target=run, name="adventure-intent", daemon=True).start()
+
+    def _shadow_close(self):
+        """`adventure_intent_shadow`: Jev's reading next to what the narrator did — `narrator` None
+        when it called no action (chat, or it asked the child). `agrees`: the same world after and the
+        same told (both no action counts); `false_action`: Jev would have played an action, confident,
+        where the narrator played none (the risk of letting Jev decide)."""
+        p, self._pending = self._pending, None
+        if p is None:
+            return
+        d = dict(p["result"] or {"error": "no answer yet"})
+        if "error" not in d:
+            jev, narrator = d["actions"], p["narrator"]
+            d["would_decide"] = d["confidence"] >= adventure_intent.CONFIDENT and not d["unclear"]
+            d["agrees"] = adventure_intent.agrees(p["world"], p["before"], jev, narrator or [])
+            d["false_action"] = bool(d["would_decide"] and jev and not narrator)
+        self._ev("adventure_intent_shadow", said=p["said"][:160], narrator=p["narrator"], **d)
+
+    def _naming(self, intent: dict) -> list[dict]:
+        """How the narrator named things, when not by an id in reach (to measure how often the
+        engine has to read words): « elsewhere » (an id, not in reach), « words » (names a thing of
+        the adventure), « unknown » (names nothing: imagination, or a miss). An answer is words."""
+        assert self.world and self.state
+        w, st = self.world, self.state
+        if intent.get("verb") == "answer":
+            return []
+        reach = set(w.in_reach(st))
+        out = []
+        for field in ("object", "target"):
+            said = intent.get(field)
+            if not isinstance(said, str) or not said or said in reach:
+                continue
+            everything = w.everything()
+            kind = "elsewhere" if said in everything else "words" if any(w.resolve(said, everything)) else "unknown"
+            out.append({"field": field, "said": said[:60], "kind": kind})
         return out
 
     def _remember_play(self, intents: list[dict], results: list[dict], said: str):
@@ -915,6 +1074,7 @@ class AdventureGame(Activity):
         run["reaction"] = reaction.strip()
         self._save()
         title = self.adventure["title"]
+        self._shadow_close()
         self._ev("adventure_end", title=title, outcome=run.get("outcome"), reaction=reaction[:200])
         self.adventure = self.world = self.state = None
         self._refresh()
@@ -925,6 +1085,7 @@ class AdventureGame(Activity):
 
     def stop(self):
         """The activity ends without adventure_end: the state is kept, to resume later."""
+        self._shadow_close()
         self.cancel_preparation()
         if self.adventure:
             self._save()
@@ -989,8 +1150,11 @@ class AdventureGame(Activity):
         return kept + ("\n" + discover if discover else "")
 
     def on_user_message(self, text: str) -> str | None:
+        self._shadow_close()
         if not self.state:
             return None
+        if self._intent_mode() == "jev-shadow" and not self.state.ending and text.strip():
+            self._shadow_start(text.strip())
         return "aventure : traduis ce que dit l'enfant en actions pour adventure_act (sauf s'il parle d'autre chose)"
 
     def names(self) -> list[str]:
@@ -1060,6 +1224,10 @@ def register_tools(llm, game: AdventureGame) -> list:
                                 "answer : sa réponse",
                             },
                             "target": {"type": "string", "description": "sur quoi / à qui : un id, ou vide"},
+                            "step": {
+                                "type": "string",
+                                "description": "pour improvise : l'étape de « écran_mj » que son idée accomplit",
+                            },
                             "to": {
                                 "type": "string",
                                 "description": "pour go : l'id du lieu (« → » dans « à_portée ») "

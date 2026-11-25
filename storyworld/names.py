@@ -2,17 +2,13 @@
 
 The narrator sends ids (`World.in_reach`); a name, an alias or a state's name works too, the articles
 aside and singular or plural alike. Several things sharing that name is an ambiguity to ask about,
-never a choice made for the child.
+never a choice made for the player.
 """
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from storyworld.locale.fr import (
-    _norm,
-    _stems,
-)
 from storyworld.model import (
     State,
 )
@@ -43,8 +39,11 @@ class Names:
         articles aside and singular or plural alike (« les algues » is « une algue »). No guessing."""
         if said == ident:
             return True
-        n, stems = _norm(said), _stems(said)
-        return bool(n) and any(_norm(label) == n or (stems and _stems(label) == stems) for label in self.labels(ident))
+        n, stems = self.w.lang.norm(said), self.w.lang.stems(said)
+        return bool(n) and any(
+            self.w.lang.norm(label) == n or (stems and self.w.lang.stems(label) == stems)
+            for label in self.labels(ident)
+        )
 
     def resolve(self, said: str, candidates: list[str]) -> tuple[str | None, list[str]]:
         """(id, []) when exactly one candidate is meant; (None, [ids]) when several share that name;

@@ -65,7 +65,11 @@
      "label": "vers la forêt",
      "dir": "sud"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Pfff… pfff… la locomotive soupire, et la grande horloge fait tic-tac, tic-tac.",
+    "smell": "Ça sent le charbon… et les fleurs de la gare."
+   }
   },
   {
    "id": "salle",
@@ -112,7 +116,10 @@
      "label": "vers la gare",
      "dir": "sud"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Glouglou, l'eau dans la tour… et tout là-haut, une pie qui jacasse : tchac-tchac-tchac !"
+   }
   },
   {
    "id": "maisonnette",
@@ -169,7 +176,11 @@
      "label": "vers la gare",
      "dir": "nord"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Rrrron… pfiou… Rrrron… Un énorme ronflement sort de derrière les sapins !",
+    "smell": "Mmm, la résine des sapins et les champignons."
+   }
   }
  ],
  "items": [
@@ -318,6 +329,7 @@
    ],
    "at": "gare",
    "description": "Une tortue conductrice avec une casquette de cheminot.",
+   "persona": "Parle lentement, comme une tortue, avec des « tchou-tchou » rêveurs et en tapotant sa casquette de cheminot. Patiente et un peu soucieuse, elle adore son petit train et la fête des nuages. Elle remercie le héros avec beaucoup de douceur et l'appelle son « mécanicien en chef ».",
    "initial": [
     {
      "when": [
@@ -364,6 +376,7 @@
    ],
    "at": "chateau_eau",
    "description": "Une pie noire et blanche, très coquette, qui collectionne les choses brillantes.",
+   "persona": "Parle d'une voix chantante et coquette, en jacassant « tchac tchac ! » et en admirant ses trésors. Vaniteuse et collectionneuse, elle adore tout ce qui brille et ne donne rien sans un bel échange. Elle fait la maligne avec le héros, puis devient toute fière et généreuse quand elle est ravie.",
    "initial": "Tout en haut, au bord du nid, Chipie la pie fait briller un sifflet argenté.",
    "says": "J'adore tout ce qui brille ! Mes trésors, je ne les échange que contre quelque chose de doré, qui brille encore plus.",
    "states": [
@@ -387,6 +400,7 @@
    ],
    "at": "maisonnette",
    "description": "Une taupe avec un gilet orange et de grosses lunettes.",
+   "persona": "Parle en se grattant la tête, d'un ton appliqué, avec des « bon, bon, bon… » quand elle réfléchit. Consciencieuse et un peu dépassée, elle aime son travail de garde-barrière et son bon miel. Elle accueille le héros avec reconnaissance et adore faire plaisir.",
    "initial": "Madame Taupe, la garde-barrière, regarde sa barrière en se grattant la tête, un pot de miel sous le bras.",
    "says": "Ma barrière, il faut la fermer avec le gros levier rouge quand le train passe ! Celui qui m'aide à la fermer gagne un pot de mon meilleur miel.",
    "states": [
@@ -409,6 +423,7 @@
    ],
    "at": "foret",
    "description": "Un énorme ours brun au ventre tout rond, qui adore le miel.",
+   "persona": "Ronfle en « rrron, pchhh… » quand il dort, et parle d'une grosse voix lente et ensommeillée, « mmmh… ». Gourmand et doux comme un nounours, il rêve de tartines de miel et n'aime pas être réveillé brusquement. Une fois bien réveillé, il est tout gentil avec le héros et lui souhaite bon voyage.",
    "initial": "Sur un gros tas de bûches, Gros Ours fait la sieste en ronflant : rrron, pchhh… Impossible de prendre une bûche sans le réveiller. Mais attention : on ne tape jamais un ours qui dort, il se fâcherait tout rouge ! Un ours, ça se réveille en douceur.",
    "says": "Mmmh… miel… tartine… Rien ne vaut une bonne tartine de miel… mmmh…",
    "states": [
@@ -431,13 +446,17 @@
     {
      "verb": "search",
      "object": "manteau"
+    },
+    {
+     "verb": "touch",
+     "object": "manteau"
     }
    ],
    "effects": [
     "reveal:bouton"
    ],
    "points": 5,
-   "text": "Tu fouilles les grandes poches… dans le fond, un bouton doré tout brillant !",
+   "text": "Tu tâtes les grandes poches… dans le fond, quelque chose de tout rond et de tout dur : un bouton doré tout brillant !",
    "hint": "Ce vieux manteau a de grandes poches… et si on regardait dedans ?"
   },
   {

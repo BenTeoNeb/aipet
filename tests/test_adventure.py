@@ -566,7 +566,8 @@ def test_red_herrings_are_told_as_story():
 def test_walking_to_something_here_is_never_a_ride():
     w = World(LIB["Le miroir du phare d'Alexandrie"])
     donkey = next(c for c, ch in w.chars.items() if "ane" in " ".join(ch.get("aliases", [])) or "âne" in ch["name"])
-    st = at(w, w.chars[donkey]["at"])
+    st = at(w, w.chars[donkey]["at"], ["lampe"])
+    w.apply(st, ["set:lampe:allumee"])  # the ramp is dark: the little lamp lit shows the donkey
     res = w.act(st, {"verb": "go", "to": "voir l'âne"})
     assert res["outcome"] == "done" and "juste à côté" in res["text"] and not st.ending
 
@@ -831,7 +832,8 @@ def test_after_the_lost_key_the_sauvegarde_is_before_the_throw(tmp_path):
     game = _draft_game(tmp_path)
     st = game.state
     st.place, st.inventory, st.items_at["cle"] = "pied_phare", ["cle"], "inv"
-    assert game.act([{"verb": "destroy", "object": "la clé"}])["results"][0]["outcome"] == "done"
+    assert game.act([{"verb": "destroy", "object": "la clé"}])["results"][0]["outcome"] == "warning"  # think twice
+    assert game.act([{"verb": "destroy", "object": "la clé"}])["results"][0]["outcome"] == "done"  # he insists
     out = game.act([{"verb": "go", "to": "haut"}])
     assert out["results"][0]["ending"] == "lose" and "from_checkpoint" in out["note"]
     assert game.adventure["checkpoint"]["inventory"] == ["cle"]

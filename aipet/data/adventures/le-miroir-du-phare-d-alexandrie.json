@@ -54,7 +54,11 @@
     "barques",
     "flaques",
     "mouettes"
-   ]
+   ],
+   "senses": {
+    "listen": "Plic, ploc, la pluie sur les caisses… et les vagues qui cognent contre le quai.",
+    "smell": "Ça sent la marée et le poisson !"
+   }
   },
   {
    "id": "marche",
@@ -83,7 +87,11 @@
     "tapis",
     "dattes",
     "étals"
-   ]
+   ],
+   "senses": {
+    "smell": "Mmm… le cumin, la cannelle, et le pain chaud qui sort du four !",
+    "listen": "Les braises du four crépitent tout doucement, crr, crr."
+   }
   },
   {
    "id": "bibliotheque",
@@ -258,7 +266,13 @@
     "torches éteintes",
     "paille",
     "marches"
-   ]
+   ],
+   "dark": "Il fait tout noir dans le phare : les torches sont éteintes ! Sous tes pieds, la rampe monte. Et quelque part devant toi, quelqu'un souffle par le nez : frrr… frrr…",
+   "senses": {
+    "listen": "Frrr… frrr… un gros souffle tout chaud, et des sabots qui grattent la pierre, cloc, cloc.",
+    "smell": "Ça sent la paille… et l'âne !",
+    "touch": "Les murs de pierre sont tout froids, et la rampe monte en tournant."
+   }
   },
   {
    "id": "sommet",
@@ -309,7 +323,10 @@
     "pluie",
     "éclairs",
     "mer"
-   ]
+   ],
+   "senses": {
+    "listen": "Whiii, le vent siffle ! Et tout en bas, boum, les vagues contre l'île."
+   }
   }
  ],
  "items": [
@@ -393,11 +410,35 @@
     },
     {
      "id": "allumee",
-     "name": "une petite lampe allumée",
+     "name": "une petite lampe à huile",
      "aliases": [
-      "lampe allumee"
+      "lampe allumee",
+      "lampe a huile"
      ],
-     "description": "La petite lampe pleine d'huile, avec sa flamme qui danse au bout de la mèche."
+     "description": "La petite lampe en terre cuite, avec sa mèche toute noircie."
+    }
+   ],
+   "uses": 1,
+   "light": [
+    "is:lampe:allumee"
+   ],
+   "texts": {
+    "empty": "La flamme de la petite lampe tremble… pfff, elle s'éteint : plus une goutte d'huile ! Il en reste peut-être dans l'amphore…"
+   },
+   "details": [
+    {
+     "when": [
+      "is:lampe:allumee",
+      "charged:lampe"
+     ],
+     "text": "Sa petite flamme danse au bout de la mèche."
+    },
+    {
+     "when": [
+      "is:lampe:allumee",
+      "!charged:lampe"
+     ],
+     "text": "Elle est éteinte : plus une goutte d'huile."
     }
    ]
   },
@@ -466,7 +507,7 @@
     "huile d'olive"
    ],
    "at": "menes",
-   "description": "Une grande amphore pleine d'huile d'olive. C'est la dernière du marché : pas une goutte à gaspiller !",
+   "description": "Une grande amphore pleine d'huile d'olive. C'est la dernière du marché : pas une goutte à gaspiller ! Elle est pour le grand feu… mais une petite lampe n'en boit qu'une goutte.",
    "kind": "thing"
   },
   {
@@ -620,15 +661,16 @@
    ],
    "at": "port",
    "description": "Un vieux gardien à la barbe blanche, la cheville enroulée dans un bandage.",
+   "persona": "Parle d'une voix grave de vieux marin, avec des « aïe, ma cheville ! » et des « écoute bien, apprenti ». Sérieux et prudent, il aime son phare plus que tout et a peur pour le bateau perdu dans l'orage. Il fait confiance à son apprenti et lui donne ses consignes comme un maître fier de lui.",
    "says": [
     {
      "when": [
       "has:cle"
      ],
-     "text": "Ma clé ! Tu l'as reprise à Bec-Long, bravo ! Vite, au phare : de l'huile pour le grand feu, des braises dans un pot pour l'allumer, avec les longues pinces, et le grand miroir doit briller. Pistache ne bouge que pour des douceurs… et surtout, ne grimpe jamais sur son dos !"
+     "text": "Ma clé ! Tu l'as reprise à Bec-Long, bravo ! Vite, au phare : de l'huile pour le grand feu, des braises dans un pot pour l'allumer, avec les longues pinces, et le grand miroir doit briller. Dans le phare, il fait tout noir : prends une lumière ! Pistache ne bouge que pour des douceurs… et surtout, ne grimpe jamais sur son dos !"
     },
     {
-     "text": "Aïe, ma cheville ! Je ne peux pas monter au phare. Écoute bien, apprenti : il faut de l'huile pour le grand feu, des braises pour l'allumer, et le grand miroir doit briller pour envoyer la lumière sur la mer. Le feu, c'est un travail de gardien : on porte les braises dans un pot, et on les pose sur la mèche avec les longues pinces de fer, les mains bien loin. Ce coquin de Bec-Long l'ibis m'a chipé la clé de la porte, il s'est envolé vers la bibliothèque ! Et Pistache, mon âne, ne bouge que pour des douceurs. Mais ne grimpe jamais sur son dos : il te ramènerait droit à son écurie ! Sinon… une petite lampe au bout de la jetée, peut-être ? Ce serait bien faible, mais mieux que rien."
+     "text": "Aïe, ma cheville ! Je ne peux pas monter au phare. Écoute bien, apprenti : il faut de l'huile pour le grand feu, des braises pour l'allumer, et le grand miroir doit briller pour envoyer la lumière sur la mer. Le feu, c'est un travail de gardien : on porte les braises dans un pot, et on les pose sur la mèche avec les longues pinces de fer, les mains bien loin. Ce coquin de Bec-Long l'ibis m'a chipé la clé de la porte, il s'est envolé vers la bibliothèque ! Et dans le phare, les torches sont éteintes : il y fait noir comme dans un four ! Pistache, mon âne, y attend… il ne bouge que pour des douceurs. Mais ne grimpe jamais sur son dos : il te ramènerait droit à son écurie ! Sinon… une petite lampe au bout de la jetée, peut-être ? Ce serait bien faible, mais mieux que rien."
     }
    ],
    "initial": "Théon, le vieux gardien du phare, est assis sur une caisse, la cheville bandée."
@@ -643,6 +685,7 @@
    ],
    "at": "port",
    "description": "Un chat tigré, bien rond, qui ronronne près des filets.",
+   "persona": "Ne parle qu'en « miaou… mrrrr… », en bâillant et en se léchant les pattes. Paresseux et repu, il aime dormir près des filets et ne s'intéresse à rien d'autre. Il regarde le héros d'un air endormi, gentil mais pas du tout pressé.",
    "says": "Miaou… Mrrrr… (Miou bâille. Il a l'air d'avoir déjà très bien dîné.)",
    "initial": "Miou le chat se lèche les pattes près des filets."
   },
@@ -656,6 +699,7 @@
    ],
    "at": "marche",
    "description": "Un marchand jovial, avec un grand tablier taché d'huile.",
+   "persona": "Parle fort et jovial, comme un marchand qui appelle les clients, en vantant « la meilleure d'Égypte ! ». Commerçant et bon vivant, il aime son huile d'olive et faire de bonnes affaires. Il est chaleureux avec le héros et lui donne des conseils de prudence en riant.",
    "says": "De l'huile d'olive, la meilleure d'Égypte ! C'est ma dernière amphore : une pièce et elle est à toi. Et si tu veux des braises du four, prends donc un pot : ça brûle les doigts !",
    "states": [
     {
@@ -679,6 +723,7 @@
    ],
    "at": "bibliotheque",
    "description": "Une savante aux longues tresses, un plumeau à la main.",
+   "persona": "Parle tout bas en commençant par « Chut ! », en époussetant ses rouleaux à petits coups de plumeau. Savante et très soigneuse, elle aime les livres de papyrus et a horreur du bruit. Elle répond au héros avec patience, comme une maîtresse qui adore partager ce qu'elle sait.",
    "says": "Chut ! Ici dorment des milliers de rouleaux de papyrus. Faire briller le bronze ? Les savants disent : un chiffon et du sable fin, et on frotte, on frotte ! Quant à Bec-Long, cet ibis gourmand ne lâche rien… sauf pour un poisson.",
    "initial": "Kallia la bibliothécaire époussette les rouleaux un par un."
   },
@@ -693,6 +738,7 @@
    ],
    "at": "bibliotheque",
    "description": "Un grand oiseau blanc à tête noire, avec un long bec tout courbé.",
+   "persona": "Ne parle qu'en « couic ! » malins, en claquant son long bec courbé. Chapardeur et gourmand, il aime ce qui brille et surtout ce qui se mange. Il nargue le héros du haut de sa statue, sans méchanceté, comme un petit voleur farceur.",
    "says": "Couic ! (Bec-Long regarde tes poches, l'air gourmand. Un ibis, ça raffole du poisson.)",
    "states": [
     {
@@ -717,6 +763,7 @@
    ],
    "at": "rampe",
    "description": "Un petit âne gris aux grandes oreilles. C'est lui qui monte l'huile tout en haut du phare.",
+   "persona": "Ne parle qu'en « hi-han ! », en remuant ses grandes oreilles et en reniflant les poches. Têtu mais doux, il rêve de choses sucrées et de son écurie. Il reste planté devant le héros d'un air buté, puis devient tout gentil quand on le gâte.",
    "says": "Hi-han ! (Pistache renifle tes poches. Il rêve de quelque chose de sucré.)",
    "states": [
     {
@@ -740,6 +787,7 @@
    ],
    "at": "jetee",
    "description": "Un vieux marin au visage tout ridé par le soleil, enroulé dans un manteau de laine.",
+   "persona": "Parle d'une voix rauque de vieux loup de mer, avec des « Ohé, petit ! » et des histoires de vagues. Bourru mais protecteur, il aime la mer et a peur des tempêtes de nuit. Il veille sur le héros comme un vieil oncle et s'inquiète pour le bateau au large.",
    "says": "Ohé, petit ! Surtout, ne va jamais nager dans la mer cette nuit : avec l'orage, les vagues t'emporteraient ! Ce bateau, là-bas, il lui faudrait une lumière pour trouver le port…",
    "initial": "Un vieux marin surveille les vagues, une corde à la main."
   }
@@ -1011,11 +1059,10 @@
     "is:lampe:vide"
    ],
    "effects": [
-    "lose:amphore",
     "set:lampe:pleine"
    ],
    "points": 10,
-   "text": "Glou, glou… tu verses l'huile dans la petite lampe… oups, tout le reste coule aussi ! L'amphore est vide, mais la lampe est pleine.",
+   "text": "Glou… tu verses juste un filet d'huile dans la petite lampe, sans gaspiller une goutte. La lampe est pleine, et l'amphore presque !",
    "triggers": [
     {
      "verb": "combine",
@@ -1058,16 +1105,46 @@
    "hint": "Ta lampe est pleine d'huile. Pour allumer sa mèche, une braise du four ferait l'affaire."
   },
   {
+   "id": "rajouter_huile",
+   "when": [
+    "has:lampe",
+    "has:amphore",
+    "is:lampe:allumee",
+    "!charged:lampe"
+   ],
+   "effects": [
+    "refill:lampe"
+   ],
+   "points": 0,
+   "repeatable": true,
+   "text": "Tu verses un filet d'huile dans la petite lampe. La mèche est encore chaude : fffout, la flamme repart !",
+   "not_yet": "La petite lampe a encore de l'huile : pas une goutte à gaspiller !",
+   "triggers": [
+    {
+     "verb": "combine",
+     "object": "lampe",
+     "target": "amphore"
+    },
+    {
+     "verb": "fill",
+     "object": "lampe",
+     "target": "amphore"
+    }
+   ],
+   "hint": "Ta petite lampe s'est éteinte : elle a bu toute son huile. Et dans ton amphore, il en reste !"
+  },
+  {
    "id": "agiter_lampe",
    "place": "jetee",
    "when": [
-    "is:lampe:allumee"
+    "is:lampe:allumee",
+    "charged:lampe"
    ],
    "effects": [
     "end:lampe"
    ],
    "points": 10,
-   "not_yet": "Une lampe éteinte, personne ne la verra ! Il faut d'abord l'allumer.",
+   "not_yet": "Une lampe éteinte, personne ne la verra ! Il faut d'abord qu'elle brille.",
    "text": "Tu lèves la petite lampe bien haut et tu la balances, de droite à gauche, de gauche à droite…",
    "triggers": [
     {
@@ -1294,7 +1371,8 @@
    "action": "nourrir_pistache",
    "needs": [
     "figues",
-    "pistache"
+    "pistache",
+    "lampe"
    ],
    "clue_in": "pistache"
   },
@@ -1362,6 +1440,15 @@
   {
    "goal": "Remplir la petite lampe d'huile",
    "action": "remplir_lampe",
+   "needs": [
+    "lampe",
+    "amphore"
+   ],
+   "clue_in": "lampe"
+  },
+  {
+   "goal": "Remettre de l'huile dans la petite lampe éteinte",
+   "action": "rajouter_huile",
    "needs": [
     "lampe",
     "amphore"

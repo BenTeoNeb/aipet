@@ -3,6 +3,12 @@ with the pet's difficulty profiles and French. This module only re-exports it fo
 
 See storyworld/SPEC.md (the format) and docs/adventure/model/README.md (the design notes)."""
 
+import functools
+import hashlib
+import json
+from pathlib import Path
+
+from storyworld.atlas import Atlas
 from storyworld.check import (  # noqa: F401
     CONDITIONS,
     EFFECTS,
@@ -48,7 +54,12 @@ from storyworld.world import World as _World
 
 
 class World(_World):
-    """The library's world, answering the narrator with French keys (« lieu », « à_portée »)."""
+    """The library's world with the pet's policy (its difficulty's profile), answering the narrator
+    with French keys (« lieu », « à_portée »)."""
+
+    def __init__(self, graph: dict, lang=None, policy: dict | None = None):
+        level = graph.get("difficulty") if isinstance(graph, dict) else None
+        super().__init__(graph, lang, policy or DIFFICULTIES.get(level or "", DIFFICULTIES["facile"]))
 
     def act(self, st: State, intent: dict) -> dict:  # noqa: F405
         return localize(super().act(st, intent), KEYS)
@@ -61,3 +72,85 @@ class World(_World):
 
     def nudge(self, st: State) -> dict:  # noqa: F405
         return localize(super().nudge(st), KEYS)
+
+
+# ---- the verdict, kept: an adventure is checked once per version of the engine ----------------
+_VERDICTS = "adventure_verdicts.json"  # in the cache folder: {graph hash:engine hash → errors}
+_KEPT = 500
+_memo: dict[str, list[str]] = {}
+
+
+@functools.cache
+def engine_hash() -> str:
+    """The engine's sources (storyworld and this module): any change checks every adventure again."""
+    h = hashlib.sha256()
+    for p in sorted([*_storyworld_dir().rglob("*.py"),
+                     *_storyworld_dir().rglob("*.json"), Path(__file__)]):  # fmt: skip
+        h.update(p.as_posix().encode() + b"\0" + p.read_bytes())
+    return h.hexdigest()[:16]
+
+
+def _storyworld_dir() -> Path:
+    import storyworld
+
+    return Path(storyworld.__file__).parent
+
+
+def graph_hash(graph: dict) -> str:
+    text = json.dumps(graph, sort_keys=True, ensure_ascii=False, separators=(",", ":"), default=str)
+    return hashlib.sha256(text.encode()).hexdigest()[:24]
+
+
+def errors_of(graph: dict) -> list[str]:
+    """`check`'s errors, kept per adventure and engine version (checking Mimi takes a second or more:
+    never while a child waits to start). A graph or an engine changed is checked again."""
+    from aipet import paths
+    from aipet.fileio import atomic_write_json, load_json
+
+    key = f"{graph_hash(graph)}:{engine_hash()}"
+    if key in _memo:
+        return list(_memo[key])
+    store = paths.cache_dir() / _VERDICTS
+    kept = load_json(store, {})
+    kept = kept if isinstance(kept, dict) else {}
+    if isinstance(kept.get(key), list):
+        _memo[key] = kept[key]
+        return list(kept[key])
+    errors = check(graph)[0]
+    _memo[key] = errors
+    kept[key] = errors
+    try:
+        store.parent.mkdir(parents=True, exist_ok=True)
+        atomic_write_json(store, dict(list(kept.items())[-_KEPT:]), indent=None)
+    except OSError:  # a read-only cache: kept in memory only
+        pass
+    return list(errors)
+
+
+_ATLASES = "atlases"
+_ATLASES_KEPT = 60  # adventures whose atlas is kept on disk (the bank, the latest invented ones)
+
+
+def atlas_of(w: World) -> tuple[Atlas, bool]:
+    """The atlas of this world, kept on disk per adventure and engine version: built once (up to
+    1.5 s for the biggest), then read back. (atlas, read back?)"""
+    from aipet import paths
+
+    folder = paths.cache_dir() / _ATLASES
+    path = folder / f"{graph_hash(w.g)}-{engine_hash()}.marshal"
+    try:
+        return Atlas.from_bytes(w, path.read_bytes()), True
+    except (OSError, ValueError, EOFError, TypeError):  # not built yet, or damaged: built again
+        pass
+    atlas = Atlas(w)
+    if atlas.complete:
+        try:
+            folder.mkdir(parents=True, exist_ok=True)
+            tmp = path.with_suffix(".tmp")
+            tmp.write_bytes(atlas.to_bytes())
+            tmp.replace(path)
+            for old in sorted(folder.glob("*.marshal"), key=lambda p: p.stat().st_mtime)[:-_ATLASES_KEPT]:
+                old.unlink(missing_ok=True)
+        except OSError:  # a read-only cache: built again next time
+            pass
+    return atlas, False

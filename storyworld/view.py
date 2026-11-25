@@ -6,9 +6,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from storyworld.locale.fr import (
-    _stems,
-)
 from storyworld.model import (
     State,
 )
@@ -34,8 +31,11 @@ class View:
         """What the hero sees here (for the narrator)."""
         w = self.w
         p = w.places.get(st.place, {})
+        dark = w.dark(st)
         return {
             "place": p.get("name", st.place),
+            **({"in_the_dark": w.lang.dark_note} if dark else {}),
+            **({"senses": list(p["senses"].values())} if dark and isinstance(p.get("senses"), dict) else {}),
             "description": self.place_text(st),
             "here": [w.name(i, st) for i in w.visible_items(st)],
             "people": [w.name(c, st) for c in w.chars_here(st)],
@@ -48,7 +48,9 @@ class View:
                 }
                 for x in w.exits(st)
             ],  # fmt: skip
-            **({"decor": p["decor"]} if p.get("decor") else {}),
+            **({"decor": p["decor"]} if p.get("decor") and not dark else {}),
+            **({"personas": personas} if (personas := self.personas(st)) else {}),
+            **({"progress": progress} if (progress := self.progress(st)) else {}),
             **({"memories": notes} if (notes := self.notes_here(st)) else {}),
             "in_reach": self.in_reach(st),
             **({"worth_exploring": explore} if (explore := self.worth_exploring(st)) else {}),
@@ -59,6 +61,8 @@ class View:
         here (things never moved, people) — Inform's room description."""
         w = self.w
         p = w.places.get(st.place, {})
+        if w.dark(st):  # Inform's « Darkness »: what the author says is felt there, nothing seen
+            return p["dark"] if isinstance(p.get("dark"), str) else w.say("It's dark here.")
         text = p.get("description", "")
         for v in p.get("variants", []):  # version 1: whole descriptions
             if w.holds(st, v.get("when")):
@@ -75,6 +79,60 @@ class View:
         ]  # a companion is with you
         return " ".join(x for x in parts if x)
 
+    def gm_screen(self, st: State, about: set[str] | None = None) -> list[dict]:
+        """The game master's screen: the steps the hero is ready for here (their conditions hold, their
+        things are in reach), each with what it achieves; with `about`, only the steps on those things
+        (what the player is reaching for). The narrator never tells them; a creative idea of the player
+        that achieves one of them may be played as that step (`improvise`)."""
+        w = self.w
+        goals = {z.get("action"): z.get("goal", "") for z in w.g.get("puzzles", []) if isinstance(z, dict)}
+        scope = set(w.scope(st))
+        out: dict[str, dict] = {}
+        for a in w.rules:
+            if a["id"] in out or (a.get("place") and a["place"] != st.place):
+                continue
+            things = [x for x in (a.get("object"), a.get("target")) if x]
+            if not things or not all(x in scope for x in things) or not self._ready(st, a):
+                continue
+            if about is not None and not about & set(things):
+                continue
+            if w.scripts.risky(a) or w.scripts.red_herring(a) or not w.scripts.again(a, st):
+                continue
+            goal = goals.get(a["id"]) or a.get("hint") or ""
+            out[a["id"]] = {"step": a["id"], "goal": goal, "with": [w.name(x, st) for x in things]}
+        return list(out.values())
+
+    def _ready(self, st: State, rule: dict) -> bool:
+        """Its conditions hold once its trigger has picked up what lies here (the turn takes first,
+        `Turn.perform`: « je cueille les framboises et je les lance à Patapouf »)."""
+        w = self.w
+        if not w.builtins.would_take(st, rule.get("verb", ""), rule.get("object"), rule.get("target")):
+            return w.holds(st, rule.get("when"))
+        trial = st.copy()
+        w.builtins.take_for(trial, rule)
+        return w.holds(trial, rule.get("when"))
+
+    def progress(self, st: State) -> dict:
+        """Where the story stands, for the pacing (the puzzles of the chart solved, and the act: the
+        beginning, the middle, the finale), never what is left to do."""
+        w = self.w
+        puzzles = [
+            z["action"] for z in w.g.get("puzzles", []) if isinstance(z, dict) and isinstance(z.get("action"), str)
+        ]
+        if not puzzles:
+            return {}
+
+        def solved(x: str) -> bool:
+            if x in w.riddles:
+                return bool(w.prop(st, x, "answered"))
+            if w.items.get(x, {}).get("openable"):  # a code lock, a locked door
+                return bool(w.prop(st, x, "open"))
+            return x in st.done_actions
+
+        n = sum(map(solved, puzzles))
+        act = "beginning" if n * 3 < len(puzzles) else "middle" if n * 3 < 2 * len(puzzles) else "finale"
+        return {"solved": n, "of": len(puzzles), "act": w.say(act)}
+
     def blocked(self, st: State, x: dict) -> str:
         """Why a way out is shut (its door, or the author's words)."""
         w = self.w
@@ -85,6 +143,11 @@ class View:
             closed = "{Name} is locked." if locked else "{Name} is closed."
             return texts.get("locked" if locked else "closed") or w.say(closed, Name=w.lang.cap(w.name(door, st)))
         return x.get("blocked") or w.say("blocked")
+
+    def personas(self, st: State) -> dict[str, str]:
+        """How the people here are played (their `persona`), for the narrator's improvisation."""
+        w = self.w
+        return {w.name(c, st): p for c in w.chars_here(st) if (p := w.look(c, st).get("persona"))}
 
     def worth_exploring(self, st: State) -> list[str]:
         """Things here that something can be done with (an action, a pickup, a character to talk to):
@@ -123,19 +186,21 @@ class View:
             if a.get("place") == st.place or {a.get("object"), a.get("target")} & here - {None, st.place}:
                 coming |= args_of(a.get("effects"), "reveal", "gain")
         coming = {i for i in coming if i in w.items and st.items_at.get(i) == ""}
-        shown = _stems(
+        shown = self.w.lang.stems(
             self.describe(st)["description"] + " " + " ".join(w.look(t, st).get("description", "") for t in here)
         )
         for m in said:
             found, _ = w.names.resolve(m, sorted(coming))
-            if found and any(_stems(label) and _stems(label) <= shown for label in w.names.labels(found)):
+            if found and any(
+                self.w.lang.stems(label) and self.w.lang.stems(label) <= shown for label in w.names.labels(found)
+            ):
                 return found  # named in what he sees here: « tu le vois » (not for a secret under the hay)
         return None
 
     def seen_elsewhere(self, st: State, ident: str) -> bool:
-        """The hero saw it in a place he has been to, not here."""
+        """The hero saw it in a place he has seen lit, not here."""
         where = st.items_at.get(ident) or st.chars_at.get(ident) or ""
-        return where in st.visited and where != st.place
+        return where in st.seen and where != st.place
 
     # ------------------------------------------------------------ memories
     def note(self, st: State, text: str, about: str = "") -> str:
@@ -160,7 +225,7 @@ class View:
 
     # ------------------------------------------------------------ what is true, what can be done
     def truth(self, st: State, ident: str) -> str:
-        """What is true about a thing the child acts on in their own way (a locked door, a code, a
+        """What is true about a thing the player acts on in their own way (a locked door, a code, a
         riddle, someone holding it): the narrator invents the scene, and says this."""
         w = self.w
         item = w.items.get(ident, {})
@@ -183,7 +248,7 @@ class View:
         return ""
 
     def options(self, st: State) -> dict:
-        """What can be done here, to remind a child who goes round in circles: the ways, the things,
+        """What can be done here, to remind a player who goes round in circles: the ways, the things,
         the characters, the bag, and a few things to try (never which one wins)."""
         w = self.w
         here = self.describe(st)

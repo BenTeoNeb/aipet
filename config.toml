@@ -164,6 +164,14 @@ hang_up_after_secs = 8       # silence after his last words before hanging up (a
 guess_max_questions = 20     # « devine à quoi je pense »: Flocon gives up and asks after this many questions
 adventure_drafts = false     # also offer the data model's reference adventures (docs/adventure/model), « (nouvelle version) »
 
+[adventure]
+# How the child's sentence becomes game actions. "narrator": the conversation model decides (two
+# model calls per turn: the action, then the telling). "jev-shadow": TypeSafe's Jev (a decision model,
+# ≈ 0.3 s, through OpenRouter's Decisions API, zero data retention) also decides, in the background:
+# its reading is logged next to the narrator's (adventure_intent_shadow) and changes nothing.
+# Intent benchmark, 24/11/2026: when Jev is ≥ 0.7 confident (half the turns), 97 % right.
+intent = "jev-shadow"
+
 [family]
 # The children are not listed here: each pet learns their first names, ages and classes from them
 # (and keeps them in its own memory; classes advance every school year).

@@ -16,6 +16,7 @@ IDEMPOTENT = {
     "open",
     "unlock",
     "set",
+    "refill",
 }  # doing it again changes nothing
 HELD_VERBS = {
     "give",
@@ -45,8 +46,9 @@ NEVER_SCRIPTED = {
     "help",
     "other",
     "where",
+    "improvise",
 }  # built in: scripts can't use them
-# The verb carries little once two things are named (a child over speech recognition: « j'attrape les
+# The verb carries little once two things are named (a player over speech recognition: « j'attrape les
 # lucioles avec le bocal » is « remplir le bocal de lucioles »): such an action is found by its things,
 # whatever the verb, except for these, which mean something else (looking, talking, a cuddle, a blow,
 # leaving, playing).
@@ -54,4 +56,5 @@ NO_REMAP = {"hit", "touch", "talk", "ask", "go", "drop", "close", "inventory", "
             "smell", "listen", "read", "other", "dance", "sing", "sit", "wait", "jump", "destroy", "where"}  # fmt: skip
 OPENERS = {"open", "pull", "push", "use"}  # « tirer le tiroir » opens it
 WAYS = {"climb", "swim", "jump"}  # with a `to` and no thing: going somewhere
+SENSES = {"listen", "smell", "touch"}  # a place's or a thing's `senses`: what the hero hears, smells, feels
 PRESSERS = {"push", "use", "touch", "hit", "pull", "open"}  # « appuyer / toucher / taper sur le bouton rouge »

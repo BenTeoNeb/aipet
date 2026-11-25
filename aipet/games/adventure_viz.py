@@ -92,8 +92,11 @@ def _snapshot(w: World, st: State) -> dict:
         "chars_at": dict(st.chars_at),
         "done": list(st.done_actions),
         "props": {i: {k: w.prop(st, i, k) for k in ("open", "locked", "state", "answered", "follows", "pressed")}
+                  | ({"uses": w.uses_left(st, i)} if w.max_uses(i) else {})
                   for i in [*w.items, *w.chars]
-                  if w.thing(i).get("openable") or w.thing(i).get("states") or i in w.riddles or i in w.chars},
+                  if w.thing(i).get("openable") or w.thing(i).get("states") or i in w.riddles or i in w.chars
+                  or w.max_uses(i)},
+        "dark": w.dark(st),
         "handled": list(st.handled),
         "names": {i: w.name(i, st) for i in [*w.items, *w.chars] if w.thing(i).get("states")},
     }  # fmt: skip
@@ -287,8 +290,18 @@ def chain(w: World) -> dict:
         if at in w.items:  # in a container
             made = (opened(at) or []) + (present(at) or []) + made
         elif at:
-            made = (reach(at) or []) + made
+            made = (reach(at) or []) + lit(at) + made
         return made or None
+
+    def lit(place: str) -> list[str]:
+        """In a dark place, what makes a light shine: having it, and its conditions (any light)."""
+        if not w.places.get(place, {}).get("dark"):
+            return []
+        out = []
+        for light in w.lights:
+            rules = w.items[light]["light"] if isinstance(w.items[light]["light"], list) else []
+            out += [n for r in [f"has:{light}", *rules] for n in producers(r) or []]
+        return out
 
     def need(target: str, prods: list[str] | None, why: str, alt: bool = False):
         if not prods:
@@ -417,9 +430,9 @@ def played(worlds: dict[str, World], logs: Path) -> dict[str, list[dict]]:
                 mode = ("checkpoint" if args.get("from_checkpoint") else
                         "resume" if args.get("resume") else "replay" if args.get("replay") else "new")  # fmt: skip
                 if mode == "checkpoint" and title in checkpoint:
-                    st = State.from_dict(checkpoint.pop(title).to_dict())
+                    st = checkpoint.pop(title).copy()
                 elif mode == "resume" and title in last_state:
-                    st = State.from_dict(last_state[title].to_dict())
+                    st = last_state[title].copy()
                 else:
                     st = w.start()
                 game = {"session": f.stem, "t": ev.get("t", ""), "mode": mode, "turns": [],
@@ -429,7 +442,7 @@ def played(worlds: dict[str, World], logs: Path) -> dict[str, list[dict]]:
                 w = worlds[title]
                 intents, outcomes, fired = args.get("actions") or [{"verb": "look"}], [], []
                 for intent in intents:
-                    before = State.from_dict(st.to_dict())
+                    before = st.copy()
                     r = w.act(st, intent)
                     outcomes.append(r.get("outcome", "?"))
                     fired += [x for x in st.done_actions if x not in before.done_actions]
@@ -470,7 +483,20 @@ def describe(graph: dict, source: str, records: list[dict], games: list[dict]) -
         "things": {
             i: {
                 k: t.get(k)
-                for k in ("kind", "takeable", "openable", "container", "open", "locked", "key", "at", "state", "states")
+                for k in (
+                    "kind",
+                    "takeable",
+                    "openable",
+                    "container",
+                    "open",
+                    "locked",
+                    "key",
+                    "at",
+                    "state",
+                    "states",
+                    "uses",
+                    "light",
+                )
                 if k in t
             }
             for i, t in [*w.items.items(), *w.chars.items()]
@@ -482,7 +508,7 @@ def describe(graph: dict, source: str, records: list[dict], games: list[dict]) -
         "report": {
             k: (sorted(v) if isinstance(v, set) else v)
             for k, v in report.items()
-            if k in ("wins", "loses", "states", "complete", "shortest", "puzzles", "warnings")
+            if k in ("wins", "loses", "states", "complete", "shortest", "puzzles", "warnings", "chart")
         },  # fmt: skip
         "explore": ex,
         "roads": roads,

@@ -44,6 +44,8 @@ def fake_google_credentials(monkeypatch):
 def no_real_logs(monkeypatch, tmp_path):
     """Usage lines and logs written during a test go to a temporary folder, never the family's."""
     monkeypatch.setenv("PET_LOGS", str(tmp_path / "logs"))
+    monkeypatch.setenv("PET_CACHE", str(tmp_path / "cache"))
+    monkeypatch.setattr("aipet.games.adventure.SHADOW_ATLAS", False)  # no background search per test
 
 
 @pytest.fixture(autouse=True)

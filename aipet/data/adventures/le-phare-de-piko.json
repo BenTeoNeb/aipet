@@ -51,7 +51,11 @@
     "vagues",
     "galets",
     "algues échouées"
-   ]
+   ],
+   "senses": {
+    "listen": "Chhh… chhh… les vagues. Et tout au loin, tuut-tuuut : la corne du bateau de Zouzou qui cherche son chemin.",
+    "smell": "Ça sent le sel et le sable chaud."
+   }
   },
   {
    "id": "rochers",
@@ -84,7 +88,11 @@
     "crevettes",
     "mouettes",
     "écume"
-   ]
+   ],
+   "senses": {
+    "listen": "Ploc, les flaques… et cric-cric, des pinces qui claquent sur les rochers.",
+    "smell": "Ça sent la mer et les algues !"
+   }
   },
   {
    "id": "cabane",
@@ -116,7 +124,10 @@
     "chaise",
     "poisson grillé",
     "fenêtre"
-   ]
+   ],
+   "senses": {
+    "smell": "Mmm, le poisson grillé !"
+   }
   },
   {
    "id": "pied_phare",
@@ -188,7 +199,10 @@
     "vent",
     "escalier",
     "mer"
-   ]
+   ],
+   "senses": {
+    "listen": "Le vent siffle, fiouuu ! Et tout en bas, la mer cogne contre les rochers : boum… boum…"
+   }
   }
  ],
  "items": [
@@ -394,6 +408,7 @@
    ],
    "at": "plage",
    "description": "Un petit hérisson aux piquants tout doux, très inquiet pour son amie Zouzou.",
+   "persona": "Parle vite en se tortillant, avec des « oh là là ! » et des petits reniflements inquiets. Gentil et très attaché à son amie Zouzou, il a peur qu'elle se perde dans la nuit. Il s'accroche au héros comme à un grand frère et saute de joie à chaque bonne nouvelle.",
    "says": [
     {
      "when": [
@@ -423,6 +438,7 @@
    ],
    "at": "rochers",
    "description": "Un gros crabe rouge et grognon, avec deux grosses pinces.",
+   "persona": "Parle en claquant des pinces, « clac clac ! », et grogne « grrr ! » au début de ses phrases. Grognon surtout quand il a faim, il aime les algues et déteste qu'on l'embête. Il se méfie du héros et le menace de ses pinces, puis devient tout content et bavard une fois de bonne humeur.",
    "says": "Grrr ! Moi, j'adore les algues. Et ne m'embête pas, sinon je pince !",
    "initial": "Pinces le crabe, tout grognon, serre une petite clé dans sa pince : gare à ses pinces si on l'embête !",
    "states": [
@@ -449,6 +465,7 @@
    ],
    "at": "sommet",
    "description": "Un vieux hérisson aux piquants tout blancs, avec une casquette de marin.",
+   "persona": "Parle d'une voix chevrotante de vieux marin, en ajustant sa casquette, avec des « mille sabords, mon petit ! ». Sage et prudent, il aime son phare et tient à ce que les choses dangereuses restent pour les grands. Il est très reconnaissant au héros d'être monté jusqu'à lui et le félicite chaleureusement.",
    "says": "Ah, merci d'être monté ! Pour allumer la grande lampe, il me faut des allumettes : les allumettes, c'est pour les grands, alors apporte-les-moi et c'est moi qui l'allumerai. Ou alors… une lumière qui ne brûle pas, comme celle des lucioles ?"
   }
  ],

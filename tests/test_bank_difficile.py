@@ -33,12 +33,17 @@ def test_le_miroir_du_phare_d_alexandrie(tmp_path, monkeypatch):
         ("Je mets du sable sur le chiffon",
          [A("take", "le sable"), A("combine", "le sable", "le chiffon")], ["done", "done"]),
         ("Je vais au phare et j'ouvre la porte", [G("le pied du phare"), A("open", "la porte")], ["done", "done"]),
-        ("J'entre et je monte en haut", [G("dedans"), G("en haut")], ["done", "not_yet"]),  # Pistache
+        ("J'entre et je monte en haut", [G("dedans"), G("en haut")], ["done", "not_yet"]),  # Pistache, felt
+        ("Je donne les figues à Pistache", [A("give", "les figues", "Pistache")], ["not_yet"]),  # all dark
+        ("Je ressors, je remplis ma lampe et je l'allume",
+         [G("dehors"), A("fill", "la lampe", "l'amphore"), A("light", "la lampe")], ["done"] * 3),
+        ("Je rentre dans le phare", [G("dedans")], ["done"]),  # the little lamp lights the ramp
         ("Je grimpe sur l'âne", [A("climb", "l'âne")], ["warning"]),
         ("(il insiste) Oui, je suis sûr !", [A("climb", "l'âne")], ["end"]),
         ("Oh non ! On recommence juste avant", RETRY, None),
         ("Je donne les figues à Pistache", [A("give", "les figues", "Pistache")], ["done"]),
-        ("Je monte tout en haut", [G("en haut")], ["done"]),
+        ("Je monte tout en haut", [G("en haut")], ["done"]),  # the little lamp burns its oil out
+        ("Je remets de l'huile dans ma lampe", [A("fill", "la lampe", "l'amphore")], ["done"]),
         ("Je tourne le miroir", [A("push", "le miroir")], ["not_yet"]),  # no fire, still dull
         ("Je verse l'huile dans le feu et je l'allume",
          [A("fill", "l'huile", "le feu"), A("light", "le feu")], ["done", "done"]),
@@ -67,7 +72,7 @@ def test_la_lanterne_de_la_grande_muraille(tmp_path, monkeypatch):
         ("Je cherche une feuille sur le séchoir", [A("search", "le séchoir")], ["not_yet"]),  # his lantern riddle first
         ("C'est le soleil !", [A("answer", "le soleil", "Petit Lu")], ["not_yet"]),
         ("C'est la lune !", [A("answer", "la lune", "Petit Lu")], ["done"]),
-        ("Je cherche une feuille bien sèche sur le séchoir", [A("search", "le séchoir")], ["done"]),
+        ("Je touche les feuilles du séchoir une à une", [A("touch", "le séchoir")], ["done"]),  # this one is dry
         ("Je prends la feuille", [A("take", "la feuille")], ["done"]),
         ("Je retourne au village et à la maison de thé",
          [G("le pont"), G("le village"), G("la maison de thé")], ["done"] * 3),
@@ -127,7 +132,7 @@ def test_le_petit_rover_de_la_lune(tmp_path, monkeypatch):
         ("Je sors sur la Lune", [G("dehors")], ["done"]),
         ("Je vais au gros rocher", [G("le gros rocher")], ["done"]),
         ("Je saute de joie", [A("jump")], ["clue"]),  # a small hop
-        ("Je fouille le tas de poussière", [A("search", "le tas de poussière")], ["done"]),
+        ("Je touche le tas de poussière", [A("touch", "le tas de poussière")], ["done"]),  # feels the tape
         ("Je saute du haut du rocher", [A("jump", "le rocher")], ["warning"]),
         ("(il insiste) Oui, je suis sûr !", [A("jump", "le rocher")], ["end"]),
         ("Oh non ! On recommence juste avant", RETRY, None),
@@ -141,6 +146,11 @@ def test_le_petit_rover_de_la_lune(tmp_path, monkeypatch):
         ("Je vais au cratère", [G("la plaine"), G("le cratère")], ["done", "done"]),
         ("Je saute de joie", [A("jump")], ["free"]),
         ("Je descends dans le cratère", [G("en bas")], ["done"]),
+        ("J'écoute", [A("listen")], ["done"]),  # not a sound: no air on the Moon
+        ("Je regarde la fente", [A("examine", "la fente")], ["not_yet"]),  # dark: Bip drank the battery, no lamp
+        ("Je remonte et je recharge la batterie au soleil",
+         [G("en haut"), G("la plaine"), A("use", "la batterie", "le panneau solaire")], ["done"] * 3),
+        ("Je redescends dans le cratère", [G("le cratère"), G("en bas")], ["done", "done"]),  # the helmet's lamp
         ("Je prends la pierre qui brille", [A("take", "la pierre")], ["not_yet"]),  # deep in the crack
         ("J'attrape la pierre avec la pince", [A("use", "la pince", "la fente")], ["not_yet"]),  # too short
         ("Je mets la pince au bout du manche", [A("combine", "la pince", "le manche")], ["done"]),
@@ -151,3 +161,33 @@ def test_le_petit_rover_de_la_lune(tmp_path, monkeypatch):
         ("Je donne la pierre bleue à la capitaine", [A("give", "la pierre bleue", "Lou")], ["end"]),
     ])  # fmt: skip
     assert game.state.ending == "pierre" and [r["outcome"] for r in game.adventure["runs"]] == ["lose", "win"]
+
+
+def test_la_lunette_de_mimi(tmp_path, monkeypatch):
+    game = play(tmp_path, monkeypatch, "La lunette de Mimi", [
+        ("Bonjour Mimi !", [A("talk", "Mimi")], ["done"]),
+        ("J'écoute", [A("listen")], ["done"]),  # the fountain, the pigeons
+        ("Je fouille la fontaine et je prends la pièce",
+         [A("search", "la fontaine"), A("take", "la pièce")], ["done", "done"]),
+        ("Je vais à la boulangerie", [G("la boulangerie")], ["done"]),
+        ("J'achète un croissant", [A("give", "la pièce", "Choco")], ["done"]),
+        ("J'écoute le tonneau", [A("listen", "le tonneau")], ["done"]),  # hollow, something gurgles below
+        ("Je pousse le tonneau et je descends", [A("push", "le tonneau"), G("en bas")], ["done", "done"]),
+        ("Je donne le croissant au rat", [A("give", "le croissant", "Grignote")], ["not_yet"]),  # all dark
+        ("J'écoute", [A("listen")], ["done"]),  # a belly gurgles
+        ("Je remonte et je prends la bougie", [G("en haut"), A("take", "la bougie")], ["done", "done"]),
+        ("J'allume la bougie au four", [A("light", "la bougie")], ["done"]),
+        ("Je redescends dans la cave", [G("en bas")], ["done"]),
+        ("Je donne le croissant au rat", [A("give", "le croissant", "Grignote")], ["done"]),
+        ("Je prends l'aimant", [A("take", "l'aimant")], ["done"]),
+        ("Je vais au jardin", [G("en haut"), G("la place"), G("le jardin")], ["done"] * 3),
+        ("Je fouille la haie et je prends la ficelle",
+         [A("search", "la haie"), A("take", "la ficelle")], ["done", "done"]),
+        ("J'attache l'aimant à la ficelle", [A("combine", "la ficelle", "l'aimant")], ["done"]),
+        ("Je vais au puits", [G("la place"), G("le puits")], ["done", "done"]),
+        ("Je pêche la clé avec ma canne", [A("use", "la canne", "le puits")], ["done"]),
+        ("Je vais à la tour", [G("la place"), G("la forêt"), A("open", "la porte"), G("la tour")], ["done"] * 4),
+        ("Je remets la lentille dans la lunette", [A("use", "la lentille", "la lunette")], ["done"]),
+        ("Je regarde dans la lunette", [A("examine", "la lunette")], ["end"]),
+    ])  # fmt: skip
+    assert game.state.ending == "etoiles"

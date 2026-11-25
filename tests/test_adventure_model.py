@@ -432,7 +432,12 @@ def test_a_key_thrown_into_the_sea_ends_the_game_when_he_runs_into_it(w):
     st.place, st.inventory, st.items_at["cle"] = "rochers", ["cle"], "inv"
     st.items_at["allumettes"] = "inv"
     st.inventory.append("allumettes")
-    thrown = w.act(st, {"verb": "destroy", "object": "la clé"})
+    pause = w.act(st, {"verb": "destroy", "object": "la clé"})  # once, the story makes him think twice
+    assert (
+        pause["outcome"] == "warning" and pause["précieux"] == "une petite clé dorée" and "subtilité" in pause["note"]
+    )
+    assert "cle" in st.inventory and not st.doomed
+    thrown = w.act(st, {"verb": "destroy", "object": "la clé"})  # he insists: it happens
     assert thrown["outcome"] == "done" and st.doomed["lost"] == "cle" and not st.ending  # not yet: he doesn't know
     assert w.act(st, {"verb": "go", "to": "plage"})["outcome"] == "done"
     assert w.act(st, {"verb": "go", "to": "phare"})["outcome"] == "done"
@@ -489,7 +494,7 @@ def test_a_failed_try_says_how_far_the_next_hint_is(w):
     st = w.start()
     st.place = "cabane"
     res = w.act(st, {"verb": "open", "object": "le tiroir"})
-    assert res["outcome"] == "not_yet" and res["essais_avant_indice"] == w.spec["hint_after"] - 1
+    assert res["outcome"] == "not_yet" and res["essais_avant_indice"] == w.policy["hint_after"] - 1
 
 
 def test_the_decor_is_there_to_play_with(w):

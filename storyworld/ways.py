@@ -1,16 +1,13 @@
-"""Going and « where is… »: the ways out named by the child (a destination, a label, a direction, or
+"""Going and « where is… »: the ways out named by the player (a destination, a label, a direction, or
 someone over there), going through them (a closed door opens on the way when it can), and where a
 thing or a place is, from what the hero knows."""
 
 from __future__ import annotations
 
 from collections import deque
+from collections.abc import Set as AbstractSet
 from typing import TYPE_CHECKING
 
-from storyworld.locale.fr import (
-    _norm,
-    _way,
-)
 from storyworld.model import (
     State,
 )
@@ -31,14 +28,16 @@ class Ways:
         exits = w.exits(st)
         if not exits:
             return {"outcome": "no_exit", "text": w.say("There's no way out over there.")}
-        words = _way(to)
-        if len(exits) == 1 and (not words or _norm(to) in ("sortir", "dehors", "partir")):
+        words = self.w.lang.way(to)
+        if len(exits) == 1 and (not words or self.w.lang.norm(to) in self.w.lang.leave_words):
             return self.through(st, exits[0])
 
         def names(x: dict) -> list[str]:  # an exit is named by its destination, its label or its direction
             return [x.get("to", ""), x.get("label", ""), x.get("dir", ""), *w.names.labels(x.get("to", ""))]
 
-        scored = [(int(to == x.get("to") or any(lw and lw == words for lw in map(_way, names(x)))), x) for x in exits]
+        scored = [
+            (int(to == x.get("to") or any(lw and lw == words for lw in map(w.lang.way, names(x)))), x) for x in exits
+        ]
         top = max(sc for sc, _ in scored)
         if not top:  # « chez la taupe », « vers le levier »: where someone or something is
             return self._towards(st, to, words, exits)
@@ -51,7 +50,7 @@ class Ways:
             }
         return self.through(st, best_exits[0])
 
-    def _towards(self, st: State, to: str, words: set[str], exits: list[dict]) -> dict:
+    def _towards(self, st: State, to: str, words: AbstractSet[str], exits: list[dict]) -> dict:
         """No way is named: the way to where someone or something is, or it is right here."""
         w = self.w
         resolve = w.names.resolve
@@ -79,11 +78,13 @@ class Ways:
             opened = w.builtins.open(st, door)
             if opened["outcome"] != "done":
                 return opened
-        if w.enter(st, x["to"]):
+        burnt: list[str] = []
+        if w.enter(st, x["to"], burnt):
             st.score += 2
         return {
             "outcome": "done",
             **({"text": opened["text"]} if opened.get("text") else {}),
+            **({"changes": burnt} if burnt else {}),
             "arrival": w.view.describe(st),
         }
 
@@ -142,6 +143,6 @@ class Ways:
         place = at
         while place and place not in w.places:  # in a container, or held by someone
             place = st.items_at.get(place) or st.chars_at.get(place) or ""
-        if place in st.visited and place != st.place:
+        if place in st.seen and place != st.place:
             return w.say("You saw {name} near {of_place}.", name=name, of_place=w.lang.of(w.name(place)))
         return w.say("You haven't seen {name} yet. Explore, or ask someone!", name=name)

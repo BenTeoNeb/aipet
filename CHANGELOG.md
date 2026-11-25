@@ -22,6 +22,11 @@ versions follow [Semantic Versioning](https://semver.org/) once the first releas
   princess's Sphinx-like riddle) and recipes, concrete and silly (a smelly mitten for the goat, a
   peppered scarf that makes the guard sneeze, a papyrus mouse for the cat), each a second way to
   solve a puzzle or a harmless joke. Three recipe patterns in the catalogue.
+- `storyworld`: darkness (a `dark` place shows only its ways out until an item with `light` shines
+  there), uses (`uses`, `spend:`, `refill:`, `charged:`, `texts.empty`; a light with uses burns one
+  on leaving the dark) and senses (`senses: {listen, smell, touch}` on places and things, told when
+  the hero listens, smells or touches, and in the dark). Four patterns in the catalogue; the
+  generator and the narrator know them.
 
 ### Fixed
 - The solver now takes what an action's words name, as the turn does (combining with something

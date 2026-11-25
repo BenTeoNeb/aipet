@@ -88,6 +88,7 @@ def _all_conditions(graph: dict) -> list[str]:
     out += [r for p in graph.get("places", []) for x in p.get("exits", []) for r in x.get("when") or []]
     for t in [*graph.get("places", []), *graph.get("items", []), *graph.get("characters", [])]:
         out += [r for d in t.get("details") or [] for r in d.get("when") or []]
+    out += [r for i in graph.get("items", []) if isinstance(i.get("light"), list) for r in i["light"]]
     return [r for r in out if isinstance(r, str)]
 
 
@@ -107,6 +108,9 @@ class State:
     items_at: dict[str, str] = field(default_factory=dict)  # item → place id, "" (nowhere) or "gone"
     chars_at: dict[str, str] = field(default_factory=dict)
     visited: list[str] = field(default_factory=list)
+    seen: list[str] = field(default_factory=list)  # places seen lit (a dark place visited blind is not)
+    known: list[str] = field(default_factory=list)  # clues met (`puzzles[].clue_in` of codes and riddles)
+    tried: list[str] = field(default_factory=list)  # the things of the last tries that led nowhere (for hints)
     ending: str | None = None
     turns: int = 0
     stalled: int = 0  # turns without progress (for the reminders and hints)
@@ -121,15 +125,33 @@ class State:
     props: dict[str, dict] = field(default_factory=dict)
     handled: list[str] = field(default_factory=list)
     # The adventure can't be won any more (a needed thing destroyed): {lost, text, before (the state
-    # just before)}. It ends when the child runs into it, not when it happens.
+    # just before)}. It ends when the player runs into it, not when it happens.
     doomed: dict = field(default_factory=dict)
+    destroyed: str = ""  # the last thing destroyed: off the solver's ways, each change is checked again
+    improvised: list[str] = field(default_factory=list)  # the steps a creative idea of the player did
 
     def to_dict(self) -> dict:
         return copy.deepcopy(self.__dict__)
 
+    def copy(self) -> State:
+        """An independent copy, field by field (the solver makes one per edge: a deepcopy walks every
+        string). The same as `State.from_dict(self.to_dict())`."""
+        d = dict(self.__dict__)
+        for k, v in d.items():
+            if type(v) is list:
+                d[k] = v[:]
+        d["items_at"] = dict(self.items_at)
+        d["chars_at"] = dict(self.chars_at)
+        d["props"] = {i: dict(v) for i, v in self.props.items()}
+        d["notes"] = {i: v[:] for i, v in self.notes.items()}
+        d["doomed"] = copy.deepcopy(self.doomed) if self.doomed else {}
+        return State(**d)
+
     @classmethod
     def from_dict(cls, d: dict) -> State:
         known = {k: v for k, v in d.items() if k in cls.__dataclass_fields__}
+        if "seen" not in known:  # saved before darkness: every visited place was seen
+            known["seen"] = list(known.get("visited") or [])
         return cls(**copy.deepcopy(known))
 
     def key(self) -> tuple:
@@ -148,6 +170,7 @@ class State:
 # ---- fields ----
 STATE_FIELDS = {"id", "name", "aliases", "description", "initial", "says"}
 SITUATED = ("says", "initial")  # a text, or [{when, text}]: the first that holds
-TEXT_FIELDS = {"open", "locked", "unlock", "closed"}
+TEXT_FIELDS = {"open", "locked", "unlock", "closed", "empty"}
+SENSE_FIELDS = {"listen", "smell", "touch"}
 CODE_FIELDS = {"press", "right", "wrong", "done", "hint"}
 ANSWER_FIELDS = {"question", "accept", "right", "wrong", "hint", "effects"}

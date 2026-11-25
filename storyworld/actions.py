@@ -3,7 +3,7 @@
 Matching an intent to a scripted action ranks every rule (one per trigger) on two scales, then
 chooses among the ranked ones.
 
-Verb tier (the child's canonical verb against the trigger's):
+Verb tier (the player's canonical verb against the trigger's):
 
     ======  =====  ==============================================================================
     tier    name   when
@@ -17,7 +17,7 @@ Verb tier (the child's canonical verb against the trigger's):
     0       NONE   not this action
     ======  =====  ==============================================================================
 
-Things rank (what the child named against the trigger's object and target):
+Things rank (what the player named against the trigger's object and target):
 
     ======  =========  ===========================================================================
     rank    name       when
@@ -117,6 +117,8 @@ class Actions:
                 return False
             if kind == "set" and w.prop(st, arg, "state") != r.last:
                 return False
+            if kind == "refill" and w.uses_left(st, arg) < w.max_uses(arg):
+                return False
         return True
 
     def risky(self, a: dict) -> bool:
@@ -166,7 +168,7 @@ class Actions:
             x in st.inventory for x in wanted - said)  # fmt: skip
 
     def remap_allowed(self, a: dict, verb: str, obj: str | None, st: State) -> bool:
-        """May the child's verb do this action because the things match? Never for a loss, a blow or
+        """May the player's verb do this action because the things match? Never for a loss, a blow or
         a look; and taking a thing that can be taken is taking it."""
         if verb in NO_REMAP or a.get("verb") in NO_REMAP or self.risky(a):
             return False
@@ -202,7 +204,7 @@ class Actions:
         ranked = self.ranked(st, verb, obj, tgt)
         if not ranked:
             return None
-        # The child's verb first (its tier), then: what can run now, the closest things, real steps
+        # The player's verb first (its tier), then: what can run now, the closest things, real steps
         # before clues — a clue on the same things must not hide the real action.
         steps = [m for m in ranked if self.again(m.rule, st) and not self.red_herring(m.rule)]
         tier = max(m.verb for m in (steps or ranked))  # a done action or a clue never hides a real step
@@ -221,7 +223,7 @@ class Actions:
         best = max(m.things for m in ready)
         top = list({m.rule["id"]: m.rule for m in ready if m.things == best}.values())  # one per action
         risky = [a for a in top if self.risky(a) and a["id"] not in st.warned]
-        if risky:  # the first time: a warning, the child may still do it (losing stays possible)
+        if risky:  # the first time: a warning, the player may still do it (losing stays possible)
             st.warned.append(risky[0]["id"])
             return {"outcome": "warning", "text": risky[0].get("warning") or w.lang.warning}
         if best == THINGS_PARTIAL and len({a.get("target") or a.get("object") for a in top}) > 1:
@@ -232,13 +234,26 @@ class Actions:
     def do(self, st: State, a: dict) -> dict:
         """Do an action: its effects, its points, its text (and the arrival when it moves the hero)."""
         w = self.w
-        changes = w.apply(st, a.get("effects", []))
+        taken = w.builtins.take_for(st, a)
+        changes = [w.say("gained: {thing}", thing=w.name(i, st)) for i in taken] + w.apply(st, a.get("effects", []))
         st.done_actions.append(a["id"])
         st.score += int(a.get("points", 5))
         out: dict = {"outcome": "done", "text": a.get("text", ""), "changes": changes}
         if of_kind(a.get("effects"), "goto"):
             out["arrival"] = w.view.describe(st)
         return out
+
+    def _empty(self, st: State, real: list[dict]) -> str:
+        """An action that would run but for a thing with no use left: what that thing says when empty."""
+        w = self.w
+        for a in real:
+            failing = [r for r in parse_all(a.get("when")) if not w.holds(st, [str(r)])]
+            if failing and all(r.kind == "charged" and not r.negated for r in failing):
+                x = failing[0].arg
+                return w.items.get(x, {}).get("texts", {}).get("empty") or w.say(
+                    "{Name} is empty.", Name=w.lang.cap(w.name(x, st))
+                )
+        return ""
 
     def _not_now(self, st: State, fresh: list[Match]) -> dict:
         """Nothing can run now: a clue told as story, or the author's nudge (« not yet »)."""
@@ -250,5 +265,7 @@ class Actions:
             a = clues[0]
             return {"outcome": "clue", "text": (a.get("text") if not a.get("effects") and self.w.holds(st, a.get("when"))
                                                 else a.get("not_yet")) or a.get("text", "")}  # fmt: skip
+        if empty := self._empty(st, real):
+            return {"outcome": "not_yet", "text": empty}
         nudge = next((a.get("not_yet") for a in real if a.get("not_yet")), "")
         return {"outcome": "not_yet", "text": nudge or self.w.say("Not yet… something is missing.")}

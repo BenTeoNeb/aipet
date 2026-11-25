@@ -7,12 +7,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from storyworld.locale.fr import (
-    BAG,
-    _norm,
-    _norm_keep,
-    _stems,
-)
 from storyworld.model import (
     State,
 )
@@ -22,6 +16,7 @@ from storyworld.verbs import (
     LOOK_AT,
     OPENERS,
     PRESSERS,
+    SENSES,
     SYMMETRIC,
     TALK,
 )
@@ -62,6 +57,10 @@ class Builtins:
         if verb == "drop" and obj in st.inventory:
             # Never needed, and it could strand an object behind a one-way path: the hero keeps it.
             return {"outcome": "impossible", "text": w.say("You'd rather keep it in your bag: it might come in handy!")}
+        if verb == "light" and obj == st.place and w.dark(st):  # « j'allume la lumière » with nothing to light
+            return {"outcome": "not_yet", "text": w.say("It's too dark to see that: you'd need some light.")}
+        if verb in SENSES and obj and (felt := self.sense(st, verb, obj)):
+            return felt
         if verb in LOOK_AT:
             return self.look_at(st, obj)
         if verb in TALK and obj and (said := self.talk(st, obj)):
@@ -72,7 +71,7 @@ class Builtins:
         return out
 
     def free(self, *about: str | None) -> dict:
-        """The child's own play: the narrator invents it, the world doesn't change."""
+        """The player's own play: the narrator invents it, the world doesn't change."""
         return {"outcome": "free", "about": [a for a in about if a], "note": self.w.lang.free_note}
 
     # ------------------------------------------------------------ opening, taking, destroying
@@ -123,17 +122,24 @@ class Builtins:
         if x not in st.handled:
             st.handled.append(x)
 
+    def take_for(self, st: State, rule: dict) -> list[str]:
+        """An action done takes what its trigger holds in hand (the trigger played, not the others)."""
+        return self.implicit_take(st, rule.get("verb", ""), rule.get("object"), rule.get("target"))
+
+    def would_take(self, st: State, verb: str, obj: str | None, tgt: str | None) -> list[str]:
+        """What `implicit_take` would pick up (nothing changes)."""
+        w = self.w
+        held_nouns = [obj] + ([tgt] if verb in SYMMETRIC else [])
+        return [x for x in held_nouns
+                if verb in HELD_VERBS and x in w.items and x not in st.inventory and w.items[x].get("takeable")
+                and x in w.visible_items(st)]  # fmt: skip
+
     def implicit_take(self, st: State, verb: str, obj: str | None, tgt: str | None) -> list[str]:
         """Giving, using or throwing a thing that lies here takes it first (Inform's implicit taking):
         « je donne l'algue au crabe » with the seaweed at his feet."""
-        w = self.w
-        held_nouns = [obj] + ([tgt] if verb in SYMMETRIC else [])
-        taken = []
-        for x in held_nouns:
-            if verb in HELD_VERBS and x in w.items and x not in st.inventory and w.items[x].get("takeable") \
-                    and x in w.visible_items(st):  # fmt: skip
-                self._pick_up(st, x)
-                taken.append(x)
+        taken = self.would_take(st, verb, obj, tgt)
+        for x in taken:
+            self._pick_up(st, x)
         return taken
 
     def in_closed(self, st: State, said: list[str]) -> tuple[str, str] | None:
@@ -193,6 +199,8 @@ class Builtins:
         out: dict = {"outcome": "done", "description": w.text(t.get("description", ""), t.get("details"), st)}
         if st.notes.get(obj):
             out["memories"] = st.notes[obj]
+        if w.max_uses(obj):
+            out["uses_left"] = w.uses_left(st, obj)
         if t.get("openable") or any(at == obj for at in st.items_at.values()):
             inside = [w.name(i, st) for i, at in st.items_at.items() if at == obj]
             out["inside"] = (
@@ -202,6 +210,15 @@ class Builtins:
             )
         return out
 
+    def sense(self, st: State, verb: str, obj: str) -> dict | None:
+        """Listening, smelling, touching: what the author wrote the hero hears, smells or feels there
+        (`senses`), the narrator says it (None: nothing written, the narrator imagines)."""
+        w = self.w
+        t = w.places.get(obj) if obj == st.place else w.look(obj, st)
+        senses = (t or {}).get("senses")
+        text = senses.get(verb) if isinstance(senses, dict) else None
+        return {"outcome": "done", "description": text} if text else None
+
     def talk(self, st: State, obj: str) -> dict | None:
         """Talking to someone: their riddle first, else what they say (None: not someone to talk to)."""
         w = self.w
@@ -210,12 +227,23 @@ class Builtins:
                     "question": w.thing(obj)["answer"].get("question", ""),
                     "note": w.say("A riddle: ask the question, and pass the answer with the verb answer.")}  # fmt: skip
         if obj in w.chars:
-            return {"outcome": "done", "says": w.look(obj, st).get("says", "…")}
+            persona = w.look(obj, st).get("persona")
+            return {
+                "outcome": "done",
+                "says": w.look(obj, st).get("says", "…"),
+                **({"persona": persona} if persona else {}),
+            }
         return None
 
     def inventory(self, st: State) -> dict:
         w = self.w
-        return {"outcome": "done", "inventory": [w.name(i, st) for i in st.inventory] or [w.say("nothing")]}
+
+        def named(i: str) -> str:
+            if not w.max_uses(i):
+                return w.name(i, st)
+            return w.say("{thing} ({n} uses left)", thing=w.name(i, st), n=w.uses_left(st, i))
+
+        return {"outcome": "done", "inventory": [named(i) for i in st.inventory] or [w.say("nothing")]}
 
     # ------------------------------------------------------------ code locks, riddles
     def press(self, st: State, button: str) -> dict:
@@ -249,9 +277,12 @@ class Builtins:
         return [r for r in w.riddles if r in here and not w.prop(st, r, "answered")]
 
     def right_answer(self, who: str, said: str) -> bool:
-        """Is what the child said one of the accepted answers (« un peigne », « c'est le peigne ! »)?"""
-        words = _stems(said)
-        return any(_stems(a) and _stems(a) <= words for a in self.w.thing(who)["answer"].get("accept", []))
+        """Is what the player said one of the accepted answers (« un peigne », « c'est le peigne ! »)?"""
+        words = self.w.lang.stems(said)
+        return any(
+            self.w.lang.stems(a) and self.w.lang.stems(a) <= words
+            for a in self.w.thing(who)["answer"].get("accept", [])
+        )
 
     def solve_riddle(self, st: State, who: str) -> dict:
         w = self.w
@@ -264,7 +295,7 @@ class Builtins:
         return {"outcome": "done", "text": ans.get("right") or w.say("Well done, that's it!"), "changes": changes}
 
     def answer(self, st: State, said: str, to: str) -> dict:
-        """The child's answer to a riddle or a password, in their words."""
+        """The player's answer to a riddle or a password, in their words."""
         w = self.w
         here = self.riddles_here(st)
         who = w.names.resolve(to, here)[0] if to else (here[0] if len(here) == 1 else None)
@@ -283,7 +314,9 @@ class Builtins:
     def bag(self, said: str | None, st: State) -> bool:
         """The hero's own bag (« mon sac », « ma poche »), unless a thing of the adventure is meant (the
         pockets of the coat)."""
-        if not said or (_norm(said) not in BAG and _norm_keep(said) not in BAG):
+        if not said or (
+            self.w.lang.norm(said) not in self.w.lang.bag and self.w.lang.norm_keep(said) not in self.w.lang.bag
+        ):
             return False
         found, amb = self.w.names.find(said, st)
         return not found and not amb
@@ -291,8 +324,8 @@ class Builtins:
     def decor(self, st: State, said: list[str]) -> str:
         """The decor of the place a word names (« un gros caillou » → « cailloux »), or ""."""
         w = self.w
-        words = _stems(" ".join(said))
+        words = self.w.lang.stems(" ".join(said))
         for d in w.places.get(st.place, {}).get("decor", []):
-            if _stems(d) & words:
+            if self.w.lang.stems(d) & words:
                 return w.lang.bare(d)
         return ""

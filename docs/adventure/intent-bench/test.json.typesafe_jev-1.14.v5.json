@@ -1,0 +1,6295 @@
+[
+ {
+  "said": "je prends le bol de farine",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "farine"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "farine"
+   }
+  ],
+  "conf": 0.86,
+  "ok": true
+ },
+ {
+  "said": "euh je dis bonjour à mamma rosa et après je secoue les pots sur l'étagère",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "rosa"
+    },
+    {
+     "verb": "push",
+     "object": "etagere"
+    }
+   ],
+   "why": "secouer les pots = push etagere"
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "rosa"
+   },
+   {
+    "verb": "other",
+    "object": "etagere"
+   }
+  ],
+  "conf": 0.35,
+  "ok": false
+ },
+ {
+  "said": "ok je l'attrape",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "farine"
+    }
+   ],
+   "why": "l' = la farine dont il vient de parler"
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "farine"
+   }
+  ],
+  "conf": 0.51,
+  "ok": true
+ },
+ {
+  "said": "on retourne dans la chambre du maître",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "chambre"
+    }
+   ],
+   "why": "lieu connu, pas voisin"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "chambre"
+   }
+  ],
+  "conf": 0.93,
+  "ok": true
+ },
+ {
+  "said": "je demande à mama roza comment on fait de la colle",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "rosa"
+    }
+   ],
+   "why": "mama roza = Mamma Rosa"
+  },
+  "acts": [
+   {
+    "verb": "ask",
+    "object": "rosa"
+   }
+  ],
+  "conf": 0.9,
+  "ok": true
+ },
+ {
+  "said": "je regarde dans le grand miroir",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "miroir"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "examine",
+    "object": "miroir"
+   }
+  ],
+  "conf": 0.46,
+  "ok": true
+ },
+ {
+  "said": "je mets le plan devant le miroir et je le lis",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "plan",
+     "target": "miroir"
+    },
+    {
+     "verb": "read",
+     "object": "plan"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "plan",
+    "target": "miroir"
+   },
+   {
+    "verb": "read",
+    "object": "plan",
+    "target": "miroir"
+   }
+  ],
+  "conf": 0.5,
+  "ok": true
+ },
+ {
+  "said": "je le réveille tout doucement",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "mascarpone"
+    }
+   ],
+   "why": "le = le chat Mascarpone"
+  },
+  "acts": [
+   {
+    "verb": "touch",
+    "object": "mascarpone"
+   }
+  ],
+  "conf": 0.89,
+  "ok": true
+ },
+ {
+  "said": "je pousse le gros chat pour voir ce qu'il y a dessous",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "push",
+     "object": "mascarpone"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "push",
+    "object": "mascarpone"
+   }
+  ],
+  "conf": 0.62,
+  "ok": true
+ },
+ {
+  "said": "euh je prends le truc",
+  "src": "opus",
+  "gold": {
+   "kind": "preciser",
+   "why": "rien de désigné : miroir, chat, la chose brillante sous le chat ?"
+  },
+  "acts": [],
+  "conf": 0.8,
+  "ok": true
+ },
+ {
+  "said": "je mélange la farine avec l'eau du seau",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "combine",
+     "object": "farine",
+     "target": "seau"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "combine",
+    "object": "farine",
+    "target": "seau"
+   }
+  ],
+  "conf": 0.49,
+  "ok": true
+ },
+ {
+  "said": "je regarde dans le puits et je jette une pièce dedans",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "puits"
+    },
+    {
+     "verb": "throw",
+     "target": "puits"
+    }
+   ],
+   "why": "pièce imaginaire : pas d'objet"
+  },
+  "acts": [
+   {
+    "verb": "examine",
+    "object": "puits"
+   },
+   {
+    "verb": "throw",
+    "target": "puits"
+   }
+  ],
+  "conf": 0.43,
+  "ok": true
+ },
+ {
+  "said": "les abeilles elles piquent ? moi j'ai peur des abeilles",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "why": "peur réelle, pas une action"
+  },
+  "acts": [],
+  "conf": 0.69,
+  "ok": true
+ },
+ {
+  "said": "on retourne à la cuisine",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "cuisine"
+    }
+   ],
+   "why": "lieu connu, pas voisin"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "cuisine"
+   }
+  ],
+  "conf": 0.93,
+  "ok": true
+ },
+ {
+  "said": "qu'est-ce que j'ai dans mon sac",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "inventory"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "inventory"
+   }
+  ],
+  "conf": 0.71,
+  "ok": true
+ },
+ {
+  "said": "je prends la torche",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "torche"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "torche"
+   }
+  ],
+  "conf": 0.94,
+  "ok": true
+ },
+ {
+  "said": "je prends la torche et je l'allume dans le feu",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "torche"
+    },
+    {
+     "verb": "light",
+     "object": "torche"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "torche"
+   },
+   {
+    "verb": "light",
+    "object": "torche",
+    "target": "feu"
+   }
+  ],
+  "conf": 0.69,
+  "ok": true
+ },
+ {
+  "said": "je lui demande ce qu'on doit faire",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "oukou"
+    }
+   ],
+   "why": "lui = Oukou"
+  },
+  "acts": [
+   {
+    "verb": "ask",
+    "object": "oukou"
+   }
+  ],
+  "conf": 0.87,
+  "ok": true
+ },
+ {
+  "said": "on va au petit bois",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "bois"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "bois"
+   }
+  ],
+  "conf": 0.91,
+  "ok": true
+ },
+ {
+  "said": "je danse autour du feu avec oukou",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "dance"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "dance"
+   }
+  ],
+  "conf": 0.41,
+  "ok": true
+ },
+ {
+  "said": "je ramasse les morceaux de charbon",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "charbon"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "charbon"
+   }
+  ],
+  "conf": 0.89,
+  "ok": true
+ },
+ {
+  "said": "je mets le charbon dans mon sac et je vais à la rivière",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "charbon"
+    },
+    {
+     "verb": "go",
+     "to": "riviere"
+    }
+   ],
+   "why": "rivière lieu connu lointain"
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "charbon"
+   },
+   {
+    "verb": "go",
+    "to": "riviere"
+   }
+  ],
+  "conf": 0.49,
+  "ok": true
+ },
+ {
+  "said": "j'écoute les petits bruits dans la grotte",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "listen"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "listen"
+   }
+  ],
+  "conf": 0.66,
+  "ok": true
+ },
+ {
+  "said": "je prend le chat bon",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "charbon"
+    }
+   ],
+   "why": "chat bon = charbon (STT)"
+  },
+  "acts": [],
+  "conf": 0.3,
+  "ok": false
+ },
+ {
+  "said": "je joue du tambour tout doucement",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "hit",
+     "object": "tambour"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "tambour"
+   }
+  ],
+  "conf": 0.52,
+  "ok": true
+ },
+ {
+  "said": "c'est la l'une",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "answer",
+     "object": "la lune",
+     "target": "lu"
+    }
+   ],
+   "why": "la l'une = la lune (STT), réponse à la devinette de Petit Lu"
+  },
+  "acts": [
+   {
+    "verb": "answer",
+    "object": "c'est la l'une",
+    "target": "lu"
+   }
+  ],
+  "conf": 0.7,
+  "ok": false
+ },
+ {
+  "said": "je cherche une feuille sèche sur le séchoir et je la prends",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search",
+     "object": "sechoir"
+    },
+    {
+     "verb": "take",
+     "object": "papier"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "search",
+    "target": "sechoir"
+   },
+   {
+    "verb": "take"
+   }
+  ],
+  "conf": 0.47,
+  "ok": true
+ },
+ {
+  "said": "je retourne à la forêt de bambous",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "bambous"
+    }
+   ],
+   "why": "lieu connu lointain"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "bambous"
+   }
+  ],
+  "conf": 0.81,
+  "ok": true
+ },
+ {
+  "said": "je mets mes mains dans la pâte à papier",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "bac"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "touch",
+    "object": "bac"
+   }
+  ],
+  "conf": 0.6,
+  "ok": true
+ },
+ {
+  "said": "tu peux me la redire petit lu",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "lu"
+    }
+   ],
+   "why": "la = la devinette"
+  },
+  "acts": [
+   {
+    "verb": "ask",
+    "object": "lu"
+   }
+  ],
+  "conf": 0.74,
+  "ok": true
+ },
+ {
+  "said": "je regarde les poissons dorés",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "carpes"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "examine",
+    "object": "carpes"
+   }
+  ],
+  "conf": 0.63,
+  "ok": true
+ },
+ {
+  "said": "je jette la pièce dans l'eau et je regarde les carpes",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "throw",
+     "object": "piece",
+     "target": "riviere"
+    },
+    {
+     "verb": "examine",
+     "object": "carpes"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "throw",
+    "object": "piece",
+    "target": "riviere"
+   },
+   {
+    "verb": "examine",
+    "object": "carpes"
+   }
+  ],
+  "conf": 0.38,
+  "ok": true
+ },
+ {
+  "said": "on retourne à la maison de thé",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "maison_the"
+    }
+   ],
+   "why": "lieu connu lointain"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "maison_the"
+   }
+  ],
+  "conf": 0.88,
+  "ok": true
+ },
+ {
+  "said": "je pêche une carpe avec mon foulard",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "foulard",
+     "target": "carpes"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "foulard",
+    "target": "carpes"
+   }
+  ],
+  "conf": 0.49,
+  "ok": false
+ },
+ {
+  "said": "je saute dans l'eau",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "jump",
+     "object": "riviere"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "jump"
+   }
+  ],
+  "conf": 0.65,
+  "ok": false
+ },
+ {
+  "said": "je prends le foulard rouge",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "foulard"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "foulard"
+   }
+  ],
+  "conf": 0.94,
+  "ok": true
+ },
+ {
+  "said": "j'ouvre la bouche du dragon et je prends le truc qui fait ding",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "open",
+     "object": "dragon"
+    },
+    {
+     "verb": "take",
+     "object": "piece"
+    }
+   ],
+   "why": "gueule du dragon = conteneur; le truc qui tinte = la pièce"
+  },
+  "acts": [
+   {
+    "verb": "open",
+    "object": "dragon"
+   },
+   {
+    "verb": "take"
+   }
+  ],
+  "conf": 0.52,
+  "ok": false
+ },
+ {
+  "said": "on retourne chez la dame du thé",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "maison_the"
+    }
+   ],
+   "why": "la maison de thé, déjà vue"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "maison_the"
+   }
+  ],
+  "conf": 0.92,
+  "ok": true
+ },
+ {
+  "said": "euh bonjour mamie mei",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "mei"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "mei"
+   }
+  ],
+  "conf": 0.89,
+  "ok": true
+ },
+ {
+  "said": "je mets le foulard sur ma tête comme une princesse",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "foulard"
+    },
+    {
+     "verb": "wear",
+     "object": "foulard"
+    }
+   ],
+   "why": "porter le foulard; il faut d'abord le prendre"
+  },
+  "acts": [
+   {
+    "verb": "wear",
+    "object": "foulard"
+   }
+  ],
+  "conf": 0.4,
+  "ok": false
+ },
+ {
+  "said": "je cherche une feuille bien sèche dans le séchoir",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search",
+     "object": "sechoir"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "search",
+    "object": "sechoir"
+   }
+  ],
+  "conf": 0.59,
+  "ok": true
+ },
+ {
+  "said": "c'est la lune",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "answer",
+     "object": "la lune",
+     "target": "lu"
+    }
+   ],
+   "why": "réponse à la devinette de Petit Lu (lanterne au-dessus de lui)"
+  },
+  "acts": [
+   {
+    "verb": "answer",
+    "object": "c'est la lune",
+    "target": ""
+   }
+  ],
+  "conf": 0.44,
+  "ok": false
+ },
+ {
+  "said": "je dis bonjour à petit lu et je lui demande comment on fait le papier",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "lu"
+    },
+    {
+     "verb": "ask",
+     "object": "lu"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "lu"
+   },
+   {
+    "verb": "ask",
+    "object": "lu"
+   }
+  ],
+  "conf": 0.51,
+  "ok": true
+ },
+ {
+  "said": "on retourne sur le pont",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "pont"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "pont"
+   }
+  ],
+  "conf": 0.85,
+  "ok": true
+ },
+ {
+  "said": "tu sais moi aussi à l'école on a fait du papier avec la maîtresse",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "why": "raconte sa vie au pet"
+  },
+  "acts": [],
+  "conf": 0.98,
+  "ok": true
+ },
+ {
+  "said": "je caresse le chameau",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "dodu"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "touch",
+    "object": "dodu"
+   }
+  ],
+  "conf": 0.92,
+  "ok": true
+ },
+ {
+  "said": "je pousse dodu et après je grimpe sur sa bosse",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "push",
+     "object": "dodu"
+    },
+    {
+     "verb": "climb",
+     "object": "dodu"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "push",
+    "object": "dodu"
+   },
+   {
+    "verb": "climb",
+    "object": "dodu"
+   }
+  ],
+  "conf": 0.77,
+  "ok": true
+ },
+ {
+  "said": "je lui fais sentir mon foulard",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "foulard",
+     "target": "dodu"
+    }
+   ],
+   "why": "lui = Dodu; foulard plein de poivre"
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "foulard",
+    "target": "dodu"
+   }
+  ],
+  "conf": 0.77,
+  "ok": true
+ },
+ {
+  "said": "je fouille le tas de bambous",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search",
+     "object": "tas"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "search",
+    "object": "tas"
+   }
+  ],
+  "conf": 0.87,
+  "ok": true
+ },
+ {
+  "said": "c'est vrai que les chameaux ils boivent pas pendant des jours",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "why": "question sur le vrai monde"
+  },
+  "acts": [],
+  "conf": 0.95,
+  "ok": true
+ },
+ {
+  "said": "je prends la fi selle",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "ficelle"
+    }
+   ],
+   "why": "« fi selle » = ficelle (reconnaissance vocale)"
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "ficelle"
+   }
+  ],
+  "conf": 0.87,
+  "ok": true
+ },
+ {
+  "said": "je réveille le renard et je lui dis bonjour",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "nero"
+    },
+    {
+     "verb": "talk",
+     "object": "nero"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "other",
+    "object": "nero"
+   },
+   {
+    "verb": "talk",
+    "object": "nero"
+   }
+  ],
+  "conf": 0.5,
+  "ok": true
+ },
+ {
+  "said": "je retourne sur la place",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "place"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "place"
+   }
+  ],
+  "conf": 0.96,
+  "ok": true
+ },
+ {
+  "said": "je fouille dans la haie",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search",
+     "object": "haie"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "search",
+    "object": "haie"
+   }
+  ],
+  "conf": 0.76,
+  "ok": true
+ },
+ {
+  "said": "je cherche le drap qui s'est envolé",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search"
+    }
+   ],
+   "why": "le drap n'est pas ici; chercher ici"
+  },
+  "acts": [
+   {
+    "verb": "search"
+   }
+  ],
+  "conf": 0.57,
+  "ok": true
+ },
+ {
+  "said": "je regarde la grande haie de près",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "haie"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "examine",
+    "object": "haie"
+   }
+  ],
+  "conf": 0.7,
+  "ok": true
+ },
+ {
+  "said": "je regarde autour de moi",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "look"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "look"
+   }
+  ],
+  "conf": 0.99,
+  "ok": true
+ },
+ {
+  "said": "je prends la ficelle et je chatouille le renard avec",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "ficelle"
+    },
+    {
+     "verb": "use",
+     "object": "ficelle",
+     "target": "nero"
+    }
+   ],
+   "why": "avec = la ficelle"
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "ficelle"
+   },
+   {
+    "verb": "touch",
+    "object": "ficelle",
+    "target": "nero"
+   }
+  ],
+  "conf": 0.35,
+  "ok": true
+ },
+ {
+  "said": "je saute par-dessus la haie",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "jump",
+     "object": "haie"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "jump"
+   }
+  ],
+  "conf": 0.52,
+  "ok": false
+ },
+ {
+  "said": "je mange une carotte du jardin",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "eat"
+    }
+   ],
+   "why": "pas de carotte dans l'aventure: imagination"
+  },
+  "acts": [
+   {
+    "verb": "eat"
+   }
+  ],
+  "conf": 0.74,
+  "ok": true
+ },
+ {
+  "said": "je tire sur le bout de ficelle",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search",
+     "object": "haie"
+    }
+   ],
+   "why": "la ficelle dépasse de la haie, pas encore sortie: fouiller la haie"
+  },
+  "acts": [
+   {
+    "verb": "pull"
+   }
+  ],
+  "conf": 0.28,
+  "ok": false
+ },
+ {
+  "said": "je fouille la haie et je prends la ficelle",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search",
+     "object": "haie"
+    },
+    {
+     "verb": "take",
+     "object": "ficelle"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "search",
+    "object": "haie"
+   },
+   {
+    "verb": "take"
+   }
+  ],
+  "conf": 0.51,
+  "ok": false
+ },
+ {
+  "said": "je lui parle tout doucement",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "nero"
+    }
+   ],
+   "why": "lui = Néro"
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "nero"
+   }
+  ],
+  "conf": 0.99,
+  "ok": true
+ },
+ {
+  "said": "on va au vieux puits",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "puits"
+    }
+   ],
+   "why": "puits déjà vu, lieu lointain"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "puits"
+   }
+  ],
+  "conf": 0.93,
+  "ok": true
+ },
+ {
+  "said": "je fais un bisou au renard",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "nero"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "touch",
+    "object": "nero"
+   }
+  ],
+  "conf": 0.53,
+  "ok": true
+ },
+ {
+  "said": "je ramasse la pièce en or",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "piece"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "piece"
+   }
+  ],
+  "conf": 0.92,
+  "ok": true
+ },
+ {
+  "said": "je prends la pièce et je la donne à mimi",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "piece"
+    },
+    {
+     "verb": "give",
+     "object": "piece",
+     "target": "mimi"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "piece",
+    "target": "mimi"
+   },
+   {
+    "verb": "give",
+    "object": "piece",
+    "target": "mimi"
+   }
+  ],
+  "conf": 0.26,
+  "ok": true
+ },
+ {
+  "said": "on va dans le jardin",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "jardin"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "jardin"
+   }
+  ],
+  "conf": 0.96,
+  "ok": true
+ },
+ {
+  "said": "je demande à mimi pourquoi elle tourne en rond",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "mimi"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "ask",
+    "object": "mimi"
+   }
+  ],
+  "conf": 0.81,
+  "ok": true
+ },
+ {
+  "said": "moi j'ai une tirelire cochon avec plein de pièces",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "why": "raconte sa vie"
+  },
+  "acts": [],
+  "conf": 0.71,
+  "ok": true
+ },
+ {
+  "said": "je prends les graines",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "grains"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "grains"
+   }
+  ],
+  "conf": 0.85,
+  "ok": true
+ },
+ {
+  "said": "snif snif je suis la bonne odeur",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "smell",
+     "object": "cuisines"
+    }
+   ],
+   "why": "suivre l'odeur dans les cuisines"
+  },
+  "acts": [
+   {
+    "verb": "smell"
+   }
+  ],
+  "conf": 0.29,
+  "ok": true
+ },
+ {
+  "said": "je fais sonner la clochette",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "clochette"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "clochette"
+   }
+  ],
+  "conf": 0.68,
+  "ok": true
+ },
+ {
+  "said": "je prends le blé et je retourne dans la cour",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "grains"
+    },
+    {
+     "verb": "go",
+     "to": "cour"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "grains"
+   },
+   {
+    "verb": "go",
+    "to": "cour"
+   }
+  ],
+  "conf": 0.68,
+  "ok": true
+ },
+ {
+  "said": "je goûte le gâteau du roi",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "eat"
+    }
+   ],
+   "why": "la brioche n'est pas encore trouvée: imagination"
+  },
+  "acts": [
+   {
+    "verb": "eat"
+   }
+  ],
+  "conf": 0.49,
+  "ok": true
+ },
+ {
+  "said": "je ramasse la clochette",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "clochette"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "clochette"
+   }
+  ],
+  "conf": 0.91,
+  "ok": true
+ },
+ {
+  "said": "je prends la clochette et je la fais sonner",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "clochette"
+    },
+    {
+     "verb": "use",
+     "object": "clochette"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "clochette"
+   },
+   {
+    "verb": "use",
+    "object": "clochette"
+   }
+  ],
+  "conf": 0.67,
+  "ok": true
+ },
+ {
+  "said": "je vais dans le jardin",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "jardin"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "jardin"
+   }
+  ],
+  "conf": 0.92,
+  "ok": true
+ },
+ {
+  "said": "je fais un câlin à lucile parce qu'elle a peur",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "lucile"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "touch",
+    "object": "lucile"
+   }
+  ],
+  "conf": 0.85,
+  "ok": true
+ },
+ {
+  "said": "je souffle très fort dans le ballon pour le gonfler",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "other",
+     "object": "ballon"
+    }
+   ],
+   "why": "souffler dans le ballon: verbe libre"
+  },
+  "acts": [
+   {
+    "verb": "other",
+    "object": "ballon"
+   }
+  ],
+  "conf": 0.34,
+  "ok": true
+ },
+ {
+  "said": "je fouille la cuisine",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "search"
+   }
+  ],
+  "conf": 0.73,
+  "ok": true
+ },
+ {
+  "said": "je renifle partout pour trouver ce qui sent bon",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "smell",
+     "object": "cuisines"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "smell"
+   }
+  ],
+  "conf": 0.88,
+  "ok": true
+ },
+ {
+  "said": "on va dans les jardins du roi",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "jardin"
+    }
+   ],
+   "why": "jardins déjà vus, lieu lointain"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "jardin"
+   }
+  ],
+  "conf": 0.85,
+  "ok": true
+ },
+ {
+  "said": "je jette les grains par terre et je retourne dans la cour",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "drop",
+     "object": "grains"
+    },
+    {
+     "verb": "go",
+     "to": "cour"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "throw",
+    "object": "grains"
+   },
+   {
+    "verb": "go",
+    "to": "cour"
+   }
+  ],
+  "conf": 0.16,
+  "ok": false
+ },
+ {
+  "said": "moi ma maman elle fait des crêpes le dimanche",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "why": "raconte sa vie"
+  },
+  "acts": [],
+  "conf": 1,
+  "ok": true
+ },
+ {
+  "said": "je regarde le clou tout en haut",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "clou"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "examine",
+    "object": "clou"
+   }
+  ],
+  "conf": 0.63,
+  "ok": true
+ },
+ {
+  "said": "je saute très haut pour attraper le chapeau",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "jump",
+     "object": "clou"
+    }
+   ],
+   "why": "le chapeau est accroché au clou, pas encore à portée"
+  },
+  "acts": [
+   {
+    "verb": "jump"
+   }
+  ],
+  "conf": 0.24,
+  "ok": false
+ },
+ {
+  "said": "je mets la chaussette géante et je retourne dans le jardin",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "wear",
+     "object": "chaussette"
+    },
+    {
+     "verb": "go",
+     "to": "jardin"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "wear",
+    "object": "chaussette"
+   },
+   {
+    "verb": "go",
+    "to": "jardin"
+   }
+  ],
+  "conf": 0.43,
+  "ok": true
+ },
+ {
+  "said": "je grimpe sur le mur comme spider-man",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "climb"
+    }
+   ],
+   "why": "le mur n'est pas un objet du jeu : imagination"
+  },
+  "acts": [
+   {
+    "verb": "climb"
+   }
+  ],
+  "conf": 0.59,
+  "ok": true
+ },
+ {
+  "said": "euh je cherche partout un truc pour monter",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "search"
+   }
+  ],
+  "conf": 0.37,
+  "ok": true
+ },
+ {
+  "said": "je regarde le bonhomme de neige",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "bonhomme"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "examine",
+    "object": "bonhomme"
+   }
+  ],
+  "conf": 0.42,
+  "ok": true
+ },
+ {
+  "said": "je parle à plumette et je lui donne la chaussette",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "plumette"
+    },
+    {
+     "verb": "give",
+     "object": "chaussette",
+     "target": "plumette"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "plumette"
+   },
+   {
+    "verb": "give",
+    "object": "chaussette",
+    "target": "plumette"
+   }
+  ],
+  "conf": 0.9,
+  "ok": true
+ },
+ {
+  "said": "ok on y retourne dans la cabane",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "cabane"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "cabane"
+   }
+  ],
+  "conf": 0.94,
+  "ok": true
+ },
+ {
+  "said": "je fais une écharpe au bonhomme avec la chausse sept",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "chaussette",
+     "target": "bonhomme"
+    }
+   ],
+   "why": "« chausse sept » = chaussette (reconnaissance vocale)"
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "chaussette",
+    "target": "bonhomme"
+   }
+  ],
+  "conf": 0.85,
+  "ok": true
+ },
+ {
+  "said": "je vais chez mamie",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "cuisine"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "cuisine"
+   }
+  ],
+  "conf": 0.91,
+  "ok": true
+ },
+ {
+  "said": "je monte sur le tabouret",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "climb",
+     "object": "tabouret"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "climb",
+    "object": "tabouret"
+   }
+  ],
+  "conf": 0.46,
+  "ok": true
+ },
+ {
+  "said": "je pose le tabouret je monte dessus et je prends le chapeau",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "climb",
+     "object": "tabouret"
+    },
+    {
+     "verb": "take",
+     "object": "chapeau"
+    }
+   ],
+   "why": "poser + monter = une seule action climb ; le chapeau apparaît ensuite"
+  },
+  "acts": [
+   {
+    "verb": "drop",
+    "object": "tabouret"
+   },
+   {
+    "verb": "climb"
+   },
+   {
+    "verb": "take"
+   }
+  ],
+  "conf": 0.46,
+  "ok": false
+ },
+ {
+  "said": "je vais le chercher avec l'escabeau",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "tabouret",
+     "target": "clou"
+    }
+   ],
+   "why": "escabeau = tabouret ; le = le chapeau sur le clou"
+  },
+  "acts": [
+   {
+    "verb": "use"
+   },
+   {
+    "verb": "use"
+   }
+  ],
+  "conf": 0.27,
+  "ok": false
+ },
+ {
+  "said": "je lance la chaussette sur le clou pour faire tomber le chapeau",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "throw",
+     "object": "chaussette",
+     "target": "clou"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "throw",
+    "object": "chaussette",
+    "target": "clou"
+   }
+  ],
+  "conf": 0.96,
+  "ok": true
+ },
+ {
+  "said": "qu'est-ce que j'ai dans mon sac déjà",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "inventory"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "inventory"
+   }
+  ],
+  "conf": 0.66,
+  "ok": true
+ },
+ {
+  "said": "je mets la carotte pour faire le nez",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "carotte",
+     "target": "bonhomme"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "carotte",
+    "target": "bonhomme"
+   }
+  ],
+  "conf": 0.77,
+  "ok": true
+ },
+ {
+  "said": "je mets la carotte et le chapeau au bonhomme",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "carotte",
+     "target": "bonhomme"
+    },
+    {
+     "verb": "use",
+     "object": "chapeau",
+     "target": "bonhomme"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "carotte",
+    "target": "bonhomme"
+   },
+   {
+    "verb": "use",
+    "object": "chapeau",
+    "target": "bonhomme"
+   }
+  ],
+  "conf": 0.69,
+  "ok": true
+ },
+ {
+  "said": "je le mets sur la tête du bonhomme",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "chapeau",
+     "target": "bonhomme"
+    }
+   ],
+   "why": "le = le chapeau"
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "chapeau",
+    "target": "bonhomme"
+   }
+  ],
+  "conf": 0.92,
+  "ok": true
+ },
+ {
+  "said": "je mets le seau sur la tête du bonhomme comme un casque",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "seau",
+     "target": "bonhomme"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "seau",
+    "target": "bonhomme"
+   }
+  ],
+  "conf": 0.82,
+  "ok": true
+ },
+ {
+  "said": "est-ce que les colibris ça existe en vrai",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "actions": [],
+   "why": "question sur le monde réel"
+  },
+  "acts": [],
+  "conf": 0.99,
+  "ok": true
+ },
+ {
+  "said": "je parle au hibou",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "bambou"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "bambou"
+   }
+  ],
+  "conf": 0.73,
+  "ok": true
+ },
+ {
+  "said": "je regarde le carillon et je demande à bambou ce qui va pas",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "carillon"
+    },
+    {
+     "verb": "ask",
+     "object": "bambou"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "examine",
+    "object": "carillon"
+   },
+   {
+    "verb": "ask",
+    "object": "bambou"
+   }
+  ],
+  "conf": 0.71,
+  "ok": true
+ },
+ {
+  "said": "on retourne à la rivière voir la loutre",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "riviere"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "riviere"
+   }
+  ],
+  "conf": 0.62,
+  "ok": true
+ },
+ {
+  "said": "je fais ding dong sur la cloche avec ma main",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "hit",
+     "object": "carillon"
+    }
+   ],
+   "why": "cloche = carillon"
+  },
+  "acts": [
+   {
+    "verb": "hit",
+    "object": "carillon"
+   }
+  ],
+  "conf": 0.82,
+  "ok": true
+ },
+ {
+  "said": "je vais voir la taupe ou la loutre",
+  "src": "opus",
+  "gold": {
+   "kind": "preciser",
+   "actions": [],
+   "why": "deux destinations proposées, l'enfant n'a pas choisi"
+  },
+  "acts": [],
+  "conf": 0.39,
+  "ok": true
+ },
+ {
+  "said": "je vais au verger",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "verger"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "verger"
+   }
+  ],
+  "conf": 0.92,
+  "ok": true
+ },
+ {
+  "said": "je dis bonjour à bambou et je vais au terrier",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "bambou"
+    },
+    {
+     "verb": "go",
+     "to": "terrier"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "bambou"
+   },
+   {
+    "verb": "go",
+    "to": "terrier"
+   }
+  ],
+  "conf": 0.88,
+  "ok": true
+ },
+ {
+  "said": "pourquoi il est triste je lui demande",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "bambou"
+    }
+   ],
+   "why": "lui = Bambou"
+  },
+  "acts": [
+   {
+    "verb": "ask",
+    "object": "bambou"
+   }
+  ],
+  "conf": 0.85,
+  "ok": true
+ },
+ {
+  "said": "je cherche la boule du carillon dans l'herbe",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "search"
+   }
+  ],
+  "conf": 0.24,
+  "ok": true
+ },
+ {
+  "said": "tu pourras me raconter une autre histoire ce soir",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "actions": [],
+   "why": "demande au compagnon, hors de l'aventure"
+  },
+  "acts": [],
+  "conf": 0.85,
+  "ok": true
+ },
+ {
+  "said": "je fais des trous dans le roseau avec la pierre",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "silex",
+     "target": "roseau"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "silex",
+    "target": "roseau"
+   }
+  ],
+  "conf": 0.57,
+  "ok": true
+ },
+ {
+  "said": "je fabrique une flûte et après je souffle dedans",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "silex",
+     "target": "roseau"
+    },
+    {
+     "verb": "use",
+     "object": "pipeau"
+    }
+   ],
+   "why": "la flûte = le pipeau fabriqué avec silex + roseau"
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "roseau"
+   },
+   {
+    "verb": "use",
+    "object": "roseau"
+   }
+  ],
+  "conf": 0.36,
+  "ok": false
+ },
+ {
+  "said": "on va sur le pont maintenant",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "pont"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "pont"
+   }
+  ],
+  "conf": 0.98,
+  "ok": true
+ },
+ {
+  "said": "je donne le rosso à zouzou",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "roseau",
+     "target": "zouzou"
+    }
+   ],
+   "why": "« rosso » = roseau (reconnaissance vocale)"
+  },
+  "acts": [
+   {
+    "verb": "give",
+    "object": "roseau",
+    "target": "zouzou"
+   }
+  ],
+  "conf": 0.94,
+  "ok": true
+ },
+ {
+  "said": "ça mange quoi une loutre en vrai",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "actions": [],
+   "why": "question sur le monde réel"
+  },
+  "acts": [],
+  "conf": 0.79,
+  "ok": true
+ },
+ {
+  "said": "je touche le carillon",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "carillon"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "touch",
+    "object": "carillon"
+   }
+  ],
+  "conf": 0.55,
+  "ok": true
+ },
+ {
+  "said": "je regarde ma pomme et après je la croque",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "pomme"
+    },
+    {
+     "verb": "eat",
+     "object": "pomme"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "examine",
+    "object": "pomme"
+   },
+   {
+    "verb": "eat",
+    "object": "pomme"
+   }
+  ],
+  "conf": 0.81,
+  "ok": true
+ },
+ {
+  "said": "on retourne au vieux pont",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "pont"
+    }
+   ],
+   "why": "pont déjà vu, trajet automatique"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "pont"
+   }
+  ],
+  "conf": 0.9,
+  "ok": true
+ },
+ {
+  "said": "aide moi bambou je sais pas quoi faire",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "help"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "help"
+   }
+  ],
+  "conf": 0.5,
+  "ok": true
+ },
+ {
+  "said": "je vais dans le terrier et je donne la pomme à taupinette",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "terrier"
+    },
+    {
+     "verb": "give",
+     "object": "pomme",
+     "target": "taupinette"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "terrier"
+   },
+   {
+    "verb": "give",
+    "object": "pomme"
+   }
+  ],
+  "conf": 0.6,
+  "ok": true
+ },
+ {
+  "said": "je prends le navet",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "navet"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "navet"
+   }
+  ],
+  "conf": 0.95,
+  "ok": true
+ },
+ {
+  "said": "je prends le poisson et je le frotte sur la moufle",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "poisson"
+    },
+    {
+     "verb": "use",
+     "object": "poisson",
+     "target": "moufle"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "poisson",
+    "target": "moufle"
+   },
+   {
+    "verb": "use",
+    "object": "moufle"
+   }
+  ],
+  "conf": 0.45,
+  "ok": true
+ },
+ {
+  "said": "je lui demande où il y a de la laine",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "olaf"
+    }
+   ],
+   "why": "lui = Grand-père Olaf"
+  },
+  "acts": [
+   {
+    "verb": "ask",
+    "object": "olaf"
+   }
+  ],
+  "conf": 0.74,
+  "ok": true
+ },
+ {
+  "said": "ça pue ici je renifle partout",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "smell",
+     "object": "cabane"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "smell"
+   },
+   {
+    "verb": "smell"
+   }
+  ],
+  "conf": 0.52,
+  "ok": false
+ },
+ {
+  "said": "je retourne sur le bateau",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "drakkar"
+    }
+   ],
+   "why": "bateau = drakkar, déjà vu"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "drakkar"
+   }
+  ],
+  "conf": 0.78,
+  "ok": true
+ },
+ {
+  "said": "je monte dans le drakkar",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "drakkar"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "climb",
+    "to": "drakkar"
+   }
+  ],
+  "conf": 0.63,
+  "ok": true
+ },
+ {
+  "said": "bonjour sigrid moi je vais sur la colline",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "sigrid"
+    },
+    {
+     "verb": "go",
+     "to": "colline"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "sigrid"
+   },
+   {
+    "verb": "go",
+    "to": "colline"
+   }
+  ],
+  "conf": 0.67,
+  "ok": true
+ },
+ {
+  "said": "je lui demande ce qu'il faut faire",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "sigrid"
+    }
+   ],
+   "why": "lui = Sigrid"
+  },
+  "acts": [
+   {
+    "verb": "ask",
+    "object": "sigrid"
+   }
+  ],
+  "conf": 0.92,
+  "ok": true
+ },
+ {
+  "said": "je me baigne dans le fiord",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "swim",
+     "object": "fjord"
+    }
+   ],
+   "why": "« fiord » = fjord"
+  },
+  "acts": [
+   {
+    "verb": "swim"
+   }
+  ],
+  "conf": 0.77,
+  "ok": false
+ },
+ {
+  "said": "chez moi aussi il fait froid il a neigé ce matin",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "actions": [],
+   "why": "anecdote de l'enfant"
+  },
+  "acts": [],
+  "conf": 1,
+  "ok": true
+ },
+ {
+  "said": "je vais dans la cabane du papi",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "cabane"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "cabane"
+   }
+  ],
+  "conf": 0.83,
+  "ok": true
+ },
+ {
+  "said": "je regarde la mer et j'écoute les vagues",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "fjord"
+    },
+    {
+     "verb": "listen",
+     "object": "fjord"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "examine",
+    "object": "fjord"
+   },
+   {
+    "verb": "listen",
+    "object": "fjord"
+   }
+  ],
+  "conf": 0.25,
+  "ok": true
+ },
+ {
+  "said": "allez on y monte",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "drakkar"
+    }
+   ],
+   "why": "y = le drakkar"
+  },
+  "acts": [
+   {
+    "verb": "climb",
+    "to": "drakkar"
+   }
+  ],
+  "conf": 0.47,
+  "ok": true
+ },
+ {
+  "said": "je jette un caillou dans l'eau",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "throw",
+     "target": "fjord"
+    }
+   ],
+   "why": "caillou = décor (galets), imagination"
+  },
+  "acts": [
+   {
+    "verb": "throw",
+    "target": "fjord"
+   }
+  ],
+  "conf": 0.72,
+  "ok": true
+ },
+ {
+  "said": "je vais à la co… la ca… euh",
+  "src": "opus",
+  "gold": {
+   "kind": "preciser",
+   "actions": [],
+   "why": "coupé : colline ou cabane ?"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "cabane"
+   }
+  ],
+  "conf": 0.62,
+  "ok": false
+ },
+ {
+  "said": "bonjour sigrid",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "sigrid"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "sigrid"
+   }
+  ],
+  "conf": 0.96,
+  "ok": true
+ },
+ {
+  "said": "je monte dans le drakkar et je regarde partout",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "drakkar"
+    },
+    {
+     "verb": "look"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "climb",
+    "to": "drakkar"
+   },
+   {
+    "verb": "look"
+   }
+  ],
+  "conf": 0.52,
+  "ok": true
+ },
+ {
+  "said": "je lui demande ce qu'il faut faire",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "sigrid"
+    }
+   ],
+   "why": "lui = Sigrid"
+  },
+  "acts": [
+   {
+    "verb": "ask",
+    "object": "sigrid"
+   }
+  ],
+  "conf": 0.97,
+  "ok": true
+ },
+ {
+  "said": "je me baigne dans le fiord",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "swim",
+     "object": "fjord"
+    }
+   ],
+   "why": "ASR fiord = fjord"
+  },
+  "acts": [
+   {
+    "verb": "swim"
+   }
+  ],
+  "conf": 0.77,
+  "ok": false
+ },
+ {
+  "said": "on va sur la colline des runes",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "colline"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "colline"
+   }
+  ],
+  "conf": 0.89,
+  "ok": true
+ },
+ {
+  "said": "je donne le navet à sigrid",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "navet",
+     "target": "sigrid"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "give",
+    "object": "navet",
+    "target": "sigrid"
+   }
+  ],
+  "conf": 0.96,
+  "ok": true
+ },
+ {
+  "said": "je croque le navet",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "eat",
+     "object": "navet"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "eat",
+    "object": "navet"
+   }
+  ],
+  "conf": 0.73,
+  "ok": true
+ },
+ {
+  "said": "on retourne à la cabane de pêche",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "cabane"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "cabane"
+   }
+  ],
+  "conf": 0.94,
+  "ok": true
+ },
+ {
+  "said": "je jette le navet dans l'eau et après je vais sur la colline",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "throw",
+     "object": "navet",
+     "target": "fjord"
+    },
+    {
+     "verb": "go",
+     "to": "colline"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "throw",
+    "object": "navet",
+    "target": "fjord"
+   },
+   {
+    "verb": "go",
+    "to": "colline"
+   }
+  ],
+  "conf": 0.55,
+  "ok": true
+ },
+ {
+  "said": "je lance des cailloux dans le fjord",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "throw",
+     "target": "fjord"
+    }
+   ],
+   "why": "pebbles are not an item: imaginary object"
+  },
+  "acts": [
+   {
+    "verb": "throw",
+    "target": "fjord"
+   }
+  ],
+  "conf": 0.8,
+  "ok": true
+ },
+ {
+  "said": "je parle à kallia",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "kallia"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "kallia"
+   }
+  ],
+  "conf": 0.65,
+  "ok": true
+ },
+ {
+  "said": "je donne les figues à l'oiseau",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "figues",
+     "target": "ibis"
+    }
+   ],
+   "why": "l'oiseau = Bec-Long l'ibis"
+  },
+  "acts": [
+   {
+    "verb": "give",
+    "object": "figues",
+    "target": "ibis"
+   }
+  ],
+  "conf": 0.99,
+  "ok": true
+ },
+ {
+  "said": "je lis les rouleaux et je demande à kallia où il y a un poisson",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "read",
+     "object": "rouleaux"
+    },
+    {
+     "verb": "ask",
+     "object": "kallia"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "read",
+    "object": "rouleaux"
+   },
+   {
+    "verb": "ask",
+    "object": "kallia"
+   }
+  ],
+  "conf": 0.73,
+  "ok": true
+ },
+ {
+  "said": "bon ben je lui prends la clé dans le bec",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "cle"
+    }
+   ],
+   "why": "lui = the ibis"
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "cle",
+    "target": "ibis"
+   }
+  ],
+  "conf": 0.61,
+  "ok": true
+ },
+ {
+  "said": "piko tu sais lire toi ?",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "actions": [],
+   "why": "chit-chat with the pet"
+  },
+  "acts": [
+   {
+    "verb": "ask"
+   }
+  ],
+  "conf": 0.4,
+  "ok": false
+ },
+ {
+  "said": "je vais au phare",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "pied"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "pied"
+   }
+  ],
+  "conf": 0.92,
+  "ok": true
+ },
+ {
+  "said": "je regarde la mer et après je vais sur la jetée",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "look"
+    },
+    {
+     "verb": "go",
+     "to": "jetee"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "look"
+   },
+   {
+    "verb": "go",
+    "to": "jetee"
+   }
+  ],
+  "conf": 0.33,
+  "ok": true
+ },
+ {
+  "said": "on retourne au port",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "port"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "port"
+   }
+  ],
+  "conf": 0.96,
+  "ok": true
+ },
+ {
+  "said": "je fais un château de sable",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "sable"
+    }
+   ],
+   "why": "creative use of the sand"
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "sable"
+   }
+  ],
+  "conf": 0.25,
+  "ok": true
+ },
+ {
+  "said": "je lance le sable dans les vagues",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "throw",
+     "object": "sable"
+    }
+   ],
+   "why": "waves are not an item"
+  },
+  "acts": [
+   {
+    "verb": "throw",
+    "object": "sable"
+   }
+  ],
+  "conf": 0.77,
+  "ok": true
+ },
+ {
+  "said": "je ramasse le sable",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "sable"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "sable"
+   }
+  ],
+  "conf": 0.87,
+  "ok": true
+ },
+ {
+  "said": "je prends le sable et je vais au port",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "sable"
+    },
+    {
+     "verb": "go",
+     "to": "port"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "sable"
+   },
+   {
+    "verb": "go",
+    "to": "port"
+   }
+  ],
+  "conf": 0.83,
+  "ok": true
+ },
+ {
+  "said": "on retourne au bout de la jetée",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "jetee"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "jetee"
+   }
+  ],
+  "conf": 0.9,
+  "ok": true
+ },
+ {
+  "said": "je mets du sable dans la lampe",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "sable",
+     "target": "lampe"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "sable",
+    "target": "lampe"
+   }
+  ],
+  "conf": 0.55,
+  "ok": true
+ },
+ {
+  "said": "je vais là-bas euh vers la grande tour noire",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "pied"
+    }
+   ],
+   "why": "la grande tour noire = the lighthouse (north)"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "pied"
+   }
+  ],
+  "conf": 0.89,
+  "ok": true
+ },
+ {
+  "said": "je prends la pièce",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "obole"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "obole"
+   }
+  ],
+  "conf": 0.8,
+  "ok": true
+ },
+ {
+  "said": "je prends la lampe et la pièce d'argent",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "lampe"
+    },
+    {
+     "verb": "take",
+     "object": "obole"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "lampe"
+   },
+   {
+    "verb": "take",
+    "object": "obole"
+   }
+  ],
+  "conf": 0.76,
+  "ok": true
+ },
+ {
+  "said": "je donne la sardine au chat",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "sardine",
+     "target": "miou"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "give",
+    "object": "sardine",
+    "target": "miou"
+   }
+  ],
+  "conf": 0.99,
+  "ok": true
+ },
+ {
+  "said": "on va au marché",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "marche"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "marche"
+   }
+  ],
+  "conf": 0.9,
+  "ok": true
+ },
+ {
+  "said": "je mets la petite lanterne dans mon sac",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "lampe"
+    }
+   ],
+   "why": "lanterne = the small lamp"
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "lampe"
+   }
+  ],
+  "conf": 0.63,
+  "ok": false
+ },
+ {
+  "said": "je mets des braises dans le pot",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "pot",
+     "target": "four"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "target": "pot"
+   }
+  ],
+  "conf": 0.51,
+  "ok": true
+ },
+ {
+  "said": "je prends des braises avec le pot et je retourne à la digue",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "pot",
+     "target": "four"
+    },
+    {
+     "verb": "go",
+     "to": "digue"
+    }
+   ],
+   "why": "far known place"
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "target": "pot"
+   },
+   {
+    "verb": "go",
+    "to": "digue"
+   }
+  ],
+  "conf": 0.38,
+  "ok": false
+ },
+ {
+  "said": "je dis merci à ménès",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "menes"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "menes"
+   }
+  ],
+  "conf": 0.63,
+  "ok": true
+ },
+ {
+  "said": "qu'est-ce que j'ai dans mon sac",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "inventory"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "inventory"
+   }
+  ],
+  "conf": 0.77,
+  "ok": true
+ },
+ {
+  "said": "je fais cuire les figues dans le four",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "figues",
+     "target": "four"
+    }
+   ],
+   "why": "creative idea"
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "figues",
+    "target": "four"
+   }
+  ],
+  "conf": 0.76,
+  "ok": true
+ },
+ {
+  "said": "je prends le ruban",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "ruban"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "ruban"
+   }
+  ],
+  "conf": 0.93,
+  "ok": true
+ },
+ {
+  "said": "je fouille la poussière et je prends le scotch",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search",
+     "object": "poussiere"
+    },
+    {
+     "verb": "take",
+     "object": "ruban"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "search",
+    "object": "poussiere"
+   },
+   {
+    "verb": "take",
+    "object": "ruban"
+   }
+  ],
+  "conf": 0.75,
+  "ok": true
+ },
+ {
+  "said": "je saute du haut du rocher",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "jump"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "jump"
+   }
+  ],
+  "conf": 0.44,
+  "ok": true
+ },
+ {
+  "said": "je redescends vers le module",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "echelle"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "echelle"
+   }
+  ],
+  "conf": 0.61,
+  "ok": true
+ },
+ {
+  "said": "je prends le ruban à dés if",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "ruban"
+    }
+   ],
+   "why": "ASR mangled « adhésif »"
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "ruban"
+   }
+  ],
+  "conf": 0.69,
+  "ok": true
+ },
+ {
+  "said": "bonjour chipie",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "chipie"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "chipie"
+   }
+  ],
+  "conf": 0.81,
+  "ok": true
+ },
+ {
+  "said": "je monte jusqu'au nid et je prends le sifflet",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "climb",
+     "object": "nid"
+    },
+    {
+     "verb": "take",
+     "object": "sifflet"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "climb"
+   },
+   {
+    "verb": "take",
+    "object": "sifflet"
+   }
+  ],
+  "conf": 0.49,
+  "ok": false
+ },
+ {
+  "said": "je lui donne ma tartine",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "pain",
+     "target": "chipie"
+    }
+   ],
+   "why": "lui = Chipie ; tartine = pain"
+  },
+  "acts": [
+   {
+    "verb": "give",
+    "object": "pain",
+    "target": "chipie"
+   }
+  ],
+  "conf": 0.9,
+  "ok": true
+ },
+ {
+  "said": "je lance mon ballon sur le nid pour faire tomber le sifflet",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "throw",
+     "target": "nid"
+    }
+   ],
+   "why": "ballon imaginaire"
+  },
+  "acts": [
+   {
+    "verb": "throw",
+    "target": "nid"
+   }
+  ],
+  "conf": 0.7,
+  "ok": true
+ },
+ {
+  "said": "je fais coucou à chipie avec la main",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "chipie"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "chipie"
+   }
+  ],
+  "conf": 0.89,
+  "ok": true
+ },
+ {
+  "said": "je caresse l'ours tout doucement",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "ours"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "touch",
+    "object": "ours"
+   }
+  ],
+  "conf": 0.89,
+  "ok": true
+ },
+ {
+  "said": "je prends une bûche et je rentre à la gare",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "buches"
+    },
+    {
+     "verb": "go",
+     "to": "gare"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "buches"
+   },
+   {
+    "verb": "go",
+    "to": "gare"
+   }
+  ],
+  "conf": 0.43,
+  "ok": true
+ },
+ {
+  "said": "je lui chante une berceuse",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "sing",
+     "object": "ours"
+    }
+   ],
+   "why": "lui = Gros Ours"
+  },
+  "acts": [
+   {
+    "verb": "sing",
+    "object": "ours"
+   }
+  ],
+  "conf": 0.88,
+  "ok": true
+ },
+ {
+  "said": "je prends les bouches",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "buches"
+    }
+   ],
+   "why": "bouches = bûches"
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "buches"
+   }
+  ],
+  "conf": 0.73,
+  "ok": true
+ },
+ {
+  "said": "je tape l'ours pour le réveiller",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "hit",
+     "object": "ours"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "hit",
+    "object": "ours"
+   }
+  ],
+  "conf": 0.91,
+  "ok": true
+ },
+ {
+  "said": "je tire le levier rouge",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "pull",
+     "object": "levier"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "pull",
+    "object": "levier"
+   }
+  ],
+  "conf": 0.48,
+  "ok": true
+ },
+ {
+  "said": "je mets le miel sur le pain et je retourne à la gare",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "combine",
+     "object": "miel",
+     "target": "pain"
+    },
+    {
+     "verb": "go",
+     "to": "gare"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "miel",
+    "target": "pain"
+   },
+   {
+    "verb": "go",
+    "to": "gare"
+   }
+  ],
+  "conf": 0.82,
+  "ok": true
+ },
+ {
+  "said": "je lui fais un bisou",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "taupe"
+    }
+   ],
+   "why": "lui = Madame Taupe"
+  },
+  "acts": [
+   {
+    "verb": "touch",
+    "object": "taupe"
+   }
+  ],
+  "conf": 0.75,
+  "ok": true
+ },
+ {
+  "said": "je fais une tartine au miel",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "combine",
+     "object": "miel",
+     "target": "pain"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "pain"
+   }
+  ],
+  "conf": 0.41,
+  "ok": true
+ },
+ {
+  "said": "je vais dans la forêt donner le pain à l'ours",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "foret"
+    },
+    {
+     "verb": "give",
+     "object": "pain",
+     "target": "ours"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "foret"
+   },
+   {
+    "verb": "give",
+    "object": "pain"
+   }
+  ],
+  "conf": 0.5,
+  "ok": true
+ },
+ {
+  "said": "je monte dans le train",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "climb",
+     "object": "locomotive"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "climb"
+   }
+  ],
+  "conf": 0.29,
+  "ok": false
+ },
+ {
+  "said": "je demande à tutu ce qui va pas et après je vais dans la salle d'attente",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "tutu"
+    },
+    {
+     "verb": "go",
+     "to": "salle"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "ask",
+    "object": "tutu"
+   },
+   {
+    "verb": "go",
+    "to": "salle"
+   }
+  ],
+  "conf": 0.64,
+  "ok": true
+ },
+ {
+  "said": "je vais chez la taupe",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "maisonnette"
+    }
+   ],
+   "why": "taupe = maisonnette (voisine)"
+  },
+  "acts": [],
+  "conf": 0.4,
+  "ok": false
+ },
+ {
+  "said": "j'allume le feu de la locomotive",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "light",
+     "object": "locomotive"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "light",
+    "object": "locomotive"
+   }
+  ],
+  "conf": 0.48,
+  "ok": true
+ },
+ {
+  "said": "pourquoi tu parles comme ça toi",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "actions": [],
+   "why": "question au compagnon"
+  },
+  "acts": [],
+  "conf": 0.47,
+  "ok": true
+ },
+ {
+  "said": "je donne le bouton à tutu",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "bouton",
+     "target": "tutu"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "give",
+    "object": "bouton",
+    "target": "tutu"
+   }
+  ],
+  "conf": 0.98,
+  "ok": true
+ },
+ {
+  "said": "je regarde la locomotive et je parle à tutu",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "locomotive"
+    },
+    {
+     "verb": "talk",
+     "object": "tutu"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "examine",
+    "object": "locomotive"
+   },
+   {
+    "verb": "talk",
+    "object": "tutu"
+   }
+  ],
+  "conf": 0.39,
+  "ok": true
+ },
+ {
+  "said": "je le regarde de près",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "examine",
+     "object": "bouton"
+    }
+   ],
+   "why": "le = bouton"
+  },
+  "acts": [
+   {
+    "verb": "examine",
+    "object": "bouton"
+   }
+  ],
+  "conf": 0.46,
+  "ok": true
+ },
+ {
+  "said": "je vais au chat d'eau",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "chateau_eau"
+    }
+   ],
+   "why": "chat d'eau = château d'eau"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "chateau_eau"
+   }
+  ],
+  "conf": 0.9,
+  "ok": true
+ },
+ {
+  "said": "je vais là-bas",
+  "src": "opus",
+  "gold": {
+   "kind": "preciser",
+   "actions": [],
+   "why": "quatre sorties, rien de désigné"
+  },
+  "acts": [],
+  "conf": 0.62,
+  "ok": true
+ },
+ {
+  "said": "bonjour princesse",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "meryt"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "meryt"
+   }
+  ],
+  "conf": 0.96,
+  "ok": true
+ },
+ {
+  "said": "je lui demande ce qu'elle attend",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "meryt"
+    }
+   ],
+   "why": "lui = Méryt"
+  },
+  "acts": [
+   {
+    "verb": "ask",
+    "object": "meryt"
+   }
+  ],
+  "conf": 0.85,
+  "ok": true
+ },
+ {
+  "said": "je redescends au marché et je parle à la marchande",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "marche"
+    },
+    {
+     "verb": "talk",
+     "object": "henout"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "marche"
+   },
+   {
+    "verb": "talk"
+   }
+  ],
+  "conf": 0.37,
+  "ok": false
+ },
+ {
+  "said": "je donne mon cas lame à la prince esse",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "calame",
+     "target": "meryt"
+    }
+   ],
+   "why": "ASR: cas lame = calame, prince esse = princesse"
+  },
+  "acts": [
+   {
+    "verb": "give",
+    "object": "calame",
+    "target": "meryt"
+   }
+  ],
+  "conf": 0.92,
+  "ok": true
+ },
+ {
+  "said": "je fais une révérence à la princesse",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "other",
+     "object": "meryt"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "other",
+    "object": "meryt"
+   }
+  ],
+  "conf": 0.61,
+  "ok": true
+ },
+ {
+  "said": "je prends le pain",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "pain"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "pain"
+   }
+  ],
+  "conf": 0.93,
+  "ok": true
+ },
+ {
+  "said": "je prends le pain et je le trempe dans la soupe",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "pain"
+    },
+    {
+     "verb": "use",
+     "object": "pain",
+     "target": "marmite"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "pain"
+   },
+   {
+    "verb": "use",
+    "object": "pain",
+    "target": "marmite"
+   }
+  ],
+  "conf": 0.38,
+  "ok": true
+ },
+ {
+  "said": "bonjour dame berthe qu'est-ce que vous faites",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "berthe"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "berthe"
+   },
+   {
+    "verb": "ask",
+    "object": "berthe"
+   }
+  ],
+  "conf": 0.41,
+  "ok": false
+ },
+ {
+  "said": "je croque dans la pomme",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "eat",
+     "object": "pomme"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "eat",
+    "object": "pomme"
+   }
+  ],
+  "conf": 0.63,
+  "ok": true
+ },
+ {
+  "said": "je demande à dame berte si elle a besoin d'aide",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "berthe"
+    }
+   ],
+   "why": "ASR: berte = Berthe"
+  },
+  "acts": [
+   {
+    "verb": "ask",
+    "object": "berthe"
+   }
+  ],
+  "conf": 0.81,
+  "ok": true
+ },
+ {
+  "said": "je donne le bouclier à sire bertrand",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "bouclier",
+     "target": "bertrand"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "give",
+    "object": "bouclier",
+    "target": "bertrand"
+   }
+  ],
+  "conf": 0.98,
+  "ok": true
+ },
+ {
+  "said": "je souffle dans la trompette",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "trompette"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "trompette"
+   }
+  ],
+  "conf": 0.44,
+  "ok": true
+ },
+ {
+  "said": "je caresse caramel et je lui dis bravo",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "caramel"
+    },
+    {
+     "verb": "talk",
+     "object": "caramel"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "touch",
+    "object": "caramel"
+   },
+   {
+    "verb": "talk",
+    "object": "caramel"
+   }
+  ],
+  "conf": 0.86,
+  "ok": true
+ },
+ {
+  "said": "je plante le bâton dans la terre",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "perche"
+    }
+   ],
+   "why": "bâton = perche"
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "perche"
+   }
+  ],
+  "conf": 0.33,
+  "ok": true
+ },
+ {
+  "said": "on retourne dans la cour",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "cour"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "cour"
+   }
+  ],
+  "conf": 0.91,
+  "ok": true
+ },
+ {
+  "said": "je rends son bouclier au chevalier",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "bouclier",
+     "target": "bertrand"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "give",
+    "object": "bouclier",
+    "target": "bertrand"
+   }
+  ],
+  "conf": 0.96,
+  "ok": true
+ },
+ {
+  "said": "je vais au champ du tournoi",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "lice"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "lice"
+   }
+  ],
+  "conf": 0.89,
+  "ok": true
+ },
+ {
+  "said": "j'y retourne",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "ecurie"
+    }
+   ],
+   "why": "y = écurie"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "ecurie"
+   }
+  ],
+  "conf": 0.57,
+  "ok": true
+ },
+ {
+  "said": "je fais peur à l'oie avec mon long bâton",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "perche",
+     "target": "oie"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "perche",
+    "target": "oie"
+   }
+  ],
+  "conf": 0.46,
+  "ok": true
+ },
+ {
+  "said": "je parle à l'oie et je regarde dans le puits",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "oie"
+    },
+    {
+     "verb": "examine",
+     "object": "puits"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "oie"
+   },
+   {
+    "verb": "examine",
+    "object": "puits"
+   }
+  ],
+  "conf": 0.66,
+  "ok": true
+ },
+ {
+  "said": "je caresse le cheval",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "caramel"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "touch",
+    "object": "caramel"
+   }
+  ],
+  "conf": 0.9,
+  "ok": true
+ },
+ {
+  "said": "je donne une carotte à caramel",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "target": "caramel"
+    }
+   ],
+   "why": "imaginary carrot"
+  },
+  "acts": [
+   {
+    "verb": "give",
+    "target": "caramel"
+   }
+  ],
+  "conf": 0.87,
+  "ok": true
+ },
+ {
+  "said": "je tire caramel pour qu'il se lève",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "pull",
+     "object": "caramel"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "pull",
+    "object": "caramel"
+   }
+  ],
+  "conf": 0.75,
+  "ok": true
+ },
+ {
+  "said": "je lui donne la perche",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "give",
+     "object": "perche",
+     "target": "caramel"
+    }
+   ],
+   "why": "lui = Caramel"
+  },
+  "acts": [
+   {
+    "verb": "give",
+    "object": "perche",
+    "target": "caramel"
+   }
+  ],
+  "conf": 0.94,
+  "ok": true
+ },
+ {
+  "said": "moi j'ai déjà fait du poney au centre équestre",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "actions": [],
+   "why": "chit-chat"
+  },
+  "acts": [],
+  "conf": 0.98,
+  "ok": true
+ },
+ {
+  "said": "je parle à raya",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "raya"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "raya"
+   }
+  ],
+  "conf": 0.62,
+  "ok": true
+ },
+ {
+  "said": "je vais à l'épave",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "epave"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "epave"
+   }
+  ],
+  "conf": 0.74,
+  "ok": true
+ },
+ {
+  "said": "je demande à la raie où est la perle et après je vais au jardin de corail",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "raya"
+    },
+    {
+     "verb": "go",
+     "to": "jardin"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "ask",
+    "object": "raya"
+   },
+   {
+    "verb": "go",
+    "to": "jardin"
+   }
+  ],
+  "conf": 0.28,
+  "ok": true
+ },
+ {
+  "said": "je monte sur le dos de raya",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "climb",
+     "object": "raya"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "climb",
+    "object": "raya"
+   }
+  ],
+  "conf": 0.86,
+  "ok": true
+ },
+ {
+  "said": "on va par là",
+  "src": "opus",
+  "gold": {
+   "kind": "preciser",
+   "actions": [],
+   "why": "four paths, none pointed at"
+  },
+  "acts": [],
+  "conf": 0.68,
+  "ok": true
+ },
+ {
+  "said": "je ramasse des coquillages",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "coquillages"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "coquillages"
+   }
+  ],
+  "conf": 0.76,
+  "ok": true
+ },
+ {
+  "said": "je creuse dans le sable et je prends les coquillages",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "search",
+     "object": "sable"
+    },
+    {
+     "verb": "take",
+     "object": "coquillages"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "search",
+    "object": "sable"
+   },
+   {
+    "verb": "take",
+    "object": "coquillages"
+   }
+  ],
+  "conf": 0.57,
+  "ok": true
+ },
+ {
+  "said": "je descends dans le trou noir",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "fosse"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "fosse"
+   }
+  ],
+  "conf": 0.84,
+  "ok": true
+ },
+ {
+  "said": "je chatouille l'anguille",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch",
+     "object": "zigzag"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "touch",
+    "object": "zigzag"
+   }
+  ],
+  "conf": 0.77,
+  "ok": true
+ },
+ {
+  "said": "c'est vrai que les anguilles ça fait de l'électricité",
+  "src": "opus",
+  "gold": {
+   "kind": "hors_jeu",
+   "actions": [],
+   "why": "real-world question"
+  },
+  "acts": [],
+  "conf": 0.91,
+  "ok": true
+ },
+ {
+  "said": "je vais à l'épave et je fouille",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "epave"
+    },
+    {
+     "verb": "search"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "epave"
+   },
+   {
+    "verb": "search"
+   }
+  ],
+  "conf": 0.74,
+  "ok": true
+ },
+ {
+  "said": "raya tu viens avec moi",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "raya"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "raya"
+   }
+  ],
+  "conf": 0.61,
+  "ok": true
+ },
+ {
+  "said": "je danse avec la raie",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "dance",
+     "object": "raya"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "dance"
+   }
+  ],
+  "conf": 0.37,
+  "ok": false
+ },
+ {
+  "said": "je vais au jardin",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "jardin"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "jardin"
+   }
+  ],
+  "conf": 0.82,
+  "ok": true
+ },
+ {
+  "said": "on y retourne",
+  "src": "opus",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "epave"
+    }
+   ],
+   "why": "y = épave"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "epave"
+   }
+  ],
+  "conf": 0.76,
+  "ok": true
+ },
+ {
+  "said": "Piko, arrête de courir partout, stp, on va t'aider ! Euh... je peux ramasser les coquillages bizarres dessinés sur le sable, ou c'est juste de la peinture ?",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "piko"
+    },
+    {
+     "verb": "examine",
+     "object": "dessin"
+    }
+   ],
+   "why": "the drawn shells = the sand drawing"
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "piko"
+   },
+   {
+    "verb": "take",
+    "object": "dessin"
+   }
+  ],
+  "conf": 0.32,
+  "ok": false
+ },
+ {
+  "said": "Je vais vite courir vers la cabane de Zouzou à l'est pour chercher le paquet d'allumettes !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "cabane"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "cabane"
+   }
+  ],
+  "conf": 0.45,
+  "ok": true
+ },
+ {
+  "said": "Euh je veux ouvrir le tiroir, je touche les coquillages dessus... Attends, l'ordre c'est bleu, rose, blanc comme sur la plage ?",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "open",
+     "object": "tiroir"
+    }
+   ],
+   "why": "the order is only asked as a question, no push yet"
+  },
+  "acts": [
+   {
+    "verb": "open",
+    "object": "tiroir"
+   },
+   {
+    "verb": "touch",
+    "object": "coquillage_bleu",
+    "target": "tiroir"
+   }
+  ],
+  "conf": 0.14,
+  "ok": true
+ },
+ {
+  "said": "Oui oui ! Je clique vite sur le bleu, après sur le rose, et à la fin sur le blanc !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "push",
+     "object": "coquillage_bleu"
+    },
+    {
+     "verb": "push",
+     "object": "coquillage_rose"
+    },
+    {
+     "verb": "push",
+     "object": "coquillage_blanc"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "push",
+    "object": "coquillage_bleu"
+   },
+   {
+    "verb": "push",
+    "object": "coquillage_rose"
+   },
+   {
+    "verb": "push",
+    "object": "coquillage_blanc"
+   }
+  ],
+  "conf": 0.86,
+  "ok": true
+ },
+ {
+  "said": "Oui, je mets vite la boîte d'allumettes dans mon sac ! Et euh, je prends le bocal vide aussi, et après je vais vite voir les rochers au nord !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "allumettes"
+    },
+    {
+     "verb": "take",
+     "object": "bocal"
+    },
+    {
+     "verb": "go",
+     "to": "plage"
+    },
+    {
+     "verb": "go",
+     "to": "rochers"
+    }
+   ],
+   "why": "rocks not yet seen: via the beach"
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "allumettes"
+   },
+   {
+    "verb": "take",
+    "object": "bocal"
+   },
+   {
+    "verb": "go"
+   }
+  ],
+  "conf": 0.55,
+  "ok": false
+ },
+ {
+  "said": "Bonjour Monsieur le Crabe, tu me donnes la clé dorée stp ? Et puis avec mon bocal, j'attrape plein de lucioles pour faire une veilleuse !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "ask",
+     "object": "pinces"
+    },
+    {
+     "verb": "fill",
+     "object": "bocal",
+     "target": "lucioles"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "pinces"
+   },
+   {
+    "verb": "take",
+    "object": "lucioles"
+   }
+  ],
+  "conf": 0.41,
+  "ok": true
+ },
+ {
+  "said": "Ouiii, je ramasse la clé dorée et je cours très très vite au phare à l'ouest !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take",
+     "object": "cle"
+    },
+    {
+     "verb": "go",
+     "to": "plage"
+    },
+    {
+     "verb": "go",
+     "to": "pied_phare"
+    }
+   ],
+   "why": "lighthouse not yet seen: via the beach"
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "cle"
+   },
+   {
+    "verb": "go"
+   }
+  ],
+  "conf": 0.48,
+  "ok": false
+ },
+ {
+  "said": "Je mets la clé dorée dans la serrure, je tourne le truc et j'ouvre la grande porte !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "use",
+     "object": "cle",
+     "target": "porte"
+    },
+    {
+     "verb": "open",
+     "object": "porte"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "cle",
+    "target": "porte"
+   },
+   {
+    "verb": "use",
+    "object": "cle",
+    "target": "porte"
+   },
+   {
+    "verb": "open",
+    "object": "porte"
+   }
+  ],
+  "conf": 0.4,
+  "ok": false
+ },
+ {
+  "said": "Oui, je monte tous les escaliers super vite jusqu'en haut pour voir Papy Pic !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "sommet"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "climb",
+    "to": "sommet"
+   }
+  ],
+  "conf": 0.75,
+  "ok": true
+ },
+ {
+  "said": "Euh alors je ramasse un super bâton pointu par terre et je l'enfonce dans le coquillage rose pour le casser !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take"
+    },
+    {
+     "verb": "use",
+     "target": "dessin"
+    }
+   ],
+   "why": "imaginary stick; the pink shell is only drawn in the sand"
+  },
+  "acts": [
+   {
+    "verb": "take"
+   },
+   {
+    "verb": "use"
+   }
+  ],
+  "conf": 0.45,
+  "ok": false
+ },
+ {
+  "said": "je prends un caillou très lourd et je le jette super fort sur Pikouik le hérisson pour voir s'il saute !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take"
+    },
+    {
+     "verb": "throw",
+     "target": "piko"
+    }
+   ],
+   "why": "imaginary pebble; Pikouik = Piko"
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "target": "piko"
+   },
+   {
+    "verb": "throw",
+    "target": "piko"
+   }
+  ],
+  "conf": 0.28,
+  "ok": false
+ },
+ {
+  "said": "Alors je cours super vite vers la cabane de Zouzou la loutre à l'est et je tape très fort dans la porte !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "cabane"
+    },
+    {
+     "verb": "hit"
+    }
+   ],
+   "why": "the cabin door is not an item"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "cabane"
+   },
+   {
+    "verb": "hit"
+   }
+  ],
+  "conf": 0.53,
+  "ok": true
+ },
+ {
+  "said": "Je pousse le bleu, puis le rose, puis le blanc, et après je vole toutes les allumettes !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "push",
+     "object": "coquillage_bleu"
+    },
+    {
+     "verb": "push",
+     "object": "coquillage_rose"
+    },
+    {
+     "verb": "push",
+     "object": "coquillage_blanc"
+    },
+    {
+     "verb": "take",
+     "object": "allumettes"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "push",
+    "object": "coquillage_bleu"
+   },
+   {
+    "verb": "push",
+    "object": "coquillage_rose"
+   },
+   {
+    "verb": "push",
+    "object": "coquillage_blanc"
+   }
+  ],
+  "conf": 0.42,
+  "ok": false
+ },
+ {
+  "said": "Je sors de la cabane et je vais au nord vers les rochers pour chercher le gros crabe grognon !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "plage"
+    },
+    {
+     "verb": "go",
+     "to": "rochers"
+    }
+   ],
+   "why": "rocks not yet seen: via the beach"
+  },
+  "acts": [
+   {
+    "verb": "go"
+   },
+   {
+    "verb": "go"
+   }
+  ],
+  "conf": 0.33,
+  "ok": false
+ },
+ {
+  "said": "je cours vite à la cabane pour prendre du poisson grillé sur la table !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "cabane"
+    },
+    {
+     "verb": "take"
+    }
+   ],
+   "why": "no grilled fish item: imaginary"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "cabane"
+   },
+   {
+    "verb": "take"
+   }
+  ],
+  "conf": 0.48,
+  "ok": true
+ },
+ {
+  "said": "Je cours à l'ouest vers the phare et je donne un grand coup de pied dans la porte d'entrée !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "plage"
+    },
+    {
+     "verb": "go",
+     "to": "pied_phare"
+    },
+    {
+     "verb": "hit",
+     "object": "porte"
+    }
+   ],
+   "why": "lighthouse not yet seen: via the beach"
+  },
+  "acts": [
+   {
+    "verb": "go"
+   },
+   {
+    "verb": "hit"
+   }
+  ],
+  "conf": 0.44,
+  "ok": false
+ },
+ {
+  "said": "Je cours au nord vers les rochers et je lui donne l'algue verte de mon sac pour qu'il la mange !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "rochers"
+    },
+    {
+     "verb": "give",
+     "object": "algue",
+     "target": "pinces"
+    }
+   ],
+   "why": "« lui » = Pinces (qui tient la clé) ; rochers = lieu connu"
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "rochers"
+   },
+   {
+    "verb": "give",
+    "object": "algue"
+   }
+  ],
+  "conf": 0.45,
+  "ok": true
+ },
+ {
+  "said": "Je mets la clé dorée dans la porte, je tourne et j'ouvre pour monter tout en haut !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "open",
+     "object": "porte"
+    },
+    {
+     "verb": "go",
+     "to": "sommet"
+    }
+   ],
+   "why": "ouvrir avec la clé du sac puis monter"
+  },
+  "acts": [
+   {
+    "verb": "use",
+    "object": "cle",
+    "target": "porte"
+   },
+   {
+    "verb": "use",
+    "object": "cle",
+    "target": "porte"
+   },
+   {
+    "verb": "open"
+   }
+  ],
+  "conf": 0.31,
+  "ok": false
+ },
+ {
+  "said": "salut Pikouic le hérisson ! Je prends un gros bâton par terre et je dessine des moustaches sur son dessin dans le sable !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "talk",
+     "object": "piko"
+    },
+    {
+     "verb": "take"
+    },
+    {
+     "verb": "use",
+     "target": "dessin"
+    }
+   ],
+   "why": "« Pikouic » = Piko ; bâton imaginaire ; dessine sur le dessin du sable"
+  },
+  "acts": [
+   {
+    "verb": "talk",
+    "object": "piko"
+   },
+   {
+    "verb": "use",
+    "target": "dessin"
+   },
+   {
+    "verb": "use",
+    "object": "dessin"
+   }
+  ],
+  "conf": 0.23,
+  "ok": false
+ },
+ {
+  "said": "Je ramasse un super caillou brillant pour le lancer sur Pinces le crabe et après on court vers la cabane à l'est !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "take"
+    },
+    {
+     "verb": "go",
+     "to": "cabane"
+    }
+   ],
+   "why": "caillou imaginaire ; Pinces n'est pas là, le lancer n'est qu'un projet"
+  },
+  "acts": [
+   {
+    "verb": "take"
+   },
+   {
+    "verb": "throw"
+   },
+   {
+    "verb": "go",
+    "to": "cabane"
+   }
+  ],
+  "conf": 0.33,
+  "ok": false
+ },
+ {
+  "said": "Euh c'est trop dur le code ! Je tape fort sur la commode avec mon bâton pour l'casser et je prends le bocal vide !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "hit",
+     "object": "tiroir"
+    },
+    {
+     "verb": "take",
+     "object": "bocal"
+    }
+   ],
+   "why": "commode = tiroir ; bâton imaginaire"
+  },
+  "acts": [
+   {
+    "verb": "hit",
+    "object": "tiroir"
+   },
+   {
+    "verb": "take",
+    "object": "bocal"
+   }
+  ],
+  "conf": 0.19,
+  "ok": true
+ },
+ {
+  "said": "Haha oui Pikouic ! Euh… je prends les lucioles magiques dans mon bocal vide et je les montre au crabe pour l'éclairer !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "fill",
+     "object": "bocal",
+     "target": "lucioles"
+    },
+    {
+     "verb": "use",
+     "object": "bocal",
+     "target": "pinces"
+    }
+   ],
+   "why": "montrer le bocal au crabe pour l'éclairer"
+  },
+  "acts": [
+   {
+    "verb": "take",
+    "object": "lucioles",
+    "target": "bocal"
+   },
+   {
+    "verb": "give",
+    "object": "lucioles",
+    "target": "pinces"
+   }
+  ],
+  "conf": 0.21,
+  "ok": false
+ },
+ {
+  "said": "je vais dans la grotte direct !",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "entree"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "entree"
+   }
+  ],
+  "conf": 0.98,
+  "ok": true
+ },
+ {
+  "said": "j'ai pas peur, je rentre dans le noir",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "fond"
+    }
+   ]
+  },
+  "acts": [],
+  "conf": 0.76,
+  "ok": false
+ },
+ {
+  "said": "je touche le mur partout pour trouver un truc. c'est quoi qui ronfle ?",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "touch"
+    },
+    {
+     "verb": "listen"
+    }
+   ],
+   "why": "dans le noir la paroi n'est pas visible : toucher le mur au hasard ; qui ronfle = écouter"
+  },
+  "acts": [
+   {
+    "verb": "touch"
+   },
+   {
+    "verb": "ask"
+   }
+  ],
+  "conf": 0.06,
+  "ok": false
+ },
+ {
+  "said": "oui je tape quand même hihi",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "hit",
+     "object": "tambour"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "hit",
+    "object": "tambour"
+   }
+  ],
+  "conf": 0.56,
+  "ok": true
+ },
+ {
+  "said": "je rentre dans la grotte avec ma torche, je regarde partout",
+  "src": "simulé",
+  "gold": {
+   "kind": "act",
+   "actions": [
+    {
+     "verb": "go",
+     "to": "fond"
+    },
+    {
+     "verb": "look"
+    }
+   ]
+  },
+  "acts": [
+   {
+    "verb": "go",
+    "to": "fond"
+   },
+   {
+    "verb": "look"
+   }
+  ],
+  "conf": 0.47,
+  "ok": true
+ }
+]

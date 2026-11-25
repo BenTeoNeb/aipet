@@ -59,7 +59,11 @@
      ],
      "text": "Le bonhomme porte fièrement sa chaussette géante autour du cou."
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Crounch, crounch, la neige sous tes bottes… et vrrrr, les petites ailes de Plumette qui bourdonnent !",
+    "smell": "Ça sent le froid tout propre et le sapin."
+   }
   },
   {
    "id": "cuisine",
@@ -91,7 +95,11 @@
      "label": "vers le jardin",
      "dir": "sud"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "La marmite fait blop-blop, et le gros poêle ronronne comme un chat.",
+    "smell": "Mmm, la soupe aux poireaux qui mijote !"
+   }
   },
   {
    "id": "remise",
@@ -114,7 +122,11 @@
      "label": "vers le jardin",
      "dir": "ouest"
     }
-   ]
+   ],
+   "senses": {
+    "smell": "Ça sent le vieux bois et la poussière… atchoum !",
+    "listen": "Cric… crac… les planches craquent dans le froid."
+   }
   },
   {
    "id": "cabane",
@@ -314,6 +326,7 @@
    ],
    "at": "jardin",
    "description": "Un tout petit colibri aux plumes vertes et bleues.",
+   "persona": "Parle très vite d'une petite voix aiguë, avec un « bzzzz » d'ailes qui vibrent, et répète « attention, attention ! ». Enthousiaste et un peu anxieuse, elle adore son bonhomme de neige et a peur qu'il s'écroule. Elle volette autour du héros comme autour d'un grand ami, et le félicite à chaque étape.",
    "initial": "Plumette volette autour du bonhomme : « Attention, il est tout fragile, ne le pousse pas ! »",
    "says": [
     {
@@ -343,6 +356,7 @@
    ],
    "at": "cuisine",
    "description": "Une vieille lapine avec des lunettes et un châle rose.",
+   "persona": "Parle doucement, en remontant ses lunettes, et appelle tout le monde « mon chou ». Tendre et frileuse, elle aime tricoter bien au chaud et déteste les courants d'air. Elle accueille le héros comme un petit-enfant et le remercie avec mille gentillesses.",
    "initial": [
     {
      "when": [

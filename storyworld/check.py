@@ -2,20 +2,18 @@
 
 from __future__ import annotations
 
+import difflib
 from dataclasses import dataclass
 
+from storyworld.chart import derive
 from storyworld.hints import (
     useful_steps,
-)
-from storyworld.locale.fr import (
-    LOCKED_WORDS,
-    _stems,
-    canonical_verb,
 )
 from storyworld.model import (
     ANSWER_FIELDS,
     CODE_FIELDS,
     KINDS,
+    SENSE_FIELDS,
     SITUATED,
     STATE_FIELDS,
     TEXT_FIELDS,
@@ -33,6 +31,7 @@ from storyworld.rules import (
     PLACE,
     STATE,
     THING,
+    USABLE,
     args_of,
     parse,
     problem,
@@ -55,7 +54,7 @@ from storyworld.world import (
 # ---- validation ---------------------------------------------------------------------------------
 CONDITIONS = set(CONDITION_KINDS)
 # A world that never goes back (no unflag, hide, close or lock): what was done stays done, so the
-# hero is never locked out and the solver stays small (TextWorld's quests are monotonic too).
+# hero is never locked out and the solver stays small (TextWorld builds its quests without cycles too).
 EFFECTS = set(EFFECT_KINDS)
 
 
@@ -149,7 +148,7 @@ def validate(graph: dict, profile: dict | None = None) -> tuple[list[Diagnostic]
 
 def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
     """References, rules, kinds, playability and the profile's limits (see `validate`)."""
-    w = World(graph)
+    w = World(graph, policy=profile)
     ids = set(w.places) | set(w.items) | set(w.chars)
     if graph.get("start", {}).get("place") not in w.places:
         err("start.place", "start.place is not a place id")
@@ -181,6 +180,18 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
             err("door.unused", f"door {i['id']} closes no exit (name it in an exit's door)")
         for k in set(i.get("texts") or {}) - TEXT_FIELDS:
             err("item.texts", f"item {i['id']}: texts.{k} is not one of {sorted(TEXT_FIELDS)}")
+        if "uses" in i and not w.max_uses(i["id"]) > 0:
+            err("item.uses", f"item {i['id']}: uses is a number of times, 1 or more")
+        if (i.get("texts") or {}).get("empty") and not w.max_uses(i["id"]):
+            warn("item.empty_text", f"item {i['id']}: texts.empty is told when it has no use left, and it has no uses")
+    for t in [*w.places.values(), *w.items.values()]:
+        if "senses" in t and not isinstance(t["senses"], dict):
+            err("senses.field", f"{t['id']}: senses is {{listen, smell, touch}}")
+            continue
+        for k in set(t.get("senses") or {}) - SENSE_FIELDS:
+            err("senses.field", f"{t['id']}: senses.{k} is not one of {sorted(SENSE_FIELDS)}")
+    if any(p.get("dark") for p in w.places.values()) and not w.lights:
+        err("dark.no_light", "a place is dark, and no item gives light (light)")
     for conflict in w.mirrored:
         err("door.conflict", f"two doors on one way: {conflict}")
     for i in w.items.values():
@@ -230,6 +241,7 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
     def ids_for(what: str, prev: str) -> bool | set[str]:
         """The ids an argument may name (True: anything, a flag)."""
         table: dict[str, bool | set[str]] = {ITEM: set(w.items), OPENABLE: openable, CHARACTER: set(w.chars), PLACE: set(w.places),
+                USABLE: {i for i in w.items if w.max_uses(i)},
                 ENDING: set(w.endings), THING: set(w.items) | set(w.chars), FLAG: True,
                 STATE: set(w.thing(prev).get("states") or {})}  # fmt: skip
         return table[what]
@@ -262,6 +274,9 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
             rules(f"exit {p['id']}->{x.get('to')}", x.get("when", []))
         for v in p.get("variants", []):
             rules(f"variant of {p['id']}", v.get("when", []))
+    for i in w.lights:
+        if isinstance(w.items[i]["light"], list):
+            rules(f"light of {i}", w.items[i]["light"])
     for t in [*w.places.values(), *w.items.values(), *w.chars.values()]:
         for d in t.get("details", []):
             rules(f"detail of {t['id']}", d.get("when", []))
@@ -277,7 +292,7 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
         if not a.get("triggers"):
             err("action.no_trigger", f"{where}: no trigger")
         for t in a.get("triggers", []):
-            if canonical_verb(t.get("verb", "")) != t.get("verb"):
+            if w.lang.canonical_verb(t.get("verb", "")) != t.get("verb"):
                 err("trigger.verb", f"{where}: verb {t.get('verb')} is not a canonical verb")
             elif t["verb"] in NEVER_SCRIPTED:
                 err(
@@ -299,15 +314,35 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
             err("action.place", f"{where}: place {a['place']} is not a place id")
         rules(where, a.get("when", []))
         check_effects(where, a.get("effects", []))
+    for t in [*w.items.values(), *w.places.values()]:
+        after = t.get("after")
+        if after is None:
+            continue
+        allowed = {"enter"} if t["id"] in w.places else {"take", "open"}
+        if not isinstance(after, dict) or set(after) - allowed:
+            err("after.kind", f"{t['id']}: after is {{{', '.join(sorted(allowed))}: {{when, effects, text}}}}")
+            continue
+        for k, r in after.items():
+            rules(f"{t['id']} after {k}", r.get("when", []))
+            check_effects(f"{t['id']} after {k}", r.get("effects", []))
+            if any(w.endings.get(e, {}).get("kind") == "lose" for e in args_of(r.get("effects"), "end")):
+                err("after.loses", f"{t['id']} after {k}: a reaction never loses (no warning comes before it)")
     for r in w.riddles:
         ans = w.thing(r)["answer"]
-        if not ans.get("question") or not [x for x in ans.get("accept") or [] if _stems(x)]:
+        if not ans.get("question") or not [x for x in ans.get("accept") or [] if w.lang.stems(x)]:
             err("answer.missing", f"{r}: an answer needs a question and accepted answers (accept)")
         if r in w.items and not w.items[r].get("openable") and not ans.get("effects"):
             err("answer.on", f"{r}: a thing that asks a riddle opens (container, door) or has effects")
         for k in set(ans) - ANSWER_FIELDS:
             err("answer.field", f"{r}: answer.{k} is not one of {sorted(ANSWER_FIELDS)}")
         check_effects(f"{r} answer", ans.get("effects", []))
+    for x in [i for i, it in w.items.items() if it.get("code")] + w.riddles:
+        if x not in w.clue_of:
+            err(
+                "puzzle.clue_missing",
+                f"{x}: a code or a riddle needs its puzzle in `puzzles`, with clue_in (where "
+                "its answer is learnt: the drawing, the character who asks): the checker plays it once that is met",
+            )
     for z in graph.get("puzzles", []):  # the generator's puzzle dependency chart (Ron Gilbert's)
         where = f"puzzle « {z.get('goal', '')} »"
         solver = z.get("action") or ""
@@ -357,6 +392,13 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
     for wrong in disagreements(w) if report["complete"] else []:
         err("play.disagree", f"the game does not do what the checker counts on: {wrong}")
     if report.get("path"):
+        report["chart"] = chart = derive(w, report["path"])
+        if chart["width"] == 1 and len(chart["puzzles"]) >= 5:
+            warn(
+                "chart.corridor",
+                f"the {len(chart['puzzles'])} puzzles of the shortest win form one corridor (each "
+                "needs the one before): give the player two puzzles to work on at once somewhere",
+            )
         steps = useful_steps(w, report["path"])
         report["shortest"] = len(steps)  # the things picked up on the way that serve nothing don't count
         codes = {w.buttons[i] for k, i in steps if k == "press"}  # a code is one puzzle, whatever its length
@@ -373,12 +415,44 @@ def _semantics(graph: dict, profile: dict | None, err, warn) -> dict:
                 "profile.puzzles",
                 f"{w.difficulty}: the shortest win must solve {lo} to {hi} puzzles (got {report['puzzles']})",
             )
+    for a in w.actions:  # a clue by design (« flag:jamais »), or a typo that made a step a clue?
+        for f in sorted(args_of(a.get("when"), "flag") - w.settable):
+            if a.get("effects") and (near := difflib.get_close_matches(f, sorted(w.settable), n=1, cutoff=0.75)):
+                warn("flag.typo", f"action {a['id']} needs flag {f}, which nothing sets: did you mean {near[0]}?")
     dead = [a["id"] for a in w.actions if not w.red_herring(a) and a["id"] not in report["fired"]]
     for a in dead if report["complete"] else []:
         warn("action.dead", f"action {a} can never happen")
     for text in _prose(w):
         warn("text.lies", text)
+    for who, said in _persona_clues(w):
+        warn("persona.clue", f"the persona of {who} says {said}: the narrator plays it at every turn, a clue "
+             "the puzzles don't give (keep the voice, the manners, the mood)")  # fmt: skip
     return report
+
+
+def _persona_clues(w: World) -> list[tuple[str, str]]:
+    """A persona that tells an answer or names a thing a puzzle needs which the character's own lines
+    never name: the narrator would give it away while improvising."""
+    stems = w.lang.stems
+    answers = {a: stems(a) for r in w.riddles for a in w.thing(r)["answer"].get("accept", []) if isinstance(a, str)}
+    needs = {x for z in w.g.get("puzzles", []) if isinstance(z, dict) for x in z.get("needs") or [] if x in w.items}
+    public = stems(" ".join(str(w.g.get(k) or "") for k in ("title", "intro", "goal")))
+    out = []
+    for c, ch in w.chars.items():
+        persona = ch.get("persona")
+        if not isinstance(persona, str) or not persona:
+            continue
+        words = stems(persona)
+        lines = {k: v for k, v in ch.items() if k not in ("persona", "answer")}  # what they say, not the answer
+        own = stems(" ".join(_texts({**lines, "question": (ch.get("answer") or {}).get("question", "")})))
+        said = [f"« {a} »" for a, s in answers.items() if s and s <= words and not s <= own]
+        for x in sorted(needs - {c}):  # not the story's own subject (the title, the intro, the goal)
+            labels = [s for label in w.names.labels(x) if (s := stems(label))]
+            if any(s <= words for s in labels) and not any(s <= own or s <= public for s in labels):
+                said.append(w.name(x))
+        if said:
+            out.append((c, ", ".join(said)))
+    return out
 
 
 def _prose(w: World) -> list[str]:
@@ -391,19 +465,25 @@ def _prose(w: World) -> list[str]:
         if p.get("variants"):  # version 1: whole descriptions replaced when things change
             continue
         lasting = [p.get("description", "")] + [d.get("text", "") for d in p.get("details", []) if not d.get("when")]
-        words = _stems(" ".join(lasting))
+        words = w.lang.stems(" ".join(lasting))
         for c in sorted(movers & set(w.chars)):
             if any(
-                _stems(x) and _stems(x) <= words for x in (w.chars[c].get("name", ""), *w.chars[c].get("aliases", []))
+                w.lang.stems(x) and w.lang.stems(x) <= words
+                for x in (w.chars[c].get("name", ""), *w.chars[c].get("aliases", []))
             ):
                 out.append(f"place {p['id']}: its description names {c}, who moves: say it in {c}'s initial")
         locks = [i for i, it in w.items.items() if it.get("locked")]
-        told = [d for d in p.get("details", []) if d.get("when") and LOCKED_WORDS.search(d.get("text", ""))]
-        unguarded = [t for t in lasting + [d.get("else", "") for d in p.get("details", [])] if LOCKED_WORDS.search(t)]
+        told = [d for d in p.get("details", []) if d.get("when") and _locked(w, d.get("text", ""))]
+        unguarded = [t for t in lasting + [d.get("else", "") for d in p.get("details", [])] if _locked(w, t)]
         if locks and (unguarded or any(not args_of(d["when"], "has", negated=True) for d in told)):
             out.append(f"place {p['id']}: a text says « fermé à clé » even when the hero holds the key: "
                            "put it in a detail with when [!open:X, !has:KEY]")  # fmt: skip
     return out
+
+
+def _locked(w: World, text: str) -> bool:
+    """Does a text say « locked » (in the world's language)?"""
+    return bool(w.lang.locked_words and w.lang.locked_words.search(text))
 
 
 def _texts(node) -> list[str]:
@@ -420,8 +500,8 @@ def _mentions(w: World, ident: str, needs: list[str]) -> bool:
     """Does something the thing or place says or shows name one of the things needed (a clue)?"""
     if not needs:
         return True
-    words = _stems(" ".join(_texts(w.thing(ident) or w.places.get(ident, {}))))
-    return any(_stems(label) and _stems(label) <= words for x in needs for label in w._labels(x))
+    words = w.lang.stems(" ".join(_texts(w.thing(ident) or w.places.get(ident, {}))))
+    return any(w.lang.stems(label) and w.lang.stems(label) <= words for x in needs for label in w._labels(x))
 
 
 def _why_not(w: World, ending: str, report: dict) -> str:

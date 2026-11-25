@@ -55,7 +55,11 @@
     "câbles",
     "manettes",
     "écran radar"
-   ]
+   ],
+   "senses": {
+    "listen": "Bip… bip… les petits boutons chantent, et la radio grésille : « Ici la Terre… on vous attend ! »",
+    "smell": "Ça sent le métal tout neuf et le caoutchouc des combinaisons."
+   }
   },
   {
    "id": "echelle",
@@ -146,7 +150,10 @@
     "petits cratères",
     "étoiles",
     "la Terre"
-   ]
+   ],
+   "senses": {
+    "listen": "Chut… Pas un bruit ! Sur la Lune, il n'y a pas d'air pour porter les sons. Tu n'entends que ton souffle dans le casque."
+   }
   },
   {
    "id": "antenne_coin",
@@ -265,7 +272,7 @@
      "when": [
       "!flag:pierre_prise"
      ],
-     "text": "Tout au fond, quelque chose scintille."
+     "text": "Tout au fond, il fait tout noir… et pourtant, quelque chose y scintille par moments."
     }
    ],
    "decor": [
@@ -283,7 +290,7 @@
     "fond",
     "trou"
    ],
-   "description": "Au fond du cratère, des cailloux gris partout, et une fente étroite.",
+   "description": "Au fond du cratère, à la lumière de ta lampe, des cailloux gris partout, et une fente étroite.",
    "exits": [
     {
      "to": "bord",
@@ -305,7 +312,12 @@
     "poussière",
     "câble de Bip",
     "étoiles"
-   ]
+   ],
+   "dark": "Tout est noir au fond du cratère : le soleil n'arrive jamais jusqu'ici ! Crr… crr… la poussière crisse sous tes bottes, et le câble de Bip se balance au-dessus de toi.",
+   "senses": {
+    "listen": "Rien… pas un bruit : sur la Lune, il n'y a pas d'air pour porter les sons. Juste ton souffle dans le casque, fff… fff…",
+    "touch": "Des cailloux tout froids, plus froids qu'un glaçon, et une paroi rugueuse avec une fente étroite."
+   }
   }
  ],
  "items": [
@@ -318,7 +330,7 @@
     "casque d'astronaute"
    ],
    "at": "cabine",
-   "description": "Un grand casque tout rond, avec une vitre dorée pour se protéger du soleil.",
+   "description": "Un grand casque tout rond, avec une vitre dorée pour se protéger du soleil, et une petite lampe sur le côté. Elle marche avec la batterie de rechange, quand elle est chargée.",
    "kind": "thing",
    "initial": "Un casque de scaphandre est accroché au mur.",
    "states": [
@@ -330,6 +342,11 @@
      "name": "ton casque de scaphandre",
      "description": "Le grand casque tout rond est sur ta tête, bien fermé : pschhh, l'air arrive."
     }
+   ],
+   "light": [
+    "is:casque:sur_la_tete",
+    "has:batterie",
+    "charged:batterie"
    ]
   },
   {
@@ -341,9 +358,13 @@
     "batterie de rechange"
    ],
    "at": "cabine",
-   "description": "Une grosse batterie, bien chargée. Il n'y en a qu'une : la caméra en a besoin, et Bip aussi !",
+   "description": "Une grosse batterie. Il n'y en a qu'une : la caméra en a besoin, et Bip aussi ! Heureusement, sur la Lune, le soleil brille fort…",
    "kind": "thing",
-   "initial": "Au mur, une batterie de rechange attend sur son crochet."
+   "initial": "Au mur, une batterie de rechange attend sur son crochet.",
+   "uses": 1,
+   "texts": {
+    "empty": "La batterie clignote : vide ! Il lui faudrait du soleil…"
+   }
   },
   {
    "id": "gros_bouton_rouge",
@@ -643,6 +664,25 @@
    "description": "Ton drapeau, bien planté dans la poussière de Lune, tout fier.",
    "kind": "scenery",
    "sturdy": "Ton beau drapeau ? Laisse-le flotter devant la caméra !"
+  },
+  {
+   "id": "panneau_solaire",
+   "name": "le panneau solaire",
+   "aliases": [
+    "panneau",
+    "panneau solaire",
+    "panneaux solaires",
+    "chargeur"
+   ],
+   "at": "plaine",
+   "description": "Un grand panneau tout bleu, posé au soleil. Il boit la lumière et la transforme en électricité ! Dessus, une prise pour brancher une batterie.",
+   "kind": "scenery",
+   "fixed": "Il doit rester au soleil, bien à plat !",
+   "sturdy": "Un panneau solaire, c'est précieux : sans lui, pas d'électricité !",
+   "initial": "Un panneau solaire tout bleu brille au soleil.",
+   "senses": {
+    "touch": "Il est tout tiède : il boit le soleil !"
+   }
   }
  ],
  "characters": [
@@ -657,6 +697,7 @@
    ],
    "at": "cabine",
    "description": "Une astronaute aux yeux rieurs, dans une combinaison blanche toute neuve.",
+   "persona": "Parle avec entrain et précision, comme à la radio, avec des « bien reçu ! » et des « à vos ordres, astronaute ! ». Rieuse mais très prudente, elle adore la Lune et tient beaucoup aux règles de sécurité. Elle traite le héros comme son coéquipier et s'émerveille avec lui de tout ce qu'ils découvrent.",
    "says": [
     {
      "when": [
@@ -665,7 +706,7 @@
      "text": "C'est… une pierre de Lune bleue ? Montre-la-moi vite, que je la range dans une boîte spéciale !"
     },
     {
-     "text": "Bienvenue sur la Lune ! Sur Terre, tout le monde attend devant la télé : il faut que notre antenne soit dépliée et son câble réparé, avec du ruban, une batterie dans la caméra, et un beau drapeau planté devant ! Attention, on n'a qu'une batterie de rechange, et Bip la réclame pour son treuil… Les savants rêvent aussi d'une pierre bleue, au fond du cratère. Deux règles d'astronaute : ne touche jamais au gros bouton rouge, c'est l'alarme qui nous renvoie sur Terre ! Et ici, on est six fois plus léger : jamais de grand saut du haut du rocher ! Ah, et on ne sort pas sans son casque."
+     "text": "Bienvenue sur la Lune ! Sur Terre, tout le monde attend devant la télé : il faut que notre antenne soit dépliée et son câble réparé, avec du ruban, une batterie dans la caméra, et un beau drapeau planté devant ! Attention, on n'a qu'une batterie de rechange, et Bip la réclame pour son treuil… Si elle se vide, le soleil de la Lune sait la remplir ! Les savants rêvent aussi d'une pierre bleue, au fond du cratère. Deux règles d'astronaute : ne touche jamais au gros bouton rouge, c'est l'alarme qui nous renvoie sur Terre ! Et ici, on est six fois plus léger : jamais de grand saut du haut du rocher ! Ah, et on ne sort pas sans son casque : il a même une petite lampe, qui marche avec la batterie, pour les coins tout noirs."
     }
    ],
    "initial": "La capitaine Lou regarde par le hublot."
@@ -681,6 +722,7 @@
    ],
    "at": "echelle",
    "description": "Un petit robot à six roues, avec deux gros yeux ronds et une antenne qui tourne.",
+   "persona": "Parle d'une voix de petit robot, en commençant et finissant par « bip bip ! », avec son antenne qui tourne quand il réfléchit. Serviable et un peu maladroit, il adore rouler et aider, et a peur de rester coincé. Il suit le héros comme un petit chien fidèle et fait des « bip ! » de joie à chaque réussite.",
    "says": "Bip bip ! Je suis Bip, le rover de la Libellule ! Avec une batterie bien pleine, mon treuil peut te descendre au fond du cratère… et te remonter ! Et j'ai perdu mon rouleau de ruban en roulant près du gros rocher. Bip !",
    "states": [
     {
@@ -767,14 +809,14 @@
     "is:bip:libre"
    ],
    "effects": [
-    "lose:batterie",
+    "spend:batterie",
     "flag:treuil",
     "set:bip:treuil",
     "move:bip:bord"
    ],
    "points": 10,
    "not_yet": "Bip a les roues coincées dans la poussière : il faut d'abord le dégager !",
-   "text": "Bip avale la batterie, cronch ! Ses yeux s'allument : « Bip bip, batterie pleine ! » Il file vers le cratère en déroulant le câble de son treuil.",
+   "text": "Bip branche son câble sur la batterie, glou glou glou ! Ses yeux s'allument : « Bip bip, batterie pleine ! » Il te rend la batterie et file vers le cratère en déroulant le câble de son treuil.",
    "triggers": [
     {
      "verb": "give",
@@ -785,16 +827,45 @@
    "hint": "Bip a dit qu'avec une batterie pleine, son treuil pourrait te descendre au fond du cratère."
   },
   {
+   "id": "recharger_batterie",
+   "when": [
+    "has:batterie"
+   ],
+   "effects": [
+    "refill:batterie"
+   ],
+   "points": 5,
+   "repeatable": true,
+   "text": "Tu branches la batterie sur le panneau solaire. Le soleil la remplit, bzzz… Ding ! La batterie est pleine.",
+   "triggers": [
+    {
+     "verb": "use",
+     "object": "batterie",
+     "target": "panneau_solaire"
+    },
+    {
+     "verb": "fill",
+     "object": "batterie",
+     "target": "panneau_solaire"
+    }
+   ],
+   "hint": "Une batterie vide ? Ici, le soleil brille fort… et le panneau solaire de la plaine boit sa lumière !"
+  },
+  {
    "id": "fouiller_poussiere",
    "effects": [
     "reveal:ruban",
     "flag:ruban_trouve"
    ],
    "points": 5,
-   "text": "Tu creuses dans la poussière, pfff, pfff… et tu trouves un gros rouleau de ruban adhésif !",
+   "text": "Tu glisses tes gants dans la poussière toute douce, pfff, pfff… tiens, quelque chose de dur et rond ! Un gros rouleau de ruban adhésif !",
    "triggers": [
     {
      "verb": "search",
+     "object": "poussiere"
+    },
+    {
+     "verb": "touch",
      "object": "poussiere"
     }
    ],
@@ -920,6 +991,7 @@
     "is:camera:sans_batterie"
    ],
    "effects": [
+    "spend:batterie",
     "lose:batterie",
     "set:camera:prete"
    ],
@@ -1207,6 +1279,15 @@
     "bip"
    ],
    "clue_in": "bip"
+  },
+  {
+   "goal": "Recharger la batterie au soleil",
+   "action": "recharger_batterie",
+   "needs": [
+    "batterie",
+    "panneau_solaire"
+   ],
+   "clue_in": "batterie"
   },
   {
    "goal": "Dégager les roues de Bip",

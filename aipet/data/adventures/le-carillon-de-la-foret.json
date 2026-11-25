@@ -82,7 +82,10 @@
      "label": "vers la clairière",
      "dir": "ouest"
     }
-   ]
+   ],
+   "senses": {
+    "smell": "Mmm, ça sent la pomme bien sucrée."
+   }
   },
   {
    "id": "terrier",
@@ -132,7 +135,10 @@
      "label": "vers le vieux pont",
      "dir": "nord"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Chhhhh… la rivière court sur les galets. Et plouf ! Un ricochet de Zouzou."
+   }
   },
   {
    "id": "pont",
@@ -163,7 +169,10 @@
      ],
      "blocked": "Grognon le blaireau te barre le passage : « Personne ne passe ! »"
     }
-   ]
+   ],
+   "senses": {
+    "listen": "Crrriii… crrriii… les vieilles planches grincent sous tes pieds."
+   }
   },
   {
    "id": "grotte",
@@ -172,19 +181,16 @@
     "grotte",
     "caverne"
    ],
-   "description": "Une grotte fraîche où l'on entend des gouttes qui font plic, ploc.",
+   "description": "Une grotte fraîche, avec des cristaux qui brillent partout sur les murs, comme des étoiles.",
    "details": [
     {
      "when": [
-      "has:lanterne",
-      "is:lanterne:allumee"
+      "!flag:ding"
      ],
-     "text": "La lanterne éclaire la grotte : des cristaux brillent partout sur les murs.",
-     "else": "Il fait tout noir : tu ne vois même pas le bout de ton nez."
+     "text": "L'écureuil a vu quelque chose rouler par ici… mais au milieu de tous ces cristaux qui brillent, impossible de le reconnaître ! Lequel fait « ding » ?"
     }
    ],
    "decor": [
-    "cristaux",
     "gouttes",
     "flaques",
     "chauve-souris"
@@ -195,7 +201,13 @@
      "label": "vers le pont",
      "dir": "sud"
     }
-   ]
+   ],
+   "dark": "Il fait tout noir : tu ne vois même pas le bout de ton nez ! Plic… ploc… des gouttes tombent. Et de temps en temps, tout au fond : « ding ! »",
+   "senses": {
+    "listen": "Plic… ploc… les gouttes tombent. Et parfois, quand une goutte tombe sur quelque chose de dur : « ding ! »",
+    "smell": "Ça sent la pierre mouillée et la mousse.",
+    "touch": "Les murs sont froids et pleins de petites bosses pointues."
+   }
   }
  ],
  "items": [
@@ -212,7 +224,10 @@
    "at": "clairiere",
    "fixed": "Il est accroché bien trop haut, et il est énorme !",
    "sturdy": "Le carillon est en bronze, bien trop solide… et toute la forêt en a besoin ce soir !",
-   "description": "Un grand carillon de bronze. Il lui manque son battant, la petite boule qui tape pour faire ding-dong."
+   "description": "Un grand carillon de bronze. Il lui manque son battant, la petite boule qui tape pour faire ding-dong.",
+   "senses": {
+    "touch": "Le bronze est tout froid… et tout muet, sans son battant."
+   }
   },
   {
    "id": "pommier",
@@ -255,7 +270,10 @@
    ],
    "at": "verger",
    "initial": "Au pied d'un arbre pousse un drôle de champignon bleu qui sent bizarre. Bambou le répète toujours : on ne mange jamais les champignons de la forêt !",
-   "description": "Un champignon bleu à pois blancs. Il sent bizarre… Bambou dit toujours qu'il ne faut pas manger les champignons de la forêt."
+   "description": "Un champignon bleu à pois blancs. Il sent bizarre… Bambou dit toujours qu'il ne faut pas manger les champignons de la forêt.",
+   "senses": {
+    "smell": "Pouah ! Il sent le vieux chausson. Bambou a raison : on ne le mange pas !"
+   }
   },
   {
    "id": "lanterne",
@@ -279,6 +297,9 @@
      ],
      "description": "La lanterne brille d'une jolie lumière dorée."
     }
+   ],
+   "light": [
+    "is:lanterne:allumee"
    ]
   },
   {
@@ -306,6 +327,22 @@
    ],
    "at": "",
    "description": "Une pierre noire : quand on la frotte, elle fait des étincelles !"
+  },
+  {
+   "id": "cristaux",
+   "kind": "scenery",
+   "name": "les cristaux",
+   "aliases": [
+    "cristaux",
+    "cristal",
+    "murs",
+    "mur",
+    "boules brillantes"
+   ],
+   "at": "grotte",
+   "fixed": "Ils sont bien accrochés à la roche !",
+   "sturdy": "Les cristaux sont durs comme du verre… et si jolis : on les laisse briller !",
+   "description": "Des centaines de cristaux qui brillent comme des étoiles. L'un d'eux est peut-être un peu différent… Pour le savoir, il faudrait les écouter."
   },
   {
    "id": "battant",
@@ -354,6 +391,7 @@
    ],
    "at": "clairiere",
    "description": "Un vieux hibou sage, avec de grosses lunettes rondes.",
+   "persona": "Parle lentement, d'une voix sage, en commençant par « hou hou… » et en remontant ses grosses lunettes rondes. Doux et un peu triste, il aime son carillon et la fête de la lune. Il parle au héros comme un vieux grand-père confiant, et s'illumine dès qu'il y a une bonne nouvelle.",
    "initial": "Bambou le hibou regarde son carillon d'un air triste.",
    "says": [
     {
@@ -363,7 +401,7 @@
      "text": "Hou hou ! Le battant ! Vite, raccrochons-le au carillon !"
     },
     {
-     "text": "Hou hou… Le battant de mon carillon s'est décroché, et l'écureuil l'a vu rouler jusque dans la grotte, de l'autre côté du vieux pont. Mais là-bas, il fait tout noir !"
+     "text": "Hou hou… Le battant de mon carillon s'est décroché, et l'écureuil l'a vu rouler jusque dans la grotte, de l'autre côté du vieux pont. Mais là-bas, il fait tout noir ! Et attention : mon battant brille comme un cristal… mais lui, quand on le touche, il fait « ding » !"
     }
    ]
   },
@@ -376,6 +414,7 @@
    ],
    "at": "terrier",
    "description": "Une petite taupe toute ronde, avec un nez rose.",
+   "persona": "Parle d'une petite voix ronde, en reniflant de son nez rose, avec un ventre qui gargouille « grrrou ». Gentille et gourmande, elle adore les belles pommes rouges et est un peu timide. Elle se méfie d'abord du héros, puis devient serviable et toute contente.",
    "initial": "Taupinette la taupe est assise près de sa petite lanterne éteinte, le ventre qui gargouille.",
    "says": "Moi, je ferais n'importe quoi pour une belle pomme rouge… même prêter ma lanterne !",
    "states": [
@@ -398,6 +437,7 @@
    ],
    "at": "riviere",
    "description": "Une loutre rigolote qui fait des ricochets.",
+   "persona": "Parle en riant, avec des « plouf ! » et des « tu savais ? », en lançant des ricochets entre deux phrases. Rigolote et savante de la rivière, elle aime les galets et les jeux d'eau. Elle traite le héros comme un copain et le met gentiment en garde contre le courant.",
    "initial": "Zouzou la loutre fait des ricochets.",
    "says": "Tu savais ? Sous les gros galets, il y a des pierres qui font des étincelles ! Mais ne nage surtout pas ici, le courant est bien trop fort."
   },
@@ -411,6 +451,7 @@
    ],
    "at": "pont",
    "description": "Un blaireau ronchon aux sourcils broussailleux.",
+   "persona": "Parle d'une grosse voix bougonne, en croisant les bras et en finissant ses phrases par « grrr ! ». Ronchon pour de faux, il adore les devinettes et être le gardien du pont. Il fait le dur avec le héros, mais il a bon cœur et finit par rire dans sa barbe.",
    "initial": "Grognon le blaireau est planté au milieu, les bras croisés.",
    "says": "C'est moi qui garde ce pont ! Personne ne passe… sauf qui devine ma devinette. Grrr !",
    "states": [
@@ -540,33 +581,33 @@
    "hint": "Grognon ne laisse passer que ceux qui devinent sa devinette : parle-lui pour l'entendre."
   },
   {
-   "id": "eclairer_grotte",
+   "id": "ecouter_cristaux",
    "triggers": [
     {
-     "verb": "use",
-     "object": "lanterne"
+     "verb": "listen",
+     "object": "cristaux"
     },
     {
-     "verb": "light",
-     "object": "grotte"
+     "verb": "hit",
+     "object": "cristaux"
+    },
+    {
+     "verb": "touch",
+     "object": "cristaux"
     },
     {
      "verb": "search",
-     "object": "grotte"
+     "object": "cristaux"
     }
    ],
    "place": "grotte",
-   "when": [
-    "has:lanterne",
-    "is:lanterne:allumee"
-   ],
    "effects": [
+    "flag:ding",
     "reveal:battant"
    ],
    "points": 10,
-   "not_yet": "Il fait tout noir : tu ne vois même pas le bout de ton nez ! Il te faudrait une lumière.",
-   "text": "Tu lèves la lanterne et tu regardes partout : des cristaux s'allument sur les murs… et là, par terre, une boule de bronze qui brille !",
-   "hint": "Avec ta lanterne allumée, regarde bien partout dans la grotte."
+   "text": "Tu tapotes les cristaux un par un, l'oreille tendue : tic… tic… toc… DING ! Celui-là chante ! Ce n'est pas un cristal : c'est le battant du carillon !",
+   "hint": "Bambou l'a dit : son battant fait « ding » quand on le touche. Tapote les cristaux et écoute bien !"
   },
   {
    "id": "reparer_carillon",
@@ -733,11 +774,11 @@
    "clue_in": "carillon"
   },
   {
-   "goal": "Trouver le battant dans la grotte noire",
-   "action": "eclairer_grotte",
+   "goal": "Trouver le battant parmi les cristaux de la grotte, à l'oreille",
+   "action": "ecouter_cristaux",
    "needs": [
     "lanterne",
-    "grotte"
+    "cristaux"
    ],
    "clue_in": "bambou"
   },
@@ -750,7 +791,7 @@
    "clue_in": "grognon"
   },
   {
-   "goal": "Allumer la lanterne",
+   "goal": "Allumer la lanterne pour voir dans la grotte noire",
    "action": "allumer_lanterne",
    "needs": [
     "silex",

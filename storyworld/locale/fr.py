@@ -1,4 +1,4 @@
-"""French: the words children say for each verb, how names are normalized, and the notes the engine
+"""French: the words players say for each verb, how names are normalized, and the notes the engine
 joins to its answers for a French-speaking narrator. Another language provides the same names."""
 
 from __future__ import annotations
@@ -11,13 +11,14 @@ from storyworld.locale import Language, cap
 
 def normalize_text(s: str) -> str:
     """Lower case, without accents."""
-    s = unicodedata.normalize("NFKD", (s or "").lower())
+    s = (s or "").lower().replace("œ", "oe").replace("æ", "ae")  # œuf, cœur: not decomposed by NFKD
+    s = unicodedata.normalize("NFKD", s)
     return "".join(c for c in s if not unicodedata.combining(c))
 
 
 # ---- verbs --------------------------------------------------------------------------------------
 # Canonical verbs (what the narrator sends and the generator writes) and the French words for them:
-# a safety net, the narrator already maps the child's words.
+# a safety net, the narrator already maps the player's words.
 VERBS: dict[str, list[str]] = {
     "go": [
         "va",
@@ -73,6 +74,7 @@ VERBS: dict[str, list[str]] = {
     "close": ["fermer"],
     "talk": ["parler", "dire", "discuter", "appeler", "saluer", "reveiller"],
     "answer": ["repondre", "reponds", "repond", "deviner", "devine"],
+    "improvise": ["improviser"],
     "ask": ["demander"],
     "eat": ["manger", "croquer", "gouter"],
     "drink": ["boire", "bois", "boit"],
@@ -86,7 +88,7 @@ VERBS: dict[str, list[str]] = {
     "read": ["lire", "lis", "dechiffrer"],
     "hit": ["tape", "frapper", "taper", "attaquer", "combattre", "assommer"],
     # Making a thing gone for good (« effacer le dessin », « jeter la clé à la mer »): allowed when it is
-    # plausible; if the adventure can't be won any more, it ends when the child runs into it.
+    # plausible; if the adventure can't be won any more, it ends when the player runs into it.
     "destroy": [
         "effacer",
         "efface",
@@ -102,19 +104,19 @@ VERBS: dict[str, list[str]] = {
     ],
     "where": ["ou est", "ou sont", "ou se trouve", "ou il est", "ou elle est"],
     "smell": ["sentir", "renifler"],
-    "touch": ["toucher", "caresser", "chatouiller", "gratouiller", "calin"],
+    "touch": ["toucher", "caresser", "chatouiller", "gratouiller", "calin", "tater", "palper"],
     "listen": ["ecouter"],
     "wait": ["attendre"],
     "sit": ["s'asseoir", "asseoir"],
     "sing": ["chanter"],
     "dance": ["danser"],
     "throw": ["lancer", "jeter", "jette", "jettes"],
-    "fill": ["remplir", "verser"],
+    "fill": ["remplir", "verser", "recharger"],
     "help": ["aide", "indice"],
     "other": [],
 }
 
-# What the engine cannot know is left to the narrator (a language model): it understands the child.
+# What the engine cannot know is left to the narrator (a language model): it understands the player.
 WARNING = "Attention, ça risque de très mal finir pour ta mission… Tu es sûr de vouloir le faire ?"
 TRUTH_NOTE = (
     "« à_savoir » est vrai dans l'aventure : glisse-le dans ton récit, avec tes mots (« On dirait bien qu'elle "
@@ -133,8 +135,28 @@ ABSENT_NOTE = (
     "ce qu'il veut dire. Le « décor » du lieu donne des idées, tu peux en imaginer d'autres."
 )
 DESTROY_NOTE = (
-    "C'est fait, pour de bon : raconte-le. Si ça empêche de finir la mission, l'enfant s'en rendra compte plus tard "
+    "C'est fait, pour de bon : raconte-le. Si ça empêche de finir la mission, le joueur s'en rendra compte plus tard "
     "(ne le dis pas maintenant)."
+)
+THINK_TWICE_NOTE = (
+    "Ce geste rendrait la mission impossible : ne le dis surtout pas comme ça. Fais-le sentir dans l'histoire, "
+    "avec subtilité, comme un maître du jeu : « témoin » réagit (il ouvre de grands yeux, il retient son souffle), "
+    "ou la chose semble précieuse (elle brille, elle a l'air de servir à quelque chose), ou le héros hésite une "
+    "seconde… puis demande-lui, toujours dans l'histoire, s'il le fait quand même. S'il insiste, renvoie la même "
+    "action : elle aura lieu."
+)
+IMPROVISE_NOTE = (
+    "Son idée marche : c'est ta trouvaille de maître du jeu. Raconte-la avec SES mots et SON idée (pas le "
+    "texte prévu tel quel), en gardant ce qui change (« changes ») : c'est vrai maintenant."
+)
+IMPROVISE_NO_NOTE = (
+    "Cette idée ne fait pas avancer l'aventure pour l'instant (aucune étape prête ne lui correspond, ou elle ne "
+    "nomme pas ce qu'il faut) : joue-la comme un moment libre, sans que ça change le jeu."
+)
+DARK_NOTE = (
+    "Il fait noir ici : le héros ne voit rien, mais il sent les passages sous ses mains. Ne raconte que ce qu'il "
+    "entend, sent ou touche (« sens »), jamais un objet ni un personnage (aucun n'est à portée) : il lui faut de "
+    "la lumière pour voir."
 )
 
 BAG = {"sac", "sac a dos", "poche", "poches", "cartable", "besace", "mon sac", "ma poche"}  # the hero's bag
@@ -252,10 +274,24 @@ KEYS = {
     "hint_given": "indice",
     "ideas": "idees",
     "bag": "sac",
+    "in_the_dark": "dans_le_noir",
+    "senses": "sens",
+    "uses_left": "utilisations_restantes",
+    "precious": "précieux",
+    "witness": "témoin",
+    "gm_screen": "écran_mj",
+    "then": "ensuite",
+    "step": "étape",
+    "goal": "but",
+    "with": "avec",
+    "progress": "progression",
+    "solved": "résolues",
+    "of": "sur",
+    "act": "acte",
 }
 
 
-# The engine's messages: its English source text (the message id) → the French said to the child or
+# The engine's messages: its English source text (the message id) → the French said to the player or
 # the narrator. Same named placeholders; `{of_place}` is already « du phare », `{Name}` capitalized.
 MESSAGES: dict[str, str] = {
     # what changed (effects)
@@ -266,6 +302,16 @@ MESSAGES: dict[str, str] = {
     "follows you: {who}": "te suit : {who}",
     "inside: {thing}": "dedans : {thing}",
     "gone: {thing}": "disparu : {thing}",
+    "{thing}: {n} left": "{thing} : encore {n} fois",
+    "empty: {thing}": "vide : {thing}",
+    "full again: {thing}": "de nouveau plein : {thing}",
+    "{Name} is empty.": "{Name} est vide.",
+    "{thing} ({n} uses left)": "{thing} (encore {n} fois)",
+    "It's too dark to see that: you'd need some light.": "Il fait trop noir pour voir ça : il te faudrait de la lumière.",
+    "It's dark here.": "Il fait tout noir ici.",
+    "beginning": "début",
+    "middle": "milieu",
+    "finale": "finale",
     # what is around
     "{thing} (in your bag)": "{thing} (dans ton sac)",
     "{who} holds {thing}": "{who} tient {thing}",
@@ -275,7 +321,7 @@ MESSAGES: dict[str, str] = {
     "{about}: {note}": "{about} : {note}",
     "nothing": "rien",
     "closed": "fermé",
-    # questions back to the child
+    # questions back to the player
     "with what / on what?": "avec quoi / sur quoi ?",
     "which one?": "lequel ?",
     "on what / to whom?": "sur quoi / à qui ?",
@@ -410,6 +456,18 @@ FRENCH = Language(
     free_note=FREE_NOTE,
     absent_note=ABSENT_NOTE,
     destroy_note=DESTROY_NOTE,
+    dark_note=DARK_NOTE,
+    think_twice_note=THINK_TWICE_NOTE,
+    improvise_note=IMPROVISE_NOTE,
+    improvise_no_note=IMPROVISE_NO_NOTE,
+    norm=_norm,
+    norm_keep=_norm_keep,
+    stems=_stems,
+    way=_way,
+    canonical_verb=canonical_verb,
+    bag=frozenset(BAG),
+    leave_words=frozenset({"sortir", "dehors", "partir"}),
+    locked_words=LOCKED_WORDS,
     of=of,
     bare=bare,
     plural=plural,
